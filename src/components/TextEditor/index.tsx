@@ -18,12 +18,6 @@ export default ({ labelChip, fullWidth, height, placeholder, value, onChange, la
                 init={{
                     height,
                     placeholder,
-                    // content_css: "style.css",
-                    // setup: (editor) => {
-                    //     var newColor = document.createElement("style");
-                    //     document.head.appendChild(newColor);
-                    //     newColor.sheet.insertRule("#editor_ifr {background: blue}");
-                    // },
                     menubar: false,
                     statusbar: false,
                     toolbar: false,
