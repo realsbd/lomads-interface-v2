@@ -7,7 +7,7 @@ import IconButton from 'components/IconButton';
 import TextInput from 'components/TextInput';
 import Button from "components/Button";
 
-import CloseSVG from 'assets/svg/close-new.svg'
+import CloseSVG from 'assets/svg/closeNew.svg'
 import ProjectResourceSVG from 'assets/svg/projectResource.svg'
 import { AiOutlinePlus, AiFillQuestionCircle, AiOutlineLock } from "react-icons/ai";
 import { IoCloseOutline } from 'react-icons/io5';
@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme: any) => ({
 }));
 
 interface Props {
-    open?: boolean;
+    open: boolean;
     closeModal(): any;
 }
 

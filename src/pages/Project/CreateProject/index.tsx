@@ -12,9 +12,10 @@ import Switch from "components/Switch";
 import editToken from 'assets/svg/editToken.svg'
 import Checkbox from "components/Checkbox";
 import Avatar from "components/Avatar";
-import Resources from "modals/Project/Resources";
-import Milestones from "modals/Project/Milestones";
+import ResourcesModal from "modals/Project/ResourcesModal";
+import MilestonesModal from "modals/Project/MilestonesModal";
 import Dropdown from "components/Dropdown";
+import KraModal from "modals/Project/KraModal";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -84,10 +85,10 @@ export default () => {
     const [next, setNext] = useState<boolean>(false);
     const [toggle, setToggle] = useState<boolean>(false);
     const [selectType, setSelectType] = useState<string>('Invitation');
-    const [showMore, setShowMore] = useState<boolean>(!false);
+    const [showMore, setShowMore] = useState<boolean>(false);
 
     const [openResource, setOpenResource] = useState<boolean>(false);
-    const [openMilestone, setOpenMilestone] = useState<boolean>(!false);
+    const [openMilestone, setOpenMilestone] = useState<boolean>(false);
     const [openKRA, setOpenKRA] = useState<boolean>(false);
 
     const handleChange = (option: string) => {
@@ -323,20 +324,18 @@ export default () => {
     const _renderAddProjectDetails = () => {
         return (
             <Grid container className={classes.root}>
-                {
-                    openResource &&
-                    <Resources
-                        open={openResource}
-                        closeModal={() => setOpenResource(false)}
-                    />
-                }
-                {
-                    openMilestone &&
-                    <Milestones
-                        open={openMilestone}
-                        closeModal={() => setOpenMilestone(false)}
-                    />
-                }
+                <ResourcesModal
+                    open={openResource}
+                    closeModal={() => setOpenResource(false)}
+                />
+                <MilestonesModal
+                    open={openMilestone}
+                    closeModal={() => setOpenMilestone(false)}
+                />
+                <KraModal
+                    open={openKRA}
+                    closeModal={() => setOpenKRA(false)}
+                />
                 <Grid xs={12} item display="flex" flexDirection="column" alignItems="center" sx={{ margin: '10vh 0' }}>
                     <img src={createProjectSvg} alt="frame-icon" />
                     <Typography color="primary" variant="subtitle1" className={classes.heading}>Project details</Typography>
@@ -379,6 +378,7 @@ export default () => {
                             variant="contained"
                             color="secondary"
                             sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
+                            onClick={() => setOpenKRA(true)}
                         >
                             <AddIcon sx={{ fontSize: 18 }} /> ADD
                         </Button>

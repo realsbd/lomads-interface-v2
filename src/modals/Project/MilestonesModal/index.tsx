@@ -1,16 +1,14 @@
 import React, { useState } from "react";
 
-import { Grid, Paper, Typography, Box, Select, MenuItem, FormControl, Chip, Drawer } from "@mui/material";
+import { Paper, Typography, Box, Drawer } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import IconButton from 'components/IconButton';
 import TextInput from 'components/TextInput';
 import Button from "components/Button";
 
-import CloseSVG from 'assets/svg/close-new.svg'
+import CloseSVG from 'assets/svg/closeNew.svg'
 import MilestoneSVG from 'assets/svg/milestone.svg'
-import { AiOutlinePlus, AiFillQuestionCircle, AiOutlineLock } from "react-icons/ai";
-import { IoCloseOutline } from 'react-icons/io5';
 import CurrencyInput from "components/CurrencyInput";
 import Dropdown from "components/Dropdown";
 import TextEditor from "components/TextEditor";
@@ -81,7 +79,7 @@ const useStyles = makeStyles((theme: any) => ({
 }));
 
 interface Props {
-    open?: boolean;
+    open: boolean;
     closeModal(): any;
 }
 
