@@ -29,6 +29,12 @@ const SessionReducer = (state: any = getInitialState(), action: any) =>
         draft.web3AuthNetwork = payload.web3AuthNetwork;
         draft.chain = payload.chain;
         draft.selectedChainId = payload.selectedChainId;
+        break;
+      }
+      case actionTypes.LOGOUT_ACTION : {
+        draft.token= null;
+        draft.user=null;
+        break;
       }
     }
   });

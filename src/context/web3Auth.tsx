@@ -9,7 +9,7 @@ import Web3Token from 'web3-token';
 // import { NetworkSwitch } from "@web3auth/ui";
 import { createContext, FunctionComponent, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { CHAIN_CONFIG, CHAIN_CONFIG_TYPE } from "constants/chainConfig";
-import { WEB3AUTH_NETWORK } from "constants/chains"
+import { WEB3AUTH_NETWORK, WEB3AUTH_NETWORK_TYPE } from "constants/chains";
 import { MetamaskAdapter } from "@web3auth/metamask-adapter";
 import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 import { useAppSelector } from "helpers/useAppSelector";
@@ -23,6 +23,7 @@ const whiteLabel = {
 export const Web3AuthContext = createContext<any>({
   web3Auth: null,
   provider: null,
+  w3Provider: null,
   chainId: null,
   account: null,
   isLoading: false,
@@ -50,6 +51,7 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
   const { web3AuthNetwork = "", chain = ""} = useAppSelector(store => store.session) 
   const [web3Auth, setWeb3Auth] = useState<Web3AuthNoModal | null>(null);
   const [state, setState] = useState<any>({
+    w3Provider: null,
     provider: null,
     account: null
   })
@@ -67,7 +69,7 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
           const account = await signer.getAddress();
           const { chainId } = await provider.getNetwork()
           setState({
-            provider: provider, account: account, chainId
+            provider: provider, account: account, chainId, w3Provider: web3auth?.provider
           })
         }
       });
@@ -137,7 +139,7 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
           const account = await signer.getAddress();
           const { chainId } = await provider.getNetwork()
           setState({
-            provider: provider, account: account, chainId
+            provider: provider, account: account, chainId, w3Provider: web3AuthInstance?.provider
           })
         }
       } catch (error) {
@@ -151,6 +153,7 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
 
 
   const login = async (adapter: WALLET_ADAPTER_TYPE, loginProvider: LOGIN_PROVIDER_TYPE, login_hint?: string) => {
+
     try {
       console.log("web3Auth", web3Auth)
       setIsLoading(true);
@@ -167,7 +170,7 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
         const account = await signer.getAddress();
         const { chainId } = await provider.getNetwork()
         setState({
-          provider: provider, account: account, chainId
+          provider: provider, account: account, chainId, w3Provider: web3Auth?.provider
         })
         const token = await Web3Token.sign(async (msg: string) => await signer.signMessage(msg), '365d');
         return token;
@@ -175,6 +178,7 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
       return null
     } catch (error) {
       console.log("error", error);
+      // await logout()
       return null
     } finally {
       setIsLoading(false);
@@ -186,13 +190,14 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
       console.log("web3auth not initialized yet");
       return;
     }
-    await web3Auth.logout();
-    setState({ provider: null, account: null });
+    try { await web3Auth.logout() } catch (e) {}
+    setState({ provider: null, account: null, w3Provider: null});
   };
 
   const contextProvider = {
     web3Auth,
     provider: state?.provider,
+    w3Provider: state?.w3Provider,
     account: state?.account,
     chainId: state?.chainId,
     isLoading,

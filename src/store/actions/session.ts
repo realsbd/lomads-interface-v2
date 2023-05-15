@@ -27,3 +27,9 @@ export const setNetworkConfig = (payload: any) => {
         payload
     }
 }
+
+export const logoutAction = () => {
+    return {
+        type: actionTypes.LOGOUT_ACTION
+    }
+}
