@@ -8,10 +8,11 @@ import CHEERS from 'assets/svg/cheers.svg'
 import LOMADS_LOGO from 'assets/svg/lomadsfulllogo.svg'
 import METAMASK from 'assets/svg/metamask.svg'
 import GMAIL from 'assets/images/gmail.png'
+import APPLE from 'assets/images/apple.png'
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chains';
 import toast from 'react-hot-toast';
-import { createAccountAction, setTokenAction, setNetworkConfig } from 'store/actions/session';
+import { createAccountAction, setTokenAction, setNetworkConfig, logoutAction } from 'store/actions/session';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from "components/Button";
@@ -80,7 +81,7 @@ export default () => {
     const handleClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
 
-    const { provider, login, account, chainId } = useWeb3Auth();
+    const { provider, login, account, chainId, logout } = useWeb3Auth();
 
     console.log("provider", provider)
 
@@ -104,12 +105,14 @@ export default () => {
         setCurrentChain(chain)
     }, 1000)
 
-    const handleLogin = async (loginType = WALLET_ADAPTERS.METAMASK) => {
+    const handleLogin = async (loginType = WALLET_ADAPTERS.METAMASK, provider: undefined | string = undefined) => {
+        dispatch(logoutAction())
+        await logout()
         let token = null;
         if (loginType === WALLET_ADAPTERS.METAMASK) {
             token = await login(loginType);
         } else if (loginType === WALLET_ADAPTERS.OPENLOGIN) {
-            token = await login(WALLET_ADAPTERS.OPENLOGIN, 'google');
+            token = await login(WALLET_ADAPTERS.OPENLOGIN, provider);
         }
         console.log(token)
         if (token) {
@@ -133,9 +136,18 @@ export default () => {
                         <Button onClick={() => handleLogin(WALLET_ADAPTERS.METAMASK)} className={classes.metamaskButton} variant='contained' color='secondary'>
                             <img src={METAMASK} />
                         </Button>
-                        <Button onClick={() => handleLogin(WALLET_ADAPTERS.OPENLOGIN)} className={classes.metamaskButton} style={{ marginLeft: 8, minWidth: 252 }} variant='contained' color='secondary'>
+                        {/* <Button onClick={() => handleLogin(WALLET_ADAPTERS.OPENLOGIN)} className={classes.metamaskButton} style={{ marginLeft: 8, minWidth: 252 }} variant='contained' color='secondary'>
                             <img style={{ width: 120 }} src={GMAIL} />
-                        </Button>
+                        </Button> */}
+                    </Box>
+                    <Typography mt={2} variant="h2" style={{ fontSize: '16px', color: 'rgba(27, 43, 65, 0.5)', cursor: 'pointer' }}>Continue without wallet</Typography>
+                    <Box sx={{ mt: 2 }}  display="flex" flexDirection="row" justifyContent="center" alignItems="center">
+                            <Box onClick={() => handleLogin(WALLET_ADAPTERS.OPENLOGIN, 'google')} style={{ marginRight: 8 }}>
+                                <img style={{ width: 100, cursor: 'pointer' }} src={GMAIL} />
+                            </Box>
+                            <Box onClick={() => handleLogin(WALLET_ADAPTERS.OPENLOGIN, 'apple')} style={{ marginLeft: 8 }}>
+                                <img style={{ width: 80, cursor: 'pointer' }} src={APPLE} />
+                            </Box>
                     </Box>
                     <Box mt={4} display="flex" flexDirection="row" alignItems="center">
                         <Typography variant='body1' fontWeight="bold" mr={2}>Select Blockchain:</Typography>
