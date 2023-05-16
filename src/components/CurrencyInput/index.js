@@ -62,11 +62,11 @@ export default ({ options, onChange, value, dropDownvalue, onDropDownChange, dis
                     defaultValue={dropDownvalue}
                     onChange={e => onDropDownChange(e.target.value)}
                     bg='#F5F5F5'
-                    color='#76808D'
+                    color='#C94B32'
                     variant='unstyled'
                     style={{ borderRadius: '10px 0 0 10px', borderWidth: 1, borderRightWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px', backgroundColor: '#FFF' }}
                     iconSize={15}
-                    icon={<ArrowDown />}
+                    icon={<DropdownRed />}
                 >
                     {
                         options.map(option => {
@@ -112,7 +112,7 @@ export default ({ options, onChange, value, dropDownvalue, onDropDownChange, dis
                     variant='unstyled'
                     style={{ borderRadius: '0px 10px 10px 0px', borderWidth: 1, borderLeftWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }}
                     iconSize={15}
-                    icon={<ArrowDown />}
+                    icon={<DropdownRed />}
                 >
                     {
                         options.map(option => {

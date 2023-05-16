@@ -17,6 +17,7 @@ import ProjectEditModal from "modals/Project/ProjectEditModal";
 import AssignContributionModal from "modals/Project/AssignContributionModal";
 import Button from "components/Button";
 import KraReviewModal from "modals/Project/KraReviewModal";
+import TaskSection from "sections/TaskSection";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -101,7 +102,7 @@ export default () => {
     const classes = useStyles();
 
     const [value, setValue] = useState<number>(0);
-    const [showEdit, setShowEdit] = useState<boolean>(!false);
+    const [showEdit, setShowEdit] = useState<boolean>(false);
     const [openAssignContribution, setOpenAssignContribution] = useState<boolean>(false);
     const [openKraReview, setOpenKraReview] = useState<boolean>(false);
 
@@ -178,7 +179,7 @@ export default () => {
                 </Box>
 
                 {/* Milestones and KRA */}
-                <Box sx={{ width: '100%' }} display="flex" flexDirection={"column"}>
+                <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
                     <Box sx={{ width: '100%', background: '#FFF', padding: '10px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                         <Tabs
                             value={value}
@@ -237,6 +238,8 @@ export default () => {
                         </Box>
                     </TabPanel>
                 </Box>
+
+                <TaskSection />
 
             </Grid>
         </Grid>
