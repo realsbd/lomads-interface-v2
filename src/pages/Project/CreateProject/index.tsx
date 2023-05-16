@@ -233,16 +233,9 @@ export default () => {
                                 </Grid>
                                 <Grid item xs={12} display={"flex"} flexDirection={"column"} alignItems={"center"}>
                                     <Box display={"flex"} alignItems={"center"}>
-                                        <Switch checkedSVG="lock" onChange={() => setToggle(!toggle)} />
-                                        <Typography>
-                                            {
-                                                toggle
-                                                    ?
-                                                    'FILTER BY'
-                                                    :
-                                                    'OPEN FOR ALL'
-                                            }
-                                        </Typography>
+                                        <Box sx={{ marginRight: '27px' }}><Typography sx={{ color: !toggle ? '#C94B32' : '#76808D' }}>OPEN FOR ALL</Typography></Box>
+                                        <Box><Switch checkedSVG="lock" onChange={() => setToggle(!toggle)} /></Box>
+                                        <Box sx={{ marginLeft: '-5px' }}><Typography sx={{ color: toggle ? '#C94B32' : '#76808D' }}>FILTER BY</Typography></Box>
                                     </Box>
                                     {
                                         !toggle &&

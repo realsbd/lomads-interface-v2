@@ -6,13 +6,17 @@ import { IoIosArrowBack } from 'react-icons/io';
 
 import settingIcon from 'assets/svg/settings.svg';
 import shareIcon from 'assets/svg/share.svg';
+import archiveIcon from 'assets/svg/archiveIcon.svg';
 import createProjectSvg from 'assets/svg/createProject.svg';
 import StepperProgress from "components/StepperProgress";
 import MilestoneCard from "components/MilestoneCard";
 import KraCard from "components/KraCard";
+import IconButton from 'components/IconButton';
 import ProjectLinkCard from "components/ProjectLinkCard";
 import ProjectEditModal from "modals/Project/ProjectEditModal";
 import AssignContributionModal from "modals/Project/AssignContributionModal";
+import Button from "components/Button";
+import KraReviewModal from "modals/Project/KraReviewModal";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -97,8 +101,9 @@ export default () => {
     const classes = useStyles();
 
     const [value, setValue] = useState<number>(0);
-    const [showEdit, setShowEdit] = useState<boolean>(false);
-    const [openAssignContribution, setOpenAssignContribution] = useState<boolean>(!false);
+    const [showEdit, setShowEdit] = useState<boolean>(!false);
+    const [openAssignContribution, setOpenAssignContribution] = useState<boolean>(false);
+    const [openKraReview, setOpenKraReview] = useState<boolean>(false);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -116,6 +121,11 @@ export default () => {
                 <AssignContributionModal
                     open={openAssignContribution}
                     closeModal={() => setOpenAssignContribution(false)}
+                />
+
+                <KraReviewModal
+                    open={openKraReview}
+                    closeModal={() => setOpenKraReview(false)}
                 />
 
                 {/* Name */}
@@ -186,12 +196,28 @@ export default () => {
                             <Tab label="Key results" {...a11yProps(1)} />
                         </Tabs>
 
-                        <Box display={"flex"} alignItems={"center"}>
-                            <div style={{ width: '300px' }}>
-                                <StepperProgress />
-                            </div>
-                            <Typography sx={{ marginLeft: '16px', fontWeight: 700, color: '#188C7C' }}>50%</Typography>
-                        </Box>
+                        {
+                            value === 0 &&
+                            <Box display={"flex"} alignItems={"center"}>
+                                <div style={{ width: '300px' }}>
+                                    <StepperProgress />
+                                </div>
+                                <Typography sx={{ marginLeft: '16px', fontWeight: 700, color: '#188C7C' }}>50%</Typography>
+                            </Box>
+                        }
+
+                        {
+                            value === 1 &&
+                            <Box display={"flex"} alignItems={"center"}>
+                                <Typography sx={{ marginLeft: '14px', fontWeight: 400, color: '#76808D', marginRight: '100px' }}>Review frequency : Daily</Typography>
+                                <IconButton sx={{ marginRight: '20px' }}>
+                                    <img src={archiveIcon} alt="archiveIcon" />
+                                </IconButton>
+                                <Button size="small" variant="contained" onClick={() => setOpenKraReview(true)}>
+                                    REVIEW
+                                </Button>
+                            </Box>
+                        }
                     </Box>
 
                     {/* Tab panel for milestones */}

@@ -1,11 +1,8 @@
 // @ts-nocheck
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
-import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 
 const CHECKMARK = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_2430_2610)">
@@ -58,7 +55,7 @@ const MaterialUISwitch = styled(Switch)(({ theme, checkedSVG }) => ({
     },
   },
   '& .MuiSwitch-thumb': {
-    backgroundColor: "#76808d",
+    backgroundColor: theme.palette.primary.main,
     boxShadow: 'none',
     width: 26,
     height: 26,

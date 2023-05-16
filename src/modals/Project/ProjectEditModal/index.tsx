@@ -14,6 +14,8 @@ import DeleteProjectModal from "../DeleteProjectModal";
 import ResourcesModal from "../ResourcesModal";
 import MilestonesModal from "../MilestonesModal";
 import KraModal from "../KraModal";
+import DetailsModal from "../DetailsModal";
+import ProjectMembersModal from "../ProjectMembersModal";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -82,6 +84,8 @@ export default ({ open, closeModal }: Props) => {
     const [openCloseModal, setOpenCloseModal] = useState<boolean>(false);
     const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
 
+    const [openMembers, setOpenMembers] = useState<boolean>(false);
+    const [openDetails, setOpenDetails] = useState<boolean>(false);
     const [openResource, setOpenResource] = useState<boolean>(false);
     const [openMilestone, setOpenMilestone] = useState<boolean>(false);
     const [openKRA, setOpenKRA] = useState<boolean>(false);
@@ -101,6 +105,16 @@ export default ({ open, closeModal }: Props) => {
             <DeleteProjectModal
                 open={openDeleteModal}
                 closeModal={() => setOpenDeleteModal(false)}
+            />
+
+            <DetailsModal
+                open={openDetails}
+                closeModal={() => setOpenDetails(false)}
+            />
+
+            <ProjectMembersModal
+                open={openMembers}
+                closeModal={() => setOpenMembers(false)}
             />
 
             <ResourcesModal
@@ -131,14 +145,14 @@ export default ({ open, closeModal }: Props) => {
 
                     <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} className={classes.editCard}>
                         <Typography className={classes.cardTitle}>Workspace details</Typography>
-                        <Box sx={{ cursor: 'pointer' }}>
+                        <Box sx={{ cursor: 'pointer' }} onClick={() => setOpenDetails(true)}>
                             <img src={editSvg} alt="edit-svg" />
                         </Box>
                     </Box>
 
                     <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} className={classes.editCard}>
                         <Typography className={classes.cardTitle}>Workspace members</Typography>
-                        <Box sx={{ cursor: 'pointer' }}>
+                        <Box sx={{ cursor: 'pointer' }} onClick={() => setOpenMembers(true)}>
                             <img src={editSvg} alt="edit-svg" />
                         </Box>
                     </Box>
