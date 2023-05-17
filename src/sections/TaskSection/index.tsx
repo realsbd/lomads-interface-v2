@@ -7,6 +7,7 @@ import IconButton from 'components/IconButton';
 
 import archiveIcon from 'assets/svg/archiveIcon.svg';
 import CreateTaskModal from "modals/Tasks/CreateTaskModal";
+import TaskCard from "components/TaskCard";
 
 const useStyles = makeStyles((theme: any) => ({
     addMemberBtn: {
@@ -59,7 +60,7 @@ export default () => {
     const classes = useStyles();
     const [value, setValue] = useState<number>(0);
 
-    const [openCreateTask, setOpenCreateTask] = useState<boolean>(!false);
+    const [openCreateTask, setOpenCreateTask] = useState<boolean>(false);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -103,7 +104,13 @@ export default () => {
             {/* Tab panel for my tasks */}
             <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
                 <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
-
+                    {
+                        [1, 2, 3, 4, 5, 6].map((item, index) => {
+                            return (
+                                <TaskCard />
+                            )
+                        })
+                    }
                 </Box>
             </TabPanel>
 
