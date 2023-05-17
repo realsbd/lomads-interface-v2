@@ -1,5 +1,14 @@
+import { useDAO } from "context/dao";
 import React from "react"
+import { useNavigate, useParams } from "react-router-dom"
 
 export default () => {
-    return <div></div>
+    const { daoURL } = useParams();
+    const navigate = useNavigate();
+    const { DAO, DAOList } = useDAO();
+    return (
+        DAO ?
+    <div onClick={() => navigate(`/${daoURL}/project`)}>
+        go
+    </div> : null )
 }

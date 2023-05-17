@@ -12,7 +12,21 @@ export default [
 		component: LoginPage
 	},
 	{
+		path: '/:daoURL/project',
+		exact: true,
+		layout: LandingLayout,
+		private: true,
+		component: DashboardPage
+	},
+	{
 		path: '/',
+		exact: true,
+		layout: LandingLayout,
+		private: true,
+		component: DashboardPage
+	},
+	{
+		path: '/:daoURL',
 		exact: true,
 		layout: LandingLayout,
 		private: true,
