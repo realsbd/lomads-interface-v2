@@ -4,6 +4,7 @@ import LoginPage from 'pages/Login';
 import DashboardPage from 'pages/Dashboard';
 import CreateProjectPage from 'pages/Project/CreateProject';
 import ProjectDetailsPage from 'pages/Project/ProjectDetails';
+import TaskDetailsPage from 'pages/Task/TaskDetails';
 
 export default [
 	{
@@ -33,5 +34,12 @@ export default [
 		layout: LandingLayout,
 		private: true,
 		component: ProjectDetailsPage
+	},
+	{
+		path: '/:daoURL/task/:taskId',
+		exact: true,
+		layout: LandingLayout,
+		private: true,
+		component: TaskDetailsPage
 	},
 ];
