@@ -1,8 +1,9 @@
 import { applyMiddleware, compose } from 'redux';
-import { createStore} from 'redux'
+import { createStore } from 'redux'
 import rootReducer from 'store/reducers';
 import createSagaMiddleware from 'redux-saga';
 import sessionSaga from 'store/sagas/session.saga';
+import projectSaga from 'store/sagas/project.saga';
 import daoSaga from './sagas/dao.saga';
 import { persistStore } from 'redux-persist';
 import { composeWithDevTools } from 'redux-devtools-extension';
@@ -21,6 +22,7 @@ const configureStore = (initialState: any = {}) => {
   const composedEnhancers: any = compose(...enhancers)
   const store = createStore(rootReducer, initialState, composedEnhancers);
   sagaMiddleware.run(sessionSaga);
+  sagaMiddleware.run(projectSaga);
   sagaMiddleware.run(daoSaga);
   persistor = persistStore(store);
   return store;

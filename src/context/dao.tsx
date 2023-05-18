@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {  get as _get } from 'lodash'
+import { get as _get } from 'lodash'
 import { createContext, useContext } from "react";
 import { useParams } from 'react-router-dom';
 import axiosHttp from 'api'
@@ -37,23 +37,23 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }
 
   useEffect(() => {
-    if(account && token && !DAOList)
-        loadDAOList()
+    if (account && token && !DAOList)
+      loadDAOList()
   }, [account, token, DAOList])
 
   useEffect(() => {
-    if(DAOList && !daoURL) {
-        console.log("DAOList", DAOList)
-        if(DAOList.length > 0)
-            navigate(`/${_get(DAOList, '[0].url')}`)
-        else
-            navigate(`/create-dao`)
+    if (DAOList && !daoURL) {
+      console.log("DAOList", DAOList)
+      if (DAOList.length > 0)
+        navigate(`/${_get(DAOList, '[0].url')}`)
+      else
+        navigate(`/create-dao`)
     }
   }, [DAOList])
 
   useEffect(() => {
-    if(DAOList && DAOList.length > 0 && account && token && daoURL && (!DAO || DAO.url !== daoURL))
-        loadDAO(daoURL)
+    if (DAOList && DAOList.length > 0 && account && token && daoURL && (!DAO || DAO.url !== daoURL))
+      loadDAO(daoURL)
   }, [account, token, daoURL, console, DAOList])
 
   const resetDAO = () => {
@@ -65,7 +65,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   };
   return <DAOContext.Provider value={contextProvider}>
     {
-        privateRoute && (!DAOList || (daoURL && !DAO)) ?  <FullScreenLoader skeleton="dashboard" /> : children
+      privateRoute && (!DAOList || (daoURL && !DAO)) ? <FullScreenLoader skeleton="dashboard" /> : children
     }
   </DAOContext.Provider>;
 };
