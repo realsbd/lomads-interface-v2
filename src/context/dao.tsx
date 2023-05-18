@@ -7,6 +7,8 @@ import { useWeb3Auth } from './web3Auth';
 import { useAppSelector } from 'helpers/useAppSelector';
 import { useNavigate } from 'react-router-dom';
 import FullScreenLoader from 'components/FullScreenLoader';
+import { useAppDispatch } from 'helpers/useAppDispatch';
+import { loadDAOAction, loadDAOListAction, resetDAOAction } from 'store/actions/dao';
 
 export const DAOContext = createContext<any>({
 
@@ -16,24 +18,22 @@ export function useDAO() {
   return useContext(DAOContext);
 }
 
-export const DAOProvider = ({ children }: any) => {
+export const DAOProvider = ({ privateRoute = false, children }: any) => {
   const { account } = useWeb3Auth();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   //@ts-ignore
   const { token } = useAppSelector(store => store.session);
   const { daoURL } = useParams();
-  const [DAO, setDAO] = useState<any>(null)
-  const [DAOList, setDAOList] = useState<any>(null)
+  //@ts-ignore
+  const { DAO, DAOList } = useAppSelector(store => store?.dao)
 
   const loadDAOList = async () => {
-    const daoList = await axiosHttp.get('dao').then(res => res.data).catch(e => console.log(e))
-    console.log("RESPONSE_DAO_LIST", daoList)
-    setDAOList(daoList)
+    dispatch(loadDAOListAction())
   }
 
   const loadDAO = async (url: string) => {
-    const dao = await axiosHttp.get(`dao/${url}`).then(res => res.data).catch(e => console.log(e))
-    setDAO(dao)
+    dispatch(loadDAOAction(url))
   }
 
   useEffect(() => {
@@ -56,12 +56,16 @@ export const DAOProvider = ({ children }: any) => {
         loadDAO(daoURL)
   }, [account, token, daoURL, console, DAOList])
 
+  const resetDAO = () => {
+    dispatch(resetDAOAction())
+  }
+
   const contextProvider = {
-    DAO
+    DAO, DAOList, resetDAO
   };
   return <DAOContext.Provider value={contextProvider}>
     {
-        !DAOList || (daoURL && !DAO) ?  <FullScreenLoader skeleton="dashboard" /> : children
+        privateRoute && (!DAOList || (daoURL && !DAO)) ?  <FullScreenLoader skeleton="dashboard" /> : children
     }
   </DAOContext.Provider>;
 };
