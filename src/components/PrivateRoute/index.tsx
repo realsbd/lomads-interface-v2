@@ -22,16 +22,12 @@ const PrivateRoute = (props: any) => {
 	}, [account, token, user, props.private])
 
 	if ((authenticated === null) && props.private) {
-		// if (window.location.pathname !== '/')
-		// 	window.location.href = `/login?from=${window.location.pathname}`
-		// else
 		return <FullScreenLoader />
-		//window.location.href = `/login`
 	} else if ((authenticated === false) && props.private) {
-		// if (window.location.pathname !== '/')
-		// 	window.location.href = `/login?from=${window.location.pathname}`
-		// else
-		window.location.href = `/login`
+		if (window.location.pathname !== '/')
+			window.location.href = `/login?from=${window.location.pathname}`
+		else
+			window.location.href = `/login`
 	}
 	else if (token && props.private && (!account || !user)) {
 		return <FullScreenLoader />
