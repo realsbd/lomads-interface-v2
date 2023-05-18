@@ -29,7 +29,7 @@ const App = () => {
                                         return (
                                                 <Route
                                                     element={
-                                                        <DAOProvider>
+                                                        <DAOProvider privateRoute={route.private}>
                                                             <PrivateRoute
                                                                 orRender={
                                                                     <route.layout>

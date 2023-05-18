@@ -12,9 +12,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTokenAction, setUserAction } from 'store/actions/session';
 import { useWeb3Auth } from 'context/web3Auth';
+import ChainSwitchList from 'components/ChainSwitchList';
 
 const useStyles = makeStyles((theme: any) => ({
   root: {
+    position: 'relative',
     width: 223, 
     cursor: 'pointer',
     height: 60,
@@ -38,6 +40,29 @@ const useStyles = makeStyles((theme: any) => ({
     alignItems: 'center',
     justifyContent: 'center',
     borderLeft: '1px solid #F0F0F0'
+  },
+  sliderInfo: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'absolute',
+    height: 60, 
+    right: 223,
+    padding: "12px 42px 12px 11px",
+    borderRadius: "30px 0 0 30px",
+    backgroundColor: 'hsla(214,9%,51%,.05)'
+  },
+  rolePill: {
+    color: '#76808d',
+    gap: '23px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '10px 20px',
+    height: 36,
+    minWidth: 156,
+    borderRadius: 100,
+    backgroundColor: "hsla(214,9%,51%,.05)"
   }
 }));
 
@@ -77,7 +102,7 @@ export default ({ children, ...props } : any) => {
 
   return (
     <>
-      <Box { ...props }
+      <Box id="account-options" { ...props }
         onClick={handleClick} className={classes.root}>
         <Box sx={{ pl: 2 }} display="flex" flexDirection="row" alignItems="center" flexGrow={1}>
           <Avatar sx={{ width: 30, height: 30 }} src={AVATAR} variant="square"></Avatar>
@@ -94,10 +119,21 @@ export default ({ children, ...props } : any) => {
             <ExpandMoreIcon />
           </IconButton>
         </Box>
+        <Box className={classes.sliderInfo}>
+             <Box className={classes.rolePill}>
+                <Typography style={{ fontSize: '14px', clear: 'both', display: 'inline-block', textAlign: 'center', whiteSpace: 'nowrap' }}>Active contributor</Typography>
+             </Box>
+             <Box>
+
+             </Box>
+             <ChainSwitchList chainId={chainId} />
+        </Box>
       </Box>
       <Menu
-        id="demo-positioned-menu"
-        aria-labelledby="demo-positioned-button"
+        id="account-options-menu"
+        MenuListProps={{
+        'aria-labelledby': 'account-options',
+        }}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}

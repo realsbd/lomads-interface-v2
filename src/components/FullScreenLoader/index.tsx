@@ -21,6 +21,7 @@ import HeaderLogo from 'components/HeaderLogo';
 import { useNavigate, useParams } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
+import { useDAO } from 'context/dao';
 
 
 const drawerWidth: number = 116;
@@ -81,7 +82,6 @@ const useStyles = makeStyles((theme: any) => ({
 export default ({ children }: any) => {
   const classes = useStyles();
   const navigate = useNavigate()
-
 
   return (
       <Box className={classes.root}>

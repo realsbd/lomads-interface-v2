@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
+import { get as _get } from 'lodash'
 import { Box, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import palette from 'theme/palette';
@@ -16,6 +17,14 @@ const useStyles = makeStyles((theme: any) => ({
     alignItems: 'center',
     justifyContent: 'center'
   },
+  plain: {
+    cursor: 'pointer',
+    px: [1],
+    borderBottomRightRadius: 30,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   logoContainer: {
     width: 35,
     height: 35,
@@ -25,7 +34,8 @@ const useStyles = makeStyles((theme: any) => ({
     transform: `rotate(45deg)`,
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    overflow : 'hidden'
   },
   title: {
     fontWeight: '600 !important',
@@ -35,17 +45,34 @@ const useStyles = makeStyles((theme: any) => ({
     letterSpacing: '-0.011em !important',
     color: `${palette.primary.main} !important`,
     transform: `rotate(-45deg)`,
+    textTransform: 'uppercase'
+  },
+  image: {
+    transform: 'rotate(-45deg)',
+    width: '141%',
+    maxWidth: '141% !important',
+    height: '141%;',
+    flexShrink: 0
   }
 }));
 
-export default ({ children, ...props } : any) => {
+export default ({ children, dao, ...props } : any) => {
 
   const classes = useStyles();
 
+  const initials = useMemo(() => {
+    const daoName = _get(dao, 'name', '').trim().split(" ");
+    return daoName.length === 1
+    ? daoName[0].charAt(0)
+    : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
+  }, [dao])
+
   return (
-      <Box { ...props }  className={classes.root}>
+      <Box { ...props }  className={props.plain ? classes.plain : classes.root}>
         <Box className={classes.logoContainer}>
-            <Typography variant='h6' className={classes.title}>HG</Typography>
+        { dao?.image ? <img className={classes.image} src={_get(dao, 'image')} /> :
+            dao && <Typography variant='h6' className={classes.title}>{initials}</Typography>
+        }
         </Box>
       </Box>
   );

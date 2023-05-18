@@ -28,6 +28,7 @@
     "boring-avatars": "^1.7.0",
     "browserify-zlib": "^0.2.0",
     "chroma-js": "^2.4.2",
+    "clsx": "^1.2.1",
     "ethers": "5",
     "framer-motion": "^10.12.9",
     "localforage": "^1.10.0",
