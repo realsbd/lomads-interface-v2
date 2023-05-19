@@ -256,7 +256,7 @@ export default ({ children }: any) => {
                 <Box display="flex" minHeight={107} sx={{ pb: 2, background: "linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(251,244,242,1) 0%)", pt: 3, pr: 4 }} flexDirection="row" alignItems="flex-start">
                     <Box sx={{ flexGrow: 1, ml: 4 }}>
                         <Typography sx={{ marginLeft: "20px" }} className={classes.title}>{_get(DAO, 'name', '')}</Typography>
-                        <Typography sx={{ marginLeft: "20px", maxWidth: 800 }} className={classes.subtitle}>{_get(DAO, 'description', '')}</Typography>
+                        <Typography sx={{ marginLeft: "20px", maxWidth: 500 }} className={classes.subtitle}>{_get(DAO, 'description', '')}</Typography>
                     </Box>
                     <Account/>
                 </Box>
