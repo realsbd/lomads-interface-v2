@@ -29,6 +29,7 @@ export const Web3AuthContext = createContext<any>({
   isLoading: false,
   login: async (adapter: WALLET_ADAPTER_TYPE, provider?: LOGIN_PROVIDER_TYPE, login_hint?: string) => {},
   logout: async () => {},
+  switchChain: async (chainId: string) => {},
 });
 
 export function useWeb3Auth() {
@@ -194,6 +195,18 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
     setState({ provider: null, account: null, w3Provider: null});
   };
 
+  const switchChain = async (nextChainId: string) => {
+    if (!web3Auth) {
+      console.log("web3auth not initialized yet");
+      return;
+    }
+    try { 
+      await web3Auth.switchChain({ chainId: nextChainId }); 
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   const contextProvider = {
     web3Auth,
     provider: state?.provider,
@@ -203,6 +216,7 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
     isLoading,
     login,
     logout,
+    switchChain
   };
   return <Web3AuthContext.Provider value={contextProvider}>{children}</Web3AuthContext.Provider>;
 };
