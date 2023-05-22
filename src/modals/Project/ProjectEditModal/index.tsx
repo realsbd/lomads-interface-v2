@@ -117,10 +117,10 @@ export default ({ open, closeModal }: Props) => {
                 closeModal={() => setOpenMembers(false)}
             />
 
-            <ResourcesModal
+            {/* <ResourcesModal
                 open={openResource}
                 closeModal={() => setOpenResource(false)}
-            />
+            /> */}
 
             <MilestonesModal
                 open={openMilestone}

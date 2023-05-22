@@ -7,7 +7,6 @@ export default () => {
     const { daoURL } = useParams();
     const navigate = useNavigate();
     const { DAO, DAOList } = useDAO();
-    console.log("DAO : ", DAO);
     return (
         <>
             {

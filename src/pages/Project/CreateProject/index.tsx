@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { find as _find, get as _get, debounce as _debounce, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
+
 import { Grid, Paper, Typography, Box, Chip } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import AddIcon from '@mui/icons-material/Add';
@@ -16,6 +18,11 @@ import ResourcesModal from "modals/Project/ResourcesModal";
 import MilestonesModal from "modals/Project/MilestonesModal";
 import Dropdown from "components/Dropdown";
 import KraModal from "modals/Project/KraModal";
+
+import { useDAO } from "context/dao";
+
+import { SiNotion } from "react-icons/si";
+import { BsDiscord, BsGoogle, BsGithub, BsTwitter, BsGlobe } from "react-icons/bs";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -74,25 +81,146 @@ const useStyles = makeStyles((theme: any) => ({
         borderRadius: '5px !important',
         color: '#76808D !important',
         fontSize: '14px !important'
+    },
+    arrayRow: {
+        height: '50px',
+        width: '100%',
+        background: 'rgba(118, 128, 141, 0.05) !important',
+        boxShadow: 'inset 1px 0px 4px rgba(27, 43, 65, 0.1) !important',
+        borderRadius: '5px !important',
+        marginBottom: '8px !important',
+        padding: '0 15px !important',
+        '&:last-child': {
+            marginBottom: '0 !important'
+        }
+    },
+    linkName: {
+        width: '40% !important',
+    },
+    linkAddress: {
+        width: '60% !important',
     }
 }));
 
 export default () => {
     const classes = useStyles();
 
+    const { DAO } = useDAO();
+    console.log("DAO in createProject : ", DAO);
+
     const [name, setName] = useState<string>('');
     const [desc, setDesc] = useState<string>('');
     const [next, setNext] = useState<boolean>(false);
+
+    const [showAddMember, setShowAddMember] = useState(false);
+    const [memberList, setMemberList] = useState(DAO?.members);
+    const [selectedMembers, setSelectedMembers] = useState<any[]>([]);
+    const [resourceList, setResourceList] = useState<any[]>([]);
+    const [showMore, setShowMore] = useState<boolean>(false);
+    const [success, setSuccess] = useState(false);
+    const [newAddress, setNewAddress] = useState<any[]>([]);
+
     const [toggle, setToggle] = useState<boolean>(false);
     const [selectType, setSelectType] = useState<string>('Invitation');
-    const [showMore, setShowMore] = useState<boolean>(false);
+
+    const [selectedRoles, setSelectedRoles] = useState<any[]>([]);
 
     const [openResource, setOpenResource] = useState<boolean>(false);
     const [openMilestone, setOpenMilestone] = useState<boolean>(false);
     const [openKRA, setOpenKRA] = useState<boolean>(false);
 
-    const handleChange = (option: string) => {
-        setSelectType(option)
+    const [milestones, setMilestones] = useState<any[]>([]);
+    const [results, setResults] = useState<any[]>([]);
+    const [frequency, setFrequency] = useState('');
+
+    const [compensation, setCompensation] = useState(null);
+
+    const handleParseUrl = (url: string) => {
+        try {
+            const link = new URL(url);
+            if (link.hostname.indexOf('notion.') > -1) {
+                return <SiNotion color='#76808D' size={20} />
+            }
+            else if (link.hostname.indexOf('discord.') > -1) {
+                return <BsDiscord color='#76808D' size={20} />
+            }
+            else if (link.hostname.indexOf('github.') > -1) {
+                return <BsGithub color='#76808D' size={20} />
+            }
+            else if (link.hostname.indexOf('google.') > -1) {
+                return <BsGoogle color='#76808D' size={20} />
+            }
+            else if (link.hostname.indexOf('twitter.') > -1) {
+                return <BsTwitter color='#76808D' size={20} />
+            }
+            else {
+                return <span><BsGlobe color="#76808D" size={20} /></span>
+            }
+        }
+        catch (e) {
+            console.error(e);
+            return;
+        }
+    }
+
+    const handleCreateProject = () => {
+        console.log("selectedRoles : ", selectedRoles);
+        let project: any = {};
+        project['name'] = name;
+        project['description'] = desc;
+        project['links'] = resourceList;
+        project['milestones'] = milestones;
+        project['compensation'] = compensation;
+        project['kra'] = {
+            frequency,
+            results
+        };
+        project['daoId'] = DAO?._id;
+
+        if (!toggle) {
+            let arr = [];
+            for (let i = 0; i < DAO.members.length; i++) {
+                let user = DAO.members[i];
+                arr.push({ name: user.member.name, address: user.member.wallet })
+            }
+            project['members'] = arr;
+            project['validRoles'] = [];
+            project['inviteType'] = 'Open';
+        }
+
+        if (toggle && selectType === 'Invitation') {
+            project['members'] = _uniqBy(selectedMembers, m => m.address);
+            project['validRoles'] = [];
+            project['inviteType'] = 'Invitation';
+        }
+
+        if (toggle && selectType === 'Roles') {
+            let arr = [];
+            for (let i = 0; i < DAO.members.length; i++) {
+                let user = DAO.members[i];
+                if (user.discordRoles) {
+                    let myDiscordRoles: any[] = [];
+                    Object.keys(user.discordRoles).forEach(function (key, index) {
+                        myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
+                    })
+                    let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
+
+                    if (index > -1) {
+                        arr.push({ name: user.member.name, address: user.member.wallet })
+                    }
+                }
+                else {
+                    if (selectedRoles.includes(user.role)) {
+                        arr.push({ name: user.member.name, address: user.member.wallet })
+                    }
+                }
+            }
+            project['members'] = _uniqBy(arr, m => m.address);
+            project['validRoles'] = selectedRoles;
+            project['inviteType'] = 'Roles';
+        }
+
+        // dispatch(createProject({ payload: project }));
     }
 
     const handleRenderMemberList = () => {
@@ -320,6 +448,9 @@ export default () => {
                 <ResourcesModal
                     open={openResource}
                     closeModal={() => setOpenResource(false)}
+                    list={resourceList}
+                    getResources={(value) => setResourceList(value)}
+                    editResources={false}
                 />
                 <MilestonesModal
                     open={openMilestone}
@@ -332,19 +463,42 @@ export default () => {
                 <Grid xs={12} item display="flex" flexDirection="column" alignItems="center" sx={{ margin: '10vh 0' }}>
                     <img src={createProjectSvg} alt="frame-icon" />
                     <Typography color="primary" variant="subtitle1" className={classes.heading}>Project details</Typography>
-                    <Paper className={classes.paperContainer} sx={{ width: 453, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Box>
-                            <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>Project resources</Typography>
-                            <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Add links for your team to access </Typography>
+                    <Paper className={classes.paperContainer} sx={{ width: 453, display: 'flex', flexDirection: 'column' }}>
+                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                            <Box>
+                                <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>Project resources</Typography>
+                                <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Add links for your team to access </Typography>
+                            </Box>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
+                                onClick={() => setOpenResource(true)}
+                            >
+                                <AddIcon sx={{ fontSize: 18 }} /> ADD
+                            </Button>
                         </Box>
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
-                            onClick={() => setOpenResource(true)}
-                        >
-                            <AddIcon sx={{ fontSize: 18 }} /> ADD
-                        </Button>
+                        {/* Map all the resources */}
+                        {
+                            resourceList.length > 0 &&
+                            <Box>
+                                {
+                                    resourceList.map((item, index) => {
+                                        return (
+                                            <Box key={index} className={classes.arrayRow} display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginTop: '20px' }}>
+                                                <Box className={classes.linkName} display={"flex"}>
+                                                    {handleParseUrl(item.link)}
+                                                    <Typography sx={{ marginLeft: '5px' }}>{item.title.length > 10 ? item.title.slice(0, 10) + "..." : item.title}</Typography>
+                                                </Box>
+                                                <Box className={classes.linkAddress}>
+                                                    <Typography>{item.link.length > 20 ? item.link.slice(0, 20) + "..." : item.link}</Typography>
+                                                </Box>
+                                            </Box>
+                                        )
+                                    })
+                                }
+                            </Box>
+                        }
                     </Paper>
                     <Box className={classes.divider}></Box>
                     <Paper className={classes.paperContainer} sx={{ width: 453, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

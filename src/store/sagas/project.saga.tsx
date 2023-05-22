@@ -12,7 +12,6 @@ function* createProjectSaga(action: any) {
         yield put({ type: actionTypes.CREATE_PROJECT_LOADING, payload: true })
         const { data } = yield call(createProjectService, action.payload.token)
         console.log('json, response', data)
-        yield put({ type: actionTypes.CREATE_PROJECT_LOADING, payload: false })
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data })
     } catch (e) {
 

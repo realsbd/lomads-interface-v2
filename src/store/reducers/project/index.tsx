@@ -5,7 +5,8 @@ import * as actionTypes from 'store/actionTypes';
 
 export function getInitialState() {
     return {
-        project: null
+        project: null,
+        createProjectLoading: false
     };
 }
 
@@ -13,8 +14,14 @@ const ProjectReducer = (state: any = getInitialState(), action: any) =>
     produce(state, (draft: any) => {
         const { payload } = action;
         switch (action.type) {
+
+            case actionTypes.CREATE_PROJECT_LOADING: {
+                draft.createProjectLoading = payload;
+                break;
+            }
             case actionTypes.SET_PROJECT_ACTION: {
                 draft.project = payload;
+                draft.createProjectLoading = false;
                 break;
             }
         }

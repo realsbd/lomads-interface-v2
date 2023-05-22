@@ -1,5 +1,6 @@
 import axiosHttp from 'api';
 
-export const createProjectService = (token: string) => {
-    return axiosHttp.post(`auth/create-account`, {}, { headers: { Authorization: token } })
+export const createProjectService = (params: string) => {
+    console.log("project service : ", params);
+    // return axiosHttp.post()
 }
