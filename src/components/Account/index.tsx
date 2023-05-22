@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { find as _find, get as _get } from 'lodash';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box, Typography, IconButton, Menu, MenuItem } from '@mui/material';
@@ -13,12 +13,13 @@ import starDashboard from "assets/svg/star_dashboard.svg";
 import tokenDashboard from "assets/svg/token_dashboard.svg";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useDispatch, useSelector } from 'react-redux';
-import { setTokenAction, setUserAction } from 'store/actions/session';
+import { setNetworkConfig, setTokenAction, setUserAction } from 'store/actions/session';
 import { useWeb3Auth } from 'context/web3Auth';
 import ChainSwitchList from 'components/ChainSwitchList';
 import { useAppSelector } from 'helpers/useAppSelector';
 import { useDAO } from 'context/dao';
 import useRole from 'hooks/useRole';
+import { CHAIN_INFO } from 'constants/chainInfo';
 
 const useStyles = makeStyles((theme: any) => ({
   root: {
@@ -93,7 +94,7 @@ const useStyles = makeStyles((theme: any) => ({
 export default ({ children, ...props } : any) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { chainId, account, provider } = useWeb3Auth()
+  const { chainId, account, provider, switchChain } = useWeb3Auth()
   //@ts-ignore
   const { user } = useAppSelector(store => store?.session);
   const { DAO } = useDAO();
@@ -104,6 +105,7 @@ export default ({ children, ...props } : any) => {
   const open = Boolean(anchorEl);
   const handleClick = (event: any) => setAnchorEl(event.currentTarget);
   const handleClose = () =>  setAnchorEl(null);
+
   useEffect(() => {
     if(account) {
       setAccountName(beautifyHexToken(account))
@@ -154,6 +156,12 @@ export default ({ children, ...props } : any) => {
 	// 	return 0
 	// }, [user, safeTokens, DAO])
 
+  const handleSwitch = async (nextChainId: number) => {
+      const chainInfo = CHAIN_INFO[nextChainId]
+      dispatch(setNetworkConfig({ selectedChainId: nextChainId, chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+      await switchChain(chainInfo?.chainId)
+  }
+
   return (
     <Box display="flex" position="relative">
       <Box id="account-options" { ...props }
@@ -191,7 +199,7 @@ export default ({ children, ...props } : any) => {
 									{/* } */}
              </Box>
              <Box sx={{ ml: 1 }}>
-                <ChainSwitchList chainId={chainId} />
+                <ChainSwitchList onselect={(chain: any) => handleSwitch(chain)} chainId={chainId} />
              </Box>
       </Box>
       <Menu

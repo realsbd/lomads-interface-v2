@@ -6,11 +6,13 @@ import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import LINK_SVG from 'assets/svg/ico-link.svg'
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
+import { toast } from 'react-hot-toast';
+import {Tooltip} from '@mui/material';
+import IconButton from 'components/IconButton';
 import palette from 'theme/palette';
 import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
@@ -24,6 +26,8 @@ import Account from 'components/Account';
 import { useAppSelector } from 'helpers/useAppSelector';
 import { useWeb3Auth } from 'context/web3Auth';
 import { useDAO } from 'context/dao';
+import Skeleton from '@mui/material/Skeleton';
+import zIndex from '@mui/material/styles/zIndex';
 
 
 const drawerWidth: number = 116;
@@ -220,6 +224,16 @@ export default ({ children }: any) => {
   const { contractId } = useParams()
   const { account } = useWeb3Auth()
 
+  const [toolTipOpen, setToolTipOpen] = React.useState(false);
+
+  const handleTooltipClose = () => {
+    setToolTipOpen(false);
+  };
+
+  const handleTooltipOpen = () => {
+    setToolTipOpen(true);
+  };
+
   const [open, setOpen] = React.useState(false);
   // @ts-ignore
   const { token, user } = useAppSelector(store => store.session)
@@ -251,16 +265,40 @@ export default ({ children }: any) => {
           <Toolbar
             style={{ background: 'transparent', height: '100%', paddingLeft: 0, paddingRight: 0 }}
           >
-            <HeaderLogo dao={DAO} onMouseLeave={hideDrawer} onMouseEnter={showDrawer} />
+            {
+              DAO ?
+              <HeaderLogo dao={DAO} onMouseLeave={hideDrawer} onMouseEnter={showDrawer} /> : 
+              <Skeleton variant="rectangular" width={116} height={107} sx={{ borderBottomRightRadius: 30 }} />
+            }
+            { DAO ?
             <Box sx={{ mt: 0 }} style={{ padding: 0, height: '100%', flex: 1 }}>
                 <Box display="flex" minHeight={107} sx={{ pb: 2, background: "linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(251,244,242,1) 0%)", pt: 3, pr: 4 }} flexDirection="row" alignItems="flex-start">
                     <Box sx={{ flexGrow: 1, ml: 4 }}>
-                        <Typography sx={{ marginLeft: "20px" }} className={classes.title}>{_get(DAO, 'name', '')}</Typography>
+                        <Box display="flex" flexDirection="row" alignItems="center">
+                          <Typography sx={{ marginLeft: "20px" }} className={classes.title}>{_get(DAO, 'name', '')}</Typography>
+                                  <IconButton onClick={() => { 
+                                    navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/${_get(DAO, 'url', '')}`);
+                                    toast.success('Copied to clipboard')
+                                  }} sx={{ ml: 2 }}>
+                                    <img src={LINK_SVG} />
+                                  </IconButton>
+                        </Box>
                         <Typography sx={{ marginLeft: "20px", maxWidth: 500 }} className={classes.subtitle}>{_get(DAO, 'description', '')}</Typography>
                     </Box>
                     <Account/>
                 </Box>
+            </Box> : 
+            <Box sx={{ mt: 0 }} style={{ padding: 0, height: '100%', flex: 1 }}>
+                <Box display="flex" minHeight={107} sx={{ pb: 2, pt: 3, pr: 4 }} flexDirection="row" alignItems="flex-start">
+                    <Box sx={{ flexGrow: 1, ml: 4 }}>
+                        <Skeleton variant="text" className={classes.title} sx={{ marginLeft: "20px", width: 150 }} />
+                        <Skeleton variant="text" className={classes.subtitle} sx={{ marginLeft: "20px", width: 600 }} />
+                        <Skeleton variant="text" className={classes.subtitle} sx={{ marginLeft: "20px", width: 400 }} />
+                    </Box>
+                    <Skeleton variant="rectangular" width={223} height={60} sx={{ borderRadius: 30 }} />
+                </Box>
             </Box>
+            }
           </Toolbar>
         </AppBar>
         <Box style={{ width: drawerWidth, background: 'transparent' }} ></Box>
