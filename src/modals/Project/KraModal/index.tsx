@@ -10,7 +10,6 @@ import Button from "components/Button";
 import CloseSVG from 'assets/svg/closeNew.svg'
 import KRASVG from 'assets/svg/kra.svg'
 import Dropdown from "components/Dropdown";
-import TextEditor from "components/TextEditor";
 
 import { nanoid } from 'nanoid';
 
@@ -82,24 +81,13 @@ const useStyles = makeStyles((theme: any) => ({
 interface Props {
     open: boolean;
     closeModal(): any;
+    list: any[];
+    freq: any;
+    getResults(action1: any[], action2: string): void;
+    editKRA: boolean;
 }
 
-const safeTokens = [
-    {
-        tokenAddress: '0x123456789abcd000',
-        token: {
-            symbol: 'GOR'
-        }
-    },
-    {
-        tokenAddress: '0x123456789abcd000',
-        token: {
-            symbol: 'MATIC'
-        }
-    }
-]
-
-export default ({ open, closeModal }: Props) => {
+export default ({ open, closeModal, list, freq, getResults, editKRA }: Props) => {
     const classes = useStyles();
     const [frequency, setFrequency] = useState('Daily');
     const [resultCount, setResultCount] = useState(1);

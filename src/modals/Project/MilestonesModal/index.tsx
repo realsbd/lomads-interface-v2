@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { Paper, Typography, Box, Drawer } from "@mui/material";
 import { makeStyles } from '@mui/styles';
@@ -12,6 +12,11 @@ import MilestoneSVG from 'assets/svg/milestone.svg'
 import CurrencyInput from "components/CurrencyInput";
 import Dropdown from "components/Dropdown";
 import TextEditor from "components/TextEditor";
+
+import { find as _find, get as _get, debounce as _debounce } from 'lodash';
+import { useDAO } from "context/dao";
+import { CHAIN_INFO } from 'constants/chainInfo';
+import { useWeb3Auth } from "context/web3Auth";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -81,9 +86,13 @@ const useStyles = makeStyles((theme: any) => ({
 interface Props {
     open: boolean;
     closeModal(): any;
+    list: any[];
+    getMilestones(action: any): void;
+    getCompensation(action: any): void;
+    editMilestones: boolean;
 }
 
-const safeTokens = [
+const safeTokens: any[] = [
     {
         tokenAddress: '0x123456789abcd000',
         token: {
@@ -98,12 +107,34 @@ const safeTokens = [
     }
 ]
 
-export default ({ open, closeModal }: Props) => {
+export default ({ open, closeModal, list, getMilestones, editMilestones, getCompensation }: Props) => {
     const classes = useStyles();
+    const { DAO } = useDAO();
+    const { chainId, account } = useWeb3Auth();
     const [sweatValue, setSweatValue] = useState(null);
+    const [milestones, setMilestones] = useState<any[]>([{ name: '', amount: '0', deadline: '', deliverables: '', complete: false }]);
+    const [milestoneCount, setMilestoneCount] = useState<number>(1);
+    const [amount, setAmount] = useState(null);
     const [currency, setCurrency] = useState(null);
-    const [milestones, setMilestones] = useState([{ name: '', amount: '0', deadline: '', deliverables: '', complete: false }]);
-    const [milestoneCount, setMilestoneCount] = useState(1);
+
+    useEffect(() => {
+        var date = new Date();
+        var tdate: any = date.getDate();
+        var month: any = date.getMonth() + 1;
+        if (tdate < 10) {
+            tdate = "0" + tdate;
+        }
+        if (month < 10) {
+            month = "0" + month
+        }
+        var year = date.getUTCFullYear();
+        var minDate = year + "-" + month + "-" + tdate;
+
+        let element = document.getElementById("datepicker");
+        if (element) {
+            element.setAttribute("min", minDate);
+        }
+    }, [])
 
     const onChangeNumberOfMilestones = (e: number) => {
         let n = e;
@@ -128,70 +159,186 @@ export default ({ open, closeModal }: Props) => {
             }
         }
 
-        // for (var i = 0; i < milestones.length; i++) {
-        //     var el = document.getElementById(`inputBox${i}`);
-        //     el.style.background = '';
-        // }
+        for (var i = 0; i < milestones.length; i++) {
+            var el = document.getElementById(`inputBox${i}`);
+            if (el) {
+                el.style.background = '';
+            }
+        }
 
         setMilestones(array);
     };
 
-    // const handleChangeName = (e:string, index:number) => {
-    //     let element = document.getElementById(`name${index}`);
-    //     element.innerHTML = "";
-    //     const newArray = milestones.map((item, i) => {
-    //         if (i === index) {
-    //             return { ...item, name: e };
-    //         } else {
-    //             return item;
-    //         }
-    //     });
-    //     setMilestones(newArray);
-    // }
+    const handleChangeName = (e: string, index: number) => {
+        let element = document.getElementById(`name${index}`);
+        if (element) {
+            element.innerHTML = "";
+        }
+        const newArray = milestones.map((item, i) => {
+            if (i === index) {
+                return { ...item, name: e };
+            } else {
+                return item;
+            }
+        });
+        setMilestones(newArray);
+    }
 
-    // const handleChangeAmount = (e:string, index:number) => {
-    //     var x = document.getElementById(`amount${milestones.length - 1}`);
-    //     x.innerHTML = '';
-    //     var el = document.getElementById(`inputBox${index}`);
-    //     el.style.background = '';
-    //     if (e <= 100) {
-    //         const newArray = milestones.map((item, i) => {
-    //             if (i === index) {
-    //                 return { ...item, amount: e };
-    //             } else {
-    //                 return item;
-    //             }
-    //         });
-    //         setMilestones(newArray);
-    //     }
-    // }
+    const handleChangeAmount = (e: number, index: number) => {
+        var x = document.getElementById(`amount${milestones.length - 1}`);
+        if (x) {
+            x.innerHTML = '';
+        }
+        var el = document.getElementById(`inputBox${index}`);
+        if (el) {
+            el.style.background = '';
+            if (e <= 100) {
+                const newArray = milestones.map((item, i) => {
+                    if (i === index) {
+                        return { ...item, amount: e };
+                    } else {
+                        return item;
+                    }
+                });
+                setMilestones(newArray);
+            }
+        }
+    }
 
-    // const handleChangeDeadline = (e:any, index:number) => {
-    //     let element = document.getElementById(`deadline${index}`);
-    //     element.innerHTML = "";
+    const handleChangeDeadline = (e: any, index: number) => {
+        let element = document.getElementById(`deadline${index}`);
+        if (element) {
+            element.innerHTML = "";
+        }
 
-    //     const newArray = milestones.map((item, i) => {
-    //         if (i === index) {
-    //             return { ...item, deadline: e };
-    //         } else {
-    //             return item;
-    //         }
-    //     });
-    //     setMilestones(newArray);
-    // }
+        const newArray = milestones.map((item, i) => {
+            if (i === index) {
+                return { ...item, deadline: e };
+            } else {
+                return item;
+            }
+        });
+        setMilestones(newArray);
+    }
 
-    // const handleChangeDeliverables = (e:any, index:number) => {
-    //     let element = document.getElementById(`deliverables${index}`);
-    //     element.innerHTML = "";
-    //     const newArray = milestones.map((item, i) => {
-    //         if (i === index) {
-    //             return { ...item, deliverables: e };
-    //         } else {
-    //             return item;
-    //         }
-    //     });
-    //     setMilestones(newArray);
-    // }
+    const handleChangeDeliverables = (e: any, index: number) => {
+        let element = document.getElementById(`deliverables${index}`);
+        if (element) {
+            element.innerHTML = "";
+        }
+        const newArray = milestones.map((item, i) => {
+            if (i === index) {
+                return { ...item, deliverables: e };
+            } else {
+                return item;
+            }
+        });
+        setMilestones(newArray);
+    }
+
+    const handleChangeCompensationAmount = (e: any) => {
+        console.log(e);
+        setAmount(e);
+        let element = document.getElementById('currency-amt');
+        if (element) {
+            element.innerHTML = "";
+        }
+    }
+
+    const handleChangeCurrency = (e: any) => {
+        setCurrency(e.target.value);
+        let element = document.getElementById('currency-amt');
+        if (element) {
+            element.innerHTML = "";
+        }
+    }
+
+    const handleSubmit = () => {
+        let flag = 0;
+        let total = 0;
+        if (currency === null) {
+            let e = document.getElementById('currency-amt');
+            if (e) {
+                e.innerHTML = "Please select a currency";
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+                return;
+            }
+        }
+        if (amount === 0) {
+            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency);
+            symbol = _get(symbol, 'token.symbol', null);
+            if (!symbol)
+                symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
+            let e = document.getElementById('currency-amt');
+            if (e) {
+                e.innerHTML = `Compensation amount cannot be 0 ${symbol}`;
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            }
+            return;
+        }
+
+        for (let i = 0; i < milestones.length; i++) {
+            let ob = milestones[i];
+            total += parseFloat(ob.amount);
+            if (ob.name === '') {
+                flag = -1;
+                let e = document.getElementById(`name${i}`);
+                if (e) {
+                    e.innerHTML = "Enter name";
+                    e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+                }
+                return;
+            }
+            else if (ob.amount === '') {
+                flag = -1;
+                let e = document.getElementById(`amount${i}`);
+                if (e) {
+                    e.innerHTML = "Enter amount in %";
+                    e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+                }
+                return;
+            }
+            else if (ob.deadline === '') {
+                flag = -1;
+                let e = document.getElementById(`deadline${i}`);
+                if (e) {
+                    e.innerHTML = "Enter deadline";
+                    e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+                }
+                return;
+            }
+        }
+        if (total !== 100) {
+            var x = document.getElementById(`amount${milestones.length - 1}`);
+            if (x) {
+                x.innerHTML = 'Total Project Value should be 100 %';
+            }
+            for (var i = 0; i < milestones.length; i++) {
+                if (!milestones[i].complete) {
+                    var el = document.getElementById(`inputBox${i}`);
+                    if (el) {
+                        el.style.background = 'rgba(217, 83, 79, 0.75)';
+                    }
+                }
+            }
+            return;
+        }
+        if (flag !== -1) {
+            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
+            symbol = _get(symbol, 'token.symbol', null)
+            if (!symbol)
+                symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
+
+            if (editMilestones) {
+                // dispatch(editProjectMilestone({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones, compensation: { currency, amount, symbol } } }));
+            }
+            else {
+                getCompensation({ currency: currency, amount, symbol })
+                getMilestones(milestones);
+                closeModal();
+            }
+        }
+    }
 
     return (
         <Drawer

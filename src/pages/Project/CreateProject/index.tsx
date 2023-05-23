@@ -455,10 +455,18 @@ export default () => {
                 <MilestonesModal
                     open={openMilestone}
                     closeModal={() => setOpenMilestone(false)}
+                    list={milestones}
+                    getCompensation={(value) => setCompensation(value)}
+                    getMilestones={(value) => setMilestones(value)}
+                    editMilestones={false}
                 />
                 <KraModal
                     open={openKRA}
                     closeModal={() => setOpenKRA(false)}
+                    list={results}
+                    freq={frequency}
+                    getResults={(value1: any[], value2: string) => { setResults(value1); setFrequency(value2) }}
+                    editKRA={false}
                 />
                 <Grid xs={12} item display="flex" flexDirection="column" alignItems="center" sx={{ margin: '10vh 0' }}>
                     <img src={createProjectSvg} alt="frame-icon" />

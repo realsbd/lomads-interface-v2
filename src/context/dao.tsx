@@ -65,7 +65,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   };
   return <DAOContext.Provider value={contextProvider}>
     {
-      privateRoute && (!DAOList || (daoURL && !DAO)) ? <FullScreenLoader skeleton="dashboard" /> : children
+      privateRoute && (!DAOList || (daoURL && !DAO)) ? <FullScreenLoader /> : children
     }
   </DAOContext.Provider>;
 };

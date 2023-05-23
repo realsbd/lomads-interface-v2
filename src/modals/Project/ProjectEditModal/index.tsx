@@ -122,15 +122,15 @@ export default ({ open, closeModal }: Props) => {
                 closeModal={() => setOpenResource(false)}
             /> */}
 
-            <MilestonesModal
+            {/* <MilestonesModal
                 open={openMilestone}
                 closeModal={() => setOpenMilestone(false)}
-            />
+            /> */}
 
-            <KraModal
+            {/* <KraModal
                 open={openKRA}
                 closeModal={() => setOpenKRA(false)}
-            />
+            /> */}
 
             <Box className={classes.modalContainer}>
                 <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={closeModal}>
