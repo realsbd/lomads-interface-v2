@@ -28,6 +28,7 @@ import { useWeb3Auth } from 'context/web3Auth';
 import { useDAO } from 'context/dao';
 import Skeleton from '@mui/material/Skeleton';
 import zIndex from '@mui/material/styles/zIndex';
+import Footer from 'components/Footer';
 
 
 const drawerWidth: number = 116;
@@ -87,13 +88,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
-      display: 'flex',
       background: `linear-gradient(169.22deg,#fdf7f7 12.19%,#efefef 92%)`,
     },
     main: {
         background: `linear-gradient(169.22deg,#fdf7f7 12.19%,#efefef 92%)`,
         flexGrow: 1,
-        height: '100vh',
+        minHeight: 'calc(100vh - 80px)',
         overflow: 'auto',
     },
     logoContainer: {
@@ -335,10 +335,13 @@ export default ({ children }: any) => {
           className={classes.main}
         >
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mb: 4, mt: '107px' }}>
+          <Container maxWidth="lg" sx={{ mt: '60px' }}>
             { children }
           </Container>
         </Box>
+        <Container maxWidth="lg">
+            <Footer theme='light' />
+        </Container>
       </Box>
   );
 }
