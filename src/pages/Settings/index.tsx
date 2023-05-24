@@ -1,8 +1,8 @@
-import React from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import React, { Fragment, useMemo, useState } from "react";
+import { Box, Grid, Typography, Drawer } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import { ChevronRight } from "@mui/icons-material";
-
+import CloseSVG from 'assets/svg/close-new.svg'
 import OrganistionDetails from "assets/images/settings-page/1-ogranisation-details.svg";
 import RolesPermissions from "assets/images/settings-page/2-roles-permissions.svg";
 import Safe from "assets/images/settings-page/3-safe.svg";
@@ -11,6 +11,8 @@ import XpPoints from "assets/images/settings-page/5-xp-points.svg";
 import Terminology from "assets/images/settings-page/6-terminology.svg";
 import IntegrationGrey from "assets/svg/integrations.svg";
 
+import SafeModal from './Modals/Safe'
+import IconButton from "components/IconButton";
 
 const useStyles = makeStyles((theme: any) => ({
     item: {
@@ -35,10 +37,10 @@ const useStyles = makeStyles((theme: any) => ({
     }
   }));
 
-const Content = ({ icon, title }: { icon: any | undefined, title: string | undefined }) => {
+const Content = ({ icon, title, onClick }: { icon: any | undefined, title: string | undefined, onClick: any }) => {
     const classes = useStyles();
     return (
-        <Box className={classes.item}>
+        <Box onClick={onClick} className={classes.item}>
             <Box>
                 <img src={icon} />
             </Box>
@@ -51,29 +53,50 @@ const Content = ({ icon, title }: { icon: any | undefined, title: string | undef
 }
 
 export default () => {
+
+    const [activeModal, setActiveModal] = useState<string | null>(null);
+
+    const Modal = useMemo(() => {
+        if(activeModal === SafeModal.name)
+            return SafeModal
+        return Fragment
+    }, [activeModal])
+
     return (
-        <Grid container px={3} spacing={2}>
-            <Grid item sm={12}>
-                <Content icon={OrganistionDetails} title="Organisation Details" />
+        <>
+            <Grid container px={3} spacing={2}>
+                <Grid item sm={12}>
+                    <Content onClick={() => {}} icon={OrganistionDetails} title="Organisation Details" />
+                </Grid>
+                <Grid item sm={6} md={4} xs={1}>
+                    <Content onClick={() => {}} icon={RolesPermissions} title="Roles & Permissions" />
+                </Grid>
+                <Grid item sm={6} md={4} xs={1}>
+                    <Content onClick={() => setActiveModal(SafeModal.name)} icon={Safe} title="Safes" />
+                </Grid>
+                <Grid item sm={6} md={4} xs={1}>
+                    <Content onClick={() => {}} icon={PassTokens} title="Pass Tokens" />
+                </Grid>
+                <Grid item sm={6} md={4} xs={1}>
+                    <Content onClick={() => {}} icon={XpPoints} title="XP Points" />
+                </Grid>
+                <Grid item sm={6} md={4} xs={1}>
+                    <Content onClick={() => {}} icon={Terminology} title="Tags & Terminology" />
+                </Grid>
+                <Grid item sm={6} md={4} xs={1}>
+                    <Content onClick={() => {}} icon={IntegrationGrey} title="Integrations"/>
+                </Grid>
             </Grid>
-            <Grid item sm={6} md={4} xs={1}>
-                <Content icon={RolesPermissions} title="Roles & Permissions" />
-            </Grid>
-            <Grid item sm={6} md={4} xs={1}>
-                <Content icon={Safe} title="Safe" />
-            </Grid>
-            <Grid item sm={6} md={4} xs={1}>
-                <Content icon={PassTokens} title="Pass Tokens" />
-            </Grid>
-            <Grid item sm={6} md={4} xs={1}>
-                <Content icon={XpPoints} title="XP Points" />
-            </Grid>
-            <Grid item sm={6} md={4} xs={1}>
-                <Content icon={Terminology} title="Tags & Terminology" />
-            </Grid>
-            <Grid item sm={6} md={4} xs={1}>
-                <Content  icon={IntegrationGrey} title="Integrations"/>
-            </Grid>
-        </Grid>
+            <Drawer
+                PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
+                sx={{ zIndex: 99999 }}
+                anchor={'right'}
+                open={activeModal !== null}
+                onClose={() => setActiveModal(null)}>
+                    <Box sx={{ width: '575px', flex: 1, padding: '32px 72px 32px 72px', borderRadius: '20px 0px 0px 20px' }}>
+                        <Modal onClose={() => setActiveModal(null)}/>
+                    </Box>
+            </Drawer>
+        </>
     )
 }
