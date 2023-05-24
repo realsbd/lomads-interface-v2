@@ -89,47 +89,86 @@ interface Props {
 
 export default ({ open, closeModal, list, freq, getResults, editKRA }: Props) => {
     const classes = useStyles();
-    const [frequency, setFrequency] = useState('Daily');
-    const [resultCount, setResultCount] = useState(1);
-    const [results, setResults] = useState([{ _id: nanoid(16), color: '#FFCC18', name: '', progress: 0 }]);
+    const [frequency, setFrequency] = useState<string>(freq ? freq : 'Daily');
+    const [resultCount, setResultCount] = useState<number>(list.length > 0 ? list.length : 1);
+    const [results, setResults] = useState<any[]>([{ _id: nanoid(16), color: '#FFCC18', name: '', progress: 0 }]);
 
-    // const handleChangeFrequency = (e) => {
-    //     setFrequency(e.target.value);
-    // }
+    const [errorNames, setErrorNames] = useState<number[]>([]);
 
-    // const onChangeNumberOfResults = (e) => {
-    //     let n = parseInt(e.target.value);
-    //     setResultCount(n);
-    //     let array = [...results];
-    //     if (array.length === 0) {
-    //         for (var i = 0; i < n; i++) {
-    //             if (editKRA) {
-    //                 array.push({ name: '', _id: nanoid(16) });
-    //             }
-    //             else {
-    //                 array.push({ name: '', color: '#FFCC18', progress: 0, _id: nanoid(16) });
-    //             }
-    //         }
-    //     }
-    //     else if (n > array.length) {
-    //         let count = n - array.length;
-    //         for (var i = 0; i < count; i++) {
-    //             if (editKRA) {
-    //                 array.push({ name: '', _id: nanoid(16) });
-    //             }
-    //             else {
-    //                 array.push({ name: '', color: '#FFCC18', progress: 0, _id: nanoid(16) });
-    //             }
-    //         }
-    //     }
-    //     else if (n < array.length) {
-    //         let count = array.length - n;
-    //         for (var i = 0; i < count; i++) {
-    //             array.pop();
-    //         }
-    //     }
-    //     setResults(array);
-    // };
+    const onChangeNumberOfResults = (e: any) => {
+        let n = parseInt(e);
+        setResultCount(n);
+        let array = [...results];
+        if (array.length === 0) {
+            for (var i = 0; i < n; i++) {
+                if (editKRA) {
+                    array.push({ name: '', _id: nanoid(16) });
+                }
+                else {
+                    array.push({ name: '', color: '#FFCC18', progress: 0, _id: nanoid(16) });
+                }
+            }
+        }
+        else if (n > array.length) {
+            let count = n - array.length;
+            for (var i = 0; i < count; i++) {
+                if (editKRA) {
+                    array.push({ name: '', _id: nanoid(16) });
+                }
+                else {
+                    array.push({ name: '', color: '#FFCC18', progress: 0, _id: nanoid(16) });
+                }
+            }
+        }
+        else if (n < array.length) {
+            let count = array.length - n;
+            for (var i = 0; i < count; i++) {
+                array.pop();
+            }
+        }
+        setResults(array);
+    };
+
+    const handleChangeName = (e: string, index: number) => {
+        if (errorNames.includes(index)) {
+            setErrorNames(errorNames.filter((i) => i !== index));
+        }
+        const newArray = results.map((item, i) => {
+            if (i === index) {
+                return { ...item, name: e };
+            } else {
+                return item;
+            }
+        });
+        setResults(newArray);
+    }
+
+    const handleSubmit = () => {
+        let flag = 0;
+        for (let i = 0; i < results.length; i++) {
+            let ob = results[i];
+            if (ob.name === '') {
+                flag = -1;
+                if (!errorNames.includes(i)) {
+                    setErrorNames([...errorNames, i])
+                }
+                let e = document.getElementById(`paper${i}`);
+                if (e) {
+                    e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+                }
+                return;
+            }
+        }
+        if (flag !== -1) {
+            if (editKRA) {
+                // dispatch(editProjectKRA({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { frequency, results } }));
+            }
+            else {
+                getResults(results, frequency);
+                closeModal();
+            }
+        }
+    }
 
     return (
         <Drawer
@@ -153,7 +192,7 @@ export default ({ open, closeModal, list, freq, getResults, editKRA }: Props) =>
                         <Typography className={classes.label}>Review Frequency</Typography>
                         <Dropdown
                             options={['Daily', 'Weekly', 'Monthly']}
-                            onChange={(value) => console.log(value)}
+                            onChange={(value: string) => setFrequency(value)}
                         />
                     </Box>
 
@@ -161,16 +200,17 @@ export default ({ open, closeModal, list, freq, getResults, editKRA }: Props) =>
                         <Typography className={classes.label}>N° of key results</Typography>
                         <Dropdown
                             options={[1, 2, 3, 4, 5]}
-                            onChange={(value) => console.log(value)}
+                            defaultValue={resultCount}
+                            onChange={(value) => onChangeNumberOfResults(value)}
                         />
                     </Box>
 
                     {results.length > 0 && <Box className={classes.divider}></Box>}
 
                     {
-                        results.map((item, index) => {
+                        results && results.map((item, index) => {
                             return (
-                                <Paper className={classes.mileStonePaper} sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Paper className={classes.mileStonePaper} sx={{ display: 'flex', flexDirection: 'column' }} key={index} id={`paper${index}`}>
                                     <Typography className={classes.paperTitle}>Key result {index + 1}</Typography>
 
                                     <Box display={"flex"} alignItems={'center'}>
@@ -178,17 +218,21 @@ export default ({ open, closeModal, list, freq, getResults, editKRA }: Props) =>
                                             label="Name"
                                             placeholder="Super project"
                                             fullWidth
+                                            value={item.name}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeName(e.target.value, index)}
+                                            error={errorNames.includes(index)}
+                                            id={errorNames.includes(index) ? "outlined-error-helper-text" : ""}
+                                            helperText={errorNames.includes(index) ? "Please enter name" : ""}
                                         />
                                     </Box>
-
                                 </Paper>
                             )
                         })
                     }
 
                     <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
-                        <Button variant="outlined" sx={{ marginRight: '20px' }}>CANCEL</Button>
-                        <Button variant="contained">ADD</Button>
+                        <Button variant="outlined" sx={{ marginRight: '20px' }} onClick={closeModal}>CANCEL</Button>
+                        <Button variant="contained" onClick={handleSubmit}>ADD</Button>
                     </Box>
 
                 </Box>

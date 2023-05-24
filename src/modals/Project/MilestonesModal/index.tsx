@@ -15,6 +15,7 @@ import TextEditor from "components/TextEditor";
 
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import { useDAO } from "context/dao";
+import { useSafeTokens } from "context/safeTokens";
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { useWeb3Auth } from "context/web3Auth";
 
@@ -92,30 +93,22 @@ interface Props {
     editMilestones: boolean;
 }
 
-const safeTokens: any[] = [
-    {
-        tokenAddress: '0x123456789abcd000',
-        token: {
-            symbol: 'GOR'
-        }
-    },
-    {
-        tokenAddress: '0x123456789abcd000',
-        token: {
-            symbol: 'MATIC'
-        }
-    }
-]
-
 export default ({ open, closeModal, list, getMilestones, editMilestones, getCompensation }: Props) => {
     const classes = useStyles();
     const { DAO } = useDAO();
-    const { chainId, account } = useWeb3Auth();
-    const [sweatValue, setSweatValue] = useState(null);
-    const [milestones, setMilestones] = useState<any[]>([{ name: '', amount: '0', deadline: '', deliverables: '', complete: false }]);
-    const [milestoneCount, setMilestoneCount] = useState<number>(1);
-    const [amount, setAmount] = useState(null);
-    const [currency, setCurrency] = useState(null);
+    const { safeTokens } = useSafeTokens();
+    const { chainId } = useWeb3Auth();
+
+    const [milestones, setMilestones] = useState<any[]>(list.length > 0 ? list : [{ name: '', amount: '0', deadline: '', deliverables: '', complete: false }]);
+    const [milestoneCount, setMilestoneCount] = useState<number>(list.length > 0 ? list.length : 1);
+    const [amount, setAmount] = useState<number>(0);
+    const [currency, setCurrency] = useState<string>('');
+
+    const [errorNames, setErrorNames] = useState<number[]>([]);
+    const [errorAmount, setErrorAmount] = useState<number[]>([]);
+    const [errorDeadline, setErrorDeadline] = useState<number[]>([]);
+    const [errorCurrency, setErrorCurrency] = useState<boolean>(false);
+    const [errorProjectValue, setErrorProjectValue] = useState<boolean>(false);
 
     useEffect(() => {
         var date = new Date();
@@ -170,9 +163,8 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
     };
 
     const handleChangeName = (e: string, index: number) => {
-        let element = document.getElementById(`name${index}`);
-        if (element) {
-            element.innerHTML = "";
+        if (errorNames.includes(index)) {
+            setErrorNames(errorNames.filter((i) => i !== index));
         }
         const newArray = milestones.map((item, i) => {
             if (i === index) {
@@ -184,33 +176,27 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
         setMilestones(newArray);
     }
 
-    const handleChangeAmount = (e: number, index: number) => {
-        var x = document.getElementById(`amount${milestones.length - 1}`);
-        if (x) {
-            x.innerHTML = '';
+    const handleChangeAmount = (e: string, index: number) => {
+        let amt: number = parseInt(e);
+        if (errorAmount.includes(index)) {
+            setErrorAmount(errorAmount.filter((i) => i !== index));
         }
-        var el = document.getElementById(`inputBox${index}`);
-        if (el) {
-            el.style.background = '';
-            if (e <= 100) {
-                const newArray = milestones.map((item, i) => {
-                    if (i === index) {
-                        return { ...item, amount: e };
-                    } else {
-                        return item;
-                    }
-                });
-                setMilestones(newArray);
-            }
+        if (amt <= 100) {
+            const newArray = milestones.map((item, i) => {
+                if (i === index) {
+                    return { ...item, amount: amt };
+                } else {
+                    return item;
+                }
+            });
+            setMilestones(newArray);
         }
     }
 
     const handleChangeDeadline = (e: any, index: number) => {
-        let element = document.getElementById(`deadline${index}`);
-        if (element) {
-            element.innerHTML = "";
+        if (errorDeadline.includes(index)) {
+            setErrorDeadline(errorDeadline.filter((i) => i !== index));
         }
-
         const newArray = milestones.map((item, i) => {
             if (i === index) {
                 return { ...item, deadline: e };
@@ -237,72 +223,71 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
     }
 
     const handleChangeCompensationAmount = (e: any) => {
-        console.log(e);
-        setAmount(e);
-        let element = document.getElementById('currency-amt');
-        if (element) {
-            element.innerHTML = "";
-        }
+        setAmount(parseFloat(e));
+        setErrorProjectValue(false);
     }
 
     const handleChangeCurrency = (e: any) => {
-        setCurrency(e.target.value);
-        let element = document.getElementById('currency-amt');
-        if (element) {
-            element.innerHTML = "";
-        }
+        setCurrency(e);
+        setErrorCurrency(false);
     }
 
     const handleSubmit = () => {
         let flag = 0;
         let total = 0;
-        if (currency === null) {
+        if (currency === '') {
+            setErrorCurrency(true);
             let e = document.getElementById('currency-amt');
             if (e) {
-                e.innerHTML = "Please select a currency";
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
                 return;
             }
         }
         if (amount === 0) {
+            setErrorProjectValue(true);
+            console.log("Compensation amount cannot be 0")
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency);
             symbol = _get(symbol, 'token.symbol', null);
             if (!symbol)
                 symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
             let e = document.getElementById('currency-amt');
             if (e) {
-                e.innerHTML = `Compensation amount cannot be 0 ${symbol}`;
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             }
             return;
         }
-
         for (let i = 0; i < milestones.length; i++) {
             let ob = milestones[i];
             total += parseFloat(ob.amount);
             if (ob.name === '') {
                 flag = -1;
-                let e = document.getElementById(`name${i}`);
+                if (!errorNames.includes(i)) {
+                    setErrorNames([...errorNames, i])
+                }
+                let e = document.getElementById(`paper${i}`);
                 if (e) {
-                    e.innerHTML = "Enter name";
                     e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
                 }
                 return;
             }
             else if (ob.amount === '') {
                 flag = -1;
-                let e = document.getElementById(`amount${i}`);
+                if (!errorAmount.includes(i)) {
+                    setErrorAmount([...errorAmount, i])
+                }
+                let e = document.getElementById(`paper${i}`);
                 if (e) {
-                    e.innerHTML = "Enter amount in %";
                     e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
                 }
                 return;
             }
             else if (ob.deadline === '') {
                 flag = -1;
-                let e = document.getElementById(`deadline${i}`);
+                if (!errorDeadline.includes(i)) {
+                    setErrorDeadline([...errorDeadline, i])
+                }
+                let e = document.getElementById(`paper${i}`);
                 if (e) {
-                    e.innerHTML = "Enter deadline";
                     e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
                 }
                 return;
@@ -338,6 +323,7 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
                 closeModal();
             }
         }
+        console.log("Milestones : ", milestones);
     }
 
     return (
@@ -358,26 +344,19 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
                 </Box>
                 <Box display="flex" flexDirection="column" alignItems={"center"} sx={{ width: '80%' }}>
 
-                    <Box display="flex" flexDirection="column" sx={{ width: 310, marginBottom: '35px' }}>
+                    <Box display="flex" flexDirection="column" sx={{ width: 310, marginBottom: '25px' }} id="currency-amt">
                         <Typography className={classes.label}>Total Workspace Value</Typography>
                         <CurrencyInput
-                            value={0}
-                            onChange={(value: any) => {
-                                setSweatValue(value)
-                            }}
-                            options={
-                                safeTokens.map(t => {
-                                    return {
-                                        value: t.tokenAddress,
-                                        label: t.token.symbol
-                                    }
-                                })
-                            }
+                            value={amount}
+                            onChange={(value: any) => handleChangeCompensationAmount(value)}
+                            options={safeTokens}
                             dropDownvalue={currency}
                             onDropDownChange={(value: any) => {
-                                setCurrency(value)
+                                handleChangeCurrency(value)
                             }}
                             variant="primary"
+                            errorCurrency={errorCurrency}
+                            errorProjectValue={errorProjectValue}
                         />
                     </Box>
 
@@ -385,6 +364,7 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
                         <Typography className={classes.label}>Milestones</Typography>
                         <Dropdown
                             options={[1, 2, 3, 4, 5]}
+                            defaultValue={milestoneCount}
                             onChange={(value) => onChangeNumberOfMilestones(value)}
                         />
                     </Box>
@@ -392,22 +372,76 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
                     {milestones.length > 0 && <Box className={classes.divider}></Box>}
 
                     {
-                        milestones.map((item, index) => {
+                        milestones && milestones.map((item, index) => {
                             return (
-                                <Paper className={classes.mileStonePaper} sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Paper className={classes.mileStonePaper} sx={{ display: 'flex', flexDirection: 'column' }} key={index} id={`paper${index}`}>
                                     <Typography className={classes.paperTitle}>Milestone {index + 1}</Typography>
 
+                                    {/* Milestone Name */}
+                                    <Box>
+                                        <TextInput
+                                            label="Name"
+                                            placeholder="Milestone Name"
+                                            fullWidth
+                                            value={item.name}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeName(e.target.value, index)}
+                                            disabled={item.complete}
+                                            error={errorNames.includes(index)}
+                                            id={errorNames.includes(index) ? "outlined-error-helper-text" : ""}
+                                            helperText={errorNames.includes(index) ? "Please enter name" : ""}
+                                        />
+                                    </Box>
+
+                                    {/* Milestone amount % */}
                                     <Box display={"flex"} alignItems={'center'} sx={{ marginBottom: '20px' }}>
                                         <TextInput
                                             type="number"
-                                            min={0}
-                                            max={100}
-                                            sx={{ width: 70 }} />
+                                            InputProps={{
+                                                inputProps: {
+                                                    max: 100, min: 0, step: 1,
+                                                    onKeyDown: (event: any) => {
+                                                        event.preventDefault();
+                                                    },
+                                                }
+                                            }}
+                                            sx={{ width: 90 }}
+                                            value={item.amount}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeAmount(e.target.value, index)}
+                                            placeholder={`${100 / milestoneCount}`}
+                                            disabled={item.complete}
+                                            error={errorAmount.includes(index)}
+                                            id={errorAmount.includes(index) ? "outlined-error-helper-text" : ""}
+                                            helperText={errorAmount.includes(index) ? "Enter %" : ""}
+                                        />
                                         <Typography sx={{ fontWeight: '700', fontSize: 16, color: '#76808D', marginLeft: '13.5px' }}>% of project value</Typography>
                                     </Box>
 
+                                    {/* Milestone deadline */}
                                     <Box sx={{ marginBottom: '20px' }}>
-                                        <TextInput sx={{ width: 172 }} label="Due date" type="date" />
+                                        {
+                                            errorDeadline.includes(index)
+                                                ?
+                                                <TextInput
+                                                    sx={{ width: 172 }}
+                                                    label="Due date"
+                                                    type="date"
+                                                    value={item.deadline}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeDeadline(e.target.value, index)}
+                                                    disabled={item.complete}
+                                                    error
+                                                    id="outlined-error-helper-text"
+                                                    helperText="Please enter deadline"
+                                                />
+                                                :
+                                                <TextInput
+                                                    sx={{ width: 172 }}
+                                                    label="Due date"
+                                                    type="date"
+                                                    value={item.deadline}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeDeadline(e.target.value, index)}
+                                                    disabled={item.complete}
+                                                />
+                                        }
                                     </Box>
 
                                     <Box>
@@ -416,6 +450,9 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
                                             height={90}
                                             placeholder=""
                                             label="Deliverables"
+                                            value={item.deliverables}
+                                            onChange={(value: string) => handleChangeDeliverables(value, index)}
+                                            disabled={item.complete}
                                         />
                                     </Box>
                                 </Paper>
@@ -424,8 +461,8 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
                     }
 
                     <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
-                        <Button variant="outlined" sx={{ marginRight: '20px' }}>CANCEL</Button>
-                        <Button variant="contained">ADD</Button>
+                        <Button variant="outlined" sx={{ marginRight: '20px' }} onClick={closeModal}>CANCEL</Button>
+                        <Button variant="contained" onClick={handleSubmit}>ADD</Button>
                     </Box>
 
                 </Box>

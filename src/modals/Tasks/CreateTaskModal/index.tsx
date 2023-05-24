@@ -221,7 +221,7 @@ export default ({ open, closeModal }: Props) => {
                         <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Compensation</Typography>
                     </Box>
                     <Box sx={{ width: '100%' }}>
-                        <CurrencyInput
+                        {/* <CurrencyInput
                             value={0}
                             onChange={(value: any) => {
                                 setSweatValue(value)
@@ -239,7 +239,7 @@ export default ({ open, closeModal }: Props) => {
                                 setCurrency(value)
                             }}
                             variant="primary"
-                        />
+                        /> */}
                     </Box>
                 </Box>
 

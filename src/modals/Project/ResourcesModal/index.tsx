@@ -313,7 +313,7 @@ export default ({ open, closeModal, list, getResources, editResources }: Props) 
                             {
                                 resourceList.map((item, index) => {
                                     return (
-                                        <Box className={classes.linkRow} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                                        <Box className={classes.linkRow} display={"flex"} alignItems={"center"} justifyContent={"space-between"} key={index}>
                                             <Box className={classes.linkName} display={"flex"}>
                                                 {handleParseUrl(item.link)}
                                                 <Typography sx={{ marginLeft: '5px' }}>{item.title.length > 10 ? item.title.slice(0, 10) + "..." : item.title}</Typography>

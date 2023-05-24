@@ -4,12 +4,13 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 interface DropdownProps {
     options?: any[],
+    defaultValue?: any,
     placeholder?: string,
     onChange(action: any): void;
 }
 
-export default ({ options, onChange, placeholder }: DropdownProps) => {
-    const [val, setVal] = useState(options?.[0]);
+export default ({ options, onChange, placeholder, defaultValue }: DropdownProps) => {
+    const [val, setVal] = useState(defaultValue ? defaultValue : options?.[0]);
 
     const handleChange = (event: any) => {
         setVal(event.target.value);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { find as _find, get as _get, debounce as _debounce, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 
 import { Grid, Paper, Typography, Box, Chip } from "@mui/material";
@@ -20,9 +20,12 @@ import Dropdown from "components/Dropdown";
 import KraModal from "modals/Project/KraModal";
 
 import { useDAO } from "context/dao";
+import { useWeb3Auth } from "context/web3Auth";
 
 import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsTwitter, BsGlobe } from "react-icons/bs";
+
+import moment from 'moment';
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -106,6 +109,7 @@ export default () => {
     const classes = useStyles();
 
     const { DAO } = useDAO();
+    const { chainId, account } = useWeb3Auth();
     console.log("DAO in createProject : ", DAO);
 
     const [name, setName] = useState<string>('');
@@ -135,6 +139,38 @@ export default () => {
 
     const [compensation, setCompensation] = useState(null);
 
+    useEffect(() => {
+        if (DAO)
+            setMemberList(DAO.members)
+    }, [DAO])
+
+    useEffect(() => {
+        const memberList = DAO?.members;
+        if (memberList.length > 0 && selectedMembers.length === 0) {
+            for (let i = 0; i < memberList.length; i++) {
+                if (memberList[i].member.wallet.toLowerCase() === account.toLowerCase()) {
+                    let memberOb: any = {};
+                    memberOb.name = memberList[i].member.name;
+                    memberOb.address = memberList[i].member.wallet;
+                    setSelectedMembers([...selectedMembers, memberOb]);
+                }
+            }
+        }
+    }, [DAO]);
+
+    useEffect(() => {
+        console.log("new address : ", newAddress);
+        if (newAddress.length > 0) {
+            newAddress.map((value) => {
+                const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === value.toLowerCase());
+                let memberOb: any = {};
+                memberOb.name = user.member.name;
+                memberOb.address = user.member.wallet;
+                setSelectedMembers((oldValue) => [...oldValue, memberOb]);
+            })
+        }
+    }, [DAO]);
+
     const handleParseUrl = (url: string) => {
         try {
             const link = new URL(url);
@@ -163,62 +199,76 @@ export default () => {
         }
     }
 
+    const handleAddMember = (member: any) => {
+        console.log("Add member")
+        const memberExists = _find(selectedMembers, m => m.address.toLowerCase() === member.wallet.toLowerCase())
+        if (memberExists)
+            setSelectedMembers(prev => prev.filter((item) => item.address.toLowerCase() !== member.wallet.toLowerCase()));
+        else {
+            let memberOb: any = {};
+            memberOb.name = member.name;
+            memberOb.address = member.wallet;
+            setSelectedMembers(prev => [...prev, memberOb]);
+        }
+    }
+
     const handleCreateProject = () => {
-        console.log("selectedRoles : ", selectedRoles);
-        let project: any = {};
-        project['name'] = name;
-        project['description'] = desc;
-        project['links'] = resourceList;
-        project['milestones'] = milestones;
-        project['compensation'] = compensation;
-        project['kra'] = {
-            frequency,
-            results
-        };
-        project['daoId'] = DAO?._id;
+        console.log("selected members : ", selectedMembers);
+        // console.log("selectedRoles : ", selectedRoles);
+        // let project: any = {};
+        // project['name'] = name;
+        // project['description'] = desc;
+        // project['links'] = resourceList;
+        // project['milestones'] = milestones;
+        // project['compensation'] = compensation;
+        // project['kra'] = {
+        //     frequency,
+        //     results
+        // };
+        // project['daoId'] = DAO?._id;
 
-        if (!toggle) {
-            let arr = [];
-            for (let i = 0; i < DAO.members.length; i++) {
-                let user = DAO.members[i];
-                arr.push({ name: user.member.name, address: user.member.wallet })
-            }
-            project['members'] = arr;
-            project['validRoles'] = [];
-            project['inviteType'] = 'Open';
-        }
+        // if (!toggle) {
+        //     let arr = [];
+        //     for (let i = 0; i < DAO.members.length; i++) {
+        //         let user = DAO.members[i];
+        //         arr.push({ name: user.member.name, address: user.member.wallet })
+        //     }
+        //     project['members'] = arr;
+        //     project['validRoles'] = [];
+        //     project['inviteType'] = 'Open';
+        // }
 
-        if (toggle && selectType === 'Invitation') {
-            project['members'] = _uniqBy(selectedMembers, m => m.address);
-            project['validRoles'] = [];
-            project['inviteType'] = 'Invitation';
-        }
+        // if (toggle && selectType === 'Invitation') {
+        //     project['members'] = _uniqBy(selectedMembers, m => m.address);
+        //     project['validRoles'] = [];
+        //     project['inviteType'] = 'Invitation';
+        // }
 
-        if (toggle && selectType === 'Roles') {
-            let arr = [];
-            for (let i = 0; i < DAO.members.length; i++) {
-                let user = DAO.members[i];
-                if (user.discordRoles) {
-                    let myDiscordRoles: any[] = [];
-                    Object.keys(user.discordRoles).forEach(function (key, index) {
-                        myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
-                    })
-                    let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
+        // if (toggle && selectType === 'Roles') {
+        //     let arr = [];
+        //     for (let i = 0; i < DAO.members.length; i++) {
+        //         let user = DAO.members[i];
+        //         if (user.discordRoles) {
+        //             let myDiscordRoles: any[] = [];
+        //             Object.keys(user.discordRoles).forEach(function (key, index) {
+        //                 myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
+        //             })
+        //             let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
 
-                    if (index > -1) {
-                        arr.push({ name: user.member.name, address: user.member.wallet })
-                    }
-                }
-                else {
-                    if (selectedRoles.includes(user.role)) {
-                        arr.push({ name: user.member.name, address: user.member.wallet })
-                    }
-                }
-            }
-            project['members'] = _uniqBy(arr, m => m.address);
-            project['validRoles'] = selectedRoles;
-            project['inviteType'] = 'Roles';
-        }
+        //             if (index > -1) {
+        //                 arr.push({ name: user.member.name, address: user.member.wallet })
+        //             }
+        //         }
+        //         else {
+        //             if (selectedRoles.includes(user.role)) {
+        //                 arr.push({ name: user.member.name, address: user.member.wallet })
+        //             }
+        //         }
+        //     }
+        //     project['members'] = _uniqBy(arr, m => m.address);
+        //     project['validRoles'] = selectedRoles;
+        //     project['inviteType'] = 'Roles';
+        // }
 
         // dispatch(createProject({ payload: project }));
     }
@@ -230,30 +280,37 @@ export default () => {
                     <Typography sx={{ fontWeight: 700, fontSize: 16, color: '#76808D' }}>Invite members</Typography>
                     <Button variant="contained" color="secondary" className={classes.addMemberBtn}>ADD NEW MEMBER</Button>
                 </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Avatar name="Zohaib" wallet="0xA015C8B6844Fa3294209f413F32Da90e92c45F5a" />
-                    <Checkbox />
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Avatar name="Zohaib" wallet="0xA015C8B6844Fa3294209f413F32Da90e92c45F5a" />
-                    <Checkbox />
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Avatar name="Zohaib" wallet="0xA015C8B6844Fa3294209f413F32Da90e92c45F5a" />
-                    <Checkbox />
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Avatar name="Zohaib" wallet="0xA015C8B6844Fa3294209f413F32Da90e92c45F5a" />
-                    <Checkbox />
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Avatar name="Zohaib" wallet="0xA015C8B6844Fa3294209f413F32Da90e92c45F5a" />
-                    <Checkbox />
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Avatar name="Zohaib" wallet="0xA015C8B6844Fa3294209f413F32Da90e92c45F5a" />
-                    <Checkbox />
-                </Box>
+                {
+                    _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item, index) => {
+                        if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
+                            return (
+                                <>
+                                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} key={index} onClick={() => handleAddMember(item.member)}>
+                                        <Avatar name={item.member.name} wallet={item.member.wallet} />
+                                        <Checkbox />
+                                    </Box>
+                                    {/* <div className="member-li" key={index} onClick={() => handleAddMember(item.member)}>
+                                    
+                                    <div className="member-address">
+
+                                        <div className='checkbox' onClick={() => handleAddMember(item.member)}>
+                                            {
+                                                !(selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false)
+                                                    ?
+                                                    <div className="active-box">
+                                                        <BsCheck2 color="#FFF" />
+                                                    </div>
+                                                    :
+                                                    <div className="inactive-box"></div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div> */}
+                                </>
+                            )
+                        }
+                    })
+                }
             </Paper>
         )
     }
@@ -401,6 +458,7 @@ export default () => {
                                         variant='contained'
                                         disableElevation
                                         sx={{ width: 255, height: 50, fontSize: 16 }}
+                                        onClick={handleCreateProject}
                                     >
                                         CREATE WORKSPACE
                                     </Button>
@@ -415,6 +473,7 @@ export default () => {
                                         fullWidth
                                         value={name}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+
                                     />
                                 </Box>
                                 <Box sx={{ marginBottom: '20px' }}>
@@ -471,6 +530,7 @@ export default () => {
                 <Grid xs={12} item display="flex" flexDirection="column" alignItems="center" sx={{ margin: '10vh 0' }}>
                     <img src={createProjectSvg} alt="frame-icon" />
                     <Typography color="primary" variant="subtitle1" className={classes.heading}>Project details</Typography>
+
                     <Paper className={classes.paperContainer} sx={{ width: 453, display: 'flex', flexDirection: 'column' }}>
                         <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                             <Box>
@@ -508,35 +568,81 @@ export default () => {
                             </Box>
                         }
                     </Paper>
+
                     <Box className={classes.divider}></Box>
-                    <Paper className={classes.paperContainer} sx={{ width: 453, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Box>
-                            <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>Milestones</Typography>
-                            <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Add links for your team to access </Typography>
+
+                    <Paper className={classes.paperContainer} sx={{ width: 453, display: 'flex', flexDirection: 'column' }}>
+                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                            <Box>
+                                <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>Milestones</Typography>
+                                <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Add links for your team to access </Typography>
+                            </Box>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
+                                onClick={() => setOpenMilestone(true)}
+                            >
+                                <AddIcon sx={{ fontSize: 18 }} /> ADD
+                            </Button>
                         </Box>
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
-                            onClick={() => setOpenMilestone(true)}
-                        >
-                            <AddIcon sx={{ fontSize: 18 }} /> ADD
-                        </Button>
+                        {/* Map all the milestones */}
+                        {
+                            milestones.length > 0 &&
+                            <Box>
+                                {
+                                    milestones.map((item, index) => {
+                                        return (
+                                            <Box key={index} className={classes.arrayRow} display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginTop: '20px' }}>
+                                                <Box display={"flex"} alignItems={"center"}>
+                                                    <Typography sx={{ fontWeight: '700', fontSize: '14px', color: '#C94B32' }}>{index + 1}</Typography>
+                                                    <Typography sx={{ fontWeight: '700', fontSize: '14px', color: '#76808D', marginLeft: '5px' }}>{item.name}</Typography>
+                                                </Box>
+                                                <Box>
+                                                    <Typography sx={{ fontWeight: '700', fontSize: '14px', color: '#76808D' }}>{moment(item.deadline).format('L')}</Typography>
+                                                </Box>
+                                            </Box>
+                                        )
+                                    })
+                                }
+                            </Box>
+                        }
                     </Paper>
+
                     <Box className={classes.divider}></Box>
-                    <Paper className={classes.paperContainer} sx={{ width: 453, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Box>
-                            <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>Key results</Typography>
-                            <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Set objective for your team</Typography>
+
+                    <Paper className={classes.paperContainer} sx={{ width: 453, display: 'flex', flexDirection: 'column' }}>
+                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                            <Box>
+                                <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>Key results</Typography>
+                                <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Set objective for your team</Typography>
+                            </Box>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
+                                onClick={() => setOpenKRA(true)}
+                            >
+                                <AddIcon sx={{ fontSize: 18 }} /> ADD
+                            </Button>
                         </Box>
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
-                            onClick={() => setOpenKRA(true)}
-                        >
-                            <AddIcon sx={{ fontSize: 18 }} /> ADD
-                        </Button>
+                        {/* Map all the results */}
+                        {
+                            results.length > 0 &&
+                            <Box>
+                                {
+                                    results.map((item, index) => {
+                                        return (
+                                            <Box key={index} className={classes.arrayRow} display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginTop: '20px' }}>
+                                                <Box display={"flex"} alignItems={"center"}>
+                                                    <Typography sx={{ fontWeight: '700', fontSize: '14px', color: '#76808D' }}>{item.name}</Typography>
+                                                </Box>
+                                            </Box>
+                                        )
+                                    })
+                                }
+                            </Box>
+                        }
                     </Paper>
                     <Button
                         variant='contained'

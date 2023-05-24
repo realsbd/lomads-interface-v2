@@ -6,16 +6,18 @@ import { Box, Typography } from '@mui/material';
 
 export default ({ name, wallet, hideDetails, ...props }: any) => {
 
+    var getInitials = function (value: string) {
+        var names = value.split(' '),
+            initials = names[0].substring(0, 1).toUpperCase();
+
+        if (names.length > 1) {
+            initials += names[names.length - 1].substring(0, 1).toUpperCase();
+        }
+        return initials;
+    };
+
     return (
         <Box style={{ display: 'flex', width: '100%', position: 'relative' }}>
-            {/* <Box style={{ height: 40, width: 40, borderRadius: '50%', backgroundColor: '#FFF', boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)' }} display={"flex"} alignItems={"center"} justifyContent={"center"}>
-                <Avatar
-                    size={32}
-                    name={wallet}
-                    variant="marble"
-                    colors={["#E67C40", "#EDCD27", "#8ECC3E", "#2AB87C", "#188C8C"]}
-                />
-            </Box> */}
             <Avatar
                 size={32}
                 name={wallet}
@@ -23,7 +25,7 @@ export default ({ name, wallet, hideDetails, ...props }: any) => {
                 colors={["#E67C40", "#EDCD27", "#8ECC3E", "#2AB87C", "#188C8C"]}
             />
             {name && <Box style={{ height: 32, width: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', left: 0, top: 0 }} >
-                <Typography sx={{ color: '#FFF', fontWeight: 500 }}>ZK</Typography>
+                <Typography sx={{ color: '#FFF', fontWeight: 500 }}>{getInitials(name)}</Typography>
             </Box>}
             {
                 !hideDetails &&
