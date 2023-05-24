@@ -19,7 +19,7 @@ export default () => {
     const navigate = useNavigate();
     const { DAO, DAOList } = useDAO();
     return (
-        <Grid container maxWidth={"1079px"}>
+        <Grid container>
             <Grid item sm={12}>
                 <Links />
             </Grid>

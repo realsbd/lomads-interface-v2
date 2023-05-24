@@ -1,9 +1,11 @@
 // eslint-disable-next-line no-unused-vars
 import LandingLayout from 'layouts/LandingLayout';
 import DashboardLayout from 'layouts/DashboardLayout';
+import SettingsLayout from 'layouts/SettingsLayout';
 
 import LoginPage from 'pages/Login';
 import DashboardPage from 'pages/Dashboard';
+import SettingsPage from 'pages/Settings';
 
 export default [
 	{
@@ -19,6 +21,13 @@ export default [
 		layout: LandingLayout,
 		private: true,
 		component: DashboardPage
+	},
+	{
+		path: '/:daoURL/settings',
+		exact: true,
+		layout: SettingsLayout,
+		private: true,
+		component: SettingsPage
 	},
 	{
 		path: '/',

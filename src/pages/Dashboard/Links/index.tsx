@@ -7,6 +7,7 @@ import SettingsSVG from 'assets/svg/settings.svg';
 import LinkChip from "components/LinkChip";
 import { useDAO } from "context/dao";
 import Skeleton from '@mui/material/Skeleton';
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -41,6 +42,7 @@ const useStyles = makeStyles((theme: any) => ({
   }));
 
 export default () => {
+    const navigate = useNavigate()
     const classes = useStyles();
     const { DAO } = useDAO()
 
@@ -63,7 +65,7 @@ export default () => {
                     }
                 </Stack>
             </Box>
-            <IconButton>
+            <IconButton onClick={() => navigate(`/${DAO?.url}/settings`)}>
                 <img src={SettingsSVG} />
             </IconButton>
         </Paper>
