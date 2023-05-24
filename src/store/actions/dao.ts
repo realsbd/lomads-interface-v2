@@ -18,3 +18,10 @@ export const loadDAOAction = (payload: string | null) => {
         payload
     }
 }
+
+export const setDAOAction = (payload: any) => {
+    return {
+        type: actionTypes.SET_DAO_ACTION,
+        payload
+    }
+}

@@ -334,7 +334,7 @@ export default () => {
 
         console.log("projected created : ", project);
 
-        dispatch(createProjectAction({ payload: project }));
+        dispatch(createProjectAction(project));
     }
 
     const handleRenderMemberList = () => {

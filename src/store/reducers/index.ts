@@ -14,7 +14,7 @@ const rootPersistConfig = {
   version: 0,
   storage: storage,
   stateReconciler: autoMergeLevel2,
-  whitelist: ['session', 'project'],
+  whitelist: ['session'],
 };
 
 
