@@ -283,7 +283,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: any }) => {
                             <Box display="flex" flexDirection="row" alignItems="center">
                                 <Box display="flex" flexDirection="row" alignItems="center" flexGrow={1}>
                                     <img className='icon'></img>
-                                    <Typography className={classes.timelineTitle}>{ DAO?.name }</Typography>
+                                    <Typography className={classes.timelineTitle}>{ DAO?.name } created !</Typography>
                                 </Box>
                                 <Typography className={classes.timelineDate}>{ moment.utc(DAO?.createdAt).local().format('MM/DD') }</Typography>
                             </Box>
