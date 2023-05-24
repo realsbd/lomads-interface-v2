@@ -335,7 +335,7 @@ export default ({ children }: any) => {
           className={classes.main}
         >
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mb: 4, mt: '107px' }}>
+          <Container maxWidth="lg" sx={{ mb: 4, mt: '60px' }}>
             { children }
           </Container>
         </Box>
