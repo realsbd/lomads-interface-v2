@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { find as _find, get as _get, debounce as _debounce, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 
 import { Grid, Paper, Typography, Box, Chip } from "@mui/material";
@@ -22,10 +22,18 @@ import KraModal from "modals/Project/KraModal";
 import { useDAO } from "context/dao";
 import { useWeb3Auth } from "context/web3Auth";
 
+import useTerminology from 'hooks/useTerminology';
+
 import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsTwitter, BsGlobe } from "react-icons/bs";
 
 import moment from 'moment';
+
+import { DEFAULT_ROLES } from "constants/terminology";
+
+import { useAppDispatch } from "helpers/useAppDispatch";
+import { createProjectAction } from "store/actions/project";
+import { useAppSelector } from "helpers/useAppSelector";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -102,6 +110,12 @@ const useStyles = makeStyles((theme: any) => ({
     },
     linkAddress: {
         width: '60% !important',
+    },
+    rolePill: {
+        width: 200,
+        display: "flex !important",
+        alignItems: "center !important",
+        justifyContent: "flex-start !important"
     }
 }));
 
@@ -109,8 +123,13 @@ export default () => {
     const classes = useStyles();
 
     const { DAO } = useDAO();
-    const { chainId, account } = useWeb3Auth();
+    const { account } = useWeb3Auth();
+    const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'));
     console.log("DAO in createProject : ", DAO);
+
+    const dispatch = useAppDispatch();
+    // @ts-ignore
+    const { createProjectLoading } = useAppSelector(store => store.project);
 
     const [name, setName] = useState<string>('');
     const [desc, setDesc] = useState<string>('');
@@ -127,6 +146,7 @@ export default () => {
     const [toggle, setToggle] = useState<boolean>(false);
     const [selectType, setSelectType] = useState<string>('Invitation');
 
+    const [roles, setRoles] = useState<any[]>([]);
     const [selectedRoles, setSelectedRoles] = useState<any[]>([]);
 
     const [openResource, setOpenResource] = useState<boolean>(false);
@@ -143,6 +163,42 @@ export default () => {
         if (DAO)
             setMemberList(DAO.members)
     }, [DAO])
+
+    useEffect(() => {
+        const rolesArr = _get(DAO, 'terminologies.roles', DEFAULT_ROLES);
+        const discordOb = _get(DAO, 'discord', {});
+        let temp: any[] = [];
+        if (rolesArr) {
+            Object.keys(rolesArr).forEach(function (key, _index) {
+                temp.push({
+                    lastRole: _index === 3, title: key, value: rolesArr[key].label,
+                    roleColor: _index == 0 ? '#92e1a8' :
+                        _index == 1 ? '#89b3e5' :
+                            _index == 2 ? '#e96447' : '#92e1a8'
+                });
+            });
+        }
+        if (discordOb) {
+            Object.keys(discordOb).forEach(function (key, _index) {
+                const discordChannel = discordOb[key];
+                discordChannel.roles.forEach((item: any) => {
+                    if (item.name !== '@everyone' && item.name !== 'LomadsTestBot' && item.name !== 'Lomads' && (temp.some((m) => m.title.toLowerCase() === item.id.toLowerCase()) === false)) {
+                        temp.push({ title: item.id, value: item.name, roleColor: item?.roleColor });
+                    }
+                })
+            });
+        }
+        setRoles(temp);
+    }, [DAO]);
+
+    const all_roles = useMemo(() => {
+        let roles: any[] = [];
+        Object.keys(_get(DAO, 'discord', {})).map((server) => {
+            const r = DAO.discord[server].roles
+            roles = roles.concat(r);
+        })
+        return roles.filter(r => r.name !== "@everyone" && r.name !== 'Lomads' && r.name !== 'LomadsTestBot');
+    }, [DAO.discord])
 
     useEffect(() => {
         const memberList = DAO?.members;
@@ -200,7 +256,6 @@ export default () => {
     }
 
     const handleAddMember = (member: any) => {
-        console.log("Add member")
         const memberExists = _find(selectedMembers, m => m.address.toLowerCase() === member.wallet.toLowerCase())
         if (memberExists)
             setSelectedMembers(prev => prev.filter((item) => item.address.toLowerCase() !== member.wallet.toLowerCase()));
@@ -212,65 +267,74 @@ export default () => {
         }
     }
 
+    const handleAddRoles = (role: any) => {
+        const roleExists = _find(selectedRoles, m => m.toLowerCase() === role.toLowerCase())
+        if (roleExists)
+            setSelectedRoles(prev => prev.filter((item) => item.toLowerCase() !== role.toLowerCase()));
+        else {
+            setSelectedRoles([...selectedRoles, role]);
+        }
+    }
+
     const handleCreateProject = () => {
-        console.log("selected members : ", selectedMembers);
-        // console.log("selectedRoles : ", selectedRoles);
-        // let project: any = {};
-        // project['name'] = name;
-        // project['description'] = desc;
-        // project['links'] = resourceList;
-        // project['milestones'] = milestones;
-        // project['compensation'] = compensation;
-        // project['kra'] = {
-        //     frequency,
-        //     results
-        // };
-        // project['daoId'] = DAO?._id;
+        let project: any = {};
+        project['name'] = name;
+        project['description'] = desc;
+        project['links'] = resourceList;
+        project['milestones'] = milestones;
+        project['compensation'] = compensation;
+        project['kra'] = {
+            frequency,
+            results
+        };
+        project['daoId'] = DAO?._id;
 
-        // if (!toggle) {
-        //     let arr = [];
-        //     for (let i = 0; i < DAO.members.length; i++) {
-        //         let user = DAO.members[i];
-        //         arr.push({ name: user.member.name, address: user.member.wallet })
-        //     }
-        //     project['members'] = arr;
-        //     project['validRoles'] = [];
-        //     project['inviteType'] = 'Open';
-        // }
+        if (!toggle) {
+            let arr = [];
+            for (let i = 0; i < DAO.members.length; i++) {
+                let user = DAO.members[i];
+                arr.push({ name: user.member.name, address: user.member.wallet })
+            }
+            project['members'] = arr;
+            project['validRoles'] = [];
+            project['inviteType'] = 'Open';
+        }
 
-        // if (toggle && selectType === 'Invitation') {
-        //     project['members'] = _uniqBy(selectedMembers, m => m.address);
-        //     project['validRoles'] = [];
-        //     project['inviteType'] = 'Invitation';
-        // }
+        if (toggle && selectType === 'Invitation') {
+            project['members'] = _uniqBy(selectedMembers, m => m.address);
+            project['validRoles'] = [];
+            project['inviteType'] = 'Invitation';
+        }
 
-        // if (toggle && selectType === 'Roles') {
-        //     let arr = [];
-        //     for (let i = 0; i < DAO.members.length; i++) {
-        //         let user = DAO.members[i];
-        //         if (user.discordRoles) {
-        //             let myDiscordRoles: any[] = [];
-        //             Object.keys(user.discordRoles).forEach(function (key, index) {
-        //                 myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
-        //             })
-        //             let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
+        if (toggle && selectType === 'Roles') {
+            let arr = [];
+            for (let i = 0; i < DAO.members.length; i++) {
+                let user = DAO.members[i];
+                if (user.discordRoles) {
+                    let myDiscordRoles: any[] = [];
+                    Object.keys(user.discordRoles).forEach(function (key, index) {
+                        myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
+                    })
+                    let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
 
-        //             if (index > -1) {
-        //                 arr.push({ name: user.member.name, address: user.member.wallet })
-        //             }
-        //         }
-        //         else {
-        //             if (selectedRoles.includes(user.role)) {
-        //                 arr.push({ name: user.member.name, address: user.member.wallet })
-        //             }
-        //         }
-        //     }
-        //     project['members'] = _uniqBy(arr, m => m.address);
-        //     project['validRoles'] = selectedRoles;
-        //     project['inviteType'] = 'Roles';
-        // }
+                    if (index > -1) {
+                        arr.push({ name: user.member.name, address: user.member.wallet })
+                    }
+                }
+                else {
+                    if (selectedRoles.includes(user.role)) {
+                        arr.push({ name: user.member.name, address: user.member.wallet })
+                    }
+                }
+            }
+            project['members'] = _uniqBy(arr, m => m.address);
+            project['validRoles'] = selectedRoles;
+            project['inviteType'] = 'Roles';
+        }
 
-        // dispatch(createProject({ payload: project }));
+        console.log("projected created : ", project);
+
+        dispatch(createProjectAction({ payload: project }));
     }
 
     const handleRenderMemberList = () => {
@@ -289,23 +353,6 @@ export default () => {
                                         <Avatar name={item.member.name} wallet={item.member.wallet} />
                                         <Checkbox />
                                     </Box>
-                                    {/* <div className="member-li" key={index} onClick={() => handleAddMember(item.member)}>
-                                    
-                                    <div className="member-address">
-
-                                        <div className='checkbox' onClick={() => handleAddMember(item.member)}>
-                                            {
-                                                !(selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false)
-                                                    ?
-                                                    <div className="active-box">
-                                                        <BsCheck2 color="#FFF" />
-                                                    </div>
-                                                    :
-                                                    <div className="inactive-box"></div>
-                                            }
-                                        </div>
-                                    </div>
-                                </div> */}
                                 </>
                             )
                         }
@@ -321,73 +368,60 @@ export default () => {
                 <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '22px' }}>
                     <Typography sx={{ fontWeight: 700, fontSize: 16, color: '#76808D' }}>Organisation Roles</Typography>
                 </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Chip
-                        label="Admin"
-                        avatar={<Box sx={{ background: 'rgba(146, 225, 168, 1)', borderRadius: '50%' }}></Box>}
-                        sx={{ background: 'rgba(146, 225, 168, 0.3)', width: 200, display: "flex", alignItems: "center", justifyContent: "flex-start" }}
-                    />
-                    <Checkbox />
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Chip
-                        label="Core Contributor"
-                        avatar={<Box sx={{ background: 'rgba(137,179,229,1)', borderRadius: '50%' }}></Box>}
-                        sx={{ background: 'rgba(137,179,229,0.3)', width: 200, display: "flex", alignItems: "center", justifyContent: "flex-start" }}
-                    />
-                    <Checkbox />
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Chip
-                        label="Active Contributor"
-                        avatar={<Box sx={{ background: 'rgba(234,100,71,1)', borderRadius: '50%' }}></Box>}
-                        sx={{ background: 'rgba(234,100,71,0.3)', width: 200, display: "flex", alignItems: "center", justifyContent: "flex-start" }}
-                    />
-                    <Checkbox />
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Chip
-                        label="Contributor"
-                        avatar={<Box sx={{ background: 'rgba(146, 225, 168, 1)', borderRadius: '50%' }}></Box>}
-                        sx={{ background: 'rgba(146, 225, 168, 0.3)', width: 200, display: "flex", alignItems: "center", justifyContent: "flex-start" }}
-                    />
-                    <Checkbox />
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ margin: '22px 0' }}>
-                    <Typography sx={{ fontWeight: 700, fontSize: 16, color: '#76808D' }}>Discord Roles</Typography>
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Chip
-                        label="Headmaster"
-                        avatar={<Box sx={{ background: 'rgba(146, 225, 168, 1)', borderRadius: '50%' }}></Box>}
-                        sx={{ background: 'rgba(146, 225, 168, 0.3)', width: 200, display: "flex", alignItems: "center", justifyContent: "flex-start" }}
-                    />
-                    <Checkbox />
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Chip
-                        label="Teacher"
-                        avatar={<Box sx={{ background: 'rgba(137,179,229,1)', borderRadius: '50%' }}></Box>}
-                        sx={{ background: 'rgba(137,179,229,0.3)', width: 200, display: "flex", alignItems: "center", justifyContent: "flex-start" }}
-                    />
-                    <Checkbox />
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Chip
-                        label="Studens"
-                        avatar={<Box sx={{ background: 'rgba(234,100,71,1)', borderRadius: '50%' }}></Box>}
-                        sx={{ background: 'rgba(234,100,71,0.3)', width: 200, display: "flex", alignItems: "center", justifyContent: "flex-start" }}
-                    />
-                    <Checkbox />
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Chip
-                        label="Staff"
-                        avatar={<Box sx={{ background: 'rgba(146, 225, 168, 1)', borderRadius: '50%' }}></Box>}
-                        sx={{ background: 'rgba(146, 225, 168, 0.3)', width: 200, display: "flex", alignItems: "center", justifyContent: "flex-start" }}
-                    />
-                    <Checkbox />
-                </Box>
+                {
+                    Object.keys(_get(DAO, 'terminologies.roles', {})).map((key, index) => {
+                        return (
+                            <>
+                                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} key={index} onClick={() => handleAddRoles(key)}>
+                                    <Chip
+                                        label={_get(transformRole(key), 'label')}
+                                        className={classes.rolePill}
+                                        avatar={
+                                            <Box sx={
+                                                index === 0 ? { background: 'rgba(146, 225, 168, 1)', borderRadius: '50% !important', } :
+                                                    index === 1 ? { background: 'rgba(137,179,229,1)', borderRadius: '50% !important', } :
+                                                        index === 2 ? { background: 'rgba(234,100,71,1)', borderRadius: '50% !important', } : { background: 'rgba(146, 225, 168, 1)', borderRadius: '50% !important', }
+
+                                            }></Box>
+                                        }
+                                        sx={
+                                            index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } :
+                                                index === 1 ? { background: 'rgba(137,179,229,0.3)' } :
+                                                    index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }
+                                        }
+                                    />
+                                    <Checkbox />
+                                </Box>
+                            </>
+                        )
+                    })
+                }
+
+                {
+                    all_roles && all_roles.length > 0 &&
+                    <>
+                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ margin: '22px 0' }}>
+                            <Typography sx={{ fontWeight: 700, fontSize: 16, color: '#76808D' }}>Discord Roles</Typography>
+                        </Box>
+                        {
+                            all_roles.map((discord_value, index) => {
+                                return (
+                                    <>
+                                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} key={index} onClick={() => handleAddRoles(discord_value.id)}>
+                                            <Chip
+                                                label={discord_value.name}
+                                                className={classes.rolePill}
+                                                avatar={<Box sx={{ background: _get(discord_value, 'roleColor', '#99aab5'), borderRadius: '50%' }}></Box>}
+                                                sx={{ background: `${_get(discord_value, 'roleColor', '#99aab5')}50` }}
+                                            />
+                                            <Checkbox />
+                                        </Box>
+                                    </>
+                                )
+                            })
+                        }
+                    </>
+                }
             </Paper>
         )
     }
@@ -455,6 +489,7 @@ export default () => {
                                         ADD MORE DETAIL
                                     </Button>
                                     <Button
+                                        loading={createProjectLoading}
                                         variant='contained'
                                         disableElevation
                                         sx={{ width: 255, height: 50, fontSize: 16 }}
@@ -537,14 +572,20 @@ export default () => {
                                 <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>Project resources</Typography>
                                 <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Add links for your team to access </Typography>
                             </Box>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
-                                onClick={() => setOpenResource(true)}
-                            >
-                                <AddIcon sx={{ fontSize: 18 }} /> ADD
-                            </Button>
+                            {
+                                resourceList.length > 0
+                                    ?
+                                    <img src={editToken} alt="hk-logo" onClick={() => setOpenResource(true)} style={{ cursor: 'pointer' }} />
+                                    :
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
+                                        onClick={() => setOpenResource(true)}
+                                    >
+                                        <AddIcon sx={{ fontSize: 18 }} /> ADD
+                                    </Button>
+                            }
                         </Box>
                         {/* Map all the resources */}
                         {
@@ -577,14 +618,20 @@ export default () => {
                                 <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>Milestones</Typography>
                                 <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Add links for your team to access </Typography>
                             </Box>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
-                                onClick={() => setOpenMilestone(true)}
-                            >
-                                <AddIcon sx={{ fontSize: 18 }} /> ADD
-                            </Button>
+                            {
+                                milestones.length > 0
+                                    ?
+                                    <img src={editToken} alt="hk-logo" onClick={() => setOpenMilestone(true)} style={{ cursor: 'pointer' }} />
+                                    :
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
+                                        onClick={() => setOpenMilestone(true)}
+                                    >
+                                        <AddIcon sx={{ fontSize: 18 }} /> ADD
+                                    </Button>
+                            }
                         </Box>
                         {/* Map all the milestones */}
                         {
@@ -617,14 +664,20 @@ export default () => {
                                 <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>Key results</Typography>
                                 <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Set objective for your team</Typography>
                             </Box>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
-                                onClick={() => setOpenKRA(true)}
-                            >
-                                <AddIcon sx={{ fontSize: 18 }} /> ADD
-                            </Button>
+                            {
+                                results.length > 0
+                                    ?
+                                    <img src={editToken} alt="hk-logo" onClick={() => setOpenKRA(true)} style={{ cursor: 'pointer' }} />
+                                    :
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        sx={{ width: 125, height: 40, fontSize: 16, color: '#C94B32' }}
+                                        onClick={() => setOpenKRA(true)}
+                                    >
+                                        <AddIcon sx={{ fontSize: 18 }} /> ADD
+                                    </Button>
+                            }
                         </Box>
                         {/* Map all the results */}
                         {
@@ -645,9 +698,11 @@ export default () => {
                         }
                     </Paper>
                     <Button
+                        loading={createProjectLoading}
                         variant='contained'
                         disableElevation
                         sx={{ width: 255, height: 50, fontSize: 16, marginTop: '35px' }}
+                        onClick={handleCreateProject}
                     >
                         CREATE WORKSPACE
                     </Button>

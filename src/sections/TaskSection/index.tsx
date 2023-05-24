@@ -12,7 +12,7 @@ import TaskCard from "components/TaskCard";
 const useStyles = makeStyles((theme: any) => ({
     addMemberBtn: {
         width: '125px',
-        hieght: '40px',
+        height: '40px',
         background: '#FFFFFF !important',
         boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), - 3px - 3px 8px rgba(201, 75, 50, 0.1) !important',
         borderRadius: '5px !important',

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Typography, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import Button from "components/Button";
@@ -7,8 +7,20 @@ import IconButton from 'components/IconButton';
 
 import archiveIcon from 'assets/svg/archiveIcon.svg';
 
-const useStyles = makeStyles((theme: any) => ({
+import { useNavigate } from "react-router-dom"
+import ProjectCard from "components/ProjectCard";
+import { useDAO } from "context/dao";
 
+const useStyles = makeStyles((theme: any) => ({
+    createBtn: {
+        width: '125px',
+        height: '40px',
+        background: '#FFFFFF !important',
+        boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), - 3px - 3px 8px rgba(201, 75, 50, 0.1) !important',
+        borderRadius: '5px !important',
+        fontSize: '14px !important',
+        color: '#C94B32 !important'
+    },
 }));
 
 interface TabPanelProps {
@@ -48,6 +60,8 @@ function a11yProps(index: number) {
 
 export default () => {
     const classes = useStyles();
+    const { DAO } = useDAO();
+    const navigate = useNavigate();
     const [value, setValue] = useState<number>(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -75,11 +89,10 @@ export default () => {
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
-                    <Typography sx={{ marginLeft: '14px', fontWeight: 400, color: '#76808D', marginRight: '100px' }}>Review frequency : Daily</Typography>
                     <IconButton sx={{ marginRight: '20px' }}>
                         <img src={archiveIcon} alt="archiveIcon" />
                     </IconButton>
-                    <Button size="small" variant="contained">
+                    <Button size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/createProject`)}>
                         + CREATE
                     </Button>
                 </Box>
@@ -88,21 +101,45 @@ export default () => {
             {/* Tab panel for my workspace */}
             <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
                 <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
-
+                    {
+                        [1, 2, 3, 4, 5, 6].map((item, index) => {
+                            return (
+                                <Box key={index}>
+                                    <ProjectCard />
+                                </Box>
+                            )
+                        })
+                    }
                 </Box>
             </TabPanel>
 
             {/* Tab panel for drafts */}
             <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
                 <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
-
+                    {
+                        [1, 2, 3].map((item, index) => {
+                            return (
+                                <Box key={index}>
+                                    <ProjectCard />
+                                </Box>
+                            )
+                        })
+                    }
                 </Box>
             </TabPanel>
 
             {/* Tab panel for all workspace */}
-            <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
+            <TabPanel value={value} index={2} style={{ marginTop: '0.2rem' }}>
                 <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
-
+                    {
+                        [1, 2, 3, 4].map((item, index) => {
+                            return (
+                                <Box key={index}>
+                                    <ProjectCard />
+                                </Box>
+                            )
+                        })
+                    }
                 </Box>
             </TabPanel>
         </Box>
