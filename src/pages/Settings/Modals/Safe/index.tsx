@@ -111,7 +111,7 @@ export default ({ onClose }: { onClose: any }) => {
                                             return null
                                         }
                                         return safe
-                                     })} expanded={active && active._id === safe._id}>
+                                     })} expanded={active && active?._id === safe?._id}>
                                         <AccordionSummary
                                         expandIcon={<ExpandMoreIcon color="primary" />}
                                         aria-controls="panel1bh-content"
@@ -127,20 +127,22 @@ export default ({ onClose }: { onClose: any }) => {
                                             </Box>
                                         </AccordionSummary>
                                             <AccordionDetails className={classes.safeDetails}>
-                                                <Box>
+                                                <Box sx={{ mb: 1 }}>
                                                     <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                                                         <Typography className={classes.ownerTitle}>{ `${safe?.owners?.length} Owners` }</Typography>
                                                         <IconButton>
                                                             <img src={EditSVG} />
                                                         </IconButton>
                                                     </Box>
-                                                    {
-                                                        safe?.owners?.map((owner:any) => (
-                                                        <Box sx={{ my: 2 }}>
-                                                            <LomadsAvatar name={owner.name} wallet={owner.wallet}/>
-                                                        </Box>
-                                                        ))
-                                                    }
+                                                    <Box style={{ maxHeight: 250, overflow: 'hidden', overflowY: 'auto' }}>
+                                                        {
+                                                            safe?.owners?.map((owner:any) => (
+                                                            <Box sx={{ my: 2 }}>
+                                                                <LomadsAvatar name={owner.name} wallet={owner.wallet}/>
+                                                            </Box>
+                                                            ))
+                                                        }
+                                                    </Box>
                                                 </Box>
                                                 <Box sx={{ width: 190, border: "2px solid #C94B32" }} ></Box>
                                                 <Box sx={{ mt: 2 }}>
