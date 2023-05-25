@@ -4,6 +4,7 @@ import { get as _get } from 'lodash'
 import { Box, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import palette from 'theme/palette';
+import Skeleton from '@mui/material/Skeleton';
 
 const useStyles = makeStyles((theme: any) => ({
   root: {
@@ -69,11 +70,16 @@ export default ({ children, dao, ...props } : any) => {
 
   return (
       <Box { ...props }  className={props.plain ? classes.plain : classes.root}>
+        { dao ? 
         <Box className={classes.logoContainer}>
-        { dao?.image ? <img className={classes.image} src={_get(dao, 'image')} /> :
-            dao && <Typography variant='h6' className={classes.title}>{initials}</Typography>
-        }
+          { dao?.image ? <img className={classes.image} src={_get(dao, 'image')} /> :
+              dao && <Typography variant='h6' className={classes.title}>{initials}</Typography>
+          }
+        </Box> :
+        <Box className={classes.logoContainer}>
+          <Skeleton className={classes.logoContainer} animation="wave" variant="rounded" height={35} width={35} />
         </Box>
+      }
       </Box>
   );
 }

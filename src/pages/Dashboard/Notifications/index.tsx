@@ -261,8 +261,8 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: any }) => {
     if(!DAO || !myNotifications) {
         return (
             <Box className={classes.root}>
-                <Skeleton variant="rectangular" height={328} width={'59.8%'} className={clsx([classes.myNotifications])} />
-                <Skeleton variant="rectangular" height={328} width={'39.8%'} className={clsx([classes.timelineNotification, { marginleft: '5px !important' }])} />
+                <Skeleton variant="rectangular" animation="wave" height={328} width={'59.8%'} className={clsx([classes.myNotifications])} />
+                <Skeleton variant="rectangular" animation="wave" height={328} width={'39.8%'} className={clsx([classes.timelineNotification, { marginleft: '5px !important' }])} />
             </Box>
         )
     }

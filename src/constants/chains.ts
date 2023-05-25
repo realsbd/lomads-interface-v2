@@ -87,6 +87,7 @@ export const L2_CHAIN_IDS = [
 export type SupportedL2ChainId = typeof L2_CHAIN_IDS[number]
 
 export const GNOSIS_SAFE_BASE_URLS:any = {
+  [SupportedChainId.MAINNET]: 'https://safe-transaction-mainnet.safe.global',
   [SupportedChainId.GOERLI]: 'https://safe-transaction.goerli.gnosis.io',
   [SupportedChainId.POLYGON]: 'https://safe-transaction-polygon.safe.global'
 }

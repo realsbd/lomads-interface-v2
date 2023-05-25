@@ -48,7 +48,7 @@ export default () => {
 
     if(!DAO) {
         return (
-            <Skeleton variant="rectangular" className={classes.root} />
+            <Skeleton variant="rectangular" animation="wave" className={classes.root} />
         )
     }
 

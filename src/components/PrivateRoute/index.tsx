@@ -22,6 +22,8 @@ export default (props: any) => {
 		}
 	}, [account, token, user, props.private])
 
+	console.log("authenticated", authenticated)
+	
 	if ((authenticated === null) && props.private) {
 		return <FullScreenLoader />
 	} else if ((authenticated === false) && props.private) {
