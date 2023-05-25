@@ -30,13 +30,19 @@ export default ({ variant, milestones }) => {
         >
             <Step transition="scale">
                 {({ accomplished, index }) => (
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} className={accomplished ? `${classes.indexedStep} accomplished` : `${classes.indexedStep}`}></Box>
+                    <Box
+                        display={"flex"}
+                        alignItems={"center"}
+                        justifyContent={"center"}
+                        className={accomplished ? `${classes.indexedStep} accomplished` : `${classes.indexedStep}`}
+                    >
+                    </Box>
                 )}
             </Step>
             {
                 milestones.map((item, index) => {
                     return (
-                        <Step transition="scale">
+                        <Step transition="scale" key={index}>
                             {({ accomplished, index }) => (
                                 <Box display={"flex"} alignItems={"center"} justifyContent={"center"} className={accomplished ? `${classes.indexedStep} accomplished` : `${classes.indexedStep}`}></Box>
                             )}

@@ -18,6 +18,9 @@ import { isValidUrl } from 'utils';
 import { nanoid } from 'nanoid';
 
 import { useDAO } from "context/dao";
+import AddDiscordLink from "components/AddDiscordLink";
+import AddNotionLink from "components/AddNotionLink";
+import Switch from "components/Switch";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -62,7 +65,8 @@ const useStyles = makeStyles((theme: any) => ({
         height: 50,
         borderRadius: '5px',
         cursor: 'pointer',
-        margin: '0 !important'
+        margin: '0 !important',
+        marginTop: '10px !important'
     },
     linkArea: {
         width: '100% !important',
@@ -103,8 +107,8 @@ export default ({ open, closeModal, list, getResources, editResources }: Props) 
     const [titleError, setTitleError] = useState<string>('');
     const [link, setLink] = useState<string>('');
     const [linkError, setLinkError] = useState<string>('');
-    const [roleName, setRoleName] = useState(null);
-    const [spaceDomain, setSpaceDomain] = useState(null);
+    const [roleName, setRoleName] = useState<string>('');
+    const [spaceDomain, setSpaceDomain] = useState<string>('');
     const [accessControl, setAccessControl] = useState(false);
     const [accessControlError, setAccessControlError] = useState<string>('');
     const [resourceList, setResourceList] = useState<any[]>(list);
@@ -140,6 +144,23 @@ export default ({ open, closeModal, list, getResources, editResources }: Props) 
         }
     }, [link]);
 
+    const LinkBtn = (props: any): JSX.Element => {
+        if (link && link.indexOf('discord.') > -1) {
+            return (
+                <Box sx={{ marginTop: '10px' }}>
+                    <AddDiscordLink onLinkError={(e: React.SetStateAction<string>) => setLinkError(e)} {...props} />
+                </Box>
+            )
+        }
+        else {
+            return (
+                <Box sx={{ marginTop: '10px' }}>
+                    <AddNotionLink {...props} />
+                </Box>
+            )
+        }
+    }
+
     const handleParseUrl = (url: string) => {
         try {
             const link = new URL(url);
@@ -169,87 +190,77 @@ export default ({ open, closeModal, list, getResources, editResources }: Props) 
     }
 
     const handleAddResource = async (status: any = undefined) => {
-        // if (title === '') {
-        //     setTitleError('Please enter a title');
-        //     return;
-        // }
-        // else if (link === '') {
-        //     setLinkError("Please enter a link");
-        //     return;
-        // }
-        // else if (!isValidUrl(link)) {
-        //     setLinkError("Please enter a valid link");
-        //     return;
-        // }
-        // else {
-        //     let tempLink = link;
-        //     if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
-        //         tempLink = 'https://' + tempLink;
-        //     }
-        //     if (link.indexOf('discord.') > -1) {
-        //         let resource:any = {};
-        //         resource.id = nanoid(16);
-        //         resource.title = title;
-        //         resource.link = tempLink;
-        //         resource.provider = new URL(tempLink).hostname;
-        //         let dcserverid = undefined;
-        //         if (status)
-        //             dcserverid = new URL(tempLink).pathname.split('/')[2]
-        //         resource.platformId = dcserverid;
-        //         resource.accessControl = accessControl;
-        //         if (status)
-        //             resource.roleId = status;
-        //         setResourceList([...resourceList, resource]);
-        //         setAccessControl(false);
-        //         setTitle('');
-        //         setLink('');
-        //         setRoleName(null)
-        //         setSpaceDomain(null)
-        //     }
-        //     else if (link.indexOf('notion.') > -1) {
-        //         if (status.status) {
-        //             let resource:any = {};
-        //             resource.id = nanoid(16);
-        //             resource.title = title;
-        //             resource.link = tempLink;
-        //             resource.provider = new URL(tempLink).hostname;
-        //             resource.spaceDomain = spaceDomain;
-        //             resource.accessControl = accessControl;
-        //             setResourceList([...resourceList, resource]);
-        //             setAccessControl(false);
-        //             setTitle('');
-        //             setLink('');
-        //             setRoleName(null)
-        //             setSpaceDomain(null)
-        //         }
-        //         else {
-        //             setLinkError(status.message || 'Something went wrong.')
-        //         }
-        //     }
-        //     else {
-        //         let resource:any = {};
-        //         resource.id = nanoid(16);
-        //         resource.title = title;
-        //         resource.link = tempLink;
-        //         resource.accessControl = false
-        //         setResourceList([...resourceList, resource]);
-        //         setAccessControl(false);
-        //         setTitle('');
-        //         setLink('');
-        //         setRoleName(null)
-        //         setSpaceDomain(null)
-        //     }
-        // }
-        let tempLink = link;
-        if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
-            tempLink = 'https://' + tempLink;
+        if (title === '') {
+            setTitleError('Enter title');
+            return;
         }
-        let resource: any = {};
-        resource.id = nanoid(16);
-        resource.title = title;
-        resource.link = tempLink;
-        resource.accessControl = false
-        setResourceList([...resourceList, resource]);
+        else if (link === '') {
+            setLinkError("Enter link");
+            return;
+        }
+        else if (!isValidUrl(link)) {
+            setLinkError("Enter valid link");
+            return;
+        }
+        else {
+            let tempLink = link;
+            if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+                tempLink = 'https://' + tempLink;
+            }
+            if (link.indexOf('discord.') > -1) {
+                let resource: any = {};
+                resource.id = nanoid(16);
+                resource.title = title;
+                resource.link = tempLink;
+                resource.provider = new URL(tempLink).hostname;
+                let dcserverid = undefined;
+                if (status)
+                    dcserverid = new URL(tempLink).pathname.split('/')[2]
+                resource.platformId = dcserverid;
+                resource.accessControl = accessControl;
+                if (status)
+                    resource.roleId = status;
+                setResourceList([...resourceList, resource]);
+                setAccessControl(false);
+                setTitle('');
+                setLink('');
+                setRoleName('')
+                setSpaceDomain('')
+            }
+            else if (link.indexOf('notion.') > -1) {
+                if (status.status) {
+                    let resource: any = {};
+                    resource.id = nanoid(16);
+                    resource.title = title;
+                    resource.link = tempLink;
+                    resource.provider = new URL(tempLink).hostname;
+                    resource.spaceDomain = spaceDomain;
+                    resource.accessControl = accessControl;
+                    setResourceList([...resourceList, resource]);
+                    setAccessControl(false);
+                    setTitle('');
+                    setLink('');
+                    setRoleName('')
+                    setSpaceDomain('')
+                }
+                else {
+                    setLinkError(status.message || 'Something went wrong.')
+                }
+            }
+            else {
+                let resource: any = {};
+                resource.id = nanoid(16);
+                resource.title = title;
+                resource.link = tempLink;
+                resource.accessControl = false
+                setResourceList([...resourceList, resource]);
+                setAccessControl(false);
+                setTitle('');
+                setLink('');
+                setRoleName('')
+                setSpaceDomain('')
+            }
+        }
     }
 
     const handleRemoveResource = (position: number) => {
@@ -283,30 +294,118 @@ export default ({ open, closeModal, list, getResources, editResources }: Props) 
                 </Box>
                 <Box display="flex" flexDirection="column" sx={{ width: '80%' }}>
                     <Typography className={classes.label}>Add links</Typography>
-                    <Box display="flex" alignItems={"center"} justifyContent={"space-between"}>
+                    <Box display="flex" justifyContent={"space-between"} sx={{ height: '80px' }}>
                         <TextInput
                             sx={{ width: 145 }}
                             placeholder="Ex Portfolio"
                             value={title}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setTitle(e.target.value); setTitleError(''); }}
+                            error={titleError !== ''}
+                            id={titleError !== '' ? "outlined-error-helper-text" : ""}
+                            helperText={titleError}
                         />
                         <TextInput
                             sx={{ width: 195 }}
                             placeholder="link"
                             value={link}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setLink(e.target.value); setLinkError(''); }}
+                            error={linkError !== ''}
+                            id={linkError !== '' ? "outlined-error-helper-text" : ""}
+                            helperText={linkError}
                         />
-                        <Box
-                            className={classes.addLinkBtn}
-                            sx={link !== '' && title !== '' ? { background: '#C84A32' } : { background: 'rgba(27, 43, 65, 0.2)', }}
-                            display={"flex"}
-                            alignItems={"center"}
-                            justifyContent={"center"}
-                            onClick={() => handleAddResource()}
-                        >
-                            <AiOutlinePlus color="#FFF" size={25} />
-                        </Box>
+
+                        {
+                            link && (link.indexOf('discord.') > -1 || link.indexOf('notion.') > -1) ?
+                                <>
+                                    {/* <Box
+                                        className={classes.addLinkBtn}
+                                        sx={link !== '' && title !== '' ? { background: '#C84A32' } : { background: 'rgba(27, 43, 65, 0.2)', }}
+                                        display={"flex"}
+                                        alignItems={"center"}
+                                        justifyContent={"center"}
+                                        onClick={() => handleAddResource()}
+                                    >
+                                        <AiOutlinePlus color="#FFF" size={25} />
+                                    </Box> */}
+                                    <LinkBtn
+                                        spaceDomain={spaceDomain}
+                                        onNotionCheckStatus={handleAddResource}
+                                        onGuildCreateSuccess={handleAddResource}
+                                        title={title}
+                                        link={link}
+                                        roleName={roleName}
+                                        accessControl={accessControl}
+                                    />
+                                </>
+                                :
+                                <Box
+                                    className={classes.addLinkBtn}
+                                    sx={link !== '' && title !== '' ? { background: '#C84A32' } : { background: 'rgba(27, 43, 65, 0.2)', }}
+                                    display={"flex"}
+                                    alignItems={"center"}
+                                    justifyContent={"center"}
+                                    onClick={() => handleAddResource()}
+                                >
+                                    <AiOutlinePlus color="#FFF" size={25} />
+                                </Box>
+                        }
                     </Box>
+
+                    {
+                        accessControl && link && link.indexOf('discord.') > -1 &&
+                        <Box style={{ width: '100%' }}>
+                            <TextInput
+                                sx={{ width: '100%' }}
+                                type="text"
+                                placeholder="Role name"
+                                value={roleName}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRoleName(e.target.value)}
+                            />
+                        </Box>
+                    }
+
+                    {
+                        accessControl && link && link.indexOf('notion.') > -1 && !linkHasDomain &&
+                        <Box style={{ width: '100%' }}>
+                            <TextInput
+                                sx={{ width: '100%' }}
+                                type="text"
+                                placeholder="Notion Domain"
+                                value={spaceDomain}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSpaceDomain(e.target.value)}
+                            />
+                        </Box>
+                    }
+
+                    {
+                        DAO?.sbt &&
+                        <Box sx={{ width: '100%', marginTop: '10px' }} display={"flex"}>
+                            {
+                                (link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('email') > -1) || (link && link.indexOf('discord.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('discord') > -1)
+                                    ?
+                                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"}>
+                                        <Switch checkedSVG="checkmark" onChange={() => setAccessControl(prev => !prev)} />
+                                    </Box>
+                                    :
+                                    null
+                            }
+                            <Box style={{ display: 'flex', flexDirection: 'column' }}>
+                                <Typography sx={{ color: '#76808D', opacity: '0.6' }}>ACCESS CONTROL <AiFillQuestionCircle /></Typography>
+                                <Typography sx={{ color: 'rgba(118, 128, 141, 0.5)', fontStyle: 'italic', fontSize: '14px' }}>Currently available for Notion and Discord only</Typography>
+                                {accessControlError && <div><span style={{ color: 'red' }}>{accessControlError}</span></div>}
+                            </Box>
+                        </Box>
+                    }
+
+                    {
+                        accessControl && link && link.indexOf('notion.') > -1 &&
+                        <Box
+                            style={{ fontSize: 14, marginTop: '10px', marginBottom: 16, padding: "5px 10px", backgroundColor: "#188C7C", borderRadius: 5, color: "#FFF" }}
+                        >
+                            Invite <span style={{ color: "#FFF", fontWeight: 'bold' }}>{process.env.REACT_APP_NOTION_ADMIN_EMAIL}</span> to be an Admin of your workspace
+                        </Box>
+                    }
+
                     {
                         resourceList.length > 0 &&
                         <Box className={classes.linkArea}>
@@ -318,8 +417,9 @@ export default ({ open, closeModal, list, getResources, editResources }: Props) 
                                                 {handleParseUrl(item.link)}
                                                 <Typography sx={{ marginLeft: '5px' }}>{item.title.length > 10 ? item.title.slice(0, 10) + "..." : item.title}</Typography>
                                             </Box>
-                                            <Box className={classes.linkAddress}>
+                                            <Box className={classes.linkAddress} display={"flex"} alignItems={"center"}>
                                                 <Typography>{item.link.length > 20 ? item.link.slice(0, 20) + "..." : item.link}</Typography>
+                                                {item.accessControl && <AiOutlineLock color='#C94B32' />}
                                             </Box>
                                             <Box display={"flex"} alignItems={"center"} justifyContent={"center"}
                                                 sx={{ width: 40, cursor: 'pointer' }}

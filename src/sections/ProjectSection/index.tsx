@@ -8,6 +8,7 @@ import IconButton from 'components/IconButton';
 
 import archiveIcon from 'assets/svg/archiveIcon.svg';
 import AddIcon from '@mui/icons-material/Add';
+import expandIcon from 'assets/svg/expand.svg';
 
 import { useNavigate, useParams } from "react-router-dom"
 import ProjectCard from "components/ProjectCard";
@@ -140,7 +141,7 @@ export default () => {
                     prj.notification = 1
                 return prj;
             })
-            setOtherProjects(_orderBy(myProjects.concat(otherProjects), p => moment(p.createdAt).unix(), 'desc'))
+            setOtherProjects(_orderBy(otherProjects, p => moment(p.createdAt).unix(), 'desc'))
         }
     }, [DAO, value]);
 
@@ -177,6 +178,9 @@ export default () => {
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
+                    <IconButton sx={{ marginRight: '20px' }}>
+                        <img src={expandIcon} alt="archive-icon" />
+                    </IconButton>
                     <IconButton sx={{ marginRight: '20px' }}>
                         <img src={archiveIcon} alt="archiveIcon" />
                     </IconButton>

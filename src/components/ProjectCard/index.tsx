@@ -3,8 +3,6 @@ import { get as _get, find as _find, groupBy as _groupBy, orderBy as _orderBy } 
 import { Typography, Box, Card, CardContent } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
-import submitted from 'assets/svg/submitted.svg';
-import calendarIcon from 'assets/svg/calendar.svg'
 import { BsDiscord } from 'react-icons/bs';
 import { FaTrello, FaGithub } from 'react-icons/fa';
 
@@ -17,7 +15,7 @@ const useStyles = makeStyles((theme: any) => ({
     taskCard: {
         width: '315px',
         height: '110px',
-        padding: '0 !important',
+        padding: '20px !important',
         marginRight: '20px !important',
         marginBottom: '15px !important',
         borderRadius: '5px !important',
@@ -30,19 +28,10 @@ const useStyles = makeStyles((theme: any) => ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        "&:last-child": {
-            padding: '0 15px !important'
-        }
-    },
-    projectText: {
-        fontSize: '14px !important',
-        color: '#76808D !important',
-        lineHeight: '16px !important',
     },
     taskText: {
         fontSize: '22px !important',
         color: '#B12F15 !important',
-        marginTop: '3px !important',
         marginBottom: '10px !important',
         lineHeight: '25px !important',
     },
@@ -96,14 +85,12 @@ export default ({ project, daoUrl, tab }: CardProps) => {
             const provider = Object.keys(grp)[index];
             count.push({ provider, count: grp[provider].reduce((p, c) => (p + (+_get(c, 'notification', 0))), 0) })
         }
-        console.log(count)
         return count
     }, [project]);
 
     const handleCardClick = () => {
-        console.log("clicked... : ", project.name);
         // dispatch(updateViewProject({ projectId: project._id, daoUrl: _get(DAO, 'url', '') }));
-        // navigate(`/${daoUrl}/project/${project._id}`, { state: { project } })
+        navigate(`/${daoUrl}/project/${project._id}`, { state: { project } })
     }
 
     return (
@@ -114,16 +101,17 @@ export default ({ project, daoUrl, tab }: CardProps) => {
                     background: '#FFF',
                     boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
                 }}
+                onClick={handleCardClick}
             >
                 {
                     project.links.length > 0 && tab === 0
                         ?
                         <Box className={classes.iconContainer}>
                             {
-                                notifications.map(notification => {
+                                notifications.map((notification, index) => {
                                     if (notification.provider.indexOf('discord') > -1 && notification.count) {
                                         return (
-                                            <Box className={classes.iconPill}>
+                                            <Box className={classes.iconPill} key={index}>
                                                 <BsDiscord color='#FFF' size={20} />
                                                 <p>+{notification.count}</p>
                                             </Box>
@@ -163,11 +151,11 @@ export default ({ project, daoUrl, tab }: CardProps) => {
                     <Typography className={classes.taskText}>{_get(project, 'name', '')}</Typography>
                     {
                         _get(project, 'milestones', []).length > 0 &&
-                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                        <Box sx={{ width: '100%' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                             <Box sx={{ width: '195px' }}>
                                 <StepperProgress variant="primary" milestones={_get(project, 'milestones', [])} />
                             </Box>
-                            <Typography sx={{ fontSize: '14px', color: '#188c7c', marginLeft: '18px' }}>
+                            <Typography sx={{ fontSize: '14px', color: '#76808D' }}>
                                 {(((_get(project, 'milestones', []).filter((item: any) => item.complete === true).length) / (_get(project, 'milestones', []).length)) * 100).toFixed(2)}%
                             </Typography>
                         </Box>

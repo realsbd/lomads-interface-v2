@@ -54,6 +54,9 @@ const MaterialUISwitch = styled(Switch)(({ theme, checkedSVG }) => ({
       },
     },
   },
+  '& .MuiFormControlLabel-root': {
+    marginLeft: '0px !important'
+  },
   '& .MuiSwitch-thumb': {
     backgroundColor: theme.palette.primary.main,
     boxShadow: 'none',
@@ -86,6 +89,7 @@ export default ({ label,
   ...props }: any) => {
   return (
     <FormControlLabel
+      sx={{ margin: '0' }}
       control={<MaterialUISwitch checkedSVG={checkedSVG === 'lock' ? LOCK : CHECKMARK} sx={{ mr: 1 }} />}
       label={label}
       {...props}

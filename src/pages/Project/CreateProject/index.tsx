@@ -133,13 +133,13 @@ export default () => {
 
     const [name, setName] = useState<string>('');
     const [desc, setDesc] = useState<string>('');
-    const [next, setNext] = useState<boolean>(false);
+    const [next, setNext] = useState<boolean>(!false);
 
     const [showAddMember, setShowAddMember] = useState(false);
     const [memberList, setMemberList] = useState(DAO?.members);
     const [selectedMembers, setSelectedMembers] = useState<any[]>([]);
     const [resourceList, setResourceList] = useState<any[]>([]);
-    const [showMore, setShowMore] = useState<boolean>(false);
+    const [showMore, setShowMore] = useState<boolean>(!false);
     const [success, setSuccess] = useState(false);
     const [newAddress, setNewAddress] = useState<any[]>([]);
 
@@ -149,7 +149,7 @@ export default () => {
     const [roles, setRoles] = useState<any[]>([]);
     const [selectedRoles, setSelectedRoles] = useState<any[]>([]);
 
-    const [openResource, setOpenResource] = useState<boolean>(false);
+    const [openResource, setOpenResource] = useState<boolean>(!false);
     const [openMilestone, setOpenMilestone] = useState<boolean>(false);
     const [openKRA, setOpenKRA] = useState<boolean>(false);
 
@@ -215,7 +215,6 @@ export default () => {
     }, [DAO]);
 
     useEffect(() => {
-        console.log("new address : ", newAddress);
         if (newAddress.length > 0) {
             newAddress.map((value) => {
                 const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === value.toLowerCase());
@@ -429,7 +428,7 @@ export default () => {
             <Grid container className={classes.root}>
                 <Grid xs={12} item display="flex" flexDirection="column" alignItems="center" sx={{ margin: '10vh 0' }}>
                     <img src={createProjectSvg} alt="frame-icon" />
-                    <Typography color="primary" variant="subtitle1" className={classes.heading}>Create new Project</Typography>
+                    <Typography color="primary" variant="subtitle1" className={classes.heading}>Create New {transformWorkspace().label}</Typography>
                     {
                         next
                             ?
@@ -437,7 +436,7 @@ export default () => {
                                 <Grid item xs={12} display={"flex"} flexDirection={"column"} alignItems={"center"}>
                                     <Paper className={classes.descriptionCard} elevation={0}>
                                         <Box>
-                                            <Typography className={classes.projectName}>Project Name</Typography>
+                                            <Typography className={classes.projectName}>{transformWorkspace().label} Name</Typography>
                                             <Typography className={classes.projectDesc} dangerouslySetInnerHTML={{ __html: desc.length > 50 ? desc.substring(0, 50) + "..." : desc }}></Typography>
                                         </Box>
                                         <Box>
@@ -456,7 +455,7 @@ export default () => {
                                     </Box>
                                     {
                                         !toggle &&
-                                        <Typography sx={{ marginTop: '35px', fontSize: 14, fontStyle: 'italic', fontWeight: 400 }}>Any member can see this workplace</Typography>
+                                        <Typography sx={{ marginTop: '35px', fontSize: 14, fontStyle: 'italic', fontWeight: 400 }}>Any member can see this {transformWorkspace().label}</Typography>
                                     }
                                     {
                                         toggle &&
@@ -493,7 +492,7 @@ export default () => {
                                         sx={{ width: 255, height: 50, fontSize: 16 }}
                                         onClick={handleCreateProject}
                                     >
-                                        CREATE WORKSPACE
+                                        CREATE {transformWorkspace().label.toUpperCase()}
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -501,7 +500,7 @@ export default () => {
                             <Paper className={classes.paperContainer} sx={{ width: 394 }}>
                                 <Box sx={{ marginBottom: '20px' }}>
                                     <TextInput
-                                        label="Name of the project"
+                                        label={`Name of the ${transformWorkspace().label}`}
                                         placeholder="Super project"
                                         fullWidth
                                         value={name}
@@ -562,12 +561,12 @@ export default () => {
                 />
                 <Grid xs={12} item display="flex" flexDirection="column" alignItems="center" sx={{ margin: '10vh 0' }}>
                     <img src={createProjectSvg} alt="frame-icon" />
-                    <Typography color="primary" variant="subtitle1" className={classes.heading}>Project details</Typography>
+                    <Typography color="primary" variant="subtitle1" className={classes.heading}>{transformWorkspace().label} Details</Typography>
 
                     <Paper className={classes.paperContainer} sx={{ width: 453, display: 'flex', flexDirection: 'column' }}>
                         <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                             <Box>
-                                <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>Project resources</Typography>
+                                <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>{transformWorkspace().label} resources</Typography>
                                 <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Add links for your team to access </Typography>
                             </Box>
                             {
@@ -614,7 +613,7 @@ export default () => {
                         <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                             <Box>
                                 <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>Milestones</Typography>
-                                <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Add links for your team to access </Typography>
+                                <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Organise and link payments to milestones</Typography>
                             </Box>
                             {
                                 milestones.length > 0
@@ -702,7 +701,7 @@ export default () => {
                         sx={{ width: 255, height: 50, fontSize: 16, marginTop: '35px' }}
                         onClick={handleCreateProject}
                     >
-                        CREATE WORKSPACE
+                        CREATE {transformWorkspace().label.toUpperCase()}
                     </Button>
                 </Grid>
             </Grid>

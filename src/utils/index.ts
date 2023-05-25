@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers'
 
 export function beautifyHexToken(token: string): string {
   return (token?.slice(0, 6) + "..." + token?.slice(-4))
@@ -28,3 +29,9 @@ export const isRightAddress = (holderAddress: string) => {
   const isValid: boolean = ethers.utils.isAddress(holderAddress);
   return isValid;
 };
+
+
+// account is not optional
+export function getSigner(provider: JsonRpcProvider, account: string): JsonRpcSigner {
+  return provider.getSigner(account).connectUnchecked()
+}

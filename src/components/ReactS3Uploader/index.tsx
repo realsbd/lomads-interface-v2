@@ -50,7 +50,6 @@ class ReactS3Uploader extends React.Component {
   }
 
   uploadFile() {
-    console.log("UPLOAD FILE");
     this.myUploader = new S3Upload({
       fileElement: ReactDOM.findDOMNode(this),
       signingUrl: this.props.signingUrl,
@@ -73,7 +72,6 @@ class ReactS3Uploader extends React.Component {
   }
 
   dropFile(files) {
-    console.log("DROP FILE");
     this.myUploader = new S3Upload({
       files: files,
       signingUrl: this.props.signingUrl,
@@ -154,7 +152,6 @@ ReactS3Uploader.propTypes = {
 
 ReactS3Uploader.defaultProps = {
   preprocess: function (file, next) {
-    console.log('Pre-process: ' + file.name);
     next(file);
   },
   onSignedUrl: function (signingServerResponse) {

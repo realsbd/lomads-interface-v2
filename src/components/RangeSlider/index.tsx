@@ -8,15 +8,11 @@ const colors = ["#FFCC18", "#A7DB39", "#1AC1C1"];
 export function getTrackBackground({ values }: any) {
     // sort values ascending
     const progress = values.slice(0).sort((a: any, b: any) => a - b).map((value: any) => ((value - 0) / 100) * 100);
-    console.log(progress)
     const middle = progress.reduce(
         (acc: any, point: any, index: number) =>
             `${acc}, ${colors[index]} ${point}%, ${colors[index + 1]} ${point}%`,
         ''
     );
-    console.log(middle)
-    console.log(`linear-gradient(45deg, ${colors[0]} 0%${middle}, ${colors[colors.length - 1]
-        } 100%)`)
     return `linear-gradient(45deg, ${colors[0]} 0%${middle}, ${colors[colors.length - 1]
         } 100%)`;
 }

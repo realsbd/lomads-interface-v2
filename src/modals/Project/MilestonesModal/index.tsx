@@ -245,7 +245,6 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
         }
         if (amount === 0) {
             setErrorProjectValue(true);
-            console.log("Compensation amount cannot be 0")
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency);
             symbol = _get(symbol, 'token.symbol', null);
             if (!symbol)
@@ -323,7 +322,6 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
                 closeModal();
             }
         }
-        console.log("Milestones : ", milestones);
     }
 
     return (
