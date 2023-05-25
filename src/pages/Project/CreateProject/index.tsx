@@ -332,8 +332,6 @@ export default () => {
             project['inviteType'] = 'Roles';
         }
 
-        console.log("projected created : ", project);
-
         dispatch(createProjectAction(project));
     }
 

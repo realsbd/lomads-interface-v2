@@ -4,6 +4,7 @@ import { makeStyles } from '@mui/styles';
 
 import Button from "components/Button";
 import IconButton from 'components/IconButton';
+import AddIcon from '@mui/icons-material/Add';
 
 import archiveIcon from 'assets/svg/archiveIcon.svg';
 import CreateTaskModal from "modals/Tasks/CreateTaskModal";
@@ -67,7 +68,7 @@ export default () => {
     };
 
     return (
-        <Box sx={{ width: '100%' }} display="flex" flexDirection={"column"}>
+        <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
             <CreateTaskModal
                 open={openCreateTask}
                 closeModal={() => setOpenCreateTask(false)}
@@ -96,7 +97,7 @@ export default () => {
                         <img src={archiveIcon} alt="archiveIcon" />
                     </IconButton>
                     <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn} onClick={() => setOpenCreateTask(true)}>
-                        + CREATE
+                        <AddIcon sx={{ fontSize: 18 }} /> CREATE
                     </Button>
                 </Box>
             </Box>

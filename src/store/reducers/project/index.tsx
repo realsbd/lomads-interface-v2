@@ -19,11 +19,6 @@ const ProjectReducer = (state: any = getInitialState(), action: any) =>
                 draft.createProjectLoading = payload;
                 break;
             }
-            case actionTypes.SET_PROJECT_ACTION: {
-                draft.project = payload;
-                draft.createProjectLoading = false;
-                break;
-            }
         }
     });
 

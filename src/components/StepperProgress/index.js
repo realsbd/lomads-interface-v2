@@ -6,8 +6,8 @@ import { makeStyles } from '@mui/styles';
 const useStyles = makeStyles((theme) => ({
     indexedStep: {
         color: '#FFF',
-        width: 15,
-        height: 15,
+        width: 11,
+        height: 11,
         fontSize: 12,
         backgroundColor: 'rgba(211, 211, 211, 1)',
         borderRadius: '50% !important',
@@ -18,13 +18,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default () => {
+export default ({ variant, milestones }) => {
     const classes = useStyles();
 
     return (
         <ProgressBar
-            percent={0.5 * 100}
-            filledBackground="#188C7C"
+            percent={((milestones.filter((item) => item.complete === true).length) / (milestones.length)) * 100}
+            filledBackground={variant === 'primary' ? "#76808D" : "#188C7C"}
             unfilledBackground="#F0F0F0"
             height="5px"
         >
@@ -33,16 +33,17 @@ export default () => {
                     <Box display={"flex"} alignItems={"center"} justifyContent={"center"} className={accomplished ? `${classes.indexedStep} accomplished` : `${classes.indexedStep}`}></Box>
                 )}
             </Step>
-            <Step transition="scale">
-                {({ accomplished, index }) => (
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} className={accomplished ? `${classes.indexedStep} accomplished` : `${classes.indexedStep}`}></Box>
-                )}
-            </Step>
-            <Step transition="scale">
-                {({ accomplished, index }) => (
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} className={accomplished ? `${classes.indexedStep} accomplished` : `${classes.indexedStep}`}></Box>
-                )}
-            </Step>
+            {
+                milestones.map((item, index) => {
+                    return (
+                        <Step transition="scale">
+                            {({ accomplished, index }) => (
+                                <Box display={"flex"} alignItems={"center"} justifyContent={"center"} className={accomplished ? `${classes.indexedStep} accomplished` : `${classes.indexedStep}`}></Box>
+                            )}
+                        </Step>
+                    )
+                })
+            }
         </ProgressBar>
     )
 }

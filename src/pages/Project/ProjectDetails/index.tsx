@@ -201,7 +201,7 @@ export default () => {
                             value === 0 &&
                             <Box display={"flex"} alignItems={"center"}>
                                 <div style={{ width: '300px' }}>
-                                    <StepperProgress />
+                                    <StepperProgress variant="secondary" milestones={[]} />
                                 </div>
                                 <Typography sx={{ marginLeft: '16px', fontWeight: 700, color: '#188C7C' }}>50%</Typography>
                             </Box>
