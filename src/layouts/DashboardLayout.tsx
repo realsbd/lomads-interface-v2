@@ -268,7 +268,7 @@ export default ({ children }: any) => {
             {
               DAO ?
               <HeaderLogo dao={DAO} onMouseLeave={hideDrawer} onMouseEnter={showDrawer} /> : 
-              <Skeleton variant="rectangular" width={116} height={107} sx={{ borderBottomRightRadius: 30 }} />
+              <Skeleton variant="rectangular" animation="wave" width={116} height={107} sx={{ borderBottomRightRadius: 30 }} />
             }
             { DAO ?
             <Box sx={{ mt: 0 }} style={{ padding: 0, height: '100%', flex: 1 }}>
@@ -291,11 +291,11 @@ export default ({ children }: any) => {
             <Box sx={{ mt: 0 }} style={{ padding: 0, height: '100%', flex: 1 }}>
                 <Box display="flex" minHeight={107} sx={{ pb: 2, pt: 3, pr: 4 }} flexDirection="row" alignItems="flex-start">
                     <Box sx={{ flexGrow: 1, ml: 4 }}>
-                        <Skeleton variant="text" className={classes.title} sx={{ marginLeft: "20px", width: 150 }} />
-                        <Skeleton variant="text" className={classes.subtitle} sx={{ marginLeft: "20px", width: 600 }} />
-                        <Skeleton variant="text" className={classes.subtitle} sx={{ marginLeft: "20px", width: 400 }} />
+                        <Skeleton variant="text" animation="wave" className={classes.title} sx={{ marginLeft: "20px", width: 150 }} />
+                        <Skeleton variant="text"  animation="wave" className={classes.subtitle} sx={{ marginLeft: "20px", width: 600 }} />
+                        <Skeleton variant="text" animation="wave" className={classes.subtitle} sx={{ marginLeft: "20px", width: 400 }} />
                     </Box>
-                    <Skeleton variant="rectangular" width={223} height={60} sx={{ borderRadius: 30 }} />
+                    <Skeleton animation="wave" variant="rectangular" width={223} height={60} sx={{ borderRadius: 30 }} />
                 </Box>
             </Box>
             }

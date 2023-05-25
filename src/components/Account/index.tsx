@@ -91,7 +91,7 @@ const useStyles = makeStyles((theme: any) => ({
   }
 }));
 
-export default ({ children, ...props } : any) => {
+export default ({ children, options = true, ...props } : any) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { chainId, account, provider, switchChain } = useWeb3Auth()
@@ -182,7 +182,7 @@ export default ({ children, ...props } : any) => {
           </IconButton>
         </Box>
       </Box>
-      <Box className={classes.sliderInfo}>
+      { options && <Box className={classes.sliderInfo}>
              <Box className={classes.rolePill}>
                 <Typography style={{ fontSize: '14px', clear: 'both', display: 'inline-block', textAlign: 'center', whiteSpace: 'nowrap' }}>{ displayRole }</Typography>
              </Box>
@@ -201,7 +201,7 @@ export default ({ children, ...props } : any) => {
              <Box sx={{ ml: 1 }}>
                 <ChainSwitchList onselect={(chain: any) => handleSwitch(chain)} chainId={chainId} />
              </Box>
-      </Box>
+      </Box> }
       <Menu
         key="account-options-menu"
         id="account-options-menu"

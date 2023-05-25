@@ -1,8 +1,11 @@
 import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
-import Grid from '@mui/material/Grid';
+import { Grid, Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { Container } from '@mui/system';
+import Account from 'components/Account';
+import { useWeb3Auth } from 'context/web3Auth';
+import { useAppSelector } from 'helpers/useAppSelector';
 
 const useStyles = makeStyles((theme: any) => ({
   root: {
@@ -12,12 +15,19 @@ const useStyles = makeStyles((theme: any) => ({
 }));
 
 export default ({ children } : any) => {
-
+  const { account } = useWeb3Auth();
+  //@ts-ignore
+  const { token } = useAppSelector(store => store.session)
   const classes = useStyles();
 
   return (
       <Grid container component="main" className={classes.root}>
         <CssBaseline />
+        {  account && token &&
+          <Box style={{ position: 'absolute', top: 24, right: 32 }}>
+            <Account options={false} />
+          </Box>
+        }
         <Container maxWidth="lg">
           { children }
         </Container>

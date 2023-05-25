@@ -10,9 +10,10 @@ import PassTokens from "assets/images/settings-page/4-pass-tokens.svg";
 import XpPoints from "assets/images/settings-page/5-xp-points.svg";
 import Terminology from "assets/images/settings-page/6-terminology.svg";
 import IntegrationGrey from "assets/svg/integrations.svg";
-
+import Skeleton from '@mui/material/Skeleton';
 import SafeModal from './Modals/Safe'
 import IconButton from "components/IconButton";
+import { useDAO } from "context/dao";
 
 const useStyles = makeStyles((theme: any) => ({
     item: {
@@ -30,7 +31,7 @@ const useStyles = makeStyles((theme: any) => ({
         fontFamily: 'Inter, sans-serif',
         fontStyle: 'normal',
         fontWeight: '400 !important',
-        fontSize: '20px !important',
+        fontSize: '18px !important',
         lineHeight: '25px !important',
         letterSpacing: '-0.011em',
         color: '#C94B32'
@@ -39,6 +40,12 @@ const useStyles = makeStyles((theme: any) => ({
 
 const Content = ({ icon, title, onClick }: { icon: any | undefined, title: string | undefined, onClick: any }) => {
     const classes = useStyles();
+    const { DAO } = useDAO()
+    if(!DAO) {
+        return (
+            <Skeleton variant="rectangular"  animation="wave" height={130} className={classes.item} width={'100%'} />
+        )
+    }
     return (
         <Box onClick={onClick} className={classes.item}>
             <Box>

@@ -113,20 +113,23 @@ export default ({ children } : any) => {
               <Grid item sm={12}>
                 <Box className={classes.header}>
                   <Box className={classes.plain}>
-                    <Box className={classes.logoContainer}>
+                    { DAO ? <Box className={classes.logoContainer}>
                     { DAO?.image ? <img className={classes.image} src={_get(DAO, 'image')} /> :
                         DAO && <Typography variant='h6' className={classes.title}>{initials}</Typography>
                     }
-                    </Box>
+                    </Box> :   
+                    <Box className={classes.logoContainer}>
+                        <Skeleton animation="wave" variant="rounded" height={72} width={72} />
+                    </Box> }
                   </Box>
                   <Box ml={4} flexGrow={1}>
                     { DAO ?
                       <Typography className={classes.daoName}>{ _get(DAO, 'name', '') }</Typography> :
-                      <Skeleton variant="rectangular" color={palette.primary.dark} className={classes.daoName} sx={{ width: 250 }} />
+                      <Skeleton animation="wave" variant="rectangular" className={classes.daoName} sx={{ width: 250 }} />
                     }
                     {  DAO ?
                       <Typography className={classes.settings}>Settings</Typography>: 
-                      <Skeleton variant="rectangular" color={palette.primary.dark} className={classes.settings} sx={{ width: 100 }} />
+                      <Skeleton animation="wave" variant="rectangular" className={classes.settings} sx={{ width: 100 }} />
                     }
                   </Box>
                   <IconButton onClick={() => navigate(-1)} sx={{ width: 37, height: 37, borderRadius: 1, backgroundColor: 'rgba(27, 43, 65, 0.2)' }}>

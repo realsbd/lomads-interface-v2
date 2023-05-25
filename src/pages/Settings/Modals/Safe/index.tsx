@@ -18,6 +18,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { CHAIN_INFO } from "constants/chainInfo"
 import { beautifyHexToken } from "utils"
+import { useNavigate } from "react-router-dom"
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -65,12 +66,24 @@ const useStyles = makeStyles((theme: any) => ({
         fontSize: '12px',
         lineHeight: '16px',
         color: '#1B2B41'
-    }
+    },
+    ChainLogo: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#EEE',
+		borderRadius: '50%',
+		width: 32,
+		height: 32,
+		margin: 10
+	},
   }));
 
 
 export default ({ onClose }: { onClose: any }) => {
     const classes = useStyles();
+    const navigate = useNavigate();
     const { DAO } = useDAO();
     const [active, setActive] = useState<any>(null)
 
@@ -91,22 +104,22 @@ export default ({ onClose }: { onClose: any }) => {
             <Box sx={{ mt: 0 }} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
                 <img src={SafeSVG} />
                 <Typography sx={{ mt: 4 }} className={classes.headerTitle}>Safes</Typography>
-                <Typography sx={{ mt: 2 }} className={classes.headerDescription}>Easily customize your multi-sig wallet with a <br/><span>personal name, signatories and voting threshold.</span></Typography>
+                <Typography sx={{ mt: 2 }} className={classes.headerDescription}>Easily customize your multi-sig wallet with a <br/><span>personal name, signatories</span> and <span>voting threshold.</span></Typography>
             </Box>
             <Box sx={{ mt: 4 }}>
-                <Button size="small" fullWidth variant="contained" color="secondary"><Typography color="primary">Add new safe</Typography></Button>
+                <Button onClick={() => navigate(`/${DAO?.url}/attach-safe/new`)} sx={{ borderRadius: '10px' }} size="small" fullWidth variant="contained" color="secondary"><Typography color="primary">Add new safe</Typography></Button>
             </Box>
             <Box sx={{ mt: 2 }}>
                 {
                     !DAO ?
                     <Stack spacing={1} direction="column">
-                        { ['','','','','','','',''].map(s => <Skeleton variant="rectangular" height={64} width={'100%'} />) }
+                        { ['','','','','','','',''].map(s => <Skeleton variant="rectangular" animation="wave" height={64} width={'100%'} />) }
                     </Stack> : 
                     <Stack spacing={1} direction="column">
                         {
                             DAO?.safes?.map((safe: any) => {
                                 return (
-                                    <Accordion elevation={0} onChange={() => setActive((prev: any) => { 
+                                    <Accordion key={safe.address} elevation={0} onChange={() => setActive((prev: any) => { 
                                         if(prev && prev._id === safe._id) {
                                             return null
                                         }
@@ -119,9 +132,12 @@ export default ({ onClose }: { onClose: any }) => {
                                         className={classes.safeItem}
                                         >
                                             <Box display="flex" flexDirection="row" alignItems="center">
-                                                <Avatar sx={{ width: 32, height: 32 }} sizes="" src={CHAIN_INFO[safe?.chainId]?.logoUrl} />
+                                                <Box className={classes.ChainLogo}>
+                                                    <img width={18} height={18} src={CHAIN_INFO[safe?.chainId]?.logoUrl} alt="seek-logo" />
+												</Box>
+                                                {/* <Avatar sx={{ width: 32, height: 32 }} src={CHAIN_INFO[safe?.chainId]?.logoUrl} /> */}
                                                 <Box sx={{ ml: 2 }}>
-                                                    <Typography style={{ color:"#1B2B41", fontWeight: 600, fontSize: 14, fontFamily: 'Inter, sans-serif' }}>{ safe?.name }</Typography>
+                                                    <Typography style={{ color:"#1B2B41", fontWeight: 600, fontSize: 14, fontFamily: 'Inter, sans-serif' }}>{ safe?.name || 'Multi-sig wallet' }</Typography>
                                                     <Typography style={{ color:"#1B2B41", opacity: 0.59, fontWeight: 600, fontSize: 14, fontFamily: 'Inter, sans-serif' }}>{ beautifyHexToken(safe?.address) }</Typography>
                                                 </Box>
                                             </Box>
@@ -137,8 +153,8 @@ export default ({ onClose }: { onClose: any }) => {
                                                     <Box style={{ maxHeight: 250, overflow: 'hidden', overflowY: 'auto' }}>
                                                         {
                                                             safe?.owners?.map((owner:any) => (
-                                                            <Box sx={{ my: 2 }}>
-                                                                <LomadsAvatar name={owner.name} wallet={owner.wallet}/>
+                                                            <Box key={`${safe.address}-${owner?.wallet}`} sx={{ my: 2 }}>
+                                                                <LomadsAvatar key={`${safe.address}-${owner?.wallet}`} name={owner.name} wallet={owner.wallet}/>
                                                             </Box>
                                                             ))
                                                         }
@@ -168,12 +184,12 @@ export default ({ onClose }: { onClose: any }) => {
                                                     }}
                                                     transformOrigin={{
                                                         vertical: 'top',
-                                                        horizontal: 'left',
+                                                        horizontal: 'right',
                                                     }}
                                                 >
-                                                    <MenuItem>Profile</MenuItem>
-                                                    <MenuItem>Profile</MenuItem>
-                                                    <MenuItem>Profile</MenuItem>
+                                                    <MenuItem>1</MenuItem>
+                                                    <MenuItem>2</MenuItem>
+                                                    <MenuItem>3</MenuItem>
                                                 </Menu>
                                             </AccordionDetails>
                                     </Accordion>
