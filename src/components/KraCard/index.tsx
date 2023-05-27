@@ -2,6 +2,11 @@ import React from "react";
 import { Typography, Card, CardContent } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
+interface KRACardProps {
+    index: number,
+    result: any
+}
+
 const useStyles = makeStyles((theme: any) => ({
     kraCard: {
         width: '315px',
@@ -22,18 +27,19 @@ const useStyles = makeStyles((theme: any) => ({
     kraText: {
         fontSize: '14px !important',
         fontWeight: '700 !important',
-        color: '#76808D'
+        color: '#76808D',
+        textTransform: 'capitalize'
     },
 }));
 
-export default () => {
+export default ({ index, result }: KRACardProps) => {
     const classes = useStyles();
 
     return (
         <>
             <Card elevation={0} className={classes.kraCard}>
                 <CardContent className={classes.kraContent}>
-                    <Typography className={classes.kraText}>Name</Typography>
+                    <Typography className={classes.kraText}>{result.name}</Typography>
                 </CardContent>
             </Card>
         </>
