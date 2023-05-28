@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { Typography, Box, Drawer } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
@@ -16,6 +16,8 @@ import MilestonesModal from "../MilestonesModal";
 import KraModal from "../KraModal";
 import DetailsModal from "../DetailsModal";
 import ProjectMembersModal from "../ProjectMembersModal";
+
+import { useAppSelector } from "helpers/useAppSelector";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -80,7 +82,8 @@ interface Props {
 
 export default ({ open, closeModal }: Props) => {
     const classes = useStyles();
-
+    // @ts-ignore
+    const { Project } = useAppSelector(store => store.project);
     const [openCloseModal, setOpenCloseModal] = useState<boolean>(false);
     const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
 
@@ -127,10 +130,14 @@ export default ({ open, closeModal }: Props) => {
                 closeModal={() => setOpenMilestone(false)}
             /> */}
 
-            {/* <KraModal
+            <KraModal
                 open={openKRA}
                 closeModal={() => setOpenKRA(false)}
-            /> */}
+                list={_get(Project, 'kra.results', [])}
+                freq={_get(Project, 'kra.frequency', '')}
+                getResults={(value1: any[], value2: string) => console.log("TEST")}
+                editKRA={true}
+            />
 
             <Box className={classes.modalContainer}>
                 <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={closeModal}>

@@ -133,13 +133,13 @@ export default () => {
 
     const [name, setName] = useState<string>('');
     const [desc, setDesc] = useState<string>('');
-    const [next, setNext] = useState<boolean>(!false);
+    const [next, setNext] = useState<boolean>(false);
 
     const [showAddMember, setShowAddMember] = useState(false);
     const [memberList, setMemberList] = useState(DAO?.members);
     const [selectedMembers, setSelectedMembers] = useState<any[]>([]);
     const [resourceList, setResourceList] = useState<any[]>([]);
-    const [showMore, setShowMore] = useState<boolean>(!false);
+    const [showMore, setShowMore] = useState<boolean>(false);
     const [success, setSuccess] = useState(false);
     const [newAddress, setNewAddress] = useState<any[]>([]);
 
@@ -149,7 +149,7 @@ export default () => {
     const [roles, setRoles] = useState<any[]>([]);
     const [selectedRoles, setSelectedRoles] = useState<any[]>([]);
 
-    const [openResource, setOpenResource] = useState<boolean>(!false);
+    const [openResource, setOpenResource] = useState<boolean>(false);
     const [openMilestone, setOpenMilestone] = useState<boolean>(false);
     const [openKRA, setOpenKRA] = useState<boolean>(false);
 
@@ -449,9 +449,9 @@ export default () => {
                                 </Grid>
                                 <Grid item xs={12} display={"flex"} flexDirection={"column"} alignItems={"center"}>
                                     <Box display={"flex"} alignItems={"center"}>
-                                        <Box sx={{ marginRight: '27px' }}><Typography sx={{ color: !toggle ? '#C94B32' : '#76808D' }}>OPEN FOR ALL</Typography></Box>
+                                        <Box sx={{ marginRight: '11px' }}><Typography sx={{ color: !toggle ? '#C94B32' : '#76808D' }}>OPEN FOR ALL</Typography></Box>
                                         <Box><Switch checkedSVG="lock" onChange={() => setToggle(!toggle)} /></Box>
-                                        <Box sx={{ marginLeft: '-5px' }}><Typography sx={{ color: toggle ? '#C94B32' : '#76808D' }}>FILTER BY</Typography></Box>
+                                        <Box sx={{ marginLeft: '3px' }}><Typography sx={{ color: toggle ? '#C94B32' : '#76808D' }}>FILTER BY</Typography></Box>
                                     </Box>
                                     {
                                         !toggle &&
@@ -462,6 +462,7 @@ export default () => {
                                         <Box sx={{ width: 300, margin: '35px 0' }}>
                                             <Dropdown
                                                 options={['Invitation', 'Roles']}
+                                                defaultValue={'Invitation'}
                                                 onChange={(value: any) => setSelectType(value)}
                                             />
                                         </Box>

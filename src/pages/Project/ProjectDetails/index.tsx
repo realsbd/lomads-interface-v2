@@ -158,6 +158,17 @@ export default () => {
         }
     }, [projectId])
 
+    useEffect(() => {
+        if (Project) {
+            if (_get(Project, 'milestones', []).length > 0) {
+                setValue(0);
+            }
+            else if (_get(Project, 'milestones', []).length === 0 && _get(Project, 'kra.results', []).length > 0) {
+                setValue(1);
+            }
+        }
+    }, [Project]);
+
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
@@ -281,7 +292,7 @@ export default () => {
                 </Box>
 
                 {/* Description */}
-                <Box className={classes.descriptionContainer} display="flex">
+                <Box className={classes.descriptionContainer} display="flex" alignItems={"center"}>
                     <Box>
                         <Typography sx={{ fontSize: '22px', lineHeight: '25px', color: '#76808D' }}>Description</Typography>
                     </Box>

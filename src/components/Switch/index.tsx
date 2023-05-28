@@ -85,7 +85,7 @@ const MaterialUISwitch = styled(Switch)(({ theme, checkedSVG }) => ({
 }));
 
 export default ({ label,
-  checkedSVG,
+  checkedSVG, checked,
   ...props }: any) => {
   return (
     <FormControlLabel
@@ -93,6 +93,7 @@ export default ({ label,
       control={<MaterialUISwitch checkedSVG={checkedSVG === 'lock' ? LOCK : CHECKMARK} sx={{ mr: 1 }} />}
       label={label}
       {...props}
+      checked={checked}
     />
   )
 }

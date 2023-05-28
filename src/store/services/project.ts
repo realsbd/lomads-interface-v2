@@ -7,3 +7,27 @@ export const getProjectService = (params: any) => {
 export const createProjectService = (params: any) => {
     return axiosHttp.post(`project`, params);
 }
+
+export const updateProjectDetailsService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/update-project?daoUrl=${params.daoUrl}`, params.payload);
+}
+
+export const archiveProjectService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/archive?daoUrl=${params.daoUrl}`);
+}
+
+export const deleteProjectService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/delete?daoUrl=${params.daoUrl}`);
+}
+
+export const updateProjectKraService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/update-kra?daoUrl=${params.daoUrl}`, params.payload);
+}
+
+export const editProjectKraService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/edit-kra?daoUrl=${params.daoUrl}`, params.payload);
+}
+
+export const updateProjectMembersService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/edit-members`, params.payload);
+}

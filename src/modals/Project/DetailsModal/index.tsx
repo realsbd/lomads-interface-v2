@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
+import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { Paper, Typography, Box, Drawer } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
@@ -10,6 +10,11 @@ import TextEditor from 'components/TextEditor'
 
 import CloseSVG from 'assets/svg/closeNew.svg'
 import createProjectSvg from 'assets/svg/createProject.svg';
+
+import { useDAO } from "context/dao";
+import { useAppDispatch } from "helpers/useAppDispatch";
+import { useAppSelector } from "helpers/useAppSelector";
+import { updateProjectDetailsAction } from "store/actions/project";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -57,14 +62,32 @@ interface Props {
 
 export default ({ open, closeModal }: Props) => {
     const classes = useStyles();
-    const [name, setName] = useState<string>('');
-    const [desc, setDesc] = useState<string>('');
+    const dispatch = useAppDispatch();
+    // @ts-ignore
+    const { Project, updateProjectDetailsLoading } = useAppSelector(store => store.project);
+    const { DAO } = useDAO();
+    const [name, setName] = useState<string>(_get(Project, 'name', ''));
+    const [desc, setDesc] = useState<string>(_get(Project, 'description', ''));
+
+    // runs after updating a project
+    useEffect(() => {
+        if (updateProjectDetailsLoading === false) {
+            closeModal();
+            // navigate(-1);
+        }
+    }, [updateProjectDetailsLoading]);
+
+    const handleSave = () => {
+        // @ts-ignore
+        dispatch(updateProjectDetailsAction({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { name, description: desc } }));
+    }
 
     return (
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
             anchor={'right'}
             open={open}
+            hideBackdrop={true}
         >
             <Box className={classes.modalConatiner}>
                 <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={closeModal}>
@@ -99,6 +122,8 @@ export default ({ open, closeModal }: Props) => {
                             variant='contained'
                             disabled={name !== '' && desc !== '' ? false : true}
                             sx={{ width: 350 }}
+                            onClick={handleSave}
+                            loading={updateProjectDetailsLoading}
                         >
                             SAVE
                         </Button>

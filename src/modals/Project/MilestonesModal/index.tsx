@@ -459,8 +459,8 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
                     }
 
                     <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
-                        <Button variant="outlined" sx={{ marginRight: '20px' }} onClick={closeModal}>CANCEL</Button>
-                        <Button variant="contained" onClick={handleSubmit}>ADD</Button>
+                        <Button variant="outlined" sx={{ marginRight: '20px', width: '169px' }} onClick={closeModal}>CANCEL</Button>
+                        <Button variant="contained" onClick={handleSubmit} sx={{ width: '184px' }}>ADD</Button>
                     </Box>
 
                 </Box>

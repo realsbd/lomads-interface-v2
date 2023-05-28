@@ -434,11 +434,12 @@ export default ({ open, closeModal, list, getResources, editResources }: Props) 
                         </Box>
                     }
                     <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%', marginTop: '20px' }}>
-                        <Button variant="outlined" sx={{ marginRight: '20px' }} onClick={closeModal}>CANCEL</Button>
+                        <Button variant="outlined" sx={{ marginRight: '20px', width: '169px' }} onClick={closeModal}>CANCEL</Button>
                         <Button
                             variant="contained"
                             onClick={handleSubmit}
                             disabled={resourceList.length === 0}
+                            sx={{ width: '184px' }}
                         >
                             ADD
                         </Button>

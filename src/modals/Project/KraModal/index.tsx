@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
+import { find as _find, get as _get, debounce as _debounce, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { Paper, Typography, Box, Drawer } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
@@ -12,6 +12,11 @@ import KRASVG from 'assets/svg/kra.svg'
 import Dropdown from "components/Dropdown";
 
 import { nanoid } from 'nanoid';
+
+import { useDAO } from "context/dao";
+import { useAppDispatch } from "helpers/useAppDispatch";
+import { useAppSelector } from "helpers/useAppSelector";
+import { editProjectKraAction } from "store/actions/project";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -89,11 +94,23 @@ interface Props {
 
 export default ({ open, closeModal, list, freq, getResults, editKRA }: Props) => {
     const classes = useStyles();
+    const { DAO } = useDAO();
+    const dispatch = useAppDispatch();
+    // @ts-ignore
+    const { Project, editProjectKraLoading } = useAppSelector(store => store.project);
+
     const [frequency, setFrequency] = useState<string>(freq ? freq : 'Daily');
     const [resultCount, setResultCount] = useState<number>(list.length > 0 ? list.length : 1);
-    const [results, setResults] = useState<any[]>([{ _id: nanoid(16), color: '#FFCC18', name: '', progress: 0 }]);
+    const [results, setResults] = useState<any[]>(list.length > 0 ? list : [{ _id: nanoid(16), color: '#FFCC18', name: '', progress: 0 }]);
 
     const [errorNames, setErrorNames] = useState<number[]>([]);
+
+    useEffect(() => {
+        if (editProjectKraLoading === false) {
+            closeModal();
+            // navigate(-1);
+        }
+    }, [editProjectKraLoading]);
 
     const onChangeNumberOfResults = (e: any) => {
         let n = parseInt(e);
@@ -161,7 +178,7 @@ export default ({ open, closeModal, list, freq, getResults, editKRA }: Props) =>
         }
         if (flag !== -1) {
             if (editKRA) {
-                // dispatch(editProjectKRA({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { frequency, results } }));
+                dispatch(editProjectKraAction({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { frequency, results } }));
             }
             else {
                 getResults(results, frequency);
@@ -192,6 +209,7 @@ export default ({ open, closeModal, list, freq, getResults, editKRA }: Props) =>
                         <Typography className={classes.label}>Review Frequency</Typography>
                         <Dropdown
                             options={['Daily', 'Weekly', 'Monthly']}
+                            defaultValue={frequency}
                             onChange={(value: string) => setFrequency(value)}
                         />
                     </Box>
@@ -231,8 +249,16 @@ export default ({ open, closeModal, list, freq, getResults, editKRA }: Props) =>
                     }
 
                     <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
-                        <Button variant="outlined" sx={{ marginRight: '20px' }} onClick={closeModal}>CANCEL</Button>
-                        <Button variant="contained" onClick={handleSubmit}>ADD</Button>
+                        <Button variant="outlined" sx={{ marginRight: '20px', width: '169px' }} onClick={closeModal}>CANCEL</Button>
+                        <Button variant="contained" onClick={handleSubmit} sx={{ width: '184px' }} loading={editProjectKraLoading}>
+                            {
+                                editKRA
+                                    ?
+                                    'SAVE'
+                                    :
+                                    'ADD'
+                            }
+                        </Button>
                     </Box>
 
                 </Box>

@@ -10,7 +10,8 @@ interface DropdownProps {
 }
 
 export default ({ options, onChange, placeholder, defaultValue }: DropdownProps) => {
-    const [val, setVal] = useState(defaultValue ? defaultValue : options?.[0]);
+    const [val, setVal] = useState(options?.includes(defaultValue) ? defaultValue : 'Select');
+    const [showMenuItem, setShowMenuItem] = React.useState(true);
 
     const handleChange = (event: any) => {
         setVal(event.target.value);
@@ -99,9 +100,15 @@ export default ({ options, onChange, placeholder, defaultValue }: DropdownProps)
                 // IconComponent={iconComponent}
                 value={val}
                 onChange={handleChange}
-                displayEmpty
+                onOpen={() => {
+                    setShowMenuItem((prev) => false);
+                }}
+                onClose={() => {
+                    setShowMenuItem((prev) => true);
+                }}
                 renderValue={val !== "" ? undefined : () => placeholder}
             >
+                <MenuItem value="Select" style={{ display: showMenuItem ? "block" : "none" }}>Select</MenuItem>
                 {
                     options?.map((_option, _index) => {
                         return (
