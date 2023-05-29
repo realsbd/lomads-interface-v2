@@ -120,10 +120,13 @@ export default ({ open, closeModal }: Props) => {
                 closeModal={() => setOpenMembers(false)}
             />
 
-            {/* <ResourcesModal
+            <ResourcesModal
                 open={openResource}
                 closeModal={() => setOpenResource(false)}
-            /> */}
+                list={_get(Project, 'links', [])}
+                getResources={(value) => console.log("TEST")}
+                editResources={true}
+            />
 
             <MilestonesModal
                 open={openMilestone}
