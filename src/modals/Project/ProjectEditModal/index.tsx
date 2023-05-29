@@ -125,10 +125,15 @@ export default ({ open, closeModal }: Props) => {
                 closeModal={() => setOpenResource(false)}
             /> */}
 
-            {/* <MilestonesModal
+            <MilestonesModal
                 open={openMilestone}
                 closeModal={() => setOpenMilestone(false)}
-            /> */}
+                list={_get(Project, 'milestones', [])}
+                getCompensation={(value) => console.log("TEST")}
+                getMilestones={(value) => console.log("TEST")}
+                editMilestones={true}
+                hideBackdrop={true}
+            />
 
             <KraModal
                 open={openKRA}
@@ -137,6 +142,7 @@ export default ({ open, closeModal }: Props) => {
                 freq={_get(Project, 'kra.frequency', '')}
                 getResults={(value1: any[], value2: string) => console.log("TEST")}
                 editKRA={true}
+                hideBackdrop={true}
             />
 
             <Box className={classes.modalContainer}>

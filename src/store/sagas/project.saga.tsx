@@ -5,7 +5,7 @@ import {
 } from 'redux-saga/effects';
 import * as actionTypes from 'store/actionTypes';
 import { get as _get } from 'lodash';
-import { archiveProjectService, createProjectService, deleteProjectService, editProjectKraService, getProjectService, updateProjectDetailsService, updateProjectKraService, updateProjectMembersService } from 'store/services/project'
+import { archiveProjectService, createProjectService, deleteProjectService, editProjectKraService, editProjectMilestonesService, getProjectService, updateProjectDetailsService, updateProjectKraService, updateProjectMembersService } from 'store/services/project'
 
 function* getProjectSaga(action: any) {
     try {
@@ -89,6 +89,18 @@ function* editProjectKraSaga(action: any) {
     }
 }
 
+function* editProjectMilestonesSaga(action: any) {
+    try {
+        yield put({ type: actionTypes.EDIT_PROJECT_MILESTONES_LOADING, payload: true })
+        const { data } = yield call(editProjectMilestonesService, action.payload)
+        yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
+        yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
+        yield put({ type: actionTypes.EDIT_PROJECT_MILESTONES_LOADING, payload: false })
+    } catch (e) {
+
+    }
+}
+
 function* updateProjectMembersSaga(action: any) {
     try {
         yield put({ type: actionTypes.UPDATE_PROJECT_MEMBERS_LOADING, payload: true })
@@ -108,5 +120,6 @@ export default function* projectSaga() {
     yield takeLatest(actionTypes.DELETE_PROJECT_ACTION, deleteProjectSaga)
     yield takeLatest(actionTypes.UPDATE_PROJECT_KRA_ACTION, updateProjectKraSaga)
     yield takeLatest(actionTypes.EDIT_PROJECT_KRA_ACTION, editProjectKraSaga)
+    yield takeLatest(actionTypes.EDIT_PROJECT_MILESTONES_ACTION, editProjectMilestonesSaga)
     yield takeLatest(actionTypes.UPDATE_PROJECT_MEMBERS_ACTION, updateProjectMembersSaga)
 }

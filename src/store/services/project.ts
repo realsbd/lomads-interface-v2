@@ -28,6 +28,10 @@ export const editProjectKraService = (params: any) => {
     return axiosHttp.patch(`project/${params.projectId}/edit-kra?daoUrl=${params.daoUrl}`, params.payload);
 }
 
+export const editProjectMilestonesService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/edit-milestones?daoUrl=${params.daoUrl}`, params.payload);
+}
+
 export const updateProjectMembersService = (params: any) => {
     return axiosHttp.patch(`project/${params.projectId}/edit-members`, params.payload);
 }

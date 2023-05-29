@@ -19,6 +19,12 @@ import { useSafeTokens } from "context/safeTokens";
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { useWeb3Auth } from "context/web3Auth";
 
+import { useAppDispatch } from "helpers/useAppDispatch";
+import { useAppSelector } from "helpers/useAppSelector";
+
+import useTerminology from 'hooks/useTerminology';
+import { editProjectMilestonesAction } from "store/actions/project";
+
 const useStyles = makeStyles((theme: any) => ({
     root: {
         height: '100vh',
@@ -85,6 +91,7 @@ const useStyles = makeStyles((theme: any) => ({
 }));
 
 interface Props {
+    hideBackdrop?: boolean;
     open: boolean;
     closeModal(): any;
     list: any[];
@@ -93,22 +100,33 @@ interface Props {
     editMilestones: boolean;
 }
 
-export default ({ open, closeModal, list, getMilestones, editMilestones, getCompensation }: Props) => {
+export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMilestones, getCompensation }: Props) => {
     const classes = useStyles();
     const { DAO } = useDAO();
+    const dispatch = useAppDispatch();
+    // @ts-ignore
+    const { Project, editProjectMilestonesLoading } = useAppSelector(store => store.project);
     const { safeTokens } = useSafeTokens();
     const { chainId } = useWeb3Auth();
+    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
 
     const [milestones, setMilestones] = useState<any[]>(list.length > 0 ? list : [{ name: '', amount: '0', deadline: '', deliverables: '', complete: false }]);
     const [milestoneCount, setMilestoneCount] = useState<number>(list.length > 0 ? list.length : 1);
-    const [amount, setAmount] = useState<number>(0);
-    const [currency, setCurrency] = useState<string>('');
+    const [amount, setAmount] = useState(editMilestones ? _get(Project, 'compensation.amount', '') : 0);
+    const [currency, setCurrency] = useState<string>(editMilestones ? _get(Project, 'compensation.currency', '') : '');
 
     const [errorNames, setErrorNames] = useState<number[]>([]);
     const [errorAmount, setErrorAmount] = useState<number[]>([]);
     const [errorDeadline, setErrorDeadline] = useState<number[]>([]);
     const [errorCurrency, setErrorCurrency] = useState<boolean>(false);
     const [errorProjectValue, setErrorProjectValue] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (editProjectMilestonesLoading === false) {
+            closeModal();
+            // navigate(-1);
+        }
+    }, [editProjectMilestonesLoading]);
 
     useEffect(() => {
         var date = new Date();
@@ -314,7 +332,7 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
                 symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
 
             if (editMilestones) {
-                // dispatch(editProjectMilestone({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones, compensation: { currency, amount, symbol } } }));
+                dispatch(editProjectMilestonesAction({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones, compensation: { currency, amount, symbol } } }));
             }
             else {
                 getCompensation({ currency: currency, amount, symbol })
@@ -330,6 +348,7 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
             sx={{ zIndex: 1 }}
             anchor={'right'}
             open={open}
+            hideBackdrop={hideBackdrop}
         >
             <Box className={classes.modalConatiner}>
                 <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={closeModal}>
@@ -337,13 +356,13 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
                 </IconButton>
                 <Box display="flex" flexDirection="column" alignItems="center">
                     <img src={MilestoneSVG} alt="project-resource" />
-                    <Typography className={classes.modalTitle}>Project Milestones</Typography>
+                    <Typography className={classes.modalTitle}>{transformWorkspace().label} Milestones</Typography>
                     <Typography className={classes.modalSubtitle}>Organise and link payments to milestones</Typography>
                 </Box>
                 <Box display="flex" flexDirection="column" alignItems={"center"} sx={{ width: '80%' }}>
 
                     <Box display="flex" flexDirection="column" sx={{ width: 310, marginBottom: '25px' }} id="currency-amt">
-                        <Typography className={classes.label}>Total Workspace Value</Typography>
+                        <Typography className={classes.label}>Total {transformWorkspace().label} Value</Typography>
                         <CurrencyInput
                             value={amount}
                             onChange={(value: any) => handleChangeCompensationAmount(value)}
@@ -411,7 +430,7 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
                                             id={errorAmount.includes(index) ? "outlined-error-helper-text" : ""}
                                             helperText={errorAmount.includes(index) ? "Enter %" : ""}
                                         />
-                                        <Typography sx={{ fontWeight: '700', fontSize: 16, color: '#76808D', marginLeft: '13.5px' }}>% of project value</Typography>
+                                        <Typography sx={{ fontWeight: '700', fontSize: 16, color: '#76808D', marginLeft: '13.5px' }}>% of {transformWorkspace().label} value</Typography>
                                     </Box>
 
                                     {/* Milestone deadline */}
@@ -460,7 +479,15 @@ export default ({ open, closeModal, list, getMilestones, editMilestones, getComp
 
                     <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
                         <Button variant="outlined" sx={{ marginRight: '20px', width: '169px' }} onClick={closeModal}>CANCEL</Button>
-                        <Button variant="contained" onClick={handleSubmit} sx={{ width: '184px' }}>ADD</Button>
+                        <Button variant="contained" onClick={handleSubmit} sx={{ width: '184px' }} loading={editProjectMilestonesLoading}>
+                            {
+                                editMilestones
+                                    ?
+                                    'SAVE'
+                                    :
+                                    'ADD'
+                            }
+                        </Button>
                     </Box>
 
                 </Box>

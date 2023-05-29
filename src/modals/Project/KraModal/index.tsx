@@ -84,6 +84,7 @@ const useStyles = makeStyles((theme: any) => ({
 }));
 
 interface Props {
+    hideBackdrop?: boolean;
     open: boolean;
     closeModal(): any;
     list: any[];
@@ -92,7 +93,7 @@ interface Props {
     editKRA: boolean;
 }
 
-export default ({ open, closeModal, list, freq, getResults, editKRA }: Props) => {
+export default ({ hideBackdrop, open, closeModal, list, freq, getResults, editKRA }: Props) => {
     const classes = useStyles();
     const { DAO } = useDAO();
     const dispatch = useAppDispatch();
@@ -193,6 +194,7 @@ export default ({ open, closeModal, list, freq, getResults, editKRA }: Props) =>
             sx={{ zIndex: 1 }}
             anchor={'right'}
             open={open}
+            hideBackdrop={hideBackdrop}
         >
             <Box className={classes.modalConatiner}>
                 <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={closeModal}>

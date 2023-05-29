@@ -49,6 +49,13 @@ export const editProjectKraAction = (payload: any) => {
     }
 }
 
+export const editProjectMilestonesAction = (payload: any) => {
+    return {
+        type: actionTypes.EDIT_PROJECT_MILESTONES_ACTION,
+        payload
+    }
+}
+
 export const updateProjectMembersAction = (payload: any) => {
     return {
         type: actionTypes.UPDATE_PROJECT_MEMBERS_ACTION,
