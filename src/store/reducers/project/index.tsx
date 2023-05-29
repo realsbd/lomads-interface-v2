@@ -15,6 +15,7 @@ export function getInitialState() {
         editProjectKraLoading: false,
         editProjectMilestonesLoading: false,
         updateProjectMembersLoading: false,
+        inviteProjectMembersLoading: false,
     };
 }
 
@@ -70,6 +71,11 @@ const ProjectReducer = (state: any = getInitialState(), action: any) =>
 
             case actionTypes.UPDATE_PROJECT_MEMBERS_LOADING: {
                 draft.updateProjectMembersLoading = payload;
+                break;
+            }
+
+            case actionTypes.INVITE_PROJECT_MEMBERS_LOADING: {
+                draft.inviteProjectMembersLoading = payload;
                 break;
             }
 

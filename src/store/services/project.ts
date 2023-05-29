@@ -35,3 +35,7 @@ export const editProjectMilestonesService = (params: any) => {
 export const updateProjectMembersService = (params: any) => {
     return axiosHttp.patch(`project/${params.projectId}/edit-members`, params.payload);
 }
+
+export const inviteProjectMembersService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/update-member`, params.payload);
+}

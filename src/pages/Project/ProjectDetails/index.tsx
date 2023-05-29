@@ -42,6 +42,7 @@ import { useDAO } from "context/dao";
 import { useNavigate, useParams } from "react-router-dom"
 import { getProjectAction } from "store/actions/project";
 import FullScreenLoader from "components/FullScreenLoader";
+import MembersSection from "sections/MembersSection";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -403,6 +404,11 @@ export default () => {
                 }
 
                 <TaskSection />
+
+                <MembersSection
+                    list={_sortBy(_uniqBy(Project?.members, '_id'), m => _get(m, 'name', '').toLowerCase())}
+                    showProjects={true}
+                />
             </Grid>
         </Grid>
     )

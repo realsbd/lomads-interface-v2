@@ -62,3 +62,10 @@ export const updateProjectMembersAction = (payload: any) => {
         payload
     }
 }
+
+export const inviteProjectMembersAction = (payload: any) => {
+    return {
+        type: actionTypes.INVITE_PROJECT_MEMBERS_ACTION,
+        payload
+    }
+}

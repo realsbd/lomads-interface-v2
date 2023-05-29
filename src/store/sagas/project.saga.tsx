@@ -5,7 +5,7 @@ import {
 } from 'redux-saga/effects';
 import * as actionTypes from 'store/actionTypes';
 import { get as _get } from 'lodash';
-import { archiveProjectService, createProjectService, deleteProjectService, editProjectKraService, editProjectMilestonesService, getProjectService, updateProjectDetailsService, updateProjectKraService, updateProjectMembersService } from 'store/services/project'
+import { archiveProjectService, createProjectService, deleteProjectService, editProjectKraService, editProjectMilestonesService, getProjectService, inviteProjectMembersService, updateProjectDetailsService, updateProjectKraService, updateProjectMembersService } from 'store/services/project'
 
 function* getProjectSaga(action: any) {
     try {
@@ -112,6 +112,17 @@ function* updateProjectMembersSaga(action: any) {
     }
 }
 
+function* inviteProjectMembersSaga(action: any) {
+    try {
+        yield put({ type: actionTypes.INVITE_PROJECT_MEMBERS_LOADING, payload: true })
+        const { data } = yield call(inviteProjectMembersService, action.payload)
+        yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data })
+        yield put({ type: actionTypes.INVITE_PROJECT_MEMBERS_LOADING, payload: false })
+    } catch (e) {
+
+    }
+}
+
 export default function* projectSaga() {
     yield takeLatest(actionTypes.GET_PROJECT_ACTION, getProjectSaga)
     yield takeLatest(actionTypes.CREATE_PROJECT_ACTION, createProjectSaga)
@@ -122,4 +133,5 @@ export default function* projectSaga() {
     yield takeLatest(actionTypes.EDIT_PROJECT_KRA_ACTION, editProjectKraSaga)
     yield takeLatest(actionTypes.EDIT_PROJECT_MILESTONES_ACTION, editProjectMilestonesSaga)
     yield takeLatest(actionTypes.UPDATE_PROJECT_MEMBERS_ACTION, updateProjectMembersSaga)
+    yield takeLatest(actionTypes.INVITE_PROJECT_MEMBERS_ACTION, inviteProjectMembersSaga)
 }
