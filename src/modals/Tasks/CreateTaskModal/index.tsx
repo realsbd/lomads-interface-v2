@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-
+import React, { useState, useMemo } from "react";
+import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import { Typography, Box, Drawer } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
@@ -12,6 +12,11 @@ import Dropdown from "components/Dropdown";
 
 import CloseSVG from 'assets/svg/closeNew.svg'
 import createTaskSvg from 'assets/svg/task.svg';
+
+import { useSafeTokens } from "context/safeTokens";
+import { useDAO } from "context/dao";
+import { useAppDispatch } from "helpers/useAppDispatch";
+import { useAppSelector } from "helpers/useAppSelector";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -82,33 +87,54 @@ interface Props {
     closeModal(): any;
 }
 
-const safeTokens = [
-    {
-        tokenAddress: '0x123456789abcd000',
-        token: {
-            symbol: 'GOR'
-        }
-    },
-    {
-        tokenAddress: '0x123456789abcd000',
-        token: {
-            symbol: 'MATIC'
-        }
-    }
-]
-
 export default ({ open, closeModal }: Props) => {
     const classes = useStyles();
+    const { DAO } = useDAO();
+    // @ts-ignore
+    const { user } = useAppSelector(store => store.session);
+    const { safeTokens } = useSafeTokens();
+
     const [name, setName] = useState<string>('');
     const [desc, setDesc] = useState<string>('');
-    const [sweatValue, setSweatValue] = useState(null);
-    const [currency, setCurrency] = useState(null);
+    const [amount, setAmount] = useState(0);
+    const [currency, setCurrency] = useState<string>('');
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [reviewer, setReviewer] = useState(null);
+
+    const [errorNames, setErrorNames] = useState<number[]>([]);
+    const [errorAmount, setErrorAmount] = useState<number[]>([]);
+    const [errorDeadline, setErrorDeadline] = useState<number[]>([]);
+    const [errorCurrency, setErrorCurrency] = useState<boolean>(false);
+    const [errorProjectValue, setErrorProjectValue] = useState<boolean>(false);
+
+    const eligibleContributors = useMemo(() => {
+        return _get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id)
+    }, [DAO, selectedUser, reviewer])
+
+    const eligibleReviewers = useMemo(() => {
+        return _get(DAO, 'members', []).filter((m: any) => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && (m.role === 'role1' || m.role === 'role2'))
+    }, [DAO, reviewer, selectedUser])
+
+    const eligibleProjects = useMemo(() => {
+        return _get(DAO, 'projects', []).filter((p: any) => _find(p.members, m => m._id === user._id))
+    }, [DAO, reviewer, selectedUser])
+
+    const handleChangeCompensationAmount = (e: any) => {
+        setAmount(parseFloat(e));
+        setErrorProjectValue(false);
+    }
+
+    const handleChangeCurrency = (e: any) => {
+        setCurrency(e);
+        setErrorCurrency(false);
+    }
 
     return (
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
             anchor={'right'}
             open={open}
+            sx={{ zIndex: '1102' }}
         >
             <Box className={classes.modalConatiner}>
                 <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={closeModal}>
@@ -171,7 +197,8 @@ export default ({ open, closeModal }: Props) => {
                     </Box>
                     <Box sx={{ width: '100%' }}>
                         <Dropdown
-                            options={['Select project...']}
+                            options={eligibleProjects}
+                            useObjects={true}
                             onChange={(value: any) => console.log(value)}
                         />
                     </Box>
@@ -216,30 +243,23 @@ export default ({ open, closeModal }: Props) => {
 
                 <Box className={classes.divider}></Box>
 
-                <Box className={classes.modalRow}>
+                <Box className={classes.modalRow} sx={{ marginBottom: '5px !important' }}>
                     <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
                         <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Compensation</Typography>
                     </Box>
                     <Box sx={{ width: '100%' }}>
-                        {/* <CurrencyInput
-                            value={0}
-                            onChange={(value: any) => {
-                                setSweatValue(value)
-                            }}
-                            options={
-                                safeTokens.map(t => {
-                                    return {
-                                        value: t.tokenAddress,
-                                        label: t.token.symbol
-                                    }
-                                })
-                            }
+                        <CurrencyInput
+                            value={amount}
+                            onChange={(value: any) => handleChangeCompensationAmount(value)}
+                            options={safeTokens}
                             dropDownvalue={currency}
                             onDropDownChange={(value: any) => {
-                                setCurrency(value)
+                                handleChangeCurrency(value)
                             }}
                             variant="primary"
-                        /> */}
+                            errorCurrency={errorCurrency}
+                            errorProjectValue={errorProjectValue}
+                        />
                     </Box>
                 </Box>
 
@@ -253,6 +273,11 @@ export default ({ open, closeModal }: Props) => {
                             onChange={(value: any) => console.log(value)}
                         />
                     </Box>
+                </Box>
+
+                <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
+                    <Button variant="outlined" sx={{ marginRight: '20px', width: '240px' }}>SAVE AS DRAFT</Button>
+                    <Button variant="contained" sx={{ width: '240px' }}>CREATE</Button>
                 </Box>
 
             </Box>

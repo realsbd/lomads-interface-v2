@@ -126,6 +126,7 @@ export default ({ open, closeModal }: Props) => {
                 list={_get(Project, 'links', [])}
                 getResources={(value) => console.log("TEST")}
                 editResources={true}
+                hideBackdrop={true}
             />
 
             <MilestonesModal

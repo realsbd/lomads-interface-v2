@@ -543,6 +543,7 @@ export default () => {
                     list={resourceList}
                     getResources={(value) => setResourceList(value)}
                     editResources={false}
+                    hideBackdrop={false}
                 />
                 <MilestonesModal
                     open={openMilestone}

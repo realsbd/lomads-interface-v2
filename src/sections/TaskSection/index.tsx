@@ -61,7 +61,7 @@ export default () => {
     const classes = useStyles();
     const [value, setValue] = useState<number>(0);
 
-    const [openCreateTask, setOpenCreateTask] = useState<boolean>(false);
+    const [openCreateTask, setOpenCreateTask] = useState<boolean>(!false);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);

@@ -8,6 +8,7 @@ import TextInput from 'components/TextInput';
 import Button from "components/Button";
 
 import CloseSVG from 'assets/svg/closeNew.svg'
+import bin from 'assets/svg/bin.svg'
 import ProjectResourceSVG from 'assets/svg/projectResource.svg'
 import { AiOutlinePlus, AiFillQuestionCircle, AiOutlineLock } from "react-icons/ai";
 import { IoCloseOutline } from 'react-icons/io5';
@@ -74,7 +75,7 @@ const useStyles = makeStyles((theme: any) => ({
         background: 'rgba(118, 128, 141, 0.05) !important',
         boxShadow: 'inset 1px 0px 4px rgba(27, 43, 65, 0.1) !important',
         borderRadius: '5px !important',
-        marginTop: '20px!important'
+        marginTop: '20px !important'
     },
     linkRow: {
         width: '100% !important',
@@ -89,18 +90,27 @@ const useStyles = makeStyles((theme: any) => ({
     },
     linkAddress: {
         width: '60% !important',
+    },
+    resourceCard: {
+        width: '100%', padding: '10px 20px 20px 20px !important',
+        background: '#FFFFFF !important',
+        boxShadow: '0px 3px 3px rgba(27, 43, 65, 0.1), -1px -2px 3px rgba(201, 75, 50, 0.05) !important',
+        borderRadius: '5px !important',
+        marginRight: '10px !important'
     }
+
 }));
 
 interface Props {
     open: boolean;
+    hideBackdrop: boolean;
     closeModal(): void;
     list: any[];
     getResources(action: any): void;
     editResources: boolean;
 }
 
-export default ({ open, closeModal, list, getResources, editResources }: Props) => {
+export default ({ open, hideBackdrop, closeModal, list, getResources, editResources }: Props) => {
     const classes = useStyles();
     const { DAO } = useDAO();
     const [title, setTitle] = useState<string>('');
@@ -282,6 +292,7 @@ export default ({ open, closeModal, list, getResources, editResources }: Props) 
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
             anchor={'right'}
             open={open}
+            hideBackdrop={hideBackdrop}
         >
             <Box className={classes.modalConatiner}>
                 <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={closeModal}>
@@ -317,16 +328,6 @@ export default ({ open, closeModal, list, getResources, editResources }: Props) 
                         {
                             link && (link.indexOf('discord.') > -1 || link.indexOf('notion.') > -1) ?
                                 <>
-                                    {/* <Box
-                                        className={classes.addLinkBtn}
-                                        sx={link !== '' && title !== '' ? { background: '#C84A32' } : { background: 'rgba(27, 43, 65, 0.2)', }}
-                                        display={"flex"}
-                                        alignItems={"center"}
-                                        justifyContent={"center"}
-                                        onClick={() => handleAddResource()}
-                                    >
-                                        <AiOutlinePlus color="#FFF" size={25} />
-                                    </Box> */}
                                     <LinkBtn
                                         spaceDomain={spaceDomain}
                                         onNotionCheckStatus={handleAddResource}
@@ -407,7 +408,7 @@ export default ({ open, closeModal, list, getResources, editResources }: Props) 
                     }
 
                     {
-                        resourceList.length > 0 &&
+                        resourceList.length > 0 && !editResources &&
                         <Box className={classes.linkArea}>
                             {
                                 resourceList.map((item, index) => {
@@ -433,6 +434,36 @@ export default ({ open, closeModal, list, getResources, editResources }: Props) 
                             }
                         </Box>
                     }
+
+                    {
+                        resourceList.length > 0 && editResources &&
+                        <Box display={"flex"} flexDirection={"column"} sx={{ width: '100%', marginTop: '20px' }}>
+                            {
+                                resourceList.map((item, index) => {
+                                    return (
+                                        <Box sx={{ width: '100%' }} display={"flex"} justifyContent={"space-between"} key={index}>
+                                            <Box className={classes.resourceCard} display={"flex"}>
+                                                <TextInput
+                                                    sx={{ marginRight: '10px' }}
+                                                    placeholder="Ex Portfolio"
+                                                    value={item.title}
+                                                />
+                                                <TextInput
+                                                    // sx={{ width: 195 }}
+                                                    placeholder="link"
+                                                    value={item.link}
+                                                />
+                                            </Box>
+                                            <IconButton>
+                                                <img src={bin} alt="bin" />
+                                            </IconButton>
+                                        </Box>
+                                    )
+                                })
+                            }
+                        </Box>
+                    }
+
                     <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%', marginTop: '20px' }}>
                         <Button variant="outlined" sx={{ marginRight: '20px', width: '169px' }} onClick={closeModal}>CANCEL</Button>
                         <Button
@@ -441,7 +472,13 @@ export default ({ open, closeModal, list, getResources, editResources }: Props) 
                             disabled={resourceList.length === 0}
                             sx={{ width: '184px' }}
                         >
-                            ADD
+                            {
+                                editResources
+                                    ?
+                                    'SAVE'
+                                    :
+                                    'ADD'
+                            }
                         </Button>
                     </Box>
                 </Box>

@@ -7,9 +7,10 @@ interface DropdownProps {
     defaultValue?: any,
     placeholder?: string,
     onChange(action: any): void;
+    useObjects?: boolean;
 }
 
-export default ({ options, onChange, placeholder, defaultValue }: DropdownProps) => {
+export default ({ options, onChange, placeholder, defaultValue, useObjects }: DropdownProps) => {
     const [val, setVal] = useState(options?.includes(defaultValue) ? defaultValue : 'Select');
     const [showMenuItem, setShowMenuItem] = React.useState(true);
 
@@ -94,29 +95,57 @@ export default ({ options, onChange, placeholder, defaultValue }: DropdownProps)
 
     return (
         <FormControl sx={{ width: '100%' }}>
-            <Select
-                // classes={{ root: minimalSelectClasses.select }}
-                // MenuProps={menuProps}
-                // IconComponent={iconComponent}
-                value={val}
-                onChange={handleChange}
-                onOpen={() => {
-                    setShowMenuItem((prev) => false);
-                }}
-                onClose={() => {
-                    setShowMenuItem((prev) => true);
-                }}
-                renderValue={val !== "" ? undefined : () => placeholder}
-            >
-                <MenuItem value="Select" style={{ display: showMenuItem ? "block" : "none" }}>Select</MenuItem>
-                {
-                    options?.map((_option, _index) => {
-                        return (
-                            <MenuItem value={_option}>{_option}</MenuItem>
-                        )
-                    })
-                }
-            </Select>
+            {
+                useObjects
+                    ?
+                    <Select
+                        // classes={{ root: minimalSelectClasses.select }}
+                        // MenuProps={menuProps}
+                        // IconComponent={iconComponent}
+                        value={val}
+                        onChange={handleChange}
+                        onOpen={() => {
+                            setShowMenuItem((prev) => false);
+                        }}
+                        onClose={() => {
+                            setShowMenuItem((prev) => true);
+                        }}
+                        renderValue={val !== "" ? undefined : () => placeholder}
+                    >
+                        <MenuItem value="Select" style={{ display: showMenuItem ? "block" : "none" }}>Select</MenuItem>
+                        {
+                            options?.map((_option, _index) => {
+                                return (
+                                    <MenuItem value={_option}>{_option}</MenuItem>
+                                )
+                            })
+                        }
+                    </Select>
+                    :
+                    <Select
+                        // classes={{ root: minimalSelectClasses.select }}
+                        // MenuProps={menuProps}
+                        // IconComponent={iconComponent}
+                        value={val}
+                        onChange={handleChange}
+                        onOpen={() => {
+                            setShowMenuItem((prev) => false);
+                        }}
+                        onClose={() => {
+                            setShowMenuItem((prev) => true);
+                        }}
+                        renderValue={val !== "" ? undefined : () => placeholder}
+                    >
+                        <MenuItem value="Select" style={{ display: showMenuItem ? "block" : "none" }}>Select</MenuItem>
+                        {
+                            options?.map((_option, _index) => {
+                                return (
+                                    <MenuItem value={_option}>{_option}</MenuItem>
+                                )
+                            })
+                        }
+                    </Select>
+            }
         </FormControl>
     );
 };

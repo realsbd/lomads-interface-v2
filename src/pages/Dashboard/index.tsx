@@ -29,9 +29,9 @@ export default () => {
             <Grid mt={1} item sm={12}>
                 <Notifications isHelpIconOpen={false} />
             </Grid>
-            {/* <Grid sm={12}>
+            <Grid sm={12}>
                 <TaskSection />
-            </Grid> */}
+            </Grid>
             <Grid sm={12}>
                 <ProjectSection />
             </Grid>

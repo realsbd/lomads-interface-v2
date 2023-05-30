@@ -89,7 +89,6 @@ export default () => {
 
     const [value, setValue] = useState<number>(0);
     const [myProjects, setMyProjects] = useState<any[]>([]);
-    const [draftProjects, setDraftProjects] = useState<any[]>([]);
     const [otherProjects, setOtherProjects] = useState<any[]>([]);
     const [initialCheck, setInitialCheck] = useState<boolean>(false);
     const { myRole, can } = useRole(DAO, account)
@@ -126,10 +125,6 @@ export default () => {
                 return prj;
             })
             setMyProjects(_orderBy(myProjects, ['notification', p => moment(p.createdAt).unix()], ['desc', 'desc']))
-
-            // @ts-ignore
-            let draftedProjects = _get(DAO, 'projects', []).filter(project => project.draftedAt && !project.deletedAt && !project.archivedAt && project.creator.toLowerCase() === account.toLowerCase())
-            setDraftProjects(_orderBy(draftedProjects, p => moment(p.createdAt).unix(), 'desc'));
 
             // @ts-ignore
             let otherProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.draftedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()))
@@ -173,8 +168,7 @@ export default () => {
                     }}
                 >
                     <Tab label={`My ${transformWorkspace().labelPlural}`} {...a11yProps(0)} />
-                    <Tab label={`Drafts`} {...a11yProps(1)} />
-                    <Tab label={`All ${transformWorkspace().labelPlural}`} {...a11yProps(2)} />
+                    <Tab label={`All ${transformWorkspace().labelPlural}`} {...a11yProps(1)} />
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
@@ -222,40 +216,8 @@ export default () => {
                 </Box>
             </TabPanel>
 
-            {/* Tab panel for drafts */}
-            <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
-                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
-                    {
-                        draftProjects.length > 0 && draftProjects.filter((item, index) => index < 6).map((item, index) => {
-                            if (index <= 4) {
-                                return (
-                                    <Box key={index}>
-                                        <ProjectCard
-                                            project={item}
-                                            daoUrl={DAO?.url}
-                                            tab={value}
-                                        />
-                                    </Box>
-                                )
-                            }
-                            else {
-                                return (
-                                    <Box
-                                        key={index}
-                                        className={classes.showAllCard}
-                                    // onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}
-                                    >
-                                        <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
-                                    </Box>
-                                )
-                            }
-                        })
-                    }
-                </Box>
-            </TabPanel>
-
             {/* Tab panel for all workspace */}
-            <TabPanel value={value} index={2} style={{ marginTop: '0.2rem' }}>
+            <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
                 <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                     {
                         otherProjects.length > 0 && otherProjects.filter((item, index) => index < 6).map((item, index) => {
