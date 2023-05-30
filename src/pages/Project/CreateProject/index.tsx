@@ -513,6 +513,7 @@ export default () => {
                                     <TextEditor
                                         fullWidth
                                         height={90}
+                                        width={350}
                                         placeholder="Marketing BtoB"
                                         label="Short description"
                                         value={desc}

@@ -11,6 +11,7 @@ function* createTaskSaga(action: any) {
     try {
         yield put({ type: actionTypes.CREATE_TASK_LOADING, payload: true })
         const { data } = yield call(createTaskService, action.payload)
+        console.log("data : ")
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.CREATE_TASK_LOADING, payload: false })

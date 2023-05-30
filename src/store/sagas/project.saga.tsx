@@ -5,7 +5,18 @@ import {
 } from 'redux-saga/effects';
 import * as actionTypes from 'store/actionTypes';
 import { get as _get } from 'lodash';
-import { archiveProjectService, createProjectService, deleteProjectService, editProjectKraService, editProjectMilestonesService, getProjectService, inviteProjectMembersService, updateProjectDetailsService, updateProjectKraService, updateProjectMembersService } from 'store/services/project'
+import {
+    archiveProjectService,
+    createProjectService,
+    deleteProjectService,
+    editProjectKraService,
+    editProjectMilestonesService,
+    getProjectService,
+    inviteProjectMembersService,
+    updateProjectDetailsService,
+    updateProjectKraService,
+    updateProjectMembersService
+} from 'store/services/project'
 
 function* getProjectSaga(action: any) {
     try {

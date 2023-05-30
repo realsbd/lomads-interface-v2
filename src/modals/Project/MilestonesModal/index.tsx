@@ -465,6 +465,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                         <TextEditor
                                             fullWidth
                                             height={90}
+                                            width={296}
                                             placeholder=""
                                             label="Deliverables"
                                             value={item.deliverables}
