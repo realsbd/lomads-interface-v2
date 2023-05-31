@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { useDAO } from "context/dao";
 import React from "react"
 import { makeStyles } from '@mui/styles';
@@ -8,6 +9,8 @@ import Links from "./Links";
 import Notifications from "./Notifications";
 import TaskSection from "sections/TaskSection";
 import ProjectSection from "sections/ProjectSection";
+import MembersSection from "sections/MembersSection";
+import { useAppSelector } from "helpers/useAppSelector";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -21,6 +24,8 @@ export default () => {
     const { daoURL } = useParams();
     const navigate = useNavigate();
     const { DAO, DAOList } = useDAO();
+    // @ts-ignore
+    const { setProjectLoading, Project } = useAppSelector(store => store.project);
     return (
         <Grid container>
             <Grid item sm={12}>
@@ -34,6 +39,12 @@ export default () => {
             </Grid>
             <Grid sm={12}>
                 <ProjectSection />
+            </Grid>
+            <Grid sm={12}>
+                <MembersSection
+                    list={_get(DAO, 'members', [])}
+                    showProjects={false}
+                />
             </Grid>
         </Grid>
     )

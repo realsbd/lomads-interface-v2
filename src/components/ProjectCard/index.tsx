@@ -156,7 +156,7 @@ export default ({ project, daoUrl, tab }: CardProps) => {
                                 <StepperProgress variant="primary" milestones={_get(project, 'milestones', [])} />
                             </Box>
                             <Typography sx={{ fontSize: '14px', color: '#76808D' }}>
-                                {(((_get(project, 'milestones', []).filter((item: any) => item.complete === true).length) / (_get(project, 'milestones', []).length)) * 100).toFixed(2)}%
+                                {(((_get(project, 'milestones', []).filter((item: any) => item.complete === true).length) / (_get(project, 'milestones', []).length)) * 100)}%
                             </Typography>
                         </Box>
                     }
