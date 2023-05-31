@@ -27,7 +27,7 @@ import RolesListModal from "../RolesListModal";
 import useTerminology from 'hooks/useTerminology';
 import { isValidUrl } from 'utils';
 import { CHAIN_INFO } from 'constants/chainInfo';
-import { createTaskAction } from "store/actions/task";
+import { createTaskAction, draftTaskAction } from "store/actions/task";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -134,7 +134,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     // @ts-ignore
     const { user } = useAppSelector(store => store.session);
     // @ts-ignore
-    const { createTaskLoading } = useAppSelector(store => store.task);
+    const { createTaskLoading, draftTaskLoading } = useAppSelector(store => store.task);
     const { safeTokens } = useSafeTokens();
     const { account, chainId } = useWeb3Auth();
     const { transformTask, transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies', null));
@@ -161,11 +161,13 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     const [errorDchannel, setErrorDchannel] = useState('');
     const [errorSublink, setErrorSublink] = useState('');
     const [errorDeadline, setErrorDeadline] = useState('');
+    const [errorApplicant, setErrorApplicant] = useState('');
+    const [errorReviewer, setErrorReviewer] = useState('');
     const [errorCurrency, setErrorCurrency] = useState<boolean>(false);
     const [errorTaskValue, setErrorTaskValue] = useState<boolean>(false);
 
     useEffect(() => {
-        if (createTaskLoading === false) {
+        if (createTaskLoading === false || draftTaskLoading === false) {
             setContributionType('open');
             setIsSingleContributor(false);
             setIsFilterRoles(false);
@@ -182,7 +184,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             setAmount(0);
             closeModal();
         }
-    }, [createTaskLoading]);
+    }, [createTaskLoading, draftTaskLoading]);
 
     // useEffect(() => {
     //     if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
@@ -311,6 +313,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             return;
         }
         else if (contributionType === 'assign' && selectedUser === null) {
+            setErrorApplicant('Select an applicant');
             let e = document.getElementById('error-applicant');
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
@@ -334,6 +337,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             return;
         }
         else if (reviewer === null) {
+            setErrorReviewer('Select a reviewer');
             let e = document.getElementById('error-reviewer');
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
@@ -378,48 +382,50 @@ export default ({ open, closeModal, selectedProject }: Props) => {
         }
     }
 
-    // const handleDraftTask = () => {
-    //     let tempLink, tempSub = null;
-    //     if (name === '') {
-    //         let e = document.getElementById('error-name');
-    //         e.innerHTML = 'Enter name';
-    //         e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
-    //         return;
-    //     }
-    //     if (dchannel && dchannel !== '') {
-    //         tempLink = dchannel;
-    //         if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
-    //             tempLink = 'https://' + tempLink;
-    //         }
-    //     }
-    //     if (subLink && subLink !== '') {
-    //         tempSub = subLink;
-    //         if (tempSub !== '' && tempSub.indexOf('https://') === -1 && tempSub.indexOf('http://') === -1) {
-    //             tempSub = 'https://' + tempSub;
-    //         }
-    //     }
-    //     let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
-    //     symbol = _get(symbol, 'token.symbol', 'SWEAT')
-    //     if (!symbol)
-    //         symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
-    //     let task = {};
-    //     task.daoId = DAO?._id;
-    //     task.name = name;
-    //     task.description = description;
-    //     task.applicant = selectedUser;
-    //     task.projectId = selectedProject ? selectedProject._id : projectId;;
-    //     task.discussionChannel = tempLink;
-    //     task.deadline = deadline;
-    //     task.submissionLink = tempSub ? tempSub : '';
-    //     task.compensation = { currency: currency?.currency, amount, symbol };
-    //     task.reviewer = reviewer;
-    //     task.contributionType = contributionType;
-    //     task.isSingleContributor = isSingleContributor;
-    //     task.isFilterRoles = isFilterRoles;
-    //     task.validRoles = validRoles;
+    const handleDraftTask = () => {
+        let tempLink, tempSub = null;
+        if (name === '') {
+            setErrorName('Enter name');
+            let e = document.getElementById('error-name');
+            if (e) {
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            }
+            return;
+        }
+        if (dchannel && dchannel !== '') {
+            tempLink = dchannel;
+            if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+                tempLink = 'https://' + tempLink;
+            }
+        }
+        if (subLink && subLink !== '') {
+            tempSub = subLink;
+            if (tempSub !== '' && tempSub.indexOf('https://') === -1 && tempSub.indexOf('http://') === -1) {
+                tempSub = 'https://' + tempSub;
+            }
+        }
+        let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
+        symbol = _get(symbol, 'token.symbol', 'SWEAT')
+        if (!symbol)
+            symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
+        let task: any = {};
+        task.daoId = DAO?._id;
+        task.name = name;
+        task.description = desc;
+        task.applicant = selectedUser;
+        task.projectId = selectedProject ? selectedProject._id : projectId;;
+        task.discussionChannel = tempLink;
+        task.deadline = deadline;
+        task.submissionLink = tempSub ? tempSub : '';
+        task.compensation = { currency: currency, amount, symbol };
+        task.reviewer = reviewer;
+        task.contributionType = contributionType;
+        task.isSingleContributor = isSingleContributor;
+        task.isFilterRoles = isFilterRoles;
+        task.validRoles = validRoles;
 
-    //     dispatch(draftTask({ payload: task }))
-    // }
+        dispatch(draftTaskAction(task))
+    }
 
     return (
         <Drawer
@@ -546,7 +552,8 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                             <Box sx={{ width: '100%' }} id="error-applicant">
                                 <MuiSelect
                                     options={eligibleContributors}
-                                    setSelectedValue={(value) => handleSetApplicant(value)}
+                                    setSelectedValue={(value) => { handleSetApplicant(value); setErrorApplicant('') }}
+                                    errorSelect={errorApplicant}
                                 />
                             </Box>
                         </>
@@ -623,7 +630,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
 
                 <Box className={classes.divider}></Box>
 
-                <Box className={classes.modalRow} sx={{ marginBottom: '5px !important' }} id="error-currency-amt">
+                <Box className={classes.modalRow} id="error-currency-amt">
                     <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
                         <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Compensation</Typography>
                     </Box>
@@ -650,13 +657,14 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                     <Box sx={{ width: '100%' }}>
                         <MuiSelect
                             options={eligibleReviewers}
-                            setSelectedValue={(value) => setReviewer(value)}
+                            setSelectedValue={(value) => { setReviewer(value); setErrorReviewer('') }}
+                            errorSelect={errorReviewer}
                         />
                     </Box>
                 </Box>
 
                 <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
-                    <Button variant="outlined" sx={{ marginRight: '20px', width: '240px' }}>SAVE AS DRAFT</Button>
+                    <Button variant="outlined" sx={{ marginRight: '20px', width: '240px' }} onClick={handleDraftTask} loading={draftTaskLoading}>SAVE AS DRAFT</Button>
                     <Button variant="contained" sx={{ width: '240px' }} onClick={handleCreateTask} loading={createTaskLoading}>CREATE</Button>
                 </Box>
 

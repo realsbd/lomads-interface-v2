@@ -450,7 +450,7 @@ export default () => {
                                 <Grid item xs={12} display={"flex"} flexDirection={"column"} alignItems={"center"}>
                                     <Box display={"flex"} alignItems={"center"}>
                                         <Box sx={{ marginRight: '11px' }}><Typography sx={{ color: !toggle ? '#C94B32' : '#76808D' }}>OPEN FOR ALL</Typography></Box>
-                                        <Box><Switch checkedSVG="lock" onChange={() => setToggle(!toggle)} /></Box>
+                                        <Box><Switch unidirectional={false} checkedSVG="lock" onChange={() => setToggle(!toggle)} /></Box>
                                         <Box sx={{ marginLeft: '3px' }}><Typography sx={{ color: toggle ? '#C94B32' : '#76808D' }}>FILTER BY</Typography></Box>
                                     </Box>
                                     {

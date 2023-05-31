@@ -147,7 +147,7 @@ export default () => {
                 setValue(0);
             }
             else {
-                setValue(2);
+                setValue(1);
             }
         }
     }, [myProjects, initialCheck]);

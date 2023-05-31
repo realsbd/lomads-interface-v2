@@ -30,7 +30,7 @@ const LOCK = `<svg width="12" height="15" viewBox="0 0 12 15" fill="none" xmlns=
 </defs>
 </svg>`
 
-const MaterialUISwitch = styled(Switch)(({ theme, checkedSVG }) => ({
+const MaterialUISwitch = styled(Switch)(({ theme, checkedSVG, unidirectional }) => ({
   width: 65,
   height: 30,
   padding: 0,
@@ -58,7 +58,7 @@ const MaterialUISwitch = styled(Switch)(({ theme, checkedSVG }) => ({
     marginLeft: '0px !important'
   },
   '& .MuiSwitch-thumb': {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: unidirectional ? '#FFF' : theme.palette.primary.main,
     boxShadow: 'none',
     width: 26,
     height: 26,
@@ -85,12 +85,12 @@ const MaterialUISwitch = styled(Switch)(({ theme, checkedSVG }) => ({
 }));
 
 export default ({ label,
-  checkedSVG, checked,
+  checkedSVG, checked, unidirectional = true,
   ...props }: any) => {
   return (
     <FormControlLabel
       sx={{ margin: '0' }}
-      control={<MaterialUISwitch checkedSVG={checkedSVG === 'lock' ? LOCK : CHECKMARK} sx={{ mr: 1 }} />}
+      control={<MaterialUISwitch unidirectional={unidirectional} checkedSVG={checkedSVG === 'lock' ? LOCK : CHECKMARK} sx={{ mr: 1 }} />}
       label={label}
       {...props}
       checked={checked}

@@ -7,6 +7,7 @@ import IconButton from 'components/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 
 import archiveIcon from 'assets/svg/archiveIcon.svg';
+import expandIcon from 'assets/svg/expand.svg';
 import CreateTaskModal from "modals/Tasks/CreateTaskModal";
 import TaskCard from "components/TaskCard";
 
@@ -93,6 +94,9 @@ export default () => {
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
+                    <IconButton sx={{ marginRight: '20px' }}>
+                        <img src={expandIcon} alt="archive-icon" />
+                    </IconButton>
                     <IconButton sx={{ marginRight: '20px' }}>
                         <img src={archiveIcon} alt="archiveIcon" />
                     </IconButton>
