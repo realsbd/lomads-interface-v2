@@ -438,6 +438,8 @@ export default () => {
     const [validSafeDetails, setValidSafeDetails] = useState<boolean>(false);
     const [state, setState] = useState<any>({})
     const [isLoading, setisLoading] = useState<boolean>(false)
+	const params = new URLSearchParams(window.location.search) // id=123
+	let fromFlow = params.get('createflow') 
 
     useEffect(() => {
         setState((prev: any) => {
@@ -807,7 +809,7 @@ export default () => {
 				<Box className={classes.StartSafe}>
 					{ !DAO ? 
 					  <Skeleton variant="text" sx={{ mb: 2 }} className={classes.headerText} width={400} /> :
-					  <Box className={classes.headerText}>{ daoURL ? '' : '2/2'} Organisation Multi-sig Wallet</Box> 
+					  <Box className={classes.headerText}>{ !fromFlow ? '' : '2/2'} Organisation Multi-sig Wallet</Box> 
 					}
 					<Box className={classes.buttonArea}>
 						<Box>
@@ -840,8 +842,7 @@ export default () => {
 									width: 228
 								}}
 								onClick={() => {
-									daoURL ?  navigate(`/${daoURL}/attach-safe/existing`) :
-									navigate('/addsafe') 
+									navigate(`/${daoURL}/attach-safe/existing${fromFlow ? '?createflow=1' : ''}`)
 								}}
 								variant='contained'>
 								ADD EXISTING
