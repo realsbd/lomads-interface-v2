@@ -55,7 +55,7 @@ export default ({ value, onUpload }) => {
                 }}
                 contentDisposition="auto"
             />
-            <div style={{ display: 'flex',  borderRadius: 10, margin: '16px 0', height: 200, width: 200, backgroundColor: '#F5F5F5', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ display: 'flex',  borderRadius: 10, height: 200, width: 200, backgroundColor: '#F5F5F5', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                 {uploadLoading ?
                     <LeapFrog size={24} color="#C94B32" /> :
                     <>

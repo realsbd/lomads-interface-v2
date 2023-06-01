@@ -196,6 +196,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: any }) => {
     }, [DAO, daoURL, user])
 
     const loadNotification = (notification: any) => {
+        if(!user) return;
         if(notification.model === 'Project') {
             if(notification.type === 'project:member.invited' || notification.type === 'project:member.added'){
                 if(notification.to && notification.to._id === user._id)

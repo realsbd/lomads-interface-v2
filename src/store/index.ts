@@ -5,6 +5,7 @@ import createSagaMiddleware from 'redux-saga';
 import sessionSaga from 'store/sagas/session.saga';
 import projectSaga from 'store/sagas/project.saga';
 import taskSaga from 'store/sagas/task.saga';
+import treasurySaga from 'store/sagas/treasury.saga';
 import daoSaga from './sagas/dao.saga';
 import { persistStore } from 'redux-persist';
 import { composeWithDevTools } from 'redux-devtools-extension';
@@ -26,6 +27,7 @@ const configureStore = (initialState: any = {}) => {
   sagaMiddleware.run(projectSaga);
   sagaMiddleware.run(taskSaga);
   sagaMiddleware.run(daoSaga);
+  sagaMiddleware.run(treasurySaga);
   persistor = persistStore(store);
   return store;
 };

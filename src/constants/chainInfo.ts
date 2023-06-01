@@ -63,7 +63,7 @@ export const CHAIN_INFO: any = {
     infoLink: 'https://info.uniswap.org/#/',
     label: 'Görli',
     logoUrl: ethereumLogoUrl,
-    nativeCurrency: { name: 'Görli Ether', symbol: 'ETH', decimals: 18 },
+    nativeCurrency: { name: 'Görli Ether', symbol: 'GörETH', decimals: 18 },
     chainId: '0x5',
     network: 'testnet',
     chainName: 'goerli'

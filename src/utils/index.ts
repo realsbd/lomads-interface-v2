@@ -35,3 +35,7 @@ export const isRightAddress = (holderAddress: string) => {
 export function getSigner(provider: JsonRpcProvider, account: string): JsonRpcSigner {
   return provider.getSigner(account).connectUnchecked()
 }
+export const getQueryString = (params: any = {}) => {
+  if (Object.keys(params).length == 0) return ''
+  return `?${Object.keys(params).map(key => key + '=' + params[key]).join('&')}`;
+}

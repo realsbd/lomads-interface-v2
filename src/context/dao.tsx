@@ -42,12 +42,12 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }, [account, token, DAOList])
 
   useEffect(() => {
-    if (DAOList && !daoURL) {
+    if (DAOList && !daoURL && window.location.pathname === '/') {
       console.log("DAOList", DAOList)
       if (DAOList.length > 0)
         navigate(`/${_get(DAOList, '[0].url')}`)
       else
-        navigate(`/create-dao`)
+        navigate(`/organisation/create`)
     }
   }, [DAOList])
 
@@ -55,6 +55,12 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
     if (DAOList && DAOList.length > 0 && account && token && daoURL && (!DAO || DAO.url !== daoURL))
       loadDAO(daoURL)
   }, [account, token, daoURL, console, DAOList])
+
+  useEffect(() => {
+    if (DAO && (!DAO.safes || (DAO.safes && DAO.safes.length == 0))) {
+      navigate(`/${DAO?.url}/attach-safe/new`)
+    }
+  }, [DAO])
 
   const resetDAO = () => {
     dispatch(resetDAOAction())

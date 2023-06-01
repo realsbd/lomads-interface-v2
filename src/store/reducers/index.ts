@@ -3,6 +3,7 @@ import sessionReducer from './session';
 import DAOReducer from './dao';
 import projectReducer from './project';
 import { persistReducer } from 'redux-persist';
+import TreasuryReducer from './treasury';
 import localforage from 'localforage';
 import storage from 'redux-persist/lib/storage'
 import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2';
@@ -23,7 +24,8 @@ const rootReducer: any = combineReducers({
   session: sessionReducer,
   dao: DAOReducer,
   project: projectReducer,
-  task: taskReducer
+  task: taskReducer,
+  treasury: TreasuryReducer
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);

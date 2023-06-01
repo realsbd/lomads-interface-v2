@@ -11,6 +11,7 @@ import TaskDetailsPage from 'pages/Task/TaskDetails';
 import SettingsPage from 'pages/Settings';
 import AttachNewSafePage from 'pages/AttachSafe/New';
 import AttachExistingSafePage from 'pages/AttachSafe/Existing';
+import CreateOrganisation from 'pages/CreateOrganisation';
 
 export default [
 	{
@@ -19,6 +20,13 @@ export default [
 		layout: LandingLayout,
 		private: false,
 		component: LoginPage
+	},
+	{
+		path: '/organisation/create',
+		exact: true,
+		layout: LandingLayout,
+		private: true,
+		component: CreateOrganisation
 	},
 	{
 		path: '/:daoURL/attach-safe/new',

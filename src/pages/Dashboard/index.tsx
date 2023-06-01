@@ -11,6 +11,7 @@ import TaskSection from "sections/TaskSection";
 import ProjectSection from "sections/ProjectSection";
 import MembersSection from "sections/MembersSection";
 import { useAppSelector } from "helpers/useAppSelector";
+import Treasury from "./Treasury";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -40,11 +41,14 @@ export default () => {
             <Grid sm={12}>
                 <ProjectSection />
             </Grid>
-            <Grid sm={12}>
+            {/* <Grid sm={12}>
                 <MembersSection
                     list={_get(DAO, 'members', [])}
                     showProjects={false}
                 />
+            </Grid> */}
+            <Grid mt={1} item sm={12}>
+                <Treasury />
             </Grid>
         </Grid>
     )

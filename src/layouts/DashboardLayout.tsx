@@ -322,7 +322,7 @@ export default ({ children }: any) => {
                     </Box> )
               })
             }
-            <Box onClick={() => navigate('/sbt')}  className={classes.stripItem}>
+            <Box onClick={() => navigate('/organisation/create')}  className={classes.stripItem}>
                 <Box className={classes.invertedBox} sx={{ backgroundColor: 'transparent' }}>
                   <Typography variant='h6' className={classes.create}>+</Typography>
                 </Box>

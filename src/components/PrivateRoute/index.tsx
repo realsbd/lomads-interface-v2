@@ -21,16 +21,14 @@ export default (props: any) => {
 			setAuthenticated(true)
 		}
 	}, [account, token, user, props.private])
-
-	console.log("authenticated", authenticated)
 	
 	if ((authenticated === null) && props.private) {
 		return <FullScreenLoader />
 	} else if ((authenticated === false) && props.private) {
 		if (window.location.pathname !== '/')
-			return window.location.href = `/login?from=${window.location.pathname}`
+			window.location.href = `/login?from=${window.location.pathname}`
 		else
-			return window.location.href = `/login`
+			window.location.href = `/login`
 	}
 	else if (token && props.private && (!account || !user)) {
 		return <FullScreenLoader />

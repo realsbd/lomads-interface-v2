@@ -339,6 +339,9 @@ export default () => {
 	const { provider, account, chainId } = useWeb3Auth();
     const [selectedSafeAddress, setSelectedSafeAddress] = useState<string | null>(null);
     const [state, setState] = useState<any>({})
+	const params = new URLSearchParams(window.location.search) // id=123
+	let fromFlow = params.get('createflow') 
+
 
     const loadSafe = useCallback(async (safeAddress: string) => {
         try {
@@ -513,7 +516,7 @@ export default () => {
 		<Container>
 			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
-					<Box className={classes.headerText}>{ daoURL ? '' : '2/2'} Organisation Multi-sig Wallet</Box>
+					<Box className={classes.headerText}>{ !fromFlow ? '' : '2/2'} Organisation Multi-sig Wallet</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
@@ -526,8 +529,7 @@ export default () => {
 									color: 'rgba(201, 75, 50, 0.6)'
 								}}
 								onClick={() => {
-									daoURL ?  navigate(`/${daoURL}/attach-safe/new`) :
-									 navigate('/newsafe') 
+									navigate(`/${daoURL}/attach-safe/new${fromFlow ? '?createflow=1' : ''}`)
 								}}
 								variant='contained'>
 								CREATE
