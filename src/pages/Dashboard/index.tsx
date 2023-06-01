@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { Grid } from "@mui/material";
 import Links from "./Links";
 import Notifications from "./Notifications";
+import Treasury from "./Treasury";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -25,6 +26,9 @@ export default () => {
             </Grid>
             <Grid mt={1} item sm={12}>
                 <Notifications isHelpIconOpen={false} />
+            </Grid>
+            <Grid mt={1} item sm={12}>
+                <Treasury />
             </Grid>
         </Grid>
     )

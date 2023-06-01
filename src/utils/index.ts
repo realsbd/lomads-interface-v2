@@ -18,3 +18,8 @@ export const isRightAddress = (holderAddress: string) => {
   const isValid: boolean = ethers.utils.isAddress(holderAddress);
   return isValid;
 };
+
+export const getQueryString = (params: any = {}) => {
+	if(Object.keys(params).length == 0) return ''
+	return `?${Object.keys(params).map(key => key + '=' + params[key]).join('&')}`;
+}
