@@ -35,5 +35,5 @@ function* loadDAOSaga(action:any) {
 
 export default function* daoSaga() {
 	yield takeLatest(actionTypes.LOAD_DAOLIST_ACTION, loadDAOListSaga)
-    yield takeLatest(actionTypes.LOAD_DAO_ACTION, loadDAOSaga)
+  yield takeLatest(actionTypes.LOAD_DAO_ACTION, loadDAOSaga)
 }

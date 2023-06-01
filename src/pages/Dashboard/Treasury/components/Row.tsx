@@ -17,10 +17,10 @@ export default ({ transaction }: any) => {
     const { DAO } = useDAO();
 
     const safeChainId = useMemo(() => {
-        if(DAO)
+        if(DAO?.url)
             return _find(DAO?.safes, s => s.address === transaction?.safeAddress)?.chainId
         return undefined
-    }, [DAO])
+    }, [DAO?.url])
 
     const { transformTx } = useGnosisTxnTransform(transaction?.safeAddress, safeChainId);
 
@@ -30,14 +30,11 @@ export default ({ transaction }: any) => {
         return null
     }, [transaction, safeChainId])
 
+    if(transaction?.metadata)
+        console.log("metaaa",transaction)
+
 
     if(!txn || !safeChainId) return null
-
-    console.log("txn", txn, transaction)
-
-    if(transaction?.rawTx?.rejectedTxn) {
-        console.log("rejTxn", transaction)
-    }
 
     return (
         <>
@@ -45,9 +42,9 @@ export default ({ transaction }: any) => {
                 txn.map((tx: any, _i: number) => (
                     <TableRow>
                         <CreditDebit credit={tx?.isCredit} executed={tx?.executionDate} amount={tx?.formattedValue} token={tx?.symbol}/>
-                        <Label index={_i}/>
+                        <Label transaction={transaction} recipient={tx?.to}/>
                         <Recipient safeAddress={transaction?.safeAddress} credit={tx?.isCredit} recipient={tx?.to} />
-                        <Tag/>
+                        <Tag transaction={transaction} recipient={tx?.to} />
                         <Sign transaction={tx} index={_i} />
                         <Action transaction={tx} txnCount={txn.length} index={_i} />
                     </TableRow>

@@ -1,20 +1,24 @@
 import { TableCell, Box, Typography } from "@mui/material";
+import { get as _get } from 'lodash'
 import TextInput from "components/TextInput";
 import React, { useMemo } from "react";
 
-export default ({ index }: any) => {
+export default ({ transaction, recipient }: any) => {
 
-    const text = useMemo(() => {
-        if(index % 3 === 0) {
-            return "This is dummy comment"
+    const label = useMemo(() => {
+        if(transaction && recipient) {
+            const metadata = _get(transaction, `metadata.${recipient}`, null)
+            if(metadata){
+                return metadata?.label
+            }
         }
         return null
-    }, [index])
-
+    }, [transaction, recipient])
+    
     return (
         <TableCell>
             <Box>
-                { !text ? <TextInput size="small"/> : <Typography>{ text }</Typography> }
+                { !label ? <TextInput placeholder="Reason for transaction" fullWidth size="small"/> : <Typography>{ label }</Typography> }
             </Box>
         </TableCell>
     )

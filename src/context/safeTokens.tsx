@@ -19,6 +19,12 @@ export const SafeTokensProvider = ({ children }: any) => {
     const { DAO } = useAppSelector(store => store?.dao)
     const [safeTokens, setSafeTokens] = useState<any>(null);
 
+    useEffect(() => {
+        if(!DAO) {
+            setSafeTokens(null)
+        }
+    }, [DAO])
+
     // const tokenBalance = useCallback((token: any) => {
     //     if(safeTokens && safeTokens.length > 0) {
     //         let selToken = _find(safeTokens, t => _get(t, 'tokenAddress', null) === token)
@@ -31,7 +37,7 @@ export const SafeTokensProvider = ({ children }: any) => {
 
     const getTokens = async (chain: SupportedChainId, safeAddress: String) => {
         return axios.get(`${GNOSIS_SAFE_BASE_URLS[chain]}/api/v1/safes/${safeAddress}/balances/usd/`, {withCredentials: false })
-            .then((res: any) => {
+            .then(async (res: any) => {
                 let tokens = res.data.map((t: any) => {
                     let tkn = t
                     if(!tkn.tokenAddress){
@@ -47,11 +53,12 @@ export const SafeTokensProvider = ({ children }: any) => {
                     }
                     return t 
                 })
+                const safe: any = await axios.get(`${GNOSIS_SAFE_BASE_URLS[chain]}/api/v1/safes/${safeAddress}/`, {withCredentials: false }).then(res => res.data)
                 if(tokens && tokens.length > 0) {
                     let total = tokens.reduce((a:any, b:any) => {
                         return a + parseFloat(_get(b, 'fiatBalance', 0))
                     }, 0);
-                    axiosHttp.post(`/safe/${DAO?.safe?.address}/sync`, { tokens, balance: total })
+                    axiosHttp.post(`/safe/${safeAddress}/sync`, { tokens, balance: total, threshold: safe?.threshold  })
                 }
                 return {[`${safeAddress}`] : tokens}
             })

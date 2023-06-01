@@ -61,7 +61,7 @@ const AppBar = styled(MuiAppBar, {
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
     '& .MuiDrawer-paper': {
-      position: 'absolute',
+      position: 'fixed',
       left: 0,
       whiteSpace: 'nowrap',
       width: drawerWidth,
@@ -261,7 +261,7 @@ export default ({ children }: any) => {
   return (
       <Box className={classes.root}>
         <CssBaseline />
-        <AppBar position="absolute" open={open}>
+        <AppBar position="fixed" open={open}>
           <Toolbar
             style={{ background: 'transparent', height: '100%', paddingLeft: 0, paddingRight: 0 }}
           >
@@ -302,7 +302,7 @@ export default ({ children }: any) => {
           </Toolbar>
         </AppBar>
         <Box style={{ width: drawerWidth, background: 'transparent' }} ></Box>
-        <Drawer onMouseLeave={hideDrawer} onMouseEnter={showDrawer} variant="permanent" open={open}>
+        <Drawer  onMouseLeave={hideDrawer} onMouseEnter={showDrawer} variant="permanent" open={open}>
           <List className={classes.strip}>
           {
               DAOList && DAOList.map((dao: any) => {

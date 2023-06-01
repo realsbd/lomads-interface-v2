@@ -48,6 +48,6 @@ export const loadTreasuryService = (payload: any) => {
     //     //@ts-ignore
     //     return ptx.concat(pTxn)
     // })
-    .then(ptx => _orderBy(ptx, [p => p?.rawTx?.isExecuted, p => p?.rawTx?.executionDate, p => p?.rawTx?.nonce], ['asc', 'desc','asc']))
+    .then(ptx => _orderBy(ptx, [p => p?.rawTx?.isExecuted, p => p?.rawTx?.offChain, p => p?.rawTx?.executionDate, p => p?.rawTx?.nonce], ['asc', 'asc', 'desc','asc']))
     .then(ptx => { return { data: ptx } })
 }

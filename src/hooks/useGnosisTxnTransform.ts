@@ -1,13 +1,16 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { get as _get, find as _find, pick as _pick } from 'lodash'
 import { ethers } from 'ethers';
 import { CHAIN_INFO } from 'constants/chainInfo';
 import moment from 'moment';
 import { useSafeTokens } from 'context/safeTokens';
 import { useWeb3Auth } from 'context/web3Auth';
+import { useDAO } from 'context/dao';
+import useSafe from './useSafe';
 
 export default (safeAddress: string | undefined, chainId: number | undefined) => {
     const { account, chainId: currentChainId } = useWeb3Auth();
+    const { loadSafe } = useSafe()
     const { safeTokens } = useSafeTokens()
 
     const getERC20Token = useCallback((tokenAddr: string) => {
@@ -18,11 +21,17 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
         return null
     }, [safeTokens, safeAddress])
 
+    const safe = useMemo(() => {
+        if(safeAddress)
+            return loadSafe(safeAddress)
+        return null
+    }, [safeAddress])
+
     const getNativeToken = useCallback(() => {
         if(chainId)
             return CHAIN_INFO[chainId]?.nativeCurrency
         return { name: '', symbol: '', decimals: 18 }
-    }, [chainId])
+    }, [chainId, safeAddress])
 
     const isNativeTokenSingleTransfer = (transaction: any) => {
         if(transaction?.value !== "0" && transaction?.dataDecoded === null) 
@@ -58,8 +67,8 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
             return [];
         const hasMyConfirmation = _find(transaction.confirmations, (c:any) => c.owner === account)
         const hasMyRejection = transaction?.rejectedTxn && _find(_get(transaction, 'rejectedTxn.confirmations', []), (c:any) => c.owner === account)
-        const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === (_get(transaction, 'confirmations', [])?.length || 0)
-        const canRejectTxn = transaction?.rejectedTxn && _get(transaction, 'rejectedTxn.confirmationsRequired', 0) === _get(transaction, 'rejectedTxn.confirmations', [])?.length
+        const canExecuteTxn = _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)) === (_get(transaction, 'confirmations', [])?.length || 0)
+        const canRejectTxn = transaction?.rejectedTxn && _get(transaction, 'rejectedTxn.confirmationsRequired', _get(safe, 'threshold', 0)) === _get(transaction, 'rejectedTxn.confirmations', [])?.length
         return [{
             txHash: _get(transaction, 'txHash', ''),
             transactionHash: _get(transaction, 'transactionHash', ''),
@@ -72,7 +81,7 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
             symbol: nativeToken?.symbol,
             decimals: nativeToken?.decimals,
             to: _get(transaction, 'to', "0x"),
-            confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
+            confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
             confirmations: _get(transaction, 'confirmations', [])?.length || 0,
             hasMyConfirmation: hasMyConfirmation ? true: false,
             hasRejection: transaction?.rejectedTxn ? true : false,
@@ -93,8 +102,8 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
             return [];
         const hasMyConfirmation = _find(transaction.confirmations, (c:any) => c?.owner === account)
         const hasMyRejection = transaction?.rejectedTxn && _find(_get(transaction, 'rejectedTxn.confirmations', []), (c:any) => c.owner === account)
-        const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === (_get(transaction, 'confirmations', [])?.length || 0)
-        const canRejectTxn = transaction?.rejectedTxn && _get(transaction, 'rejectedTxn.confirmationsRequired', 0) === (_get(transaction, 'rejectedTxn.confirmations', [])?.length | 0)
+        const canExecuteTxn = _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)) === (_get(transaction, 'confirmations', [])?.length || 0)
+        const canRejectTxn = transaction?.rejectedTxn && _get(transaction, 'rejectedTxn.confirmationsRequired', _get(safe, 'threshold', 0)) === (_get(transaction, 'rejectedTxn.confirmations', [])?.length | 0)
         let op = [];
         if(_get(transaction, 'dataDecoded.parameters[0].valueDecoded')) {
             for (let index = 0; index < _get(transaction, 'dataDecoded.parameters')?.length; index++) {
@@ -117,7 +126,7 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
                                     symbol: nativeToken?.symbol,
                                     decimals: nativeToken?.decimals,
                                     to: _get(decoded, 'to', "0x"),
-                                    confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
+                                    confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
                                     confirmations: _get(transaction, 'confirmations', [])?.length || 0,
                                     hasMyConfirmation: hasMyConfirmation ? true: false,
                                     hasRejection: transaction?.rejectedTxn ? true : false,
@@ -144,11 +153,11 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
                                     offChain: transaction?.offChain,
                                     nonce: _get(transaction, 'nonce', "0"),
                                     value: value,
-                                    formattedValue: (+value / ( 10 ** erc20Token?.token?.decimals )),
-                                    symbol: erc20Token?.token?.symbol,
-                                    decimals: erc20Token?.token?.decimal || erc20Token?.token?.decimals,
+                                    formattedValue: (+value / ( 10 ** (erc20Token?.token?.decimals || erc20Token?.token?.decimal || 18) )),
+                                    symbol: erc20Token?.token?.symbol || transaction?.token?.symbol,
+                                    decimals: erc20Token?.token?.decimal || erc20Token?.token?.decimals || 18,
                                     to: to,
-                                    confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
+                                    confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
                                     confirmations: _get(transaction, 'confirmations', [])?.length || 0,
                                     hasMyConfirmation: hasMyConfirmation ? true: false,
                                     hasRejection: transaction?.rejectedTxn ? true : false,
@@ -183,7 +192,7 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
                         symbol: allowanceToken?.token?.symbol,
                         decimals: (allowanceToken?.token?.decimal || allowanceToken?.token?.decimals),
                         to: to,
-                        confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
+                        confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
                         confirmations: _get(transaction, 'confirmations', [])?.length || 0,
                         hasMyConfirmation: hasMyConfirmation ? true: false,
                         hasRejection: transaction?.rejectedTxn ? true : false,
@@ -210,11 +219,11 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
                 offChain: transaction?.offChain,
                 nonce: _get(transaction, 'nonce', "0"),
                 value: value,
-                formattedValue: value === '0x' ? '0x' : (+value / ( 10 ** transaction?.token?.decimals )),
+                formattedValue: value === '0x' ? '0x' : (+value / ( 10 ** (transaction?.token?.decimals || transaction?.token?.decimal || 18) )),
                 symbol: transaction?.token?.symbol,
-                decimals: transaction?.token?.decimals,
+                decimals: transaction?.token?.decimals || transaction?.token?.decimal || 18,
                 to: to,
-                confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
+                confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
                 confirmations: _get(transaction, 'confirmations', [])?.length || 0,
                 hasMyConfirmation: hasMyConfirmation ? true: false,
                 hasRejection: transaction?.rejectedTxn ? true : false,
@@ -238,8 +247,8 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
             return [];
         const hasMyConfirmation = _find(transaction.confirmations, (c:any) => c?.owner === account)
         const hasMyRejection = transaction?.rejectedTxn && _find(_get(transaction, 'rejectedTxn.confirmations', []), (c:any) => c.owner === account)
-        const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === (_get(transaction, 'confirmations', [])?.length || 0)
-        const canRejectTxn = transaction?.rejectedTxn && _get(transaction, 'rejectedTxn.confirmationsRequired', 0) === (_get(transaction, 'rejectedTxn.confirmations', [])?.length || 0)
+        const canExecuteTxn = _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)) === (_get(transaction, 'confirmations', [])?.length || 0)
+        const canRejectTxn = transaction?.rejectedTxn && _get(transaction, 'rejectedTxn.confirmationsRequired', _get(safe, 'threshold', 0)) === (_get(transaction, 'rejectedTxn.confirmations', [])?.length || 0)
         const parameters = _get(transaction, 'dataDecoded.parameters');
         const to = _get(_find(parameters, p => p.name === 'to'), 'value', '0x')
         const value = _get(_find(parameters, p => p.name === 'value'), 'value', 0)
@@ -252,11 +261,11 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
             offChain: transaction?.offChain,
             nonce: _get(transaction, 'nonce', "0"),
             value: value,
-            formattedValue: (+value / ( 10 ** erc20Token?.token?.decimals )),
-            symbol: erc20Token?.token?.symbol,
+            formattedValue: (+value / ( 10 ** ( erc20Token?.token?.decimals || erc20Token?.token?.decimal || 18 ) )),
+            symbol: erc20Token?.token?.symbol || transaction?.token?.symbol,
             decimals: erc20Token?.token?.decimal || erc20Token?.token?.decimals,
             to: to,
-            confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
+            confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
             confirmations: _get(transaction, 'confirmations', [])?.length || 0,
             hasMyConfirmation: hasMyConfirmation ? true: false,
             hasRejection: transaction?.rejectedTxn ? true : false,
@@ -275,8 +284,8 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
     const transformOperationTxn = (transaction: any) => {
         const hasMyConfirmation = _find(transaction.confirmations, (c:any) => c?.owner === account)
         const hasMyRejection = transaction?.rejectedTxn && _find(_get(transaction, 'rejectedTxn.confirmations', []), (c:any) => c.owner === account)
-        const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === (_get(transaction, 'confirmations', [])?.length || 0)
-        const canRejectTxn = transaction?.rejectedTxn && _get(transaction, 'rejectedTxn.confirmationsRequired', 0) === (_get(transaction, 'rejectedTxn.confirmations', [])?.length || 0)
+        const canExecuteTxn = _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)) === (_get(transaction, 'confirmations', [])?.length || 0)
+        const canRejectTxn = transaction?.rejectedTxn && _get(transaction, 'rejectedTxn.confirmationsRequired', _get(safe, 'threshold', 0)) === (_get(transaction, 'rejectedTxn.confirmations', [])?.length || 0)
         let op = [];
         op.push({
             txHash: _get(transaction, 'txHash', ''),
@@ -290,7 +299,7 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
             symbol: "",
             decimals: "",
             to: "0x",
-            confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
+            confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
             confirmations: _get(transaction, 'confirmations', [])?.length || 0,
             hasMyConfirmation: hasMyConfirmation ? true: false,
             hasRejection: transaction?.rejectedTxn ? true : false,
@@ -323,7 +332,7 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
             symbol: _get(transaction, 'transfers[0].tokenInfo.symbol', null),
             decimals: _get(transaction, 'transfers[0].tokenInfo.decimals', null),
             to: _get(transaction, 'to', "0x"),
-            confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
+            confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
             confirmations: _get(transaction, 'confirmations', [])?.length || 0,
             hasMyConfirmation: false,
             hasRejection: false,
@@ -344,18 +353,28 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
             return data
         } else {
             if(isNativeTokenSingleTransfer(transaction)) {
+                if(transaction._id === "63844dc3f01139e3fe3f7fd7")
+                    console.log("offChain", "transformNativeTokenSingleTransfer")
                 const data = transformNativeTokenSingleTransfer(transaction)
                 return data
             } else if(isTokenMultiTransfer(transaction)) {
+                if(transaction._id === "63844dc3f01139e3fe3f7fd7")
+                    console.log("offChain", "transformMultiOpeartion", transaction)
                 const data = transformMultiOpeartion(transaction, labels)
                 return data
             } else if(isERC20TokenSingleTransfer(transaction)) {
+                if(transaction._id === "63844dc3f01139e3fe3f7fd7")
+                    console.log("offChain", "transferERC20TokenSingleTransfer")
                 const data = transferERC20TokenSingleTransfer(transaction)
                 return data
             } else if(isOperationTransaction(transaction)) {
+                if(transaction._id === "63844dc3f01139e3fe3f7fd7")
+                    console.log("offChain", "transformOperationTxn")
                 const data = transformOperationTxn(transaction)
                 return data
             } else {
+                if(transaction._id === "63844dc3f01139e3fe3f7fd7")
+                    console.log("offChain", "transformMultiOpeartion", transaction)
                 const data = transformMultiOpeartion(transaction, labels)
                 return data
             }
