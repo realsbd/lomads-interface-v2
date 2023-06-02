@@ -1,7 +1,7 @@
 import { Box, Button, Stack } from "@mui/material";
 import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { useDAO } from "context/dao";
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { makeStyles } from '@mui/styles';
 import { useNavigate, useParams } from "react-router-dom"
 import { Grid } from "@mui/material";
@@ -121,7 +121,7 @@ export default () => {
     const setWalkThroughStyles = (nextObj: WalkThroughObjType) => {
         console.log(nextObj.id, '....nextObj.id...')
         anchorRef.current = document.getElementById(nextObj.id)
-        anchorRef.current.style.zIndex = '2500 !important'
+        anchorRef.current.style.zIndex = 2500
         anchorRef.current.scrollIntoView({
             behavior: 'smooth',
             block: 'end',
@@ -129,9 +129,6 @@ export default () => {
         });
         if (nextObj.step === 6) {
             anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'
-        }
-        if (nextObj.step === 7) {
-            anchorRef.current.style.border="10px solid red"
         }
     }
 
@@ -164,6 +161,22 @@ export default () => {
         clearWalkThroughStyles()
         setWalkThroughObj(Steps('')[0])
     }
+
+
+	useEffect(() => {
+		function handleClick(event: any) {
+			if (isHelpIconOpen && (event.target.matches('div.help-card')
+				|| event.target.matches('div.walkThroughOverlay')
+				|| event.target.matches('span.bold-text')
+				|| event.target.matches('span.help-card-content'))) {
+				event.preventDefault()
+				setIsHelpIconOpen(false)
+			}
+		}
+		document.addEventListener("click", handleClick);
+		return () => document.removeEventListener("click", handleClick);
+	});
+
     return (
         <Grid container>
             <Grid item sm={12}>
@@ -188,7 +201,7 @@ export default () => {
                 <Treasury />
             </Grid>
                 <Box
-                    sx={{ width: '100%', position: 'fixed', left: '33px', bottom: '44px', cursor: 'pointer', zIndex: 1300}}
+                    sx={{ width: '100%', position: 'fixed', left: '33px', bottom: '44px', cursor: 'pointer', zIndex: isHelpIconOpen ? 1300: 1000}}
                     id="question-mark"
                     ref={questionMarkRef}
                     onClick={expandHelpOptions}>

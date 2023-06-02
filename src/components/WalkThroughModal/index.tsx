@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: any) => ({
         background: "#FFFFFF",
         border: "none !important",
         overflow: "hidden",
-        padding: "40px",
+        padding: "40px !important",
         borderRadius: "20px",
         width: "700px",
         height: "490px",
@@ -35,8 +35,8 @@ const useStyles = makeStyles((theme: any) => ({
         fontFamily: "'Inter', sans-serif",
         fontStyle: "normal",
         fontWeight: 400,
-        fontSize: "30px",
-        lineHeight: "33px",
+        fontSize: "30px !important",
+        lineHeight: "33px !important",
         textAlign: "center"
       },
       textContent: {
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme: any) => ({
         alignSelf: "center",
         textAlign: "center",
         color: "#76808D",
-        paddingBottom: "25px"
+        paddingBottom: "25px !important"
       },
 }));
 

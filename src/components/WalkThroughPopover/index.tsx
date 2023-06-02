@@ -17,31 +17,31 @@ type tooltipObj = {
 }
 
 const useStyles = makeStyles((theme: any) => ({
-      closeBtn: {
+    closeBtn: {
         cursor: "pointer",
         position: "absolute",
         right: "2%",
         top: "3%",
         background: "linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)",
-        borderRadius: "'10%'"
-      },
-      walkthroughContainerRight: {
+        borderRadius: "10px"
+    },
+    walkthroughContainerRight: {
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-around",
         alignSelf: "center",
         width: "464px",
-        padding: "30px"
-      },
-      walkthroughContainerLeft: {
+        padding: "30px",
+    },
+    walkthroughContainerLeft: {
         background: "#F0F0F0",
         borderRadius: "10px 0px 0px 10px",
         width: "186px",
         height: "247px",
         alignSelf: "center",
         padding: "20px"
-      },
-      walkthroughContainer: {
+    },
+    walkthroughContainer: {
         position: "relative",
         display: "flex",
         flexDirection: "row",
@@ -52,9 +52,11 @@ const useStyles = makeStyles((theme: any) => ({
         height: "247px",
         padding: "0",
         borderRadius: "10px",
-        marginLeft: "20px"
-      },
-      textContent: {
+        marginLeft: "20px",
+        top: '5%',
+        right: '3%'
+    },
+    textContent: {
         fontFamily: "'Inter', sans-serif",
         fontStyle: "normal",
         fontWeight: 400,
@@ -62,19 +64,19 @@ const useStyles = makeStyles((theme: any) => ({
         textAlign: "center",
         color: "#76808D",
         paddingBottom: "25px"
-      },
-      popperTitle: {
+    },
+    popperTitle: {
         fontFamily: "'Inter', sans-serif",
         fontStyle: "normal",
         fontWeight: 400,
-        fontSize: "22px",
+        fontSize: "22px !important",
         lineHeight: "25px",
         display: "flex",
         alignSelf: "center",
         textAlign: "center",
         letterSpacing: "-0.011em",
         color: "#76808D"
-      }
+    }
 }));
 
 export default function WalkThroughPopover({
@@ -91,18 +93,57 @@ export default function WalkThroughPopover({
     anchorEl: any
 }) {
     const classes = useStyles();
+    const [arrowRef, setArrowRef] = useState<any>(null)
 
     return (
-        <Popper open={displayPopover} anchorEl={anchorEl} sx={{zIndex: 2000}}>
+        <Popper open={displayPopover} anchorEl={anchorEl}
+            sx={{
+                zIndex: 2000,
+                paddingBottom: 3
+            }}
+            placement={obj?.placement}
+            modifiers={[
+                {
+                    name: 'flip',
+                    enabled: true,
+                    options: {
+                        altBoundary: true,
+                        rootBoundary: 'document',
+                        padding: 8,
+                    },
+                },
+                {
+                    name: 'preventOverflow',
+                    enabled: true,
+                    options: {
+                        altAxis: true,
+                        altBoundary: true,
+                        tether: true,
+                        rootBoundary: 'document',
+                        padding: 8,
+                    },
+                },
+                {
+                    name: 'arrow',
+                    enabled: false,
+                    options: {
+                        element: arrowRef,
+                    },
+                },
+            ]}
+        >
+            {
+                true &&
+                <span className="arrow" ref={setArrowRef} />
+            }
             <Box>
                 <Box
-                    className={classes.walkthroughContainer}
-                    style={{ top: '5%', right: '3%' }}>
+                    className={classes.walkthroughContainer}>
                     <Box className={classes.walkthroughContainerLeft}>
                         <img src={obj?.imgPath} />
                     </Box>
                     <Box className={classes.walkthroughContainerRight}>
-                        <Typography className={classes.popperTitle} component="h2" variant="h4">
+                        <Typography component="h2" variant="h4" className={classes.popperTitle}>
                             {obj?.title}
                         </Typography>
                         <p className={classes.textContent} dangerouslySetInnerHTML={{ __html: obj?.content }} />
