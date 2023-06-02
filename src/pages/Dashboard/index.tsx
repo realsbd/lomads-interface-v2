@@ -72,9 +72,6 @@ const useStyles = makeStyles((theme: any) => {
             backgroundColor: '#1B2B41 !important',
         },
     },
-    zIndex1k: {
-        zIndex: 2000
-    },
     walkThroughOverlay: {
         width: "100vw",
         height: "100vh",
@@ -119,27 +116,15 @@ export default () => {
     }
 
     const setWalkThroughStyles = (nextObj: WalkThroughObjType) => {
-        console.log(nextObj.id, '....nextObj.id...')
         anchorRef.current = document.getElementById(nextObj.id)
-        anchorRef.current.style.zIndex = 2500
         anchorRef.current.scrollIntoView({
             behavior: 'smooth',
             block: 'end',
             inline: 'end'
         });
-        if (nextObj.step === 6) {
-            anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'
-        }
     }
 
-    const clearWalkThroughStyles = () => {
-        if (anchorRef.current) {
-            anchorRef.current.style = {}
-        }
-    }
     const incrementWalkThroughSteps = () => {
-        console.log(currWalkThroughObj, '....walk thr', Steps(''))
-        clearWalkThroughStyles()
         if (currWalkThroughObj?.step === 7) {
             endWalkThrough()
             return
@@ -158,7 +143,6 @@ export default () => {
     const endWalkThrough = () => {
         //dispatch(updateUserOnboardingCount({ payload: { daoId: _get(DAO, '_id', '') } }))
         setShowWalkThrough(false)
-        clearWalkThroughStyles()
         setWalkThroughObj(Steps('')[0])
     }
 
@@ -180,24 +164,32 @@ export default () => {
     return (
         <Grid container>
             <Grid item sm={12}>
-                <Links />
+                <Links highlightSettings={currWalkThroughObj.step === 6}/>
             </Grid>
             <Grid mt={1} item sm={12}>
                 <Notifications isHelpIconOpen={false} />
             </Grid>
-            <Grid sm={12}>
+            <Grid sm={12}
+                id="my-task" 
+                sx={{zIndex: currWalkThroughObj.step === 2 ? 1400: 0}} >
                 <TaskSection />
             </Grid>
-            <Grid sm={12}>
+            <Grid sm={12}
+                id="my-workspace"
+                sx={{zIndex: currWalkThroughObj.step === 1 ? 1400: 0}}>
                 <ProjectSection />
             </Grid>
-            {/* <Grid sm={12}>
+            {/* <Grid sm={12} id="members">
                 <MembersSection
                     list={_get(DAO, 'members', [])}
                     showProjects={false}
+                    highlightMembers={currWalkThroughObj.step === 6}
                 />
             </Grid> */}
-            <Grid mt={1} item sm={12}>
+            <Grid mt={1}
+                id="treasury-management"
+                item sm={12} 
+                sx={{zIndex: currWalkThroughObj.step === 4 || currWalkThroughObj.step === 3 ? 1400: 0}}>
                 <Treasury />
             </Grid>
                 <Box

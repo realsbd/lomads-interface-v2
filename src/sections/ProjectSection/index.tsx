@@ -153,7 +153,7 @@ export default () => {
     }, [myProjects, initialCheck]);
 
     return (
-        <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"} id="my-workspace">
+        <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
             <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                 <Tabs
                     value={value}
