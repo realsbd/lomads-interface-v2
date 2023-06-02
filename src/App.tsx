@@ -12,7 +12,6 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import routes from 'routes'
 import PrivateRoute from 'components/PrivateRoute';
 import { Toaster } from 'react-hot-toast';
-import { SafeTokensProvider } from 'context/safeTokens';
 export const store = configureStore();
 
 export type AppState = ReturnType<typeof store.getState>;

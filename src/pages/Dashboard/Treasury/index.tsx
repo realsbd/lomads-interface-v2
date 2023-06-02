@@ -74,7 +74,7 @@ export default () => {
     }, [DAO, daoURL])
 
     return (
-        <Grid container>
+        <Grid container id="treasury-management">
             <Grid item sm={12}>
                 { (!DAO || !treasury)  ? 
                 <Skeleton sx={{ borderRadius: 1 }}  variant="rectangular" height={72} animation="wave" /> :

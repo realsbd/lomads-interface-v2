@@ -85,7 +85,7 @@ export default ({ showProjects, list }: MembersProps) => {
 
         return (
             <>
-                <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"} key={index}>
+                <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"} key={index} id="members">
                     <Box sx={{ width: '250px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                         <Avatar name={user.name} wallet={user.wallet} />
                         <Box className={classes.lineSm}></Box>

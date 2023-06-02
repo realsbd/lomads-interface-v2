@@ -69,7 +69,7 @@ export default () => {
     };
 
     return (
-        <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
+        <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"} id="my-task">
             <CreateTaskModal
                 open={openCreateTask}
                 closeModal={() => setOpenCreateTask(false)}
