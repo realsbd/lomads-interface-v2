@@ -99,7 +99,7 @@ export default function WalkThroughPopover({
         <Popper open={displayPopover} anchorEl={anchorEl}
             sx={{
                 zIndex: 2000,
-                paddingBottom: 3
+                paddingBottom: 1
             }}
             placement={obj?.placement}
             modifiers={[
