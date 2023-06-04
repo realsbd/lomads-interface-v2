@@ -45,11 +45,12 @@ const useStyles = makeStyles((theme: any) => ({
         position: 'relative'
     },
     helpCard: {
-        position: "relative",
+        position: "absolute",
         top: "0",
         left: "0",
         borderRadius: "10px",
         display: "flex",
+        alignItems: 'center',
         justifyContent: "center",
         color: "#FFFFFF",
         backgroundColor: "#76808D",
@@ -63,7 +64,6 @@ const useStyles = makeStyles((theme: any) => ({
         minHeight: 50
     },
     helpCardContent: {
-        position: 'absolute',
         fontFamily: "'Inter', sans-serif",
         fontStyle: "normal",
         fontWeight: 400,
@@ -242,7 +242,15 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
 
             {/* Tab panel for my workspace */}
             <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
-                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', position: 'relative' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                {isHelpIconOpen && <Box className={classes.helpCard} sx={{ width: '100%', height: '100%' }}>
+                    <Box className={classes.helpCardContent}>Here, you can create 
+                        <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> customized workspaces </Typography>
+                         for all of your teams, 
+                        <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> manage milestones, </Typography>
+                        and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track key results.</Typography>
+                    </Box>
+                </Box>}
                     {
                         myProjects.length > 0 && myProjects.filter((item, index) => index < 6).map((item, index) => {
                             if (index <= 4) {
@@ -274,6 +282,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
 
             {/* Tab panel for all workspace */}
             <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
+                <Box sx={{ width: '100%', background: '#FFF', borderRadius: '5px', padding: '26px 22px 7px 22px', position: 'relative' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                 {isHelpIconOpen && <Box className={classes.helpCard} sx={{ width: '100%', height: '100%' }}>
                     <Box className={classes.helpCardContent}>Here, you can create 
                         <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> customized workspaces </Typography>
@@ -282,7 +291,6 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
                         and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track key results.</Typography>
                     </Box>
                 </Box>}
-                <Box sx={{ width: '100%', background: '#FFF', borderRadius: '5px', padding: '26px 22px 7px 22px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                     {
                         otherProjects.length > 0 && otherProjects.filter((item, index) => index < 6).map((item, index) => {
                             if (index <= 4) {
