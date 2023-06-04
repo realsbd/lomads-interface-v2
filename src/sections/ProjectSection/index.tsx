@@ -19,6 +19,7 @@ import useRole from 'hooks/useRole';
 import useTerminology from 'hooks/useTerminology';
 
 import moment from 'moment';
+import BootstrapTooltip from "components/BootstrapTooltip";
 
 const useStyles = makeStyles((theme: any) => ({
     createBtn: {
@@ -80,7 +81,7 @@ function a11yProps(index: number) {
     };
 }
 
-export default () => {
+export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
     const classes = useStyles();
     const navigate = useNavigate();
     const { daoURL } = useParams();
@@ -172,15 +173,38 @@ export default () => {
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
-                    <IconButton sx={{ marginRight: '20px' }}>
-                        <img src={expandIcon} alt="archive-icon" />
-                    </IconButton>
-                    <IconButton sx={{ marginRight: '20px' }}>
-                        <img src={archiveIcon} alt="archiveIcon" />
-                    </IconButton>
-                    <Button size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/createProject`)}>
-                        <AddIcon sx={{ fontSize: 18 }} /> CREATE
-                    </Button>
+                    <BootstrapTooltip open={isHelpIconOpen}
+                        placement="top-start"
+                        title="Open">
+                        <IconButton sx={{ marginRight: '20px', 
+                                        zIndex: isHelpIconOpen ? 1500 : 0,
+                                        boxShadow: isHelpIconOpen ? '0px 0px 20px rgba(181, 28, 72, 0.6)': '' }}>
+                            <img src={expandIcon} alt="archive-icon" />
+                        </IconButton>
+                    </BootstrapTooltip>
+                    <BootstrapTooltip open={isHelpIconOpen}
+                        placement="bottom"
+                        title="Archives">
+                        <IconButton sx={{
+                            marginRight: '20px',
+                            zIndex: isHelpIconOpen ? 1500 : 0,
+                            boxShadow: isHelpIconOpen ? '0px 0px 20px rgba(181, 28, 72, 0.6)': ''
+                        }}>
+                            <img src={archiveIcon} alt="archiveIcon" />
+                        </IconButton>
+                    </BootstrapTooltip>
+                    <BootstrapTooltip open={isHelpIconOpen}
+                        placement="top-start"
+                        title="Create Workspace">
+                        <Button
+                            sx={{
+                                zIndex: isHelpIconOpen ? '1500 !important' : 0,
+                                boxShadow: isHelpIconOpen ? '0px 0px 20px rgba(181, 28, 72, 0.6)' : 'none'
+                            }}
+                            size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/createProject`)}>
+                            <AddIcon sx={{ fontSize: 18 }} /> CREATE
+                        </Button>
+                    </BootstrapTooltip>
                 </Box>
             </Box>
 

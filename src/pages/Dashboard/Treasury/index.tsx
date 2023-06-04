@@ -52,10 +52,33 @@ const useStyles = makeStyles((theme: any) => ({
     },
     tabItemActive: {
         opacity: 0.7
+    },
+    helpCard: {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        borderRadius: "10px",
+        fontFamily: "'Inter', sans-serif",
+        fontStyle: "normal",
+        fontWeight: 400,
+        fontSize: "18px",
+        lineHeight: "22px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#FFFFFF",
+        backgroundColor: "#76808D",
+        zIndex: 999,
+        width: "100% !important",
+        height: "100%",
+        opacity: 0.8,
+        textAlign: "center",
+        cursor: "pointer",
+        padding: "10px"
     }
   }));
 
-export default () => {
+export default ({isHelpIconOpen}: {isHelpIconOpen: boolean}) => {
     const classes = useStyles();
     const dispatch = useAppDispatch()
     const { DAO } = useDAO();
@@ -91,10 +114,14 @@ export default () => {
                 </Box> }
             </Grid>
             <Grid mt={0.5} item sm={12}>
+            {isHelpIconOpen && <Box sx={{position: 'relative', width: "100%", height: "100%"}}>
+                                           <Box className={classes.helpCard}>
+											    Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!
+									        </Box>
+                                        </Box>}
                 { (!DAO || !treasury)  ? 
                 <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={72} animation="wave" /> :
                 <Box className={classes.header}>
-                    
                 </Box>
                 }
             </Grid>

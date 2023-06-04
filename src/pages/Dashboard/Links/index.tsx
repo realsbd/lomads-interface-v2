@@ -1,10 +1,11 @@
 import React from "react";
 import { get as _get } from 'lodash';
-import { Paper, Box, Stack, Typography } from "@mui/material"
+import { Paper, Box, Stack, Typography, Tooltip } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import IconButton from "components/IconButton";
 import SettingsSVG from 'assets/svg/settings.svg';
 import LinkChip from "components/LinkChip";
+import BootstrapTooltip from "components/BootstrapTooltip"
 import { useDAO } from "context/dao";
 import Skeleton from '@mui/material/Skeleton';
 import { useNavigate } from "react-router-dom";
@@ -41,7 +42,7 @@ const useStyles = makeStyles((theme: any) => ({
     }
 }));
 
-export default ({ highlightSettings }: { highlightSettings: boolean }) => {
+export default ({ highlightSettings, isHelpIconOpen }: { highlightSettings: boolean, isHelpIconOpen: boolean }) => {
     const navigate = useNavigate()
     const classes = useStyles();
     const { DAO } = useDAO()
@@ -65,14 +66,18 @@ export default ({ highlightSettings }: { highlightSettings: boolean }) => {
                     }
                 </Stack>
             </Box>
-            <IconButton onClick={() => navigate(`/${DAO?.url}/settings`)}
-                sx={{
-                    zIndex: highlightSettings ? 1400 : 0,
-                    boxShadow: highlightSettings ? '0px 0px 20px rgba(181, 28, 72, 0.6)' : 'none'
-                }}
-                id="global-settings">
-                <img src={SettingsSVG} />
-            </IconButton>
+            <BootstrapTooltip open={isHelpIconOpen} 
+                    placement="left-start"
+                    title="Global Settings">
+                <IconButton onClick={() => navigate(`/${DAO?.url}/settings`)}
+                    sx={{
+                        zIndex: highlightSettings ? 1400 : 0,
+                        boxShadow: highlightSettings ? '0px 0px 20px rgba(181, 28, 72, 0.6)' : 'none'
+                    }}
+                    id="global-settings">
+                    <img src={SettingsSVG} />
+                </IconButton>
+            </BootstrapTooltip>
         </Paper>
     )
 }

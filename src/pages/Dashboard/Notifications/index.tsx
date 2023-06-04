@@ -156,6 +156,28 @@ const useStyles = makeStyles((theme: any) => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    helpCard: {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        borderRadius: "10px",
+        fontFamily: "'Inter', sans-serif",
+        fontStyle: "normal",
+        fontWeight: 400,
+        fontSize: "18px",
+        lineHeight: "22px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#FFFFFF",
+        backgroundColor: "#76808D",
+        zIndex: 999,
+        width: "100% !important",
+        height: "100%",
+        opacity: 0.8,
+        textAlign: "center",
+        cursor: "pointer"
     }
   }));
 
@@ -298,9 +320,9 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: any }) => {
     return (
         <Box  className={classes.root}>
             <Box className={classes.myNotifications} style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
-                {isHelpIconOpen && <div className="help-card">
+                {isHelpIconOpen && <Box className={classes.helpCard}>
                     Find important personnal notifications here.
-				</div>}
+				</Box>}
                 <Box className={classes.listContainer}>
                     {
                         myNotifications.map((notification:any) => {

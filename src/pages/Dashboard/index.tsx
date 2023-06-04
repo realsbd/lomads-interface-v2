@@ -149,10 +149,11 @@ export default () => {
 
 	useEffect(() => {
 		function handleClick(event: any) {
-			if (isHelpIconOpen && (event.target.matches('div.help-card')
-				|| event.target.matches('div.walkThroughOverlay')
-				|| event.target.matches('span.bold-text')
-				|| event.target.matches('span.help-card-content'))) {
+            const className = event.target.className
+			if (isHelpIconOpen && (className.includes('help-card')
+				|| className.includes('walkThroughOverlay')
+				|| className.includes('bold-text')
+				|| className.includes('help-card-content'))) {
 				event.preventDefault()
 				setIsHelpIconOpen(false)
 			}
@@ -164,20 +165,22 @@ export default () => {
     return (
         <Grid container>
             <Grid item sm={12}>
-                <Links highlightSettings={currWalkThroughObj.step === 6}/>
+                <Links 
+                    highlightSettings={(currWalkThroughObj.step === 6) || isHelpIconOpen}
+                    isHelpIconOpen={isHelpIconOpen} />
             </Grid>
             <Grid mt={1} item sm={12}>
-                <Notifications isHelpIconOpen={false} />
+                <Notifications isHelpIconOpen={isHelpIconOpen} />
             </Grid>
             <Grid sm={12}
                 id="my-task" 
                 sx={{zIndex: currWalkThroughObj.step === 2 ? 1400: 0}} >
-                <TaskSection />
+                <TaskSection isHelpIconOpen={isHelpIconOpen}/>
             </Grid>
             <Grid sm={12}
                 id="my-workspace"
                 sx={{zIndex: currWalkThroughObj.step === 1 ? 1400: 0}}>
-                <ProjectSection />
+                <ProjectSection isHelpIconOpen={isHelpIconOpen}/>
             </Grid>
             {/* <Grid sm={12} id="members">
                 <MembersSection
@@ -190,7 +193,7 @@ export default () => {
                 id="treasury-management"
                 item sm={12} 
                 sx={{zIndex: currWalkThroughObj.step === 4 || currWalkThroughObj.step === 3 ? 1400: 0}}>
-                <Treasury />
+                <Treasury isHelpIconOpen={isHelpIconOpen} />
             </Grid>
                 <Box
                     sx={{ width: '100%', position: 'fixed', left: '33px', bottom: '44px', cursor: 'pointer', zIndex: isHelpIconOpen ? 1300: 1000}}

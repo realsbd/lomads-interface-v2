@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme: any) => ({
         alignSelf: "center",
         textAlign: "center",
         color: "#76808D",
-        paddingBottom: "25px !important"
+        paddingBottom: "15px !important"
       },
 }));
 

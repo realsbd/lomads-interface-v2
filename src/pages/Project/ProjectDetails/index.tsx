@@ -403,9 +403,10 @@ export default () => {
                     </Box>
                 }
 
-                <TaskSection />
+                <TaskSection isHelpIconOpen={false} />
 
                 <MembersSection
+                    isHelpIconOpen={false}
                     list={_sortBy(_uniqBy(Project?.members, '_id'), m => _get(m, 'name', '').toLowerCase())}
                     showProjects={true}
                 />

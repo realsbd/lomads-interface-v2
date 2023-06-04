@@ -48,9 +48,10 @@ const useStyles = makeStyles((theme: any) => ({
 interface MembersProps {
     showProjects: boolean;
     list: any[];
+    isHelpIconOpen: boolean;
 }
 
-export default ({ showProjects, list }: MembersProps) => {
+export default ({ showProjects, list, isHelpIconOpen }: MembersProps) => {
     const classes = useStyles();
     const [openInviteModal, setOpenInviteModal] = useState<boolean>(false);
     const { DAO } = useDAO();

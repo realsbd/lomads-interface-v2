@@ -58,7 +58,7 @@ function a11yProps(index: number) {
     };
 }
 
-export default () => {
+export default ({isHelpIconOpen}: {isHelpIconOpen: boolean}) => {
     const classes = useStyles();
     const [value, setValue] = useState<number>(0);
 
