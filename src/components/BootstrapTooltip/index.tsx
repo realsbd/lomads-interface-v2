@@ -2,9 +2,11 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 
-export default styled(({ className, ...props }: TooltipProps) => (
+export default styled(({ className, ...props }: TooltipProps) => {
+  console.log('....tooltip looged', props)
+  return (
     <Tooltip {...props} arrow classes={{ popper: className }} />
-  ))(({ theme }) => ({
+  )})(({ theme }) => ({
     [`& .${tooltipClasses.arrow}`]: {
       color: '#1B2B41'
     },
@@ -15,4 +17,5 @@ export default styled(({ className, ...props }: TooltipProps) => (
       margin: 10,
       borderRadius: 5
     },
-  }));
+  }))
+  ;

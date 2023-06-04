@@ -43,6 +43,32 @@ const useStyles = makeStyles((theme: any) => ({
         marginBottom: '15px !important',
         marginRight: '20px !important',
         position: 'relative'
+    },
+    helpCard: {
+        position: "relative",
+        top: "0",
+        left: "0",
+        borderRadius: "10px",
+        display: "flex",
+        justifyContent: "center",
+        color: "#FFFFFF",
+        backgroundColor: "#76808D",
+        zIndex: 999,
+        width: "100% !important",
+        height: "100% !important",
+        opacity: 0.8,
+        textAlign: "center",
+        cursor: "pointer",
+        padding: "10px",
+        minHeight: 50
+    },
+    helpCardContent: {
+        position: 'absolute',
+        fontFamily: "'Inter', sans-serif",
+        fontStyle: "normal",
+        fontWeight: 400,
+        fontSize: "18px",
+        lineHeight: "22px",
     }
 }));
 
@@ -155,7 +181,11 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
 
     return (
         <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
-            <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+            <Box
+                sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }}
+                display={"flex"}
+                alignItems={"center"}
+                justifyContent={"space-between"}>
                 <Tabs
                     value={value}
                     onChange={handleChange}
@@ -176,9 +206,11 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
                     <BootstrapTooltip open={isHelpIconOpen}
                         placement="top-start"
                         title="Open">
-                        <IconButton sx={{ marginRight: '20px', 
-                                        zIndex: isHelpIconOpen ? 1500 : 0,
-                                        boxShadow: isHelpIconOpen ? '0px 0px 20px rgba(181, 28, 72, 0.6)': '' }}>
+                        <IconButton sx={{
+                            marginRight: '20px',
+                            zIndex: isHelpIconOpen ? 1500 : 0,
+                            boxShadow: isHelpIconOpen ? '0px 0px 20px rgba(181, 28, 72, 0.6)' : ''
+                        }}>
                             <img src={expandIcon} alt="archive-icon" />
                         </IconButton>
                     </BootstrapTooltip>
@@ -188,7 +220,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
                         <IconButton sx={{
                             marginRight: '20px',
                             zIndex: isHelpIconOpen ? 1500 : 0,
-                            boxShadow: isHelpIconOpen ? '0px 0px 20px rgba(181, 28, 72, 0.6)': ''
+                            boxShadow: isHelpIconOpen ? '0px 0px 20px rgba(181, 28, 72, 0.6)' : ''
                         }}>
                             <img src={archiveIcon} alt="archiveIcon" />
                         </IconButton>
@@ -197,8 +229,8 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
                         placement="top-start"
                         title="Create Workspace">
                         <Button
-                            sx={{
-                                zIndex: isHelpIconOpen ? '1500 !important' : 0,
+                            style={{
+                                zIndex: isHelpIconOpen ? 1500 : 0,
                                 boxShadow: isHelpIconOpen ? '0px 0px 20px rgba(181, 28, 72, 0.6)' : 'none'
                             }}
                             size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/createProject`)}>
@@ -242,7 +274,15 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
 
             {/* Tab panel for all workspace */}
             <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
-                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                {isHelpIconOpen && <Box className={classes.helpCard} sx={{ width: '100%', height: '100%' }}>
+                    <Box className={classes.helpCardContent}>Here, you can create 
+                        <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> customized workspaces </Typography>
+                         for all of your teams, 
+                        <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> manage milestones, </Typography>
+                        and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track key results.</Typography>
+                    </Box>
+                </Box>}
+                <Box sx={{ width: '100%', background: '#FFF', borderRadius: '5px', padding: '26px 22px 7px 22px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                     {
                         otherProjects.length > 0 && otherProjects.filter((item, index) => index < 6).map((item, index) => {
                             if (index <= 4) {

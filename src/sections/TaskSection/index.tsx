@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import Button from "components/Button";
@@ -21,6 +21,32 @@ const useStyles = makeStyles((theme: any) => ({
         fontSize: '14px !important',
         color: '#C94B32 !important'
     },
+    helpCard: {
+        position: "relative",
+        top: "0",
+        left: "0",
+        borderRadius: "10px",
+        display: "flex",
+        justifyContent: "center",
+        color: "#FFFFFF",
+        backgroundColor: "#76808D",
+        zIndex: 999,
+        width: "100% !important",
+        height: "100% !important",
+        opacity: 0.8,
+        textAlign: "center",
+        cursor: "pointer",
+        padding: "10px",
+        minHeight: 50
+    },
+    helpCardContent: {
+        position: 'absolute',
+        fontFamily: "'Inter', sans-serif",
+        fontStyle: "normal",
+        fontWeight: 400,
+        fontSize: "18px",
+        lineHeight: "22px",
+    }
 }));
 
 interface TabPanelProps {
@@ -105,9 +131,13 @@ export default ({isHelpIconOpen}: {isHelpIconOpen: boolean}) => {
                     </Button>
                 </Box>
             </Box>
-
-            {/* Tab panel for my tasks */}
             <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
+            {
+                isHelpIconOpen && 
+                        <Box className={classes.helpCard}>
+                            <Box className={classes.helpCardContent}>By creating tasks, you can <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track progress, deadlines, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> rewards on bounties, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> assign contributors </Typography> to each task.</Box>
+                        </Box>
+            }
                 <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                     {
                         [1, 2, 3, 4, 5, 6].map((item, index) => {
@@ -121,6 +151,12 @@ export default ({isHelpIconOpen}: {isHelpIconOpen: boolean}) => {
 
             {/* Tab panel for manage tasks */}
             <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
+            {
+                isHelpIconOpen && 
+                        <Box className={classes.helpCard}>
+                            <Box className={classes.helpCardContent}>By creating tasks, you can <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track progress, deadlines, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> rewards on bounties, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> assign contributors </Typography> to each task.</Box>
+                        </Box>
+            }
                 <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
 
                 </Box>
@@ -128,6 +164,12 @@ export default ({isHelpIconOpen}: {isHelpIconOpen: boolean}) => {
 
             {/* Tab panel for drafts tasks */}
             <TabPanel value={value} index={2} style={{ marginTop: '0.2rem' }}>
+            {
+                isHelpIconOpen && 
+                        <Box className={classes.helpCard}>
+                            <Box className={classes.helpCardContent}>By creating tasks, you can <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track progress, deadlines, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> rewards on bounties, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> assign contributors </Typography> to each task.</Box>
+                        </Box>
+            }
                 <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
 
                 </Box>
@@ -135,6 +177,12 @@ export default ({isHelpIconOpen}: {isHelpIconOpen: boolean}) => {
 
             {/* Tab panel for all tasks */}
             <TabPanel value={value} index={3} style={{ marginTop: '0.2rem' }}>
+            {
+                isHelpIconOpen && 
+                        <Box className={classes.helpCard}>
+                            <Box className={classes.helpCardContent}>By creating tasks, you can <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track progress, deadlines, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> rewards on bounties, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> assign contributors </Typography> to each task.</Box>
+                        </Box>
+            }
                 <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
 
                 </Box>
