@@ -5,6 +5,9 @@ import { Grid, Box, Typography } from "@mui/material";
 import { IoIosArrowBack } from 'react-icons/io';
 import { BsCalendarCheck } from 'react-icons/bs';
 import compensationStar from 'assets/svg/compensationStar.svg';
+import editToken from 'assets/svg/editToken.svg';
+import deleteIcon from 'assets/svg/deleteIcon.svg';
+import Button from "components/Button";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -12,7 +15,6 @@ const useStyles = makeStyles((theme: any) => ({
         overflowY: 'scroll',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
     },
     arrowContainer: {
         width: '5% !important',
@@ -41,7 +43,17 @@ const useStyles = makeStyles((theme: any) => ({
         background: '#FFF',
         borderRadius: '5px',
         padding: '0 22px !important'
-    }
+    },
+    closeBtn: {
+        width: '125px',
+        height: '40px',
+        background: '#FFFFFF !important',
+        boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), - 3px - 3px 8px rgba(201, 75, 50, 0.1) !important',
+        borderRadius: '5px !important',
+        fontSize: '14px !important',
+        color: '#C94B32 !important',
+        marginLeft: '22px !important'
+    },
 }));
 
 export default () => {
@@ -49,7 +61,7 @@ export default () => {
 
     return (
         <Grid container className={classes.root}>
-            <Grid xs={12} item display="flex" flexDirection="column" sx={{ margin: '10vh 0' }}>
+            <Grid xs={10} item display="flex" flexDirection="column" sx={{ margin: '10vh 0' }}>
 
                 <Box sx={{ width: '100%', height: '32px' }}>
                     <Typography>Project Name</Typography>
@@ -64,7 +76,18 @@ export default () => {
                             <Typography className={classes.nameText}>Task Name</Typography>
                         </Box>
                         <Box display="flex" alignItems="center">
-                            <Typography sx={{ fontSize: '14px', color: '#4BA1DB' }}>Open</Typography>
+                            <Box display="flex" alignItems="center">
+                                <Typography sx={{ fontSize: '14px', color: '#4BA1DB' }}>Open</Typography>
+                            </Box>
+                            <Box sx={{ marginLeft: '22px', cursor: 'pointer' }}>
+                                <img src={editToken} alt="edit-icon" />
+                            </Box>
+                            <Box sx={{ marginLeft: '22px', cursor: 'pointer' }}>
+                                <img src={deleteIcon} alt="delete-icon" />
+                            </Box>
+                            <Button size="small" variant="contained" color="secondary" className={classes.closeBtn}>
+                                CLOSE TASK
+                            </Button>
                         </Box>
                     </Box>
                 </Box>
