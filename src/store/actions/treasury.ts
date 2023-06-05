@@ -6,3 +6,24 @@ export const loadTreasuryAction = (payload: any) => {
         payload
     }
 }
+
+export const CreateTreasuryTransactionAction = (payload: any) => {
+    return {
+        type: actionTypes.CREATE_TREASURY_TRANSACTION_ACTION,
+        payload
+    }
+}
+
+export const updateTreasuryTransactionAction = (payload: any) => {
+    return {
+        type: actionTypes.UPDATE_TREASURY_TRANSACTION_ACTION,
+        payload
+    }
+}
+
+export const updateTxLabelAction = (payload: any) => {
+    return {
+        type: actionTypes.UPDATE_TX_LABEL_ACTION,
+        payload
+    } 
+}

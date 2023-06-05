@@ -10,6 +10,18 @@ export const loadOffChainTxn = (daoId: string) => {
     })
 }
 
+export const createTreasuryTransactionService = (payload: any) => {
+    return axiosHttp.post(`/gnosis-safe`, payload)
+}
+
+export const updateTreasuryTransactionService = (payload: any) => {
+    return axiosHttp.patch(`/gnosis-safe`, payload)
+}
+
+export const updateTxLabelService = (payload: any) => {
+    return axiosHttp.patch(`/gnosis-safe/tx-label`, payload)
+}
+
 export const loadTreasuryService = (payload: any) => {
     return axiosHttp.get(`/gnosis-safe${getQueryString(payload)}`)
     .then(ptx => _get(ptx, 'data', []))
@@ -48,6 +60,6 @@ export const loadTreasuryService = (payload: any) => {
     //     //@ts-ignore
     //     return ptx.concat(pTxn)
     // })
-    .then(ptx => _orderBy(ptx, [p => p?.rawTx?.isExecuted, p => p?.rawTx?.executionDate, p => p?.rawTx?.nonce], ['asc', 'desc','asc']))
+    .then(ptx => _orderBy(ptx, [p => p?.rawTx?.isExecuted, p => p?.rawTx?.offChain, p => p?.rawTx?.executionDate, p => p?.rawTx?.nonce], ['asc', 'asc', 'desc','asc']))
     .then(ptx => { return { data: ptx } })
 }

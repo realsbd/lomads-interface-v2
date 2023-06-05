@@ -11,33 +11,26 @@ import Recipient from "./Recipient"
 import Tag from "./Tag"
 import Sign from "./Sign"
 import Action from "./Action"
+import useSafe from "hooks/useSafe"
 
-export default ({ transaction }: any) => {
+export default ({ transaction, executableNonce }: any) => {
 
     const { DAO } = useDAO();
+    const { loadSafe } = useSafe()
 
     const safeChainId = useMemo(() => {
-        if(DAO)
+        if(DAO?.url)
             return _find(DAO?.safes, s => s.address === transaction?.safeAddress)?.chainId
         return undefined
-    }, [DAO])
+    }, [DAO?.url])
 
-    const { transformTx } = useGnosisTxnTransform(transaction?.safeAddress, safeChainId);
+    const { transformTx } = useGnosisTxnTransform(transaction?.safeAddress);
 
     const txn = useMemo(() => {
-        if(safeChainId)
-            return transformTx(transaction?.rawTx, [])
-        return null
-    }, [transaction, safeChainId])
+        return transformTx(transaction?.rawTx, [])
+    }, [transaction])
 
-
-    if(!txn || !safeChainId) return null
-
-    console.log("txn", txn, transaction)
-
-    if(transaction?.rawTx?.rejectedTxn) {
-        console.log("rejTxn", transaction)
-    }
+    if(!txn) return null
 
     return (
         <>
@@ -45,11 +38,11 @@ export default ({ transaction }: any) => {
                 txn.map((tx: any, _i: number) => (
                     <TableRow>
                         <CreditDebit credit={tx?.isCredit} executed={tx?.executionDate} amount={tx?.formattedValue} token={tx?.symbol}/>
-                        <Label index={_i}/>
+                        <Label transaction={transaction} recipient={tx?.to}/>
                         <Recipient safeAddress={transaction?.safeAddress} credit={tx?.isCredit} recipient={tx?.to} />
-                        <Tag/>
+                        <Tag transaction={transaction} recipient={tx?.to} />
                         <Sign transaction={tx} index={_i} />
-                        <Action transaction={tx} txnCount={txn.length} index={_i} />
+                        <Action executableNonce={executableNonce} safeAddress={transaction?.safeAddress} transaction={tx} txnCount={txn.length} chainId={loadSafe(transaction?.safeAddress)?.chainId} index={_i} />
                     </TableRow>
                 ))
             }
