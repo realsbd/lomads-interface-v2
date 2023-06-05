@@ -5,6 +5,8 @@ import { makeStyles } from '@mui/styles';
 import submitted from 'assets/svg/submitted.svg';
 import calendarIcon from 'assets/svg/calendar.svg'
 
+import { useNavigate } from "react-router-dom"
+
 const useStyles = makeStyles((theme: any) => ({
     taskCard: {
         width: '315px',
@@ -53,8 +55,19 @@ const useStyles = makeStyles((theme: any) => ({
     },
 }));
 
-export default () => {
+interface CardProps {
+    task: any;
+    daoUrl: string;
+}
+
+export default ({ task, daoUrl }: CardProps) => {
     const classes = useStyles();
+    const navigate = useNavigate();
+
+    const handleCardClick = () => {
+        // dispatch(updateViewProject({ projectId: project._id, daoUrl: _get(DAO, 'url', '') }));
+        navigate(`/${daoUrl}/task/${task._id}`, { state: { task } })
+    }
 
     return (
         <>
@@ -64,11 +77,12 @@ export default () => {
                     background: '#FFF',
                     boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
                 }}
+                onClick={handleCardClick}
             >
                 <CardContent className={classes.taskContent}>
-                    <Typography className={classes.projectText}>Project Name</Typography>
-                    <Typography className={classes.taskText}>Task Name</Typography>
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                    <Typography className={classes.projectText}>{task?.project?.name?.length > 20 ? task?.project?.name?.substring(0, 20) + "..." : task?.project?.name}</Typography>
+                    <Typography className={classes.taskText}>{task.name.length > 20 ? task.name.substring(0, 20) + "..." : task.name}</Typography>
+                    {/* <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                         <Box display={"flex"} alignItems={"center"}>
                             <img src={submitted} alt="submitted-icon" />
                             <Typography className={classes.statusText}>Submitted</Typography>
@@ -77,7 +91,7 @@ export default () => {
                             <img src={calendarIcon} alt="calendarIcon" />
                             <Typography className={classes.dateText}>2 days</Typography>
                         </Box>
-                    </Box>
+                    </Box> */}
                 </CardContent>
             </Card>
         </>

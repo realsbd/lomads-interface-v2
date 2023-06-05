@@ -131,7 +131,6 @@ export default () => {
     // @ts-ignore
     const { setProjectLoading, Project } = useAppSelector(store => store.project);
     console.log("Project : ", Project);
-    console.log("setProjectLoading : ", setProjectLoading);
     const { DAO } = useDAO();
     const { provider, account, chainId } = useWeb3Auth();
     const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'));
@@ -405,10 +404,10 @@ export default () => {
 
                 <TaskSection />
 
-                <MembersSection
+                {/* <MembersSection
                     list={_sortBy(_uniqBy(Project?.members, '_id'), m => _get(m, 'name', '').toLowerCase())}
                     showProjects={true}
-                />
+                /> */}
             </Grid>
         </Grid>
     )
