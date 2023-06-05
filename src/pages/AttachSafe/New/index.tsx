@@ -15,8 +15,8 @@ import { useAppDispatch } from "helpers/useAppDispatch";
 import { toast } from 'react-hot-toast';
 import axiosHttp from 'api'
 import { SUPPORTED_CHAIN_IDS, SupportedChainId, CHAIN_GAS_STATION } from 'constants/chains'
-import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
-import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
+// import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
+// import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
 import { ethers } from "ethers";
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { Box, Typography, Container, Grid, Menu, MenuItem, Skeleton } from "@mui/material"
@@ -608,70 +608,70 @@ export default () => {
 	}
 
     const deployNewSafe = async () => {
-		if(!chainId) return;
-		if(+state?.selectedChainId !== +chainId) {
-            toast.custom(t => <SwitchChain t={t} nextChainId={+state?.selectedChainId}/>)
-        } else {
-			try {
-                setisLoading(true);
-				const safeOwner = provider?.getSigner(0);
-				const ethAdapter = new EthersAdapter({
-					ethers,
-					signerOrProvider: safeOwner as any,
-				});
-				const safeFactory = await SafeFactory.create({ethAdapter});
-				const owners: any = state?.members?.map((result: any) => result.address);
-				const threshold: number = state?.threshold;
-				const safeAccountConfig: SafeAccountConfig = { owners, threshold };
+		// if(!chainId) return;
+		// if(+state?.selectedChainId !== +chainId) {
+        //     toast.custom(t => <SwitchChain t={t} nextChainId={+state?.selectedChainId}/>)
+        // } else {
+		// 	try {
+        //         setisLoading(true);
+		// 		const safeOwner = provider?.getSigner(0);
+		// 		const ethAdapter = new EthersAdapter({
+		// 			ethers,
+		// 			signerOrProvider: safeOwner as any,
+		// 		});
+		// 		const safeFactory = await SafeFactory.create({ethAdapter});
+		// 		const owners: any = state?.members?.map((result: any) => result.address);
+		// 		const threshold: number = state?.threshold;
+		// 		const safeAccountConfig: SafeAccountConfig = { owners, threshold };
 		
-				let currentSafes: Array<string> = []
-				if (chainId === SupportedChainId.POLYGON)
-					currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
-				await safeFactory
-					.deploySafe({ safeAccountConfig })
-					.then(async (tx) => {
-                        console.log("txn txn", tx)
-						const value = state?.members?.reduce((final: any, current: any) => {
-							let object = final.find(
-								(item: any) => item.address === current.address
-							);
-							if (object) {
-								return final;
-							}
-							return final.concat([current]);
-						}, []);
-                        const params = {
-                            members: value.map((m: any) => {
-                                return {
-                                    ...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
-                                }
-                            }),
-                            safe: {
-                                name: state?.safeName,
-                                address: tx.getAddress(),
-                                owners: owners,
-                                chainId: state?.selectedChainId
-                            }
-                        }
-                        axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
-                        .then(res => {
-                            setisLoading(false);
-                            window.location.href = `/${daoURL}`
-                        })
-					})
-					.catch(async (err) => {
-						console.log("An error occured while creating safe", err);
-						if (chainId === SupportedChainId.POLYGON) {
-							checkNewSafe(currentSafes, owners)
-						} else {
-							setisLoading(false);
-						}
-					});
-			} catch (e) {
-				setisLoading(false);
-				console.log(e)
-			}
-		}
+		// 		let currentSafes: Array<string> = []
+		// 		if (chainId === SupportedChainId.POLYGON)
+		// 			currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+		// 		await safeFactory
+		// 			.deploySafe({ safeAccountConfig })
+		// 			.then(async (tx) => {
+        //                 console.log("txn txn", tx)
+		// 				const value = state?.members?.reduce((final: any, current: any) => {
+		// 					let object = final.find(
+		// 						(item: any) => item.address === current.address
+		// 					);
+		// 					if (object) {
+		// 						return final;
+		// 					}
+		// 					return final.concat([current]);
+		// 				}, []);
+        //                 const params = {
+        //                     members: value.map((m: any) => {
+        //                         return {
+        //                             ...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
+        //                         }
+        //                     }),
+        //                     safe: {
+        //                         name: state?.safeName,
+        //                         address: tx.getAddress(),
+        //                         owners: owners,
+        //                         chainId: state?.selectedChainId
+        //                     }
+        //                 }
+        //                 axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
+        //                 .then(res => {
+        //                     setisLoading(false);
+        //                     window.location.href = `/${daoURL}`
+        //                 })
+		// 			})
+		// 			.catch(async (err) => {
+		// 				console.log("An error occured while creating safe", err);
+		// 				if (chainId === SupportedChainId.POLYGON) {
+		// 					checkNewSafe(currentSafes, owners)
+		// 				} else {
+		// 					setisLoading(false);
+		// 				}
+		// 			});
+		// 	} catch (e) {
+		// 		setisLoading(false);
+		// 		console.log(e)
+		// 	}
+		// }
 	};
 
     const deployNewSafeDelayed = useCallback(_debounce(deployNewSafe, 1000), [deployNewSafe])

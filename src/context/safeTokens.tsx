@@ -25,15 +25,15 @@ export const SafeTokensProvider = ({ children }: any) => {
         }
     }, [DAO])
 
-    // const tokenBalance = useCallback((token: any) => {
-    //     if(safeTokens && safeTokens.length > 0) {
-    //         let selToken = _find(safeTokens, t => _get(t, 'tokenAddress', null) === token)
-	// 		if (safeTokens.length > 0 && !selToken)
-	// 		    selToken = safeTokens[0];
-    //         return _get(selToken, 'balance', 0) / 10 ** _get(selToken, 'token.decimals', 18)
-    //     }
-    //     return 0
-    // }, [safeTokens])
+    const tokenBalance = (token: any, safeAddress: string) => {
+        console.log(safeTokens)
+        if(safeTokens) {
+            let selToken = _find(_get(safeTokens, safeAddress, []), t => _get(t, 'tokenAddress', null) === token)
+            if(!selToken) return 0;
+            return _get(selToken, 'balance', 0) / 10 ** ( selToken?.token?.decimals || selToken?.token?.decimal || 18 )
+        }
+        return 0
+    }
 
     const getTokens = async (chain: SupportedChainId, safeAddress: String) => {
         return axios.get(`${GNOSIS_SAFE_BASE_URLS[chain]}/api/v1/safes/${safeAddress}/balances/usd/`, {withCredentials: false })
@@ -80,7 +80,8 @@ export const SafeTokensProvider = ({ children }: any) => {
     }, [DAO?.url])
 
     const contextProvider = {
-        safeTokens
+        safeTokens,
+        tokenBalance
     };
     return <SafeTokensContext.Provider value={contextProvider}>{children}</SafeTokensContext.Provider>;
 }

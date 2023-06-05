@@ -8,8 +8,8 @@ import { useWeb3Auth } from 'context/web3Auth';
 import { useDAO } from 'context/dao';
 import useSafe from './useSafe';
 
-export default (safeAddress: string | undefined, chainId: number | undefined) => {
-    const { account, chainId: currentChainId } = useWeb3Auth();
+export default (safeAddress: string | undefined) => {
+    const { account } = useWeb3Auth()
     const { loadSafe } = useSafe()
     const { safeTokens } = useSafeTokens()
 
@@ -28,10 +28,10 @@ export default (safeAddress: string | undefined, chainId: number | undefined) =>
     }, [safeAddress])
 
     const getNativeToken = useCallback(() => {
-        if(chainId)
-            return CHAIN_INFO[chainId]?.nativeCurrency
+        if(safe?.chainId)
+            return CHAIN_INFO[safe?.chainId]?.nativeCurrency
         return { name: '', symbol: '', decimals: 18 }
-    }, [chainId, safeAddress])
+    }, [safe?.chainId, safeAddress])
 
     const isNativeTokenSingleTransfer = (transaction: any) => {
         if(transaction?.value !== "0" && transaction?.dataDecoded === null) 

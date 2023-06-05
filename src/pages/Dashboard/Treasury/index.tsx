@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react"
-import { find as _find } from 'lodash'
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { find as _find, orderBy as _orderBy, get as _get } from 'lodash'
 import clsx from "clsx";
 import { Grid, Box, Typography, Divider, Skeleton, TableContainer, Table, TableBody, Stack } from "@mui/material"
 import { makeStyles } from '@mui/styles';
@@ -128,6 +128,12 @@ export default () => {
         }
     }, [DAO?.url])
 
+    const computeExecutableNonce = useCallback((safeAddress: string) => {
+        let safeTxn = treasury.filter((txn: any) => txn?.safeAddress === safeAddress && !txn?.rawTx?.offChain)
+        const txn = _orderBy(safeTxn, [p => p?.rawTx?.isExecuted,  p => p?.rawTx?.executionDate, p => p?.rawTx?.nonce], ['asc', 'desc','asc'])
+        return _get(txn, `[0].rawTx.nonce`, 0)
+    }, [treasury])
+
     return (
         <Grid container>
             <Grid item sm={12}>
@@ -175,7 +181,10 @@ export default () => {
                             <Table size="small" stickyHeader aria-label="simple table">
                                 <TableBody>
                                     {
-                                        DAO && treasury && treasury.map((txn:any) => <Row transaction={txn} />)
+                                        DAO && treasury && treasury.map((txn:any) => {
+                                            const executableNonce = computeExecutableNonce(txn?.safeAddress)
+                                           return <Row transaction={txn} executableNonce={executableNonce} />
+                                        })
                                     }
                                 </TableBody>
                             </Table>

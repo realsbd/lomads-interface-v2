@@ -1,16 +1,16 @@
 // @ts-nocheck 
-import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
-import Safe from "@gnosis.pm/safe-core-sdk";
-import SafeServiceClient from "@gnosis.pm/safe-service-client";
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
+import SafeApiKit from '@safe-global/api-kit'
+// import Safe from "@gnosis.pm/safe-core-sdk";
+// import SafeServiceClient from "@gnosis.pm/safe-service-client";
 import { ethers } from "ethers";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 
 export const ImportSafe = async (provider: any, safeAddress: string) => {
-  const safeOwner = provider?.getSigner(0);
-
+  const safeOwner = provider?.getSigner();
   const ethAdapter = new EthersAdapter({
     ethers,
-    signer: safeOwner as any,
+    signerOrProvider: safeOwner as any,
   });
 
   const safeSDK: Safe = await Safe.create({
@@ -21,12 +21,13 @@ export const ImportSafe = async (provider: any, safeAddress: string) => {
 };
 
 export const safeService = async (provider: any, chainId: string) => {
-  const safeOwner = provider?.getSigner(0);
+  const safeOwner = provider?.getSigner();
   const ethAdapter = new EthersAdapter({
     ethers,
-    signer: safeOwner as any,
+    signerOrProvider: safeOwner as any,
   });
   const txServiceUrl = GNOSIS_SAFE_BASE_URLS[chainId];
-  const safeService = new SafeServiceClient({ txServiceUrl, ethAdapter });
+  const safeService = new SafeApiKit({  txServiceUrl, ethAdapter })
+  console.log("safeService", safeService)
   return safeService;
 };

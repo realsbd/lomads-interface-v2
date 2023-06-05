@@ -27,7 +27,6 @@ import { useAppSelector } from 'helpers/useAppSelector';
 import { useWeb3Auth } from 'context/web3Auth';
 import { useDAO } from 'context/dao';
 import Skeleton from '@mui/material/Skeleton';
-import zIndex from '@mui/material/styles/zIndex';
 import Footer from 'components/Footer';
 
 

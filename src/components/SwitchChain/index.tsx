@@ -12,6 +12,7 @@ import { useAppDispatch } from "helpers/useAppDispatch";
 
 
 export default ({ t, nextChainId }: any) => {
+    console.log("nextChainId", nextChainId)
     const { chainId, switchChain } = useWeb3Auth()
     const dispatch = useAppDispatch()
 

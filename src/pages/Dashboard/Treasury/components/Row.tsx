@@ -11,10 +11,12 @@ import Recipient from "./Recipient"
 import Tag from "./Tag"
 import Sign from "./Sign"
 import Action from "./Action"
+import useSafe from "hooks/useSafe"
 
-export default ({ transaction }: any) => {
+export default ({ transaction, executableNonce }: any) => {
 
     const { DAO } = useDAO();
+    const { loadSafe } = useSafe()
 
     const safeChainId = useMemo(() => {
         if(DAO?.url)
@@ -22,19 +24,13 @@ export default ({ transaction }: any) => {
         return undefined
     }, [DAO?.url])
 
-    const { transformTx } = useGnosisTxnTransform(transaction?.safeAddress, safeChainId);
+    const { transformTx } = useGnosisTxnTransform(transaction?.safeAddress);
 
     const txn = useMemo(() => {
-        if(safeChainId)
-            return transformTx(transaction?.rawTx, [])
-        return null
-    }, [transaction, safeChainId])
+        return transformTx(transaction?.rawTx, [])
+    }, [transaction])
 
-    if(transaction?.metadata)
-        console.log("metaaa",transaction)
-
-
-    if(!txn || !safeChainId) return null
+    if(!txn) return null
 
     return (
         <>
@@ -46,7 +42,7 @@ export default ({ transaction }: any) => {
                         <Recipient safeAddress={transaction?.safeAddress} credit={tx?.isCredit} recipient={tx?.to} />
                         <Tag transaction={transaction} recipient={tx?.to} />
                         <Sign transaction={tx} index={_i} />
-                        <Action transaction={tx} txnCount={txn.length} index={_i} />
+                        <Action executableNonce={executableNonce} safeAddress={transaction?.safeAddress} transaction={tx} txnCount={txn.length} chainId={loadSafe(transaction?.safeAddress)?.chainId} index={_i} />
                     </TableRow>
                 ))
             }
