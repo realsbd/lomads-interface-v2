@@ -29,7 +29,13 @@ export default ({ transaction, recipient }: any) => {
     }, [editable, label])
     
     const handleUpdateLabel = () => {
-        textfieldRef?.current?.blur();
+        //hacky !!
+        setTimeout(() => { 
+            //@ts-ignore
+            if(document?.activeElement?.blur)
+                //@ts-ignore
+                document?.activeElement?.blur()
+        }, 0);
        dispatch(updateTxLabelAction({ recipient, safeAddress: transaction?.safeAddress, label: labelPlaceholder, safeTxHash: transaction?.rawTx?.safeTxHash }))
     }
 

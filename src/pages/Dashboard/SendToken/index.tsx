@@ -21,6 +21,7 @@ import useSafe from "hooks/useSafe";
 import SwitchChain from "components/SwitchChain";
 import useGnosisSafeTransaction from "hooks/useGnosisSafeTransaction";
 import { useWeb3Auth } from "context/web3Auth";
+import useOffChainTransaction from "hooks/useOffChainTransaction";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -64,11 +65,12 @@ const useStyles = makeStyles((theme: any) => ({
 
 export default ({ open, onClose }: any) => {
     const classes = useStyles()
-    const { chainId: currentChainId } = useWeb3Auth()
+    const { account, chainId: currentChainId } = useWeb3Auth()
     const { DAO } = useDAO()
     const { safeTokens } = useSafeTokens()
     const { loadSafe } = useSafe()
     const { createSafeTransaction } = useGnosisSafeTransaction();
+    const { createSafeTransaction: createOffChainSafeTransaction } = useOffChainTransaction();
     const [sendTokensLoading, setSendTokensLoading] = useState(false)
     const [state, setState] = useState<any>({
         members: []
@@ -95,16 +97,20 @@ export default ({ open, onClose }: any) => {
 
     const handleSendTokens = async () => {
         const safe = loadSafe(state?.safeAddress)
+        console.log("safe", safe)
         if(+safe?.chainId !== +currentChainId)
             return toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId}/>)
         const send = state?.members?.filter((member:any) => member?.selected).map((member:any) => { return { recipient: member?.address, amount: member?.amount, label: member?.label, tag: member?.tag } })
         try {
             setSendTokensLoading(true)
-            const txn = await createSafeTransaction({
+            const method = state?.token === "SWEAT" ? createOffChainSafeTransaction : createSafeTransaction
+            const txn = await method({
                 chainId: safe?.chainId,
                 safeAddress: state?.safeAddress,
                 tokenAddress: state?.token,
-                send
+                send,
+                daoId: _get(DAO, '_id', null),
+                isSafeOwner: _find(safe.owners, (owner:any) => owner?.wallet === account) !== null
             })
             onClose()
             return setSendTokensLoading(false)
@@ -168,10 +174,6 @@ export default ({ open, onClose }: any) => {
                                     <MenuItem key={token?.tokenAddress} value={token?.tokenAddress}>{ token?.token?.symbol }</MenuItem>
                                 )
                             })
-                        }
-                        {
-                            DAO?.sweatPoints &&
-                            <MenuItem key={"0x"} value={"0x"}>SWEAT</MenuItem>
                         }
                     </TextInput>
                 </Box>
@@ -266,10 +268,6 @@ export default ({ open, onClose }: any) => {
                                         <MenuItem key={token?.tokenAddress} value={token?.tokenAddress}>{ token?.token?.symbol }</MenuItem>
                                     )
                                 })
-                            }
-                            {
-                                DAO?.sweatPoints &&
-                                <MenuItem key={"0x"} value={"0x"}>SWEAT</MenuItem>
                             }
                         </TextInput>
                     </Box>

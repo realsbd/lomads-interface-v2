@@ -34,6 +34,10 @@ const DAOReducer = (state: any = getInitialState(), action: any) =>
             draft.DAOLoading = payload;
             break;
         }
+        case actionTypes.SET_DAO_OPTION_ACTION: {
+          draft.DAO = { ...draft.DAO, options: payload };
+          break;
+        }
         case actionTypes.RESET_DAO_ACTION: {
           draft.DAO = null;
           draft.DAOLoading = false

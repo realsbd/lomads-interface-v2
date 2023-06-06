@@ -203,7 +203,6 @@ export default () => {
                 refundReceiver: `${txn.refundReceiver}`,
                 nonce: txn.nonce,
             };
-            console.log(safeTransactionData)
             const safeTransaction = await safeSDK.createTransaction({
                 safeTransactionData,
             });

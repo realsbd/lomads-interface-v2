@@ -5,6 +5,8 @@ import { Box } from '@mui/material';
 import { useAppDispatch } from 'helpers/useAppDispatch';
 import { useAppSelector } from 'helpers/useAppSelector';
 import { useDAO } from 'context/dao';
+import axiosHttp from 'api'
+import { setDAOTagOptionsAction } from 'store/actions/dao';
 
 // import { createDaoOption} from 'state/dashboard/actions'
 // import { resetCreateOptionLoader} from 'state/dashboard/reducer';
@@ -22,13 +24,6 @@ export default ({ loading, children, className,onChangeOption,defaultMenuIsOpen,
     const [isLoading, setIsLoading] = useState(false);
     const [value, setValue] = useState<Option | null>();
 
-    useEffect(() => {
-		if (createOptionLoading) {
-            setIsLoading(false);
-            onChangeOption(value);
-			//dispatch(resetCreateOptionLoader());
-		}
-	}, [createOptionLoading]);
 
     const createOption = (label: string) => ({
         label,
@@ -39,8 +34,12 @@ export default ({ loading, children, className,onChangeOption,defaultMenuIsOpen,
     const handleCreate = (inputValue: string) => {
         setIsLoading(true);
         const newOption = createOption(inputValue);
-        setValue(newOption);
-        //dispatch(createDaoOption({ url: DAO?.url, payload: {newOption} }))
+        axiosHttp.patch(`dao/${DAO?.url}/create-option`, { newOption })
+        .then(res => {
+            dispatch(setDAOTagOptionsAction(res?.data?.options))
+            handleChange(newOption);
+        })
+        .finally(() => setIsLoading(false))
     };
 
     const handleChange = (newValue:Option) => {
