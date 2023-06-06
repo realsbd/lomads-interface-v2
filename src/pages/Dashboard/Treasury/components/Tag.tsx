@@ -5,9 +5,11 @@ import Popover from '@mui/material/Popover';
 import React, { useMemo } from "react";
 import CreatableSelectTag from "components/CreatableSelectTag";
 import AddIcon from '@mui/icons-material/Add';
+import { useAppDispatch } from "helpers/useAppDispatch";
+import { updateTxLabelAction } from "store/actions/treasury";
 
 export default ({ transaction, recipient }: any) => {
-    
+    const dispatch = useAppDispatch()
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -31,6 +33,17 @@ export default ({ transaction, recipient }: any) => {
         }
         return null
     }, [transaction, recipient])
+
+    const handleUpdateTag = (tag: any) => {
+        //hacky !!
+        setTimeout(() => { 
+            //@ts-ignore
+            if(document?.activeElement?.blur)
+                //@ts-ignore
+                document?.activeElement?.blur()
+        }, 0);
+       dispatch(updateTxLabelAction({ recipient, safeAddress: transaction?.safeAddress, tag, safeTxHash: transaction?.rawTx?.safeTxHash }))
+    }
 
     return (
         <TableCell>
@@ -57,7 +70,10 @@ export default ({ transaction, recipient }: any) => {
                 }}
             >
             <Box style={{ width: 250, height: 350, padding: 1 }}>
-                <CreatableSelectTag defaultMenuIsOpen={true} onChangeOption={() => {}}/>
+                <CreatableSelectTag defaultMenuIsOpen={true} onChangeOption={(tag:any) => { 
+                    handleClose()
+                    handleUpdateTag(tag) 
+                }}/>
             </Box>
             </Popover>
         </TableCell>

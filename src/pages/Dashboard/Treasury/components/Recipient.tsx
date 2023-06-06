@@ -63,8 +63,8 @@ export default ({ safeAddress, recipient, credit }: any) => {
                     <img style={{ width: 20, height: 20 }} src={recipient === '0x' ? SafeMethodSvg : credit ? SafeReceivedSvg : SafeSentSvg} />
                 </Box>
                 { recipient !== '0x' ?
-                    <Box key={`${safe.address}-${recipient}`}>
-                        <LomadsAvatar key={`${safe.address}-${recipient}`} name={member ? member.name : ''} wallet={recipient}/>
+                    <Box key={`${safe?.address}-${recipient}`}>
+                        <LomadsAvatar key={`${safe?.address}-${recipient}`} name={member ? member.name : ''} wallet={recipient}/>
                     </Box> : 
                     <Box display="flex" flexDirection="row" alignItems="center">
                     <Box className={classes.ChainLogo}>

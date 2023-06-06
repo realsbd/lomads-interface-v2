@@ -55,6 +55,16 @@ export const SafeTokensProvider = ({ children }: any) => {
                     }
                     return t
                 })
+                if (DAO.sweatPoints) {
+                    tokens.push({
+                        tokenAddress: "SWEAT",
+                        token: {
+                            symbol: "SWEAT",
+                            decimal: 18,
+                            decimals: 18,
+                        }
+                    })
+                }
                 const safe: any = await axios.get(`${GNOSIS_SAFE_BASE_URLS[chain]}/api/v1/safes/${safeAddress}/`, { withCredentials: false }).then(res => res.data)
                 if (tokens && tokens.length > 0) {
                     let total = tokens.reduce((a: any, b: any) => {

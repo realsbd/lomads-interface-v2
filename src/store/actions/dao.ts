@@ -25,3 +25,10 @@ export const setDAOAction = (payload: any) => {
         payload
     }
 }
+
+export const setDAOTagOptionsAction = (payload: any) => {
+    return {
+        type: actionTypes.SET_DAO_OPTION_ACTION,
+        payload
+    }
+}

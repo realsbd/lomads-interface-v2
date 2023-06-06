@@ -1,4 +1,5 @@
 import { TableCell, Box, Typography } from "@mui/material";
+import { find as _find, get as _get } from 'lodash';
 import moment from "moment";
 import React, { useMemo, useState } from "react";
 import { makeStyles } from '@mui/styles';
@@ -14,6 +15,8 @@ import useSafe from "hooks/useSafe";
 import { useWeb3Auth } from "context/web3Auth";
 import SwitchChain from "components/SwitchChain";
 import { beautifyHexToken } from "utils";
+import { useSafeTokens } from "context/safeTokens";
+import useOffChainTransaction from "hooks/useOffChainTransaction";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -22,11 +25,12 @@ const useStyles = makeStyles((theme: any) => ({
     }
   }));
 
-export default ({ safeAddress, transaction, txnCount, chainId, index, executableNonce }: any) => {
+export default ({ safeAddress, transaction, txnCount, chainId, index, executableNonce, amount, token }: any) => {
     const classes = useStyles()
     const { chainId: currentChainId } = useWeb3Auth()
     const { loadSafe } = useSafe()
     const { confirmTransaction, rejectTransaction, executeTransaction } = useGnosisSafeTransaction()
+    const { confirmTransaction: offChainConfirmTransaction} = useOffChainTransaction()
 
     const isMultiTxn = useMemo(() => txnCount > 1, [transaction, txnCount])
 
@@ -43,8 +47,10 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
             try {
                 setConfirmLoading(true)
                 const payload = { safeAddress, chainId, safeTxnHash: transaction?.safeTxHash  }
-                const txn = await confirmTransaction(payload)
-                console.log(txn)
+                if(transaction?.offChain)
+                    await offChainConfirmTransaction(payload)
+                else
+                    await confirmTransaction(payload)
                 setConfirmLoading(false)
             } catch(e) {
                 console.log(e)

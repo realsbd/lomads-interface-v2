@@ -97,6 +97,7 @@ export default () => {
             Object.values(safeTokens).map((st:any) => { at = at.concat(st) })
             for (let index = 0; index < at.length; index++) {
                 let token: any = at[index];
+                if(token.tokenAddress === 'SWEAT') continue;
                 const exists = _find(final, a => (a.tokenAddress === token.tokenAddress && token.token.symbol === a.token.symbol)) 
                 if(exists){
                     token = {
