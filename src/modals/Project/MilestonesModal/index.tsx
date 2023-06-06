@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-
-import { Paper, Typography, Box, Drawer } from "@mui/material";
+import { Paper, Typography, Box, Drawer, MenuItem } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import IconButton from 'components/IconButton';
@@ -24,6 +23,7 @@ import { useAppSelector } from "helpers/useAppSelector";
 
 import useTerminology from 'hooks/useTerminology';
 import { editProjectMilestonesAction } from "store/actions/project";
+import { beautifyHexToken } from "utils";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -114,6 +114,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     const [milestoneCount, setMilestoneCount] = useState<number>(list.length > 0 ? list.length : 1);
     const [amount, setAmount] = useState(editMilestones ? _get(Project, 'compensation.amount', '') : 0);
     const [currency, setCurrency] = useState<string>(editMilestones ? _get(Project, 'compensation.currency', '') : '');
+    const [safeAddress, setSafeAddress] = useState<string>('');
 
     const [errorNames, setErrorNames] = useState<number[]>([]);
     const [errorAmount, setErrorAmount] = useState<number[]>([]);
@@ -361,12 +362,37 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                 </Box>
                 <Box display="flex" flexDirection="column" alignItems={"center"} sx={{ width: '80%' }}>
 
+                    <Box display="flex" flexDirection="column" sx={{ width: 310, marginBottom: '25px' }}>
+                        <Box
+                            component="form"
+                            noValidate
+                            autoComplete="off"
+                        >
+                            <TextInput
+                                id="outlined-select-currency"
+                                select
+                                fullWidth
+                                label="Treasury"
+                                value={safeAddress}
+                                onChange={(e: any) => setSafeAddress(e.target.value)}
+                            >
+                                {
+                                    DAO?.safes?.map((safe: any) => {
+                                        return (
+                                            <MenuItem key={safe?.address} value={safe?.address}>{(safe?.name || "Multi-sig wallet") + " (" + beautifyHexToken(safe?.address) + ")"}</MenuItem>
+                                        )
+                                    })
+                                }
+                            </TextInput>
+                        </Box>
+                    </Box>
+
                     <Box display="flex" flexDirection="column" sx={{ width: 310, marginBottom: '25px' }} id="currency-amt">
                         <Typography className={classes.label}>Total {transformWorkspace().label} Value</Typography>
                         <CurrencyInput
                             value={amount}
                             onChange={(value: any) => handleChangeCompensationAmount(value)}
-                            options={safeTokens}
+                            options={_get(safeTokens, safeAddress, [])}
                             dropDownvalue={currency}
                             onDropDownChange={(value: any) => {
                                 handleChangeCurrency(value)

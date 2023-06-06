@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
-import { Typography, Box, Drawer, Chip } from "@mui/material";
+import { Typography, Box, Drawer, Chip, Menu, MenuItem } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import IconButton from 'components/IconButton';
@@ -154,6 +154,8 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     const [reviewer, setReviewer] = useState(null);
     const [amount, setAmount] = useState(0);
     const [currency, setCurrency] = useState<string>('');
+
+    const [safeAddress, setSafeAddress] = useState<string>('');
 
 
     const [errorName, setErrorName] = useState('');
@@ -371,14 +373,15 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             task.discussionChannel = tempLink;
             task.deadline = deadline;
             task.submissionLink = tempSub ? tempSub : '';
-            task.compensation = { currency: currency, amount, symbol };
+            // add safe address in compensation object below---safeAddress
+            task.compensation = { currency: currency, amount, symbol, safeAddress: safeAddress };
             task.reviewer = reviewer;
             task.contributionType = contributionType;
             task.isSingleContributor = isSingleContributor;
             task.isFilterRoles = isFilterRoles;
             task.validRoles = isFilterRoles ? validRoles : [];
             console.log("Task : ", task);
-            dispatch(createTaskAction(task))
+            // dispatch(createTaskAction(task))
         }
     }
 
@@ -630,24 +633,50 @@ export default ({ open, closeModal, selectedProject }: Props) => {
 
                 <Box className={classes.divider}></Box>
 
+                <Box className={classes.modalRow} id="error-reviewer">
+                    <Box
+                        component="form"
+                        // sx={{
+                        //     '& .MuiTextField-root': { m: 1, width: '350px' },
+                        // }}
+                        noValidate
+                        autoComplete="off"
+                    >
+                        <TextInput
+                            id="outlined-select-currency"
+                            select
+                            fullWidth
+                            label="Treasury"
+                            value={safeAddress}
+                            onChange={(e: any) => setSafeAddress(e.target.value)}
+                        >
+                            {
+                                DAO?.safes?.map((safe: any) => {
+                                    return (
+                                        <MenuItem key={safe?.address} value={safe?.address}>{(safe?.name || "Multi-sig wallet") + " (" + beautifyHexToken(safe?.address) + ")"}</MenuItem>
+                                    )
+                                })
+                            }
+                        </TextInput>
+                    </Box>
+                </Box>
+
                 <Box className={classes.modalRow} id="error-currency-amt">
                     <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
                         <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Compensation</Typography>
                     </Box>
-                    <Box sx={{ width: '100%' }}>
-                        {/* <CurrencyInput
-                            value={amount}
-                            onChange={(value: any) => handleChangeCompensationAmount(value)}
-                            options={safeTokens}
-                            dropDownvalue={currency}
-                            onDropDownChange={(value: any) => {
-                                handleChangeCurrency(value)
-                            }}
-                            variant="primary"
-                            errorCurrency={errorCurrency}
-                            errorProjectValue={errorTaskValue}
-                        /> */}
-                    </Box>
+                    <CurrencyInput
+                        value={amount}
+                        onChange={(value: any) => handleChangeCompensationAmount(value)}
+                        options={_get(safeTokens, safeAddress, [])}
+                        dropDownvalue={currency}
+                        onDropDownChange={(value: any) => {
+                            handleChangeCurrency(value)
+                        }}
+                        variant="primary"
+                        errorCurrency={errorCurrency}
+                        errorProjectValue={errorTaskValue}
+                    />
                 </Box>
 
                 <Box className={classes.modalRow} id="error-reviewer">

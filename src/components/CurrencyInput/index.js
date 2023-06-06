@@ -28,6 +28,7 @@ import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     pickerContainer: {
+        width: '100% !important',
         display: 'flex',
         flexDirection: 'row',
         height: '80px',
@@ -89,8 +90,11 @@ export default ({ options, onChange, value, dropDownvalue, onDropDownChange, dis
                                 return (
                                     (
                                         <option value={result.tokenAddress ? result.tokenAddress : process.env.REACT_APP_NATIVE_TOKEN_ADDRESS} key={index}>
-                                            {chainId === SupportedChainId.POLYGON ? <PolygonIcon /> : ''}
-                                            {_get(result, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol)}
+                                            {/* {chainId === SupportedChainId.POLYGON ? <PolygonIcon /> : ''}
+                                            {_get(result, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol)} */}
+                                            {
+                                                result.token.symbol
+                                            }
                                         </option>
                                     )
                                 );
