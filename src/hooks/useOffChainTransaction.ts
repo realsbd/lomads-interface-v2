@@ -37,8 +37,9 @@ export default () => {
                     safe: safeAddress,
                     safeTxHash: nanoid(32),
                     nonce,
-                    executor: account,
+                    executor: null,
                     isExecuted: false,
+                    offChain: true,
                     executionDate: null,
                     submissionDate: moment().utc().toDate(),
                     token: {
@@ -73,7 +74,10 @@ export default () => {
                     safe: safeAddress,
                     nonce,
                     safeTxHash: nanoid(32),
-                    executor: account,
+                    isExecuted: false,
+                    offChain: true,
+                    executor: null,
+                    executionDate: null,
                     submissionDate: moment().utc().toDate(),
                     token: {
                         symbol: 'SWEAT',
@@ -114,17 +118,53 @@ export default () => {
         }
     }
 
-    const rejectTransaction = async ({ safeAddress, safeTxnHash, chainId  } : any) => {
+    const rejectTransaction = async ({ safeAddress, safeTxnHash, _nonce  } : any) => {
         try {
-            const { data: txn } = await axiosHttp.get(`gnosis-safe/${safeTxnHash}?safeAddress=${safeAddress}`)
-            const payload = { safeAddress,  rawTx: { ...txn.rawTx, confirmations: [ ...txn.rawTx.confirmations, { owner: account, submissionDate: moment().utc().toDate() } ] } }
-            dispatch(updateTreasuryTransactionAction(payload))
+            if(!safeTxnHash) {
+                const payload = {
+					nonce: _nonce,
+					safeTxHash: nanoid(32),
+					value: "0",
+                    isExecuted: false,
+                    offChain: true,
+                    executionDate: null,
+					submissionDate: moment().utc().toDate(),
+					token: { symbol: 'SWEAT' },
+					confirmations: [{
+						owner: account,
+						submissionDate: moment().utc().toDate()
+					}],
+                    data: null,
+					dataDecoded: null
+				}
+                const params = {
+                    safeAddress,
+                    rawTx: payload,
+                    metadata: {}
+                }
+                dispatch(CreateTreasuryTransactionAction(params))
+            } else {
+                const { data: txn } = await axiosHttp.get(`gnosis-safe/${safeTxnHash}?safeAddress=${safeAddress}`)
+                const payload = { safeAddress,  rawTx: { ...txn.rawTx, confirmations: [ ...txn.rawTx.confirmations, { owner: account, submissionDate: moment().utc().toDate() } ] } }
+                dispatch(updateTreasuryTransactionAction(payload))
+            }          
         } catch (e) {
             console.log(e)
             throw e
         }
     }
 
-    return { confirmTransaction, createSafeTransaction }
+    const executeTransaction = async ({ safeAddress, safeTxnHash }: any) => {
+        try {
+            const { data: txn } = await axiosHttp.get(`gnosis-safe/${safeTxnHash}?safeAddress=${safeAddress}`)
+            const payload = { safeAddress,  rawTx: { ...txn.rawTx, executor: account, isExecuted: true, executionDate: moment().utc().toDate() } }
+            dispatch(updateTreasuryTransactionAction(payload))
+        }  catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    return { confirmTransaction, createSafeTransaction, rejectTransaction, executeTransaction }
     
 }
