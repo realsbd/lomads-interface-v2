@@ -10,6 +10,9 @@ import editToken from 'assets/svg/editToken.svg';
 import deleteIcon from 'assets/svg/deleteIcon.svg';
 import Button from "components/Button";
 import FullScreenLoader from "components/FullScreenLoader";
+import { SiNotion } from "react-icons/si";
+import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
+import folder from 'assets/svg/folder.svg'
 
 import { useWeb3Auth } from 'context/web3Auth';
 import { useDAO } from "context/dao";
@@ -115,6 +118,19 @@ const useStyles = makeStyles((theme: any) => ({
         cursor: 'pointer !important',
         marginLeft: '22px !important'
     },
+    otherBtn: {
+        background: '#FFFFFF !important',
+        height: '40px !important',
+        padding: '0 20px !important',
+        borderRadius: '100px !important',
+        display: 'flex !important',
+        alignItems: 'center !important',
+        justifyContent: 'center !important',
+        filter: 'drop-shadow(3px 5px 4px rgba(27, 43, 65, 0.05)) drop-shadow(-3px -3px 8px rgba(201, 75, 50, 0.1)) !important',
+        marginRight: '25px !important',
+        color: '#B12F15 !important',
+        border: 'none'
+    }
 }));
 
 export default () => {
@@ -129,9 +145,11 @@ export default () => {
     const { transformTask } = useTask()
 
     const Task = useMemo(() => {
-        if(storeTask)
+        if (storeTask)
             return transformTask(storeTask)
     }, [storeTask])
+
+    console.log("Task : ", Task);
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -159,6 +177,35 @@ export default () => {
         if (user)
             return user.member
     }, [Task]);
+
+    const handleParseUrl = (url: string) => {
+        try {
+            const link = new URL(url);
+            console.log("lnk", link)
+            if (link.hostname.indexOf('notion.') > -1) {
+                return <SiNotion color='#B12F15' size={20} style={{ marginRight: '5px' }} />
+            }
+            else if (link.hostname.indexOf('discord.') > -1) {
+                return <BsDiscord color='#B12F15' size={20} style={{ marginRight: '5px' }} />
+            }
+            else if (link.hostname.indexOf('github.') > -1) {
+                return <BsGithub color='#B12F15' size={20} style={{ marginRight: '5px' }} />
+            }
+            else if (link.hostname.indexOf('google.') > -1) {
+                return <BsGoogle color='#B12F15' size={20} style={{ marginRight: '5px' }} />
+            }
+            else if (link.hostname.indexOf('twitter.') > -1) {
+                return <BsTwitter color='#B12F15' size={20} style={{ marginRight: '5px' }} />
+            }
+            else {
+                return <span><BsGlobe size={20} style={{ marginRight: '5px' }} /></span>
+            }
+        }
+        catch (e) {
+            console.error(e);
+            return null;
+        }
+    }
 
     if (!Task || setTaskLoading || (taskId && (Task && Task._id !== taskId))) {
         return (
@@ -219,13 +266,12 @@ export default () => {
                         </Box>
                         <Box display="flex" alignItems="center">
                             <Box display="flex" alignItems="center">
-                                { 
-                                    <Typography sx={{ fontSize: '14px', color: Task?.visual?.color }}>{ Task?.visual?.status }</Typography>
-                                }
+                                <img src={Task?.visual?.icon} alt="submitted-icon" />
+                                <Typography sx={{ fontSize: '14px', marginLeft: '5px', color: Task?.visual?.color }}>{Task?.visual?.status}</Typography>
                             </Box>
-                            <Box sx={{ marginLeft: '22px', cursor: 'pointer' }}>
+                            {/* <Box sx={{ marginLeft: '22px', cursor: 'pointer' }}>
                                 <img src={editToken} alt="edit-icon" />
-                            </Box>
+                            </Box> */}
                             <Box sx={{ marginLeft: '22px', cursor: 'pointer' }} onClick={() => setOpenDeleteModal(true)}>
                                 <img src={deleteIcon} alt="delete-icon" />
                             </Box>
@@ -285,25 +331,48 @@ export default () => {
                     </Box>
                 </Box>
 
-                <Box className={classes.secondContainer} display="flex" alignItems="center" justifyContent={"flex-end"}>
-                    {
-                        _get(Task, 'compensation', null) && _get(Task, 'compensation.amount', 0) !== 0 &&
-                        <>
-                            <Typography sx={{ color: '#76808D', fontSize: '16px' }}>Compensation</Typography>
-                            <Box display="flex" alignItems="center" justifyContent={"center"} sx={{ width: '127px', height: '35px', }}>
-                                <img src={compensationStar} alt="compensation-star" style={{ marginRight: '7px' }} />
-                                <Typography>{_get(Task, 'compensation.amount', '')} {_get(Task, 'compensation.symbol', '')}</Typography>
+                <Box className={classes.secondContainer} display="flex" alignItems="center" justifyContent={"space-between"}>
+                    <Box display="flex" alignItems="center">
+                        {
+                            Task.discussionChannel && Task.discussionChannel !== ''
+                                ?
+                                <button className={classes.otherBtn} onClick={() => window.open(Task.discussionChannel, '_blank', 'noopener,noreferrer')}>
+                                    {handleParseUrl(Task.discussionChannel)}
+                                    CHAT
+                                </button>
+                                :
+                                null
+                        }
+                        {
+                            Task.submissionLink && Task.submissionLink.length > 0
+                                ?
+                                <button className={classes.otherBtn} onClick={() => window.open(Task.submissionLink, '_blank', 'noopener,noreferrer')}>
+                                    <img src={folder} />
+                                </button>
+                                :
+                                null
+                        }
+                    </Box>
+                    <Box display="flex" alignItems="center">
+                        {
+                            _get(Task, 'compensation', null) && _get(Task, 'compensation.amount', 0) !== 0 &&
+                            <>
+                                <Typography sx={{ color: '#76808D', fontSize: '16px' }}>Compensation</Typography>
+                                <Box display="flex" alignItems="center" justifyContent={"center"} sx={{ width: '127px', height: '35px', }}>
+                                    <img src={compensationStar} alt="compensation-star" style={{ marginRight: '7px' }} />
+                                    <Typography>{_get(Task, 'compensation.amount', '')} {_get(Task, 'compensation.symbol', '')}</Typography>
+                                </Box>
+                            </>
+                        }
+                        {
+                            _get(Task, 'deadline', null) &&
+                            <Box display="flex" alignItems="center" style={{ borderLeft: '1px solid rgba(118, 128, 141, 0.5)', paddingLeft: '20px' }}>
+                                <Typography sx={{ color: '#4BA1DB', marginRight: '10px', fontSize: '16px' }}>Deadline</Typography>
+                                <BsCalendarCheck color="#4BA1DB" />
+                                <Typography sx={{ fontWeight: '700', color: '#4BA1DB', marginLeft: '6px', marginRight: '10px' }}>{moment(_get(Task, 'deadline', '')).format('L')}</Typography>
                             </Box>
-                        </>
-                    }
-                    {
-                        _get(Task, 'deadline', null) &&
-                        <Box display="flex" alignItems="center" style={{ borderLeft: '1px solid rgba(118, 128, 141, 0.5)', paddingLeft: '20px' }}>
-                            <Typography sx={{ color: '#4BA1DB', marginRight: '10px', fontSize: '16px' }}>Deadline</Typography>
-                            <BsCalendarCheck color="#4BA1DB" />
-                            <Typography sx={{ fontWeight: '700', color: '#4BA1DB', marginLeft: '6px', marginRight: '10px' }}>{moment(_get(Task, 'deadline', '')).format('L')}</Typography>
-                        </Box>
-                    }
+                        }
+                    </Box>
                 </Box>
 
                 <Box className={classes.thirdContainer} display="flex" alignItems="center">
