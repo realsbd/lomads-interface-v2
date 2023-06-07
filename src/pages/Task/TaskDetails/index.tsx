@@ -35,6 +35,8 @@ import CloseTaskModal from "modals/Tasks/CloseTaskModal";
 import DeleteTaskModal from "modals/Tasks/DeleteTaskModal";
 import ApplyTaskModal from "modals/Tasks/ApplyTaskModal";
 import SubmitTaskModal from "modals/Tasks/SubmitTaskModal";
+import ApplicantListModal from "modals/Tasks/ApplicantListModal";
+import ReviewModal from "modals/Tasks/ReviewModal";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -137,6 +139,8 @@ export default () => {
     const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
     const [openApplyModal, setOpenApplyModal] = useState<boolean>(false);
     const [openSubmitModal, setOpenSubmitModal] = useState<boolean>(false);
+    const [openApplicantsModal, setOpenApplicantsModal] = useState<boolean>(false);
+    const [openReviewModal, setOpenReviewModal] = useState<boolean>(!false);
 
     useEffect(() => {
         if (DAO && taskId && (!Task || (Task && Task._id !== taskId)))
@@ -177,6 +181,18 @@ export default () => {
             <SubmitTaskModal
                 open={openSubmitModal}
                 closeModal={() => setOpenSubmitModal(false)}
+                hideBackdrop={false}
+            />
+
+            <ApplicantListModal
+                open={openApplicantsModal}
+                closeModal={() => setOpenApplicantsModal(false)}
+                hideBackdrop={false}
+            />
+
+            <ReviewModal
+                open={openReviewModal}
+                closeModal={() => setOpenReviewModal(false)}
                 hideBackdrop={false}
             />
 
@@ -288,12 +304,18 @@ export default () => {
                             dangerouslySetInnerHTML={{ __html: _get(Task, 'description', '') }}
                             sx={{ fontSize: '14px', color: '#1B2B41' }}></Typography>
                     </Box>
-                    <Box className={classes.detailsContainer} display="flex" alignItems="center" justifyContent={"center"}>
+                    <Box className={classes.detailsContainer} display="flex" flexWrap={"wrap"} alignItems="center" justifyContent={"center"}>
                         <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenApplyModal(true)}>
                             APPLY
                         </Button>
                         <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenSubmitModal(true)}>
                             SUBMIT
+                        </Button>
+                        <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenApplicantsModal(true)}>
+                            APPLICANTS
+                        </Button>
+                        <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenReviewModal(true)}>
+                            REVIEW
                         </Button>
                     </Box>
                 </Box>

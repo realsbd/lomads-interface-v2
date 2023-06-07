@@ -89,18 +89,18 @@ export default ({ options, onChange, value, dropDownvalue, onDropDownChange, dis
                             options && options.map((result, index) => {
                                 return (
                                     (
-                                        <option value={result.tokenAddress ? result.tokenAddress : process.env.REACT_APP_NATIVE_TOKEN_ADDRESS} key={index}>
+                                        <option value={result?.tokenAddress} key={index}>
                                             {/* {chainId === SupportedChainId.POLYGON ? <PolygonIcon /> : ''}
                                             {_get(result, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol)} */}
                                             {
-                                                result.token.symbol
+                                                result?.token?.symbol
                                             }
                                         </option>
                                     )
                                 );
                             })
                         }
-                        {_get(DAO, 'sweatPoints', false) && <option value="SWEAT">SWEAT</option>}
+                        {/* {_get(DAO, 'sweatPoints', false) && <option value="SWEAT">SWEAT</option>} */}
                     </Select>
                     {errorCurrency && <span style={{ background: '#EA6447', padding: '5px 10px', borderRadius: '0 0 5px 5px', color: '#FFF', textAlign: 'center', width: '90%', fontSize: '11px' }}>Select currency</span>}
                 </div>
@@ -153,15 +153,16 @@ export default ({ options, onChange, value, dropDownvalue, onDropDownChange, dis
                             options && options.map((result, index) => {
                                 return (
                                     (
-                                        <option value={result.tokenAddress ? result.tokenAddress : process.env.REACT_APP_NATIVE_TOKEN_ADDRESS} key={index}>
-                                            {chainId === SupportedChainId.POLYGON ? <PolygonIcon /> : ''}
-                                            {_get(result, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol)}
+                                        <option value={result?.tokenAddress} key={index}>
+                                            {
+                                                result?.token?.symbol
+                                            }
                                         </option>
                                     )
                                 );
                             })
                         }
-                        {_get(DAO, 'sweatPoints', false) && <option value="SWEAT">SWEAT</option>}
+                        {/* {_get(DAO, 'sweatPoints', false) && <option value="SWEAT">SWEAT</option>} */}
                     </Select>
                     {errorCurrency && <span style={{ background: '#EA6447', padding: '5px 10px', borderRadius: '0 0 5px 5px', color: '#FFF', textAlign: 'center', width: '90%', fontSize: '11px' }}>Select currency</span>}
                 </div>

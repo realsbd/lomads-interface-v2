@@ -19,3 +19,19 @@ export const archiveTaskService = (params: any) => {
 export const deleteTaskService = (params: any) => {
     return axiosHttp.patch(`task/${params.taskId}/delete?daoUrl=${params.daoUrl}`);
 }
+
+export const applyTaskService = (params: any) => {
+    return axiosHttp.patch(`task/${params.taskId}/apply?daoUrl=${params.daoUrl}`, params.payload);
+}
+
+export const submitTaskService = (params: any) => {
+    return axiosHttp.patch(`task/${params.taskId}/submit?daoUrl=${params.daoUrl}`, params);
+}
+
+export const assignTaskService = (params: any) => {
+    return axiosHttp.patch(`task/${params.taskId}/assign?daoUrl=${params.daoUrl}`, params.payload);
+}
+
+export const rejectTaskMemberService = (params: any) => {
+    return axiosHttp.patch(`task/${params.taskId}/reject-member?daoUrl=${params.daoUrl}`, params.payload);
+}

@@ -11,6 +11,10 @@ export function getInitialState() {
         draftTaskLoading: false,
         archiveTaskLoading: false,
         deleteTaskLoading: false,
+        applyTaskLoading: false,
+        submitTaskLoading: false,
+        assignTaskLoading: false,
+        rejectTaskMemberLoading: false,
     };
 }
 
@@ -46,6 +50,26 @@ const TaskReducer = (state: any = getInitialState(), action: any) =>
 
             case actionTypes.DELETE_TASK_LOADING: {
                 draft.deleteTaskLoading = payload;
+                break;
+            }
+
+            case actionTypes.APPLY_TASK_LOADING: {
+                draft.applyTaskLoading = payload;
+                break;
+            }
+
+            case actionTypes.SUBMIT_TASK_LOADING: {
+                draft.submitTaskLoading = payload;
+                break;
+            }
+
+            case actionTypes.ASSIGN_TASK_LOADING: {
+                draft.assignTaskLoading = payload;
+                break;
+            }
+
+            case actionTypes.REJECT_TASK_MEMBER_LOADING: {
+                draft.rejectTaskMemberLoading = payload;
                 break;
             }
 

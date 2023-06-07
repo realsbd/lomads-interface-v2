@@ -28,6 +28,8 @@ import useTerminology from 'hooks/useTerminology';
 import { isValidUrl } from 'utils';
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { createTaskAction, draftTaskAction } from "store/actions/task";
+import useSafe from "hooks/useSafe";
+
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -156,6 +158,8 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     const [currency, setCurrency] = useState<string>('');
 
     const [safeAddress, setSafeAddress] = useState<string>('');
+
+    // const { loadSafe } = useSafe();
 
 
     const [errorName, setErrorName] = useState('');
@@ -360,10 +364,11 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                     tempSub = 'https://' + tempSub;
                 }
             }
-            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
-            symbol = _get(symbol, 'token.symbol', null)
-            if (!symbol)
-                symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
+
+            // const safe = loadSafe(safeAddress);
+            let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency)
+            symbol = _get(symbol, 'token.symbol', 'SWEAT')
+
             let task: any = {};
             task.daoId = DAO?._id;
             task.name = name;
@@ -373,15 +378,13 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             task.discussionChannel = tempLink;
             task.deadline = deadline;
             task.submissionLink = tempSub ? tempSub : '';
-            // add safe address in compensation object below---safeAddress
             task.compensation = { currency: currency, amount, symbol, safeAddress: safeAddress };
             task.reviewer = reviewer;
             task.contributionType = contributionType;
             task.isSingleContributor = isSingleContributor;
             task.isFilterRoles = isFilterRoles;
             task.validRoles = isFilterRoles ? validRoles : [];
-            console.log("Task : ", task);
-            // dispatch(createTaskAction(task))
+            dispatch(createTaskAction(task))
         }
     }
 
@@ -407,10 +410,10 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                 tempSub = 'https://' + tempSub;
             }
         }
-        let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
+        // const safe = loadSafe(safeAddress);
+        let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency)
         symbol = _get(symbol, 'token.symbol', 'SWEAT')
-        if (!symbol)
-            symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
+
         let task: any = {};
         task.daoId = DAO?._id;
         task.name = name;
@@ -420,7 +423,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
         task.discussionChannel = tempLink;
         task.deadline = deadline;
         task.submissionLink = tempSub ? tempSub : '';
-        task.compensation = { currency: currency, amount, symbol };
+        task.compensation = { currency: currency, amount, symbol, safeAddress: safeAddress };
         task.reviewer = reviewer;
         task.contributionType = contributionType;
         task.isSingleContributor = isSingleContributor;
@@ -526,6 +529,19 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                 </Box>
 
                 <Box className={classes.divider}></Box>
+
+                <Box className={classes.modalRow} id="error-reviewer">
+                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
+                        <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Reviewer</Typography>
+                    </Box>
+                    <Box sx={{ width: '100%' }}>
+                        <MuiSelect
+                            options={eligibleReviewers}
+                            setSelectedValue={(value) => { setReviewer(value); setErrorReviewer('') }}
+                            errorSelect={errorReviewer}
+                        />
+                    </Box>
+                </Box>
 
                 <Box className={classes.modalRow}>
                     <Box sx={{ marginBottom: '10px' }}><Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Contribution</Typography></Box>
@@ -677,19 +693,6 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                         errorCurrency={errorCurrency}
                         errorProjectValue={errorTaskValue}
                     />
-                </Box>
-
-                <Box className={classes.modalRow} id="error-reviewer">
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
-                        <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Reviewer</Typography>
-                    </Box>
-                    <Box sx={{ width: '100%' }}>
-                        <MuiSelect
-                            options={eligibleReviewers}
-                            setSelectedValue={(value) => { setReviewer(value); setErrorReviewer('') }}
-                            errorSelect={errorReviewer}
-                        />
-                    </Box>
                 </Box>
 
                 <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>

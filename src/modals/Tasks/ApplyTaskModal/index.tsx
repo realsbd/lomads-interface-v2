@@ -20,6 +20,9 @@ import { isValidUrl } from 'utils';
 import { nanoid } from 'nanoid';
 
 import { useDAO } from "context/dao";
+import { useAppDispatch } from "helpers/useAppDispatch";
+import { useAppSelector } from "helpers/useAppSelector";
+import { applyTaskAction } from "store/actions/task";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -37,7 +40,6 @@ const useStyles = makeStyles((theme: any) => ({
         flexDirection: 'column',
         alignItems: 'center',
         padding: '27px !important',
-        marginTop: '60px !important'
     },
     modalTitle: {
         color: '#C94B32',
@@ -108,6 +110,9 @@ interface Props {
 export default ({ open, hideBackdrop, closeModal }: Props) => {
     const classes = useStyles();
     const { DAO } = useDAO();
+    const dispatch = useAppDispatch();
+    // @ts-ignore
+    const { Task, applyTaskLoading } = useAppSelector(store => store.task);
     const [note, setNote] = useState<string>('');
     const [noteError, setNoteError] = useState<string>('');
     const [title, setTitle] = useState<string>('');
@@ -115,6 +120,12 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
     const [link, setLink] = useState<string>('');
     const [linkError, setLinkError] = useState<string>('');
     const [resourceList, setResourceList] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (applyTaskLoading === false) {
+            closeModal();
+        }
+    }, [applyTaskLoading]);
 
 
     const handleParseUrl = (url: string) => {
@@ -163,47 +174,12 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
             if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
                 tempLink = 'https://' + tempLink;
             }
-            if (link.indexOf('discord.') > -1) {
-                let resource: any = {};
-                resource.id = nanoid(16);
-                resource.title = title;
-                resource.link = tempLink;
-                resource.provider = new URL(tempLink).hostname;
-                let dcserverid = undefined;
-                if (status)
-                    dcserverid = new URL(tempLink).pathname.split('/')[2]
-                resource.platformId = dcserverid;
-                if (status)
-                    resource.roleId = status;
-                setResourceList([...resourceList, resource]);
-                setTitle('');
-                setLink('');
-            }
-            else if (link.indexOf('notion.') > -1) {
-                if (status.status) {
-                    let resource: any = {};
-                    resource.id = nanoid(16);
-                    resource.title = title;
-                    resource.link = tempLink;
-                    resource.provider = new URL(tempLink).hostname;
-                    setResourceList([...resourceList, resource]);
-                    setTitle('');
-                    setLink('');
-                }
-                else {
-                    setLinkError(status.message || 'Something went wrong.')
-                }
-            }
-            else {
-                let resource: any = {};
-                resource.id = nanoid(16);
-                resource.title = title;
-                resource.link = tempLink;
-                resource.accessControl = false
-                setResourceList([...resourceList, resource]);
-                setTitle('');
-                setLink('');
-            }
+            let resource: any = {};
+            resource.title = title;
+            resource.link = tempLink;
+            setResourceList([...resourceList, resource]);
+            setTitle('');
+            setLink('');
         }
     }
 
@@ -211,9 +187,21 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
         setResourceList(resourceList.filter((_, index) => index !== position));
     }
 
-    const handleSubmit = () => {
-        closeModal();
+    const handleApplyApplication = () => {
+        if (note === '') {
+            setNoteError('Enter a note');
+            return;
+        }
+        else if (resourceList.length === 0) {
+            setLinkError("Enter atleast one link")
+            return;
+        }
+        else {
+            dispatch(applyTaskAction({ taskId: _get(Task, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { note, resourceList } }))
+        }
     }
+
+    const applyAsync = _debounce(handleApplyApplication, 1500)
 
     return (
         <Drawer
@@ -223,15 +211,17 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
             hideBackdrop={hideBackdrop}
         >
             <Box className={classes.modalConatiner}>
-                <Typography sx={{ position: 'fixed', left: 32, top: 32, fontSize: 14, color: '#76808D', fontStyle: 'italic' }}>Task Name</Typography>
-                <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={closeModal}>
-                    <img src={CloseSVG} />
-                </IconButton>
-                <Box display="flex" flexDirection="column" alignItems="center">
+                <Box sx={{ width: '100%' }} display="flex" alignItems="center" justifyContent={"space-between"}>
+                    <Typography sx={{ fontSize: 14, color: '#76808D', fontStyle: 'italic' }}>{_get(Task, 'name', '')}</Typography>
+                    <IconButton onClick={closeModal}>
+                        <img src={CloseSVG} />
+                    </IconButton>
+                </Box>
+                <Box sx={{ marginTop: '70px' }} display="flex" flexDirection="column" alignItems="center">
                     <img src={TASKSVG} alt="project-resource" />
                     <Typography className={classes.modalTitle}>Apply to Task</Typography>
                 </Box>
-                <Box sx={{ margin: '35px 0' }}>
+                <Box sx={{ margin: '35px 0' }} id="note-error">
                     <TextEditor
                         fullWidth
                         height={130}
@@ -307,41 +297,13 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                         </Box>
                     }
 
-                    {
-                        resourceList.length > 0 &&
-                        <Box display={"flex"} flexDirection={"column"} sx={{ width: '100%', marginTop: '20px' }}>
-                            {
-                                resourceList.map((item, index) => {
-                                    return (
-                                        <Box sx={{ width: '100%' }} display={"flex"} justifyContent={"space-between"} key={index}>
-                                            <Box className={classes.resourceCard} display={"flex"}>
-                                                <TextInput
-                                                    sx={{ marginRight: '10px' }}
-                                                    placeholder="Ex Portfolio"
-                                                    value={item.title}
-                                                />
-                                                <TextInput
-                                                    // sx={{ width: 195 }}
-                                                    placeholder="link"
-                                                    value={item.link}
-                                                />
-                                            </Box>
-                                            <IconButton>
-                                                <img src={bin} alt="bin" />
-                                            </IconButton>
-                                        </Box>
-                                    )
-                                })
-                            }
-                        </Box>
-                    }
-
                     <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%', marginTop: '20px' }}>
                         <Button
                             variant="contained"
-                            onClick={handleSubmit}
+                            onClick={applyAsync}
                             disabled={resourceList.length === 0}
                             sx={{ width: '184px' }}
+                            loading={applyTaskLoading}
                         >
                             SEND
                         </Button>

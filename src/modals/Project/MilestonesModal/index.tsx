@@ -327,13 +327,12 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
             return;
         }
         if (flag !== -1) {
-            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
-            symbol = _get(symbol, 'token.symbol', null)
-            if (!symbol)
-                symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
+
+            let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency);
+            symbol = _get(symbol, 'token.symbol', 'SWEAT');
 
             if (editMilestones) {
-                dispatch(editProjectMilestonesAction({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones, compensation: { currency, amount, symbol } } }));
+                dispatch(editProjectMilestonesAction({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones, compensation: { currency, amount, symbol, safeAddress } } }));
             }
             else {
                 getCompensation({ currency: currency, amount, symbol })
