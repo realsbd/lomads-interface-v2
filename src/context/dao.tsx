@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {  get as _get, find as _find } from 'lodash'
+import { get as _get, find as _find } from 'lodash'
 import { createContext, useContext } from "react";
 import { useParams } from 'react-router-dom';
 import axiosHttp from 'api'
@@ -41,45 +41,44 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }
 
   useEffect(() => {
-    if(account && token && !DAOList)
-        loadDAOList()
+    if (account && token && !DAOList)
+      loadDAOList()
   }, [account, token, DAOList])
 
   useEffect(() => {
-    if(DAOList && !daoURL && window.location.pathname === '/') {
-        console.log("DAOList", DAOList)
-        if(DAOList.length > 0)
-            navigate(`/${_get(DAOList, '[0].url')}`)
-        else
-            navigate(`/organisation/create`)
+    if (DAOList && !daoURL && window.location.pathname === '/') {
+      console.log("DAOList", DAOList)
+      if (DAOList.length > 0)
+        navigate(`/${_get(DAOList, '[0].url')}`)
+      else
+        navigate(`/organisation/create`)
     }
   }, [DAOList])
 
   useEffect(() => {
-    if(provider && account && DAO?.url && DAO?.sbt) {
-      balanceOf().then(res => 
-        { 
-            console.log("Balance of...", parseInt(res._hex, 16))
-            if(parseInt(res._hex, 16) === 1) {
+    if (provider && account && DAO?.url && DAO?.sbt) {
+      balanceOf().then(res => {
+        console.log("Balance of...", parseInt(res._hex, 16))
+        if (parseInt(res._hex, 16) === 1) {
 
-            } else {
-              if(!DAO?.sbt?.whitelisted || (DAO?.sbt?.whitelisted && _find(DAO?.members, (member:any) => toChecksumAddress(member.member.wallet) === account ))) {
-                navigate(`/${DAO?.url}/mint/${DAO?.sbt?.address}`)
-              } else {
-                // NOT WHITELISTED
-              }
-            }
-        })
+        } else {
+          if (!DAO?.sbt?.whitelisted || (DAO?.sbt?.whitelisted && _find(DAO?.members, (member: any) => toChecksumAddress(member.member.wallet) === account))) {
+            navigate(`/${DAO?.url}/mint/${DAO?.sbt?.address}`)
+          } else {
+            // NOT WHITELISTED
+          }
+        }
+      })
     }
   }, [DAO?.url, provider, account])
 
   useEffect(() => {
-    if(DAOList && account && token && daoURL && (!DAO || DAO.url !== daoURL))
-        loadDAO(daoURL)
+    if (DAOList && account && token && daoURL && (!DAO || DAO.url !== daoURL))
+      loadDAO(daoURL)
   }, [account, token, daoURL, console, DAOList])
 
   useEffect(() => {
-    if(DAO && (!DAO.safes || ( DAO.safes && DAO.safes.length == 0 ))) {
+    if (DAO && (!DAO.safes || (DAO.safes && DAO.safes.length == 0))) {
       navigate(`/${DAO?.url}/attach-safe/new`)
     }
   }, [DAO])
@@ -97,7 +96,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   };
   return <DAOContext.Provider value={contextProvider}>
     {
-        children
+      privateRoute && (!DAOList || (daoURL && !DAO)) ? <FullScreenLoader /> : children
     }
   </DAOContext.Provider>;
 };

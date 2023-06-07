@@ -1,7 +1,18 @@
 import { ethers } from "ethers";
+import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers'
 
 export function beautifyHexToken(token: string): string {
-    return (token?.slice(0, 6) + "..." + token?.slice(-4))
+  return (token?.slice(0, 6) + "..." + token?.slice(-4))
+}
+
+export const isValidUrl = (urlString: string) => {
+  var urlPattern = new RegExp('^(https?:\\/\\/)?' + // validate protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // validate domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))' + // validate OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // validate port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?' + // validate query string
+    '(\\#[-a-z\\d_]*)?$', 'i'); // validate fragment locator
+  return !!urlPattern.test(urlString);
 }
 
 export const isAddressValid = (holderAddress: string) => {
@@ -19,9 +30,14 @@ export const isRightAddress = (holderAddress: string) => {
   return isValid;
 };
 
+
+// account is not optional
+export function getSigner(provider: JsonRpcProvider, account: string): JsonRpcSigner {
+  return provider.getSigner(account).connectUnchecked()
+}
 export const getQueryString = (params: any = {}) => {
-	if(Object.keys(params).length == 0) return ''
-	return `?${Object.keys(params).map(key => key + '=' + params[key]).join('&')}`;
+  if (Object.keys(params).length == 0) return ''
+  return `?${Object.keys(params).map(key => key + '=' + params[key]).join('&')}`;
 }
 
 

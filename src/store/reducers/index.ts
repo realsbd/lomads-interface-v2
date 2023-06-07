@@ -1,11 +1,13 @@
-import {combineReducers} from 'redux';
+import { combineReducers } from 'redux';
 import sessionReducer from './session';
 import DAOReducer from './dao';
+import projectReducer from './project';
+import { persistReducer } from 'redux-persist';
 import TreasuryReducer from './treasury';
-import {persistReducer} from 'redux-persist';
 import localforage from 'localforage';
 import storage from 'redux-persist/lib/storage'
 import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2';
+import taskReducer from './task';
 
 // const isRemember = async()=> await getValue(REMEBER_DATA)
 
@@ -21,6 +23,8 @@ const rootPersistConfig = {
 const rootReducer: any = combineReducers({
   session: sessionReducer,
   dao: DAOReducer,
+  project: projectReducer,
+  task: taskReducer,
   treasury: TreasuryReducer
 });
 

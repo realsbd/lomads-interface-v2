@@ -19,11 +19,18 @@ export const loadDAOAction = (payload: string | null) => {
     }
 }
 
+export const setDAOAction = (payload: any) => {
+    return {
+        type: actionTypes.SET_DAO_ACTION,
+        payload
+    }
+}
+
 export const setDAOTagOptionsAction = (payload: any) => {
     return {
         type: actionTypes.SET_DAO_OPTION_ACTION,
         payload
-    } 
+    }
 }
 
 export const updateDAOAction = (payload: any) => {

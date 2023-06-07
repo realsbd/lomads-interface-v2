@@ -22,7 +22,7 @@ const usePopupWindow = (
 ) => {
   const [windowInstance, setWindowInstance] = useState<Window | null>(null)
 
-  const onOpen = (uri:string) => {
+  const onOpen = (uri: string) => {
     const dualScreenLeft = window.screenLeft ?? window.screenX
     const dualScreenTop = window.screenTop ?? window.screenY
     //eslint-disable-next-line
@@ -31,7 +31,7 @@ const usePopupWindow = (
     const height = window.innerHeight ?? document.documentElement.clientHeight ?? screen.height
 
     const systemZoom = width / window.screen.availWidth
-    const left = (width -(windowFeatures?.width || 0)) / 2 / systemZoom + dualScreenLeft
+    const left = (width - (windowFeatures?.width || 0)) / 2 / systemZoom + dualScreenLeft
     const top = (height - (windowFeatures?.height || 0)) / 2 / systemZoom + dualScreenTop
 
     windowFeatures.left = windowFeatures.left ?? left

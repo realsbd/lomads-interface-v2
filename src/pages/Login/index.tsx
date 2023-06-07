@@ -23,13 +23,13 @@ import { CHAIN_INFO } from 'constants/chainInfo';
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
-         height: "100vh",
-         maxHeight: 'fit-content',
-         display: 'flex',
-         flexDirection: 'column',
-         alignItems: 'center',
-         justifyContent: 'center',
-         overflow: 'hidden !important'
+        height: "100vh",
+        maxHeight: 'fit-content',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden !important'
     },
     logo: {
         width: 138,
@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme: any) => ({
         minWidth: 'inherit !importnt',
         padding: '0px !important'
     }
-  }));
+}));
 
 export default () => {
     const classes = useStyles();
@@ -90,11 +90,11 @@ export default () => {
     }, [selectedChainId])
 
     useEffect(() => {
-        if(token && user && account) {
-            if(from)
+        if (token && user && account) {
+            if (from)
                 navigate(from)
             else
-                navigate('/') 
+                navigate('/')
         }
     }, [token, user, account])
 
@@ -151,12 +151,12 @@ export default () => {
                     </Box>
                     <Box mt={4} display="flex" flexDirection="row" alignItems="center">
                         <Typography variant='body1' fontWeight="bold" mr={2}>Select Blockchain:</Typography>
-                        <Button onClick={handleClick} aria-controls={open ? 'fade-menu' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined} className={classes.select} variant="contained" color="secondary" disableElevation startIcon={<img style={{ width: 18, height: 18 }} src={ _get(CHAIN_INFO, `${currentChain}.logoUrl`)}/>} endIcon={<KeyboardArrowDown />}>
-                            { _get(CHAIN_INFO, `${currentChain}.label`) }
+                        <Button onClick={handleClick} aria-controls={open ? 'fade-menu' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined} className={classes.select} variant="contained" color="secondary" disableElevation startIcon={<img style={{ width: 18, height: 18 }} src={_get(CHAIN_INFO, `${currentChain}.logoUrl`)} />} endIcon={<KeyboardArrowDown />}>
+                            {_get(CHAIN_INFO, `${currentChain}.label`)}
                         </Button>
                         <Menu
                             MenuListProps={{
-                            'aria-labelledby': 'fade-button',
+                                'aria-labelledby': 'fade-button',
                             }}
                             anchorOrigin={{
                                 vertical: 'bottom',
@@ -171,9 +171,9 @@ export default () => {
                             onClose={handleClose}
                         >
                             {
-                                SUPPORTED_CHAIN_IDS.map(sc => 
+                                SUPPORTED_CHAIN_IDS.map(sc =>
                                     <MenuItem style={{ textTransform: 'uppercase' }} onClick={() => { handleSwitchNetwork(sc); handleClose() }}>
-                                        <img style={{ marginRight: '8px', width: 18, height: 18 }} src={CHAIN_INFO[sc].logoUrl} />{ CHAIN_INFO[sc].label }</MenuItem>)
+                                        <img style={{ marginRight: '8px', width: 18, height: 18 }} src={CHAIN_INFO[sc].logoUrl} />{CHAIN_INFO[sc].label}</MenuItem>)
                             }
                         </Menu>
                     </Box>

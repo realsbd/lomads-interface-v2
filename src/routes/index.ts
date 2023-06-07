@@ -6,6 +6,9 @@ import PrimaryLayout from 'layouts/PrimaryLayout';
 
 import LoginPage from 'pages/Login';
 import DashboardPage from 'pages/Dashboard';
+import CreateProjectPage from 'pages/Project/CreateProject';
+import ProjectDetailsPage from 'pages/Project/ProjectDetails';
+import TaskDetailsPage from 'pages/Task/TaskDetails';
 import SettingsPage from 'pages/Settings';
 import AttachNewSafePage from 'pages/AttachSafe/New';
 import AttachExistingSafePage from 'pages/AttachSafe/Existing';
@@ -91,5 +94,26 @@ export default [
 		layout: DashboardLayout,
 		private: true,
 		component: DashboardPage
+	},
+	{
+		path: '/:daoURL/createProject',
+		exact: true,
+		layout: LandingLayout,
+		private: true,
+		component: CreateProjectPage
+	},
+	{
+		path: '/:daoURL/project/:projectId',
+		exact: true,
+		layout: LandingLayout,
+		private: true,
+		component: ProjectDetailsPage
+	},
+	{
+		path: '/:daoURL/task/:taskId',
+		exact: true,
+		layout: LandingLayout,
+		private: true,
+		component: TaskDetailsPage
 	},
 ];
