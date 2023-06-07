@@ -1,4 +1,3 @@
-import React from "react";
 import { Box } from "@mui/material"
 import { ReactComponent as DropdownRed } from 'assets/svg/dropdown-red.svg';
 import { ReactComponent as DropupRed } from 'assets/svg/dropup-red.svg';
@@ -13,9 +12,7 @@ import {
     NumberDecrementStepper,
   } from "@chakra-ui/react";
 import { makeStyles } from '@mui/styles';
-import TextInput from 'components/TextInput';
-import IconButton from "components/IconButton";
-import { useState } from "react";
+import React, { useState } from "react";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -50,12 +47,13 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default ({ options, onChange, value, dropDownvalue, onDropDownChange, disableCurrency = false }) => {
+export default ({ options, onChange, value, dropDownvalue, onDropDownChange, disabled, disableSelect }: any) => {
+    console.log(value)
     const classes = useStyles()
     return (
         <div className={classes.pickerContainer}>
             <div className={classes.numberInput}>
-                <NumberInput value={value} onChange={e => onChange(e)} defaultValue={0} style={{ width: (100 + 50), height: 50, borderWidth: 1, borderColor: 'rgba(27, 43, 65, 0.1)', borderRightWidth: 0, borderRadius: '10px 0px 0px 10px' }} step={1} min={0}>
+                <NumberInput isDisabled={disabled} value={value || 0} onChange={e => onChange(e)} defaultValue={0} style={{ width: (100 + 50), height: 50, borderWidth: 1, borderColor: 'rgba(27, 43, 65, 0.1)', borderRightWidth: 0, borderRadius: '10px 0px 0px 10px' }} step={1} min={0}>
                     <NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 50, width: 100, backgroundColor: '#F5F5F5', borderTopRightRadius: 0, borderBottomRightRadius: 0, borderTopLeftRadius: 10, borderBottomLeftRadius: 10, borderWidth: 0 }} />
                     <NumberInputStepper style={{ width: 50, backgroundColor: 'transparent', borderRadius: '0px 10px 10px 0px' }}>
                     <NumberIncrementStepper color="#C94B32" children={<DropupRed />} />
@@ -63,9 +61,9 @@ export default ({ options, onChange, value, dropDownvalue, onDropDownChange, dis
                     </NumberInputStepper>
                 </NumberInput>
             </div>
-            <Select disabled={disableCurrency} className={classes.select} defaultValue={dropDownvalue} onChange={e => onDropDownChange(e.target.value)} bg='#F5F5F5' color='#76808D' variant='unstyled' style={{ borderRadius: '0px 10px 10px 0px', borderWidth: 1, borderLeftWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}>
+            <Select disabled={disabled || disableSelect} className={classes.select} defaultValue={dropDownvalue} onChange={e => onDropDownChange(e.target.value)} bg='#F5F5F5' color='#76808D' variant='unstyled' style={{ borderRadius: '0px 10px 10px 0px', borderWidth: 1, borderLeftWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={"15"} icon={<ArrowDown />}>
                 {
-                    options.map(option => {
+                    options.map((option: any) => {
                         return (
                             <option value={option.value}>{ option.label }</option>
                         )

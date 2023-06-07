@@ -6,6 +6,7 @@ import { useAppDispatch } from "helpers/useAppDispatch";
 import { updateTxLabelAction } from "store/actions/treasury";
 
 export default ({ transaction, recipient }: any) => {
+    console.log("transaction", transaction, recipient)
     const textfieldRef = useRef<any>()
     const dispatch = useAppDispatch()
     const [editable, setEditable] = useState(false)
@@ -13,7 +14,7 @@ export default ({ transaction, recipient }: any) => {
     
     const label = useMemo(() => {
         if(transaction && recipient) {
-            const metadata = _get(transaction, `metadata.${recipient}`, null)
+            const metadata = _get(transaction, `metadata.${recipient === '0x' ? transaction?.safeAddress : recipient}`, null)
             if(metadata){
                 return metadata?.label
             }

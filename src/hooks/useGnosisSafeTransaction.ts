@@ -9,8 +9,8 @@ import DAOTokenABI from 'abis/DAOToken.json'
 import { ethers } from "ethers";
 import { CreateTreasuryTransactionAction, updateTreasuryTransactionAction } from "store/actions/treasury"
 import { useAppDispatch } from "helpers/useAppDispatch"
-import { EthSafeSignature } from "@safe-global/protocol-kit"
-import { retry } from "utils"
+import { AddOwnerTxParams, EthSafeSignature, SafeTransactionOptionalProps } from "@safe-global/protocol-kit"
+import { beautifyHexToken, retry } from "utils"
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 
@@ -234,5 +234,87 @@ export default () => {
         }
     }
 
-    return { createSafeTransaction, confirmTransaction, rejectTransaction, executeTransaction }
+    const updateOwnersWithThreshold = async ({ safeAddress, chainId, newOwners = [], removeOwners = [], threshold, thresholdChanged = false, ownerCount = 0 }: any) => {
+        if (!safeAddress || !account || !chainId) return;
+        try {
+            const safeSDK = await ImportSafe(provider, safeAddress);
+            const isOwner = await safeSDK.isOwner(account as string);
+            if (!isOwner) {
+                throw 'Not allowed operation. Only safe owner can perform setAllowance operation'
+            }
+
+            const currentNonce = await (await safeService(provider, `${chainId}`)).getNextNonce(safeAddress);
+
+            const options: SafeTransactionOptionalProps = { nonce: currentNonce };
+
+            const newOwnerTxnData: SafeTransactionDataPartial[] = await Promise.all(
+                newOwners.map(async (owner: string) => {
+                    const params: AddOwnerTxParams = {
+                        ownerAddress: owner,
+                        threshold
+                    }
+                    const ownerTxn = await safeSDK.createAddOwnerTx(params)
+                    const transactionData = {
+                        to: ownerTxn.data.to,
+                        data: ownerTxn.data.data,
+                        value: "0",
+                    };
+                    return transactionData;
+                })
+            )
+
+            const removeOwnerTxnData: SafeTransactionDataPartial[] = await Promise.all(
+                removeOwners.map(async (owner: string) => {
+                    const params: AddOwnerTxParams = {
+                        ownerAddress: owner,
+                        threshold
+                    }
+                    const ownerTxn = await safeSDK.createRemoveOwnerTx(params)
+                    const transactionData = {
+                        to: ownerTxn.data.to,
+                        data: ownerTxn.data.data,
+                        value: "0",
+                    };
+                    return transactionData;
+                })
+            )
+
+            let txnPayload: any = [...removeOwnerTxnData, ...newOwnerTxnData]
+            if (txnPayload.length === 0) {
+                const thresholdTxn = await safeSDK.createChangeThresholdTx(threshold, options)
+                txnPayload = thresholdTxn.data
+            }
+
+            const safeTransaction = await safeSDK.createTransaction({ safeTransactionData: txnPayload, options })
+            console.log(safeTransaction)
+            const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
+            const signature = await safeSDK.signTransactionHash(safeTxHash);
+            await (await safeService(provider, `${chainId}`))
+                .proposeTransaction({ safeAddress, safeTransactionData: safeTransaction.data, safeTxHash, senderAddress: account, senderSignature: signature.data })
+            await (await safeService(provider, `${chainId}`)).confirmTransaction(safeTxHash, signature.data)
+
+            let labels: any[] = [];
+            newOwners.map((r: any) => {
+                labels.push({ recipient: safeAddress, label: thresholdChanged ? `Add Owner: ${beautifyHexToken(r)} | Change Threshold ${threshold}/${ownerCount}` : `Add Owner: ${beautifyHexToken(r)}` })
+            })
+            removeOwners.map((r: any) => {
+                labels.push({ recipient: safeAddress, label: `Remove Owner: ${beautifyHexToken(r)} | Change Threshold ${threshold}/${ownerCount}` })
+            })
+            if (newOwners.length === 0 && removeOwners.length === 0)
+                labels.push({ recipient: safeAddress, label: `Change Threshold ${threshold}/${ownerCount}` })
+            const tx = await (await safeService(provider, `${chainId}`)).getTransaction(safeTxHash)
+            const payload = {
+                safeAddress,
+                rawTx: tx,
+                metadata: labels.reduce((a, v) => ({ ...a, [v.recipient]: { label: v?.label }}), {}) 
+            }
+            dispatch(CreateTreasuryTransactionAction(payload))
+            return safeTxHash
+        } catch (e) {
+            console.log(e)
+            throw 'Something went wrong. Please try again.'
+        }
+    }
+
+    return { createSafeTransaction, confirmTransaction, rejectTransaction, executeTransaction, updateOwnersWithThreshold }
 }
