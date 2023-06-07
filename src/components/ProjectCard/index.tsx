@@ -108,7 +108,7 @@ export default ({ project, daoUrl, tab }: CardProps) => {
                         ?
                         <Box className={classes.iconContainer}>
                             {
-                                notifications.map((notification, index) => {
+                                notifications.map((notification: any, index: number) => {
                                     if (notification.provider.indexOf('discord') > -1 && notification.count) {
                                         return (
                                             <Box className={classes.iconPill} key={index}>
@@ -117,6 +117,7 @@ export default ({ project, daoUrl, tab }: CardProps) => {
                                             </Box>
                                         )
                                     }
+                                    return null
                                 })
                             }
                         </Box>

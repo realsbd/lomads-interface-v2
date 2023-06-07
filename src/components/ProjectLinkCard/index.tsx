@@ -64,6 +64,7 @@ export default ({ link, key }: ProjectLinkCardProps) => {
         }
         catch (e) {
             console.error(e);
+            return null
         }
     }
 

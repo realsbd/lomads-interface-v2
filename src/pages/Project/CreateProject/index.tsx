@@ -342,7 +342,7 @@ export default () => {
                     <Button variant="contained" color="secondary" className={classes.addMemberBtn}>ADD NEW MEMBER</Button>
                 </Box>
                 {
-                    _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item, index) => {
+                    _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item:any, index:number) => {
                         if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
                             return (
                                 <>
@@ -353,6 +353,7 @@ export default () => {
                                 </>
                             )
                         }
+                        return null
                     })
                 }
             </Paper>

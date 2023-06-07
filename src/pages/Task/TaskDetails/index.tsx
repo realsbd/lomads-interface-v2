@@ -37,6 +37,7 @@ import ApplyTaskModal from "modals/Tasks/ApplyTaskModal";
 import SubmitTaskModal from "modals/Tasks/SubmitTaskModal";
 import ApplicantListModal from "modals/Tasks/ApplicantListModal";
 import ReviewModal from "modals/Tasks/ReviewModal";
+import useTask from "hooks/useTask";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -124,8 +125,14 @@ export default () => {
     const { DAO } = useDAO();
     const { taskId, daoURL } = useParams();
     // @ts-ignore
-    const { setTaskLoading, Task } = useAppSelector(store => store.task);
-    console.log("Task : ", Task);
+    const { setTaskLoading, Task: storeTask } = useAppSelector(store => store.task);
+    const { transformTask } = useTask()
+
+    const Task = useMemo(() => {
+        if(storeTask)
+            return transformTask(storeTask)
+    }, [storeTask])
+
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: any) => {
@@ -212,7 +219,9 @@ export default () => {
                         </Box>
                         <Box display="flex" alignItems="center">
                             <Box display="flex" alignItems="center">
-                                <Typography sx={{ fontSize: '14px', color: '#4BA1DB' }}>Open</Typography>
+                                { 
+                                    <Typography sx={{ fontSize: '14px', color: Task?.visual?.color }}>{ Task?.visual?.status }</Typography>
+                                }
                             </Box>
                             <Box sx={{ marginLeft: '22px', cursor: 'pointer' }}>
                                 <img src={editToken} alt="edit-icon" />
