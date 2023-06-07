@@ -62,3 +62,10 @@ export const rejectTaskMemberAction = (payload: any) => {
         payload
     }
 }
+
+export const rejectTaskSubmissionAction = (payload: any) => {
+    return {
+        type: actionTypes.REJECT_TASK_SUBMISSION_ACTION,
+        payload
+    }
+}

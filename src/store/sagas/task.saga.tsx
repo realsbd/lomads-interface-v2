@@ -14,6 +14,7 @@ import {
     draftTaskService,
     getTaskService,
     rejectTaskMemberService,
+    rejectTaskSubmissionService,
     submitTaskService
 }
     from 'store/services/task';
@@ -128,6 +129,18 @@ function* rejectTaskMemberSaga(action: any) {
     }
 }
 
+function* rejectTaskSubmissionSaga(action: any) {
+    try {
+        yield put({ type: actionTypes.REJECT_TASK_SUBMISSION_LOADING, payload: true })
+        const { data } = yield call(rejectTaskSubmissionService, action.payload)
+        yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
+        yield put({ type: actionTypes.SET_TASK_ACTION, payload: data.task })
+        yield put({ type: actionTypes.REJECT_TASK_SUBMISSION_LOADING, payload: false })
+    } catch (e) {
+
+    }
+}
+
 export default function* taskSaga() {
     yield takeLatest(actionTypes.GET_TASK_ACTION, getTaskSaga)
     yield takeLatest(actionTypes.CREATE_TASK_ACTION, createTaskSaga)
@@ -138,4 +151,5 @@ export default function* taskSaga() {
     yield takeLatest(actionTypes.SUBMIT_TASK_ACTION, submitTaskSaga)
     yield takeLatest(actionTypes.ASSIGN_TASK_ACTION, assignTaskSaga)
     yield takeLatest(actionTypes.REJECT_TASK_MEMBER_ACTION, rejectTaskMemberSaga)
+    yield takeLatest(actionTypes.REJECT_TASK_SUBMISSION_ACTION, rejectTaskSubmissionSaga)
 }

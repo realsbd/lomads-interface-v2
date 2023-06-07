@@ -7,6 +7,9 @@ import IconButton from 'components/IconButton';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import CurrencyInput from "components/CurrencyInput";
+import TextEditor from 'components/TextEditor';
+import Switch from "components/Switch";
+import MuiSelect from "components/Select";
 
 import CloseSVG from 'assets/svg/closeNew.svg'
 
@@ -18,11 +21,12 @@ import { beautifyHexToken } from "utils";
 import { useSafeTokens } from "context/safeTokens";
 
 import TASKSVG from 'assets/svg/task.svg'
+import folder from 'assets/svg/folder.svg';
 import { IoIosArrowBack } from 'react-icons/io'
 import compensationStar from 'assets/svg/compensationStar.svg';
 import editToken from 'assets/svg/editToken.svg';
 import compensationIcon from 'assets/svg/compensation.svg';
-import { assignTaskAction, rejectTaskMemberAction } from "store/actions/task";
+import { assignTaskAction, rejectTaskMemberAction, rejectTaskSubmissionAction } from "store/actions/task";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -84,8 +88,13 @@ const useStyles = makeStyles((theme: any) => ({
         borderRadius: '5px !important',
         padding: '0 22px !important',
         marginBottom: '22px !important'
-    }
-
+    },
+    optionalBox: {
+        width: '110px',
+        height: '25px',
+        borderRadius: '100px !important',
+        backgroundColor: 'rgba(118, 128, 141, 0.05) !important'
+    },
 }));
 
 interface Props {
@@ -99,7 +108,9 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
     const { DAO } = useDAO();
     const dispatch = useAppDispatch();
     // @ts-ignore
-    const { Task } = useAppSelector(store => store.task);
+    const { Task, rejectTaskSubmissionLoading } = useAppSelector(store => store.task);
+    // @ts-ignore
+    const { user } = useAppSelector(store => store.session)
     const { safeTokens } = useSafeTokens();
 
     const [activeSubmission, setActiveSubmission] = useState<any>(null);
@@ -112,16 +123,60 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
     const [errorCurrency, setErrorCurrency] = useState<boolean>(false);
     const [errorTaskValue, setErrorTaskValue] = useState<boolean>(false);
 
+    const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [rejectUser, setRejectUser] = useState<any>(null);
+    const [reopen, setReopen] = useState(false);
+    const [rejectionNote, setRejectionNote] = useState('');
+    const [rejectionNoteError, setRejectionNoteError] = useState('');
+
     const taskSubmissions = useMemo(() => {
         if (Task)
             return _get(Task, 'members', []).filter((member: any) => member.submission && (member.status !== 'submission_accepted' && member.status !== 'submission_rejected'))
         return []
     }, [Task]);
 
+    // runs after rejecting a task submission
+    // useEffect(() => {
+    //     if (rejectTaskSubmissionLoading === false) {
+    //         if (taskSubmissions.length > 0) {
+    //             setShowRejectSubmission(false);
+    //             const currIndex = _findIndex(taskSubmissions, (t: any) => t._id === activeSubmission._id)
+    //             const nextSubmission = _get(taskSubmissions, `${currIndex + 1}`, undefined)
+    //             const prevSubmission = _get(taskSubmissions, `${currIndex - 1}`, undefined)
+    //             if (prevSubmission)
+    //                 setActiveSubmission(prevSubmission)
+    //             else if (nextSubmission)
+    //                 setActiveSubmission(nextSubmission)
+    //         }
+    //         else {
+    //             closeModal();
+    //         }
+    //     }
+    // }, [rejectTaskSubmissionLoading]);
+
     useEffect(() => {
         if (!activeSubmission && taskSubmissions.length > 0)
             setActiveSubmission(taskSubmissions[0])
     }, [taskSubmissions]);
+
+    const assignedUser = useMemo(() => {
+        let user = _find(_get(Task, 'members', []), m => m.status === 'approved')
+        if (user)
+            return user.member
+        return null;
+    }, [Task]);
+
+    const eligibleContributors = useMemo(() => {
+        return _get(DAO, 'members', []).filter((m: { member: any; }) => Task.reviewer !== m.member._id && m.member._id !== user._id &&
+            (!assignedUser ||
+                (assignedUser && m.member._id !==
+                    assignedUser?._id))).map((item: any) => { return { label: item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet), value: item.member._id } });
+    }, [DAO, selectedUser, Task]);
+
+    const handleSetApplicant = (value: any) => {
+        let user = _find(DAO.members, m => m.member._id === value);
+        setSelectedUser({ _id: user.member._id, address: user.wallet });
+    }
 
     const handleBack = () => {
         if (activeSubmission) {
@@ -151,6 +206,22 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
         setErrorCurrency(false);
     }
 
+    const handleRejectTask = () => {
+        dispatch(rejectTaskSubmissionAction({
+            payload:
+            {
+                reopen,
+                rejectionNote,
+                contributionType: _get(Task, 'contributionType', ''),
+                isSingleContributor: _get(Task, 'isSingleContributor', ''),
+                newContributorId: selectedUser ? selectedUser._id : null,
+                rejectUser
+            },
+            daoUrl: _get(DAO, 'url', ''),
+            taskId: _get(Task, '_id', '')
+        }));
+    }
+
     const updateCompensation = () => {
         return (
             <Drawer
@@ -162,7 +233,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                 <Box className={classes.modalConatiner}>
                     <Box sx={{ width: '100%', padding: '0 27px' }} display="flex" alignItems="center" justifyContent={"space-between"}>
                         <Typography sx={{ fontSize: 14, color: '#76808D', fontStyle: 'italic' }}>{_get(Task, 'name', '')}</Typography>
-                        <IconButton onClick={() => setShowModifyCompensation(false)}>
+                        <IconButton onClick={() => setShowRejectSubmission(false)}>
                             <img src={CloseSVG} />
                         </IconButton>
                     </Box>
@@ -196,9 +267,9 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                         </Box>
 
                         <Box sx={{ width: '400px', marginTop: '20px' }} display="flex" flexDirection={"column"} alignItems={"center"}>
-                            {/* <Box display={"flex"} alignItems={"center"} sx={{ marginBottom: '10px' }}>
+                            <Box display={"flex"} alignItems={"center"} sx={{ marginBottom: '10px' }}>
                                 <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Compensation</Typography>
-                            </Box> */}
+                            </Box>
                             <CurrencyInput
                                 value={amount}
                                 onChange={(value: any) => handleChangeCompensationAmount(value)}
@@ -213,43 +284,130 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                             />
                         </Box>
 
+                        <Box sx={{ width: '400px' }} display="flex" alignItems={"center"} justifyContent={"space-between"}>
+                            <Button variant="outlined" onClick={() => setShowModifyCompensation(false)}>CANCEL</Button>
+                            <Button variant="contained">CHANGE</Button>
+                        </Box>
+
                     </Box>
                 </Box>
             </Drawer>
-
         )
     }
 
     const renderRejectTask = () => {
         return (
-            <Box></Box>
+            <Drawer
+                PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
+                anchor={'right'}
+                open={showRejectSubmission}
+                hideBackdrop={false}
+            >
+                <Box className={classes.modalConatiner}>
+                    <Box sx={{ width: '100%', padding: '0 27px' }} display="flex" alignItems="center" justifyContent={"space-between"}>
+                        <Typography sx={{ fontSize: 14, color: '#76808D', fontStyle: 'italic' }}>{_get(Task, 'name', '')}</Typography>
+                        <IconButton onClick={() => setShowModifyCompensation(false)}>
+                            <img src={CloseSVG} />
+                        </IconButton>
+                    </Box>
+                    <Box sx={{ width: '100%', height: '100%' }} display="flex" flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                        <img src={TASKSVG} />
+                        <Typography sx={{ fontSize: 30, color: '#C94B32', margin: '35px 0' }}>Reject Submission</Typography>
+
+                        <Box sx={{ width: '300px', margin: '35px 0' }}>
+                            <TextEditor
+                                fullWidth
+                                height={75}
+                                width={300}
+                                placeholder="Why I reject this submission..."
+                                label="Note"
+                                value={rejectionNote}
+                                onChange={(value: string) => { setRejectionNote(value); setRejectionNoteError('') }}
+                                error={rejectionNoteError !== ''}
+                                id={rejectionNoteError !== '' ? "outlined-error-helper-text" : ""}
+                                helperText={rejectionNoteError}
+                            />
+                        </Box>
+
+                        {
+                            Task?.contributionType === 'open' && Task?.isSingleContributor &&
+                            <Box sx={{ width: '300px', marginBottom: '45px' }} display={"flex"} alignItems={"flex-start"}>
+                                <Switch checkedSVG="checkmark" onChange={() => setReopen(prev => !prev)} />
+                                <Box sx={{ marginLeft: '15px' }}>
+                                    <Typography sx={{ fontSize: '16px', color: '#76808D', marginBottom: '6px' }}>REOPEN TASK</Typography>
+                                    <Typography sx={{ fontSize: '14px', color: '#76808D', opacity: '0.5' }}>{_get(assignedUser, 'name', '')} will be removed from the task</Typography>
+                                </Box>
+                            </Box>
+                        }
+
+                        {
+                            Task?.contributionType === 'assign' &&
+                            <Box sx={{ width: '300px', marginBottom: '45px' }}>
+                                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
+                                    <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Change contributor</Typography>
+                                    <Box className={classes.optionalBox} display={"flex"} alignItems={"center"} justifyContent={"center"}>
+                                        <Typography sx={{ color: 'rgba(118, 128, 141, 0.5)', fontWeight: '700' }}>Optional</Typography>
+                                    </Box>
+                                </Box>
+                                <Box sx={{ width: '100%' }}>
+                                    <MuiSelect
+                                        options={eligibleContributors}
+                                        setSelectedValue={(value) => handleSetApplicant(value)}
+                                    />
+                                </Box>
+                            </Box>
+                        }
+
+
+                        <Box sx={{ width: '400px' }} display="flex" alignItems={"center"} justifyContent={"space-between"}>
+                            <Button variant="outlined" onClick={() => setShowRejectSubmission(false)}>CANCEL</Button>
+                            <Button variant="contained" loading={rejectTaskSubmissionLoading} onClick={() => handleRejectTask()}>VALIDATE</Button>
+                        </Box>
+
+                    </Box>
+                </Box>
+            </Drawer>
         )
     }
 
     const renderSingleSubmission = (submission: any) => {
-        // if (!submission) return null;
+        if (!submission) return null;
         return (
             <Box sx={{ width: '400px', height: '100%' }} display="flex" flexDirection={"column"}>
                 <Box display="flex" flexDirection="column" alignItems="center">
                     <img src={TASKSVG} alt="project-resource" />
-                    <Typography className={classes.modalTitle}>Jool did the job!</Typography>
+                    <Typography className={classes.modalTitle}>{submission.member.name} did the job!</Typography>
                 </Box>
 
                 <Box sx={{ width: '100%', margin: '35px 0' }}>
                     <Typography sx={{ fontSize: '16px', color: '#76808D', marginBottom: '14px', fontWeight: '700' }}>Note</Typography>
                     <Typography
-                    // dangerouslySetInnerHTML={{ __html: _get(applicant, 'note', '') }}
+                        dangerouslySetInnerHTML={{ __html: submission.submission.note }}
                     >
-                        Hi, its done ! ipsum dolor sit amet, consecteur adsipicing elit,sed diam.
+                        {/* Hi, its done ! ipsum dolor sit amet, consecteur adsipicing elit,sed diam. */}
                     </Typography>
                 </Box>
 
                 <Box sx={{ width: '100%' }}>
                     <Typography sx={{ fontSize: '16px', color: '#76808D', marginBottom: '14px', fontWeight: '700' }}>Check submission</Typography>
-                    <button className={classes.linkBtn}>CODE GITHUB</button>
-                    <button className={classes.linkBtn}>SCREEN CAPTURE</button>
-                    <button className={classes.linkBtn}>ABC</button>
-                    <button className={classes.linkBtn}>XYZ</button>
+                    {
+                        Task && _get(Task, 'submissionLink', []).length == 0
+                            ?
+                            <>
+                                {submission.submission &&
+                                    _get(submission, 'submission.submissionLink', []).map((item: any, index: number) => {
+                                        return (
+                                            <button className={classes.linkBtn} onClick={() => window.open(item.link, '_blank', 'noopener,noreferrer')}>{item.title}</button>
+                                        )
+                                    })
+                                }
+                            </>
+                            :
+                            <button className='submitLink-btn' onClick={() => window.open(Task.submissionLink, '_blank', 'noopener,noreferrer')}>
+                                <img style={{ marginRight: 8 }} src={folder} />
+                                SUBMISSION LINK
+                            </button>
+                    }
                 </Box>
 
                 <Box className={classes.compensationBox} display="flex" alignItems="center" justifyContent={"space-between"}>
@@ -262,7 +420,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                 </Box>
 
                 <Box sx={{ width: '100%' }} display="flex" alignItems={"center"} justifyContent={"space-between"}>
-                    <Button variant="outlined">REJECT</Button>
+                    <Button variant="outlined" onClick={() => { setRejectUser(submission.member._id); setShowRejectSubmission(true); }}>REJECT</Button>
                     <Button variant="contained">APPROVE</Button>
                 </Box>
 

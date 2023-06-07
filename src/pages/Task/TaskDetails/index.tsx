@@ -140,7 +140,7 @@ export default () => {
     const [openApplyModal, setOpenApplyModal] = useState<boolean>(false);
     const [openSubmitModal, setOpenSubmitModal] = useState<boolean>(false);
     const [openApplicantsModal, setOpenApplicantsModal] = useState<boolean>(false);
-    const [openReviewModal, setOpenReviewModal] = useState<boolean>(!false);
+    const [openReviewModal, setOpenReviewModal] = useState<boolean>(false);
 
     useEffect(() => {
         if (DAO && taskId && (!Task || (Task && Task._id !== taskId)))
