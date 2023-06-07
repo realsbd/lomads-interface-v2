@@ -12,6 +12,8 @@ import ProjectSection from "sections/ProjectSection";
 import MembersSection from "sections/MembersSection";
 import { useAppSelector } from "helpers/useAppSelector";
 import Treasury from "./Treasury";
+import { useWeb3Auth } from "context/web3Auth";
+import useRole from "hooks/useRole";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -25,6 +27,8 @@ export default () => {
     const { daoURL } = useParams();
     const navigate = useNavigate();
     const { DAO, DAOList } = useDAO();
+    const { account } = useWeb3Auth();
+    const { myRole, can } = useRole(DAO, account);
     // @ts-ignore
     const { setProjectLoading, Project } = useAppSelector(store => store.project);
     return (
@@ -47,9 +51,9 @@ export default () => {
                     showProjects={false}
                 />
             </Grid> */}
-            <Grid mt={1} item sm={12}>
+            { can(myRole, 'transaction.view') && <Grid mt={1} item sm={12}>
                 <Treasury />
-            </Grid>
+            </Grid> }
         </Grid>
     )
 }

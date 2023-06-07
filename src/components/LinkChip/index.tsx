@@ -75,7 +75,7 @@ export default ({
     }, [url])
 
     return (
-     <Box className={classes.root}>
+     <Box onClick={() => window.open(url, '_blank')}  className={classes.root}>
         <img className={classes.image} src={image} />
         <Typography className={classes.text}>{ name }</Typography>
      </Box>

@@ -46,11 +46,11 @@ import MembersSection from "sections/MembersSection";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
-        height: '100vh',
-        overflowY: 'scroll',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
+        // height: '100vh',
+        // overflowY: 'scroll',
+        // display: 'flex',
+        // flexDirection: 'column',
+        // justifyContent: 'center',
     },
     arrowContainer: {
         width: '5% !important',
@@ -200,7 +200,7 @@ export default () => {
 
     return (
         <Grid container className={classes.root}>
-            <Grid xs={12} item display="flex" flexDirection="column" sx={{ margin: '107px 0' }}>
+            <Grid xs={12} item display="flex" flexDirection="column">
 
                 <ProjectEditModal
                     open={showEdit}

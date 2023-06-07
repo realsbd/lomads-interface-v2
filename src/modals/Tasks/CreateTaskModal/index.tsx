@@ -198,7 +198,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     //     }
     // }, [account, chainId, user])
 
-    useEffect(() => { setReviewer(user._id) }, [user])
+    useEffect(() => { if(user) setReviewer(user?._id) }, [user])
 
     const eligibleContributors = useMemo(() => {
         return _get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id)

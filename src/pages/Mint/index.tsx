@@ -60,7 +60,7 @@ import { CHAIN_INFO } from 'constants/chainInfo'
 import { WALLET_ADAPTERS } from "@web3auth/base";
 import GMAIL from 'assets/images/gmail.png'
 import APPLE from 'assets/images/apple.png'
-import { createAccountAction, setTokenAction, setNetworkConfig, logoutAction } from 'store/actions/session';
+import { createAccountAction, setTokenAction, setNetworkConfig, logoutAction, updateAccountAction } from 'store/actions/session';
 import HeaderLogo from 'components/HeaderLogo'
 import SwitchChain from 'components/SwitchChain'
 import { useAppDispatch } from 'helpers/useAppDispatch'
@@ -70,6 +70,7 @@ import useDCAuth from 'hooks/useDCAuth'
 import { useTokenContract } from 'hooks/useContract'
 import ExternalPayment from 'components/ExternalPayment'
 import { useDAO } from 'context/dao'
+import { addDAOMemberAction } from 'store/actions/dao'
 // import ExternalPayment from 'components/ExternalPayment'
 const { NFTStorage, File } = require("nft.storage")
 const client = new NFTStorage({ token: process.env.REACT_APP_NFT_STORAGE })
@@ -134,7 +135,8 @@ export default () => {
     console.log("isMobile", isMobile)
     const navigate = useNavigate()
     const { daoURL } = useParams()
-    const { DAO } = useDAO()
+    const { DAO, loadDAO } = useDAO()
+    const { myRole } = useRole(DAO, account)
     const classes = useStyles()
     const dispatch = useAppDispatch()
     const { user, token } = useSelector((store: any) => store.session)
@@ -860,16 +862,21 @@ export default () => {
             }
             setMetadata(metadataJSON)
             setBalance(1);
-            await axiosHttp.patch(`dao/${DAO?.url}/add-member`, { name: state?.name, address: account, role: 'role4' })
-			.then(res => {
-                setTimeout(() => {
-                    setMintLoading(false)
-                    if (contract.redirectUrl) {
-                        //window.location.href = ;
-                        window.open(contract?.redirectUrl.indexOf('http') > -1 ? contract?.redirectUrl : `https://${contract?.redirectUrl}`, '_blank');
-                    }
-                }, 3000)
-            })
+            if(state?.discord) {
+                await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
+                    discordId: state?.discord || null,
+                    userId: _get(user, '_id', ''),
+                    daoId: _get(DAO, '_id')
+                })
+            }
+            dispatch(updateAccountAction({ name: state?.name }))
+            dispatch(addDAOMemberAction({ url: DAO?.url, payload: { name: '', address: account, role: myRole ? myRole : 'role4' } }))
+            loadDAO(DAO?.url);
+            setMintLoading(false)
+            setBalance(1);
+            setTimeout(() => {
+                window.location.href = `/${DAO?.url}`
+            }, 1000)
             return;
         } catch (e) {
             if (typeof e === 'string')

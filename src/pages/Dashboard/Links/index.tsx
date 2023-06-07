@@ -8,6 +8,8 @@ import LinkChip from "components/LinkChip";
 import { useDAO } from "context/dao";
 import Skeleton from '@mui/material/Skeleton';
 import { useNavigate } from "react-router-dom";
+import useRole from "hooks/useRole";
+import { useWeb3Auth } from "context/web3Auth";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -45,11 +47,17 @@ export default () => {
     const navigate = useNavigate()
     const classes = useStyles();
     const { DAO } = useDAO()
+    const { account } = useWeb3Auth();
+    const { myRole, can } = useRole(DAO, account);
 
     if(!DAO) {
         return (
             <Skeleton variant="rectangular" animation="wave" className={classes.root} />
         )
+    }
+
+    if (_get(DAO, 'links', []).length == 0 && !can(myRole, 'settings')) {
+        return null
     }
 
     return (
@@ -65,9 +73,10 @@ export default () => {
                     }
                 </Stack>
             </Box>
+            { can(myRole, 'settings') &&
             <IconButton onClick={() => navigate(`/${DAO?.url}/settings`)}>
                 <img src={SettingsSVG} />
-            </IconButton>
+            </IconButton> }
         </Paper>
     )
 }

@@ -20,6 +20,7 @@ import { useAppSelector } from 'helpers/useAppSelector';
 import { useDAO } from 'context/dao';
 import useRole from 'hooks/useRole';
 import { CHAIN_INFO } from 'constants/chainInfo';
+import { useSafeTokens } from 'context/safeTokens';
 
 const useStyles = makeStyles((theme: any) => ({
   root: {
@@ -98,6 +99,7 @@ export default ({ children, options = true, ...props } : any) => {
   //@ts-ignore
   const { user } = useAppSelector(store => store?.session);
   const { DAO } = useDAO();
+  const { safeTokens } = useSafeTokens();
   const { displayRole } = useRole(DAO, account)
   const { getENSName } = useENS();
   const [accountName, setAccountName] = useState<string>();
@@ -162,6 +164,38 @@ export default ({ children, options = true, ...props } : any) => {
       await switchChain(chainInfo?.chainId)
   }
 
+  const swtBalance = useMemo(() => {
+		if (DAO && user) {
+			const swt = _find(_get(user, 'earnings', []), (e: any) => e.currency === 'SWEAT' && e.daoId === _get(DAO, '_id'))
+			if (swt)
+				return _get(swt, 'value', 0)
+		}
+		return 0
+	}, [user, DAO])
+
+  const tokenDollarBalance = useMemo(() => {
+		if (DAO && user && safeTokens) {
+			let usdVal = 0
+			const myTokens = _get(user, 'earnings', []).filter((e: any) => e.daoId === _get(DAO, '_id'))
+			for (let index = 0; index < myTokens.length; index++) {
+				const myToken = myTokens[index];
+        let safeTkn  = null;
+        let tkns = Object.values(safeTokens);
+        for (let index = 0; index < tkns.length; index++) {
+          const element: any = tkns[index];
+          safeTkn = _find(element, (st: any) => (st?.tokenAddress || process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) === myToken?.currency)
+          if(safeTkn) break;
+        }
+				if (safeTkn) {
+					console.log("safeTkn", safeTkn, myToken)
+					usdVal = usdVal + (+_get(safeTkn, 'fiatConversion', 0) * _get(myToken, 'value', 0))
+				}
+			}
+			return (usdVal || 0).toFixed(2)
+		}
+		return 0
+	}, [user, safeTokens, DAO])
+
   return (
     <Box display="flex" position="relative">
       <Box id="account-options" { ...props }
@@ -189,12 +223,12 @@ export default ({ children, options = true, ...props } : any) => {
              <Box sx={{ mx: 1 }} display="flex" flexDirection="row" alignItems="center">
 									<Box display="flex" flexDirection="row" alignItems="center">
 										<img src={tokenDashboard} />
-										<Typography className={classes.tokenText}>${"0.00"}</Typography>
+										<Typography className={classes.tokenText}>${tokenDollarBalance}</Typography>
 									</Box>
 									{/* {_get(DAO, 'sweatPoints', false) === true && */}
 										<Box sx={{ ml: 1 }} display="flex" flexDirection="row" alignItems="center">
 											<img src={starDashboard} />
-											<Typography className={classes.tokenText}>{"30"}</Typography>
+											<Typography className={classes.tokenText}>{swtBalance}</Typography>
 										</Box>
 									{/* } */}
              </Box>

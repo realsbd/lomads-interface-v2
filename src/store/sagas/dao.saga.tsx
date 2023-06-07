@@ -5,7 +5,7 @@ import {
 } from 'redux-saga/effects';
 import * as actionTypes from 'store/actionTypes';
 import { get as _get } from 'lodash';
-import { loadDAOListService, loadDAOService, updateDAOService } from 'store/services/dao';
+import { loadDAOListService, loadDAOService, updateDAOService, addDAOMemberService } from 'store/services/dao';
 
 function* loadDAOListSaga() {
 	try {
@@ -49,8 +49,20 @@ function* updateDAOSaga(action:any) {
 }
 
 
+function* addDAOMemberSaga(action:any) {
+	try {
+        const { data } = yield call(addDAOMemberService, action.payload)
+        console.log('json, response', data)
+        yield put({ type: actionTypes.UPDATE_DAO_LOADING, payload: false })
+        yield put({ type: actionTypes.LOAD_DAO_SUCCESS, payload: data })
+      } catch (e) {
+        console.log(e)
+      }
+}
+
 export default function* daoSaga() {
 	yield takeLatest(actionTypes.LOAD_DAOLIST_ACTION, loadDAOListSaga)
   yield takeLatest(actionTypes.LOAD_DAO_ACTION, loadDAOSaga)
   yield takeLatest(actionTypes.UPDATE_DAO_ACTION, updateDAOSaga)
+  yield takeLatest(actionTypes.ADD_DAO_MEMBER_ACTION, addDAOMemberSaga)
 }

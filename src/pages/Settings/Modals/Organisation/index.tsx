@@ -214,7 +214,7 @@ const Organisation = ({ open, onClose }: any) => {
                             <AddIcon/>
                         </MuiIconButton>
                     </Box>
-                    <Box className={classes.linkContainer}>
+                    { state?.links?.length > 0 && <Box className={classes.linkContainer}>
                         {
                             state?.links?.map((link: any, _i: number) => {
                                 return (
@@ -233,7 +233,7 @@ const Organisation = ({ open, onClose }: any) => {
                                 )
                             })
                         }
-                    </Box>
+                    </Box> }
                 </Box>
             </Box>
             <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
