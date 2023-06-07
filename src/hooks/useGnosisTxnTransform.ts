@@ -119,7 +119,7 @@ export default (safeAddress: string | undefined) => {
                                     transactionHash: _get(transaction, 'transactionHash', ''),
                                     safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
                                     rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
-                                    offChain: transaction?.offChain,
+                                    offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
                                     nonce: _get(transaction, 'nonce', "0"),
                                     value: _get(decoded, 'value', 0),
                                     formattedValue: (+_get(decoded, 'value', 0) / ( 10 ** nativeToken?.decimals )),
@@ -150,7 +150,7 @@ export default (safeAddress: string | undefined) => {
                                     transactionHash: _get(transaction, 'transactionHash', ''),
                                     safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
                                     rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
-                                    offChain: transaction?.offChain,
+                                    offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
                                     nonce: _get(transaction, 'nonce', "0"),
                                     value: value,
                                     formattedValue: (+value / ( 10 ** (erc20Token?.token?.decimals || erc20Token?.token?.decimal || 18) )),
@@ -185,7 +185,7 @@ export default (safeAddress: string | undefined) => {
                         transactionHash: _get(transaction, 'transactionHash', ''),
                         safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
                         rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
-                        offChain: transaction?.offChain,
+                        offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
                         nonce: _get(transaction, 'nonce', "0"),
                         value: value,
                         formattedValue: (+value / ( 10 ** (allowanceToken?.token?.decimal || allowanceToken?.token?.decimals) )),
@@ -216,7 +216,7 @@ export default (safeAddress: string | undefined) => {
                 transactionHash: _get(transaction, 'transactionHash', ''),
                 safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
                 rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
-                offChain: transaction?.offChain,
+                offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
                 nonce: _get(transaction, 'nonce', "0"),
                 value: value,
                 formattedValue: value === '0x' ? '0x' : (+value / ( 10 ** (transaction?.token?.decimals || transaction?.token?.decimal || 18) )),
@@ -258,7 +258,7 @@ export default (safeAddress: string | undefined) => {
             transactionHash: _get(transaction, 'transactionHash', ''),
             safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
             rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
-            offChain: transaction?.offChain,
+            offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
             nonce: _get(transaction, 'nonce', "0"),
             value: value,
             formattedValue: (+value / ( 10 ** ( erc20Token?.token?.decimals || erc20Token?.token?.decimal || 18 ) )),
@@ -292,7 +292,7 @@ export default (safeAddress: string | undefined) => {
             transactionHash: _get(transaction, 'transactionHash', ''),
             safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
             rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
-            offChain: transaction?.offChain,
+            offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
             nonce: _get(transaction, 'nonce', "0"),
             value: 0,
             formattedValue: "0",
@@ -326,7 +326,7 @@ export default (safeAddress: string | undefined) => {
             safeTxHash: _get(transaction, 'txHash', "0"),
             rejectionSafeTxHash: null,
             nonce: _get(transaction, 'nonce', 0),
-            offChain: transaction?.offChain,
+            offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
             value: value,
             formattedValue: (+value / ( 10 ** (erc20Token?.token?.decimals || erc20Token?.token?.decimal) )),
             symbol: _get(transaction, 'transfers[0].tokenInfo.symbol', null),
@@ -353,27 +353,27 @@ export default (safeAddress: string | undefined) => {
             return data
         } else {
             if(isNativeTokenSingleTransfer(transaction)) {
-                if(transaction._id === "63844dc3f01139e3fe3f7fd7")
+                if(transaction._id === "647f7e0dd77026d2ba13b350")
                     console.log("offChain", "transformNativeTokenSingleTransfer")
                 const data = transformNativeTokenSingleTransfer(transaction)
                 return data
             } else if(isTokenMultiTransfer(transaction)) {
-                if(transaction._id === "63844dc3f01139e3fe3f7fd7")
+                if(transaction._id === "647f7e0dd77026d2ba13b350")
                     console.log("offChain", "transformMultiOpeartion", transaction)
                 const data = transformMultiOpeartion(transaction, labels)
                 return data
             } else if(isERC20TokenSingleTransfer(transaction)) {
-                if(transaction._id === "63844dc3f01139e3fe3f7fd7")
+                if(transaction._id === "647f7e0dd77026d2ba13b350")
                     console.log("offChain", "transferERC20TokenSingleTransfer")
                 const data = transferERC20TokenSingleTransfer(transaction)
                 return data
             } else if(isOperationTransaction(transaction)) {
-                if(transaction._id === "63844dc3f01139e3fe3f7fd7")
+                if(transaction._id === "647f7e0dd77026d2ba13b350")
                     console.log("offChain", "transformOperationTxn")
                 const data = transformOperationTxn(transaction)
                 return data
             } else {
-                if(transaction._id === "63844dc3f01139e3fe3f7fd7")
+                if(transaction._id === "647f7e0dd77026d2ba13b350")
                     console.log("offChain", "transformMultiOpeartion", transaction)
                 const data = transformMultiOpeartion(transaction, labels)
                 return data

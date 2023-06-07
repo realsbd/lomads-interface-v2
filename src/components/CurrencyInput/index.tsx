@@ -1,4 +1,3 @@
-import React from "react";
 import { Box } from "@mui/material"
 import { ReactComponent as DropdownRed } from 'assets/svg/dropdown-red.svg';
 import { ReactComponent as DropupRed } from 'assets/svg/dropup-red.svg';
@@ -13,9 +12,7 @@ import {
     NumberDecrementStepper,
 } from "@chakra-ui/react";
 import { makeStyles } from '@mui/styles';
-import TextInput from 'components/TextInput';
-import IconButton from "components/IconButton";
-import { useState } from "react";
+import React, { useState } from "react";
 
 import { ReactComponent as PolygonIcon } from 'assets/svg/polygon.svg';
 
@@ -63,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default ({ options, onChange, value, dropDownvalue, onDropDownChange, disableCurrency = false, variant = 'primary', errorCurrency, errorProjectValue }) => {
+export default ({ options, onChange, value, dropDownvalue, onDropDownChange, disableCurrency = false, variant = 'primary', errorCurrency, errorProjectValue }: any) => {
     const classes = useStyles()
     const { DAO } = useDAO();
     const { chainId, account } = useWeb3Auth();
@@ -81,12 +78,12 @@ export default ({ options, onChange, value, dropDownvalue, onDropDownChange, dis
                         color='#C94B32'
                         variant='unstyled'
                         style={{ borderRadius: '10px 0 0 10px', borderWidth: 1, borderRightWidth: 0, boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px', backgroundColor: '#FFF' }}
-                        iconSize={15}
+                        // iconSize={15}
                         icon={<DropdownRed />}
                     >
                         <option value="" selected disabled>Select currency</option>
                         {
-                            options && options.map((result, index) => {
+                            options && options.map((result: any, index: number) => {
                                 return (
                                     (
                                         <option value={result?.tokenAddress} key={index}>
@@ -145,12 +142,12 @@ export default ({ options, onChange, value, dropDownvalue, onDropDownChange, dis
                         color='#C94B32'
                         variant='unstyled'
                         style={{ borderRadius: '10px 0 0 10px', borderWidth: 1, borderRightWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px', backgroundColor: '#FFF' }}
-                        iconSize={15}
+                        // iconSize={15}
                         icon={<DropdownRed />}
                     >
                         <option value="" selected disabled>Select currency</option>
                         {
-                            options && options.map((result, index) => {
+                            options && options.map((result: any, index: number) => {
                                 return (
                                     (
                                         <option value={result?.tokenAddress} key={index}>

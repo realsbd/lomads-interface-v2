@@ -26,7 +26,7 @@ export default ({ transaction, recipient }: any) => {
 
     const tag = useMemo(() => {
         if(transaction && recipient) {
-            const metadata = _get(transaction, `metadata.${recipient}`, null)
+            const metadata = _get(transaction, `metadata.${recipient === '0x' ? transaction?.safeAddress : recipient}`, null)
             if(metadata){
                 return metadata?.tag
             }

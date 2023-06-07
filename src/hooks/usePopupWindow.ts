@@ -23,7 +23,6 @@ const usePopupWindow = (
   const [windowInstance, setWindowInstance] = useState<Window | null>(null)
 
   const onOpen = (uri: string) => {
-    console.log("uri : ", uri);
     const dualScreenLeft = window.screenLeft ?? window.screenX
     const dualScreenTop = window.screenTop ?? window.screenY
     //eslint-disable-next-line
@@ -38,20 +37,17 @@ const usePopupWindow = (
     windowFeatures.left = windowFeatures.left ?? left
     windowFeatures.top = windowFeatures.top ?? top
 
-    const w = window.open(
-      uri,
-      "_blank",
-      Object.entries({ ...defaultWindowFeatures, ...windowFeatures })
-        .map(([key, value]) =>
-          typeof value === "number" ? `${key}=${value}` : key
-        )
-        .join(",")
+    setWindowInstance(
+      window.open(
+        uri,
+        "_blank",
+        Object.entries({ ...defaultWindowFeatures, ...windowFeatures })
+          .map(([key, value]) =>
+            typeof value === "number" ? `${key}=${value}` : key
+          )
+          .join(",")
+      )
     )
-    console.log("w : ", w)
-
-    setWindowInstance(w);
-    return w;
-
   }
 
   useEffect(() => {

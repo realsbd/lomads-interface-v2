@@ -19,6 +19,7 @@ export default ({ name, wallet, hideDetails, ...props }: any) => {
     return (
         <Box style={{ display: 'flex', width: '100%', position: 'relative' }}>
             <Avatar
+                key={`${name}-${wallet}`}
                 size={32}
                 name={wallet}
                 variant="marble"

@@ -8,7 +8,8 @@ export function getInitialState() {
     DAOLoading: false,
     DAOListLoading: false,
     DAO: null,
-    DAOList: null
+    DAOList: null,
+    updateDAOLoading: null
   };
 }
 
@@ -30,12 +31,12 @@ const DAOReducer = (state: any = getInitialState(), action: any) =>
         draft.DAOLoading = false
         break;
       }
-      case actionTypes.LOAD_DAO_LOADING: {
-        draft.DAOLoading = payload;
+      case actionTypes.UPDATE_DAO_LOADING: {
+        draft.updateDAOLoading = payload
         break;
       }
-      case actionTypes.SET_DAO_ACTION: {
-        draft.DAO = payload;
+      case actionTypes.LOAD_DAO_LOADING: {
+        draft.DAOLoading = payload;
         break;
       }
       case actionTypes.SET_DAO_OPTION_ACTION: {

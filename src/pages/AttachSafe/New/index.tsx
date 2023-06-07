@@ -9,14 +9,14 @@ import Button from "components/Button";
 import plusIcon from 'assets/svg/plusIcon.svg';
 import closeOrange from 'assets/svg/closeOrange.svg';
 import GreyAddIcon from 'assets/svg/ADD.svg';
+import { EthSafeSignature } from "@safe-global/protocol-kit"
 import useENS from "hooks/useENS";
 import { useAppSelector } from "helpers/useAppSelector";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { toast } from 'react-hot-toast';
 import axiosHttp from 'api'
 import { SUPPORTED_CHAIN_IDS, SupportedChainId, CHAIN_GAS_STATION } from 'constants/chains'
-// import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
-// import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
+import Safe, { EthersAdapter, SafeFactory, SafeAccountConfig  } from '@safe-global/protocol-kit'
 import { ethers } from "ethers";
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { Box, Typography, Container, Grid, Menu, MenuItem, Skeleton } from "@mui/material"
@@ -27,6 +27,7 @@ import { useWeb3Auth } from "context/web3Auth";
 import { isAddressValid, isRightAddress } from 'utils'
 import SwitchChain from "components/SwitchChain";
 import { useDAO } from "context/dao";
+import { retry } from "utils";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -520,31 +521,6 @@ export default () => {
 		}
     }
 
-
-	const waitFor = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
-
-	const retry = (promise: any, onRetry: any, maxRetries: number) => {
-		const retryWithBackoff: any = async (retries: number) => {
-			try {
-				if (retries > 0) {
-					const timeToWait = 2 ** retries * 1000;
-					console.log(`waiting for ${timeToWait}ms...`);
-					await waitFor(timeToWait);
-				}
-				return await promise();
-			} catch (e) {
-				if (retries < maxRetries) {
-					onRetry();
-					return retryWithBackoff(retries + 1);
-				} else {
-					console.warn("Max retries reached. Bubbling the error up");
-					throw e;
-				}
-			}
-		}
-		return retryWithBackoff(0);
-	}
-
     const hasNewSafe = async (currentSafes: any) => {
 		try {
 			const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
@@ -608,70 +584,72 @@ export default () => {
 	}
 
     const deployNewSafe = async () => {
-		// if(!chainId) return;
-		// if(+state?.selectedChainId !== +chainId) {
-        //     toast.custom(t => <SwitchChain t={t} nextChainId={+state?.selectedChainId}/>)
-        // } else {
-		// 	try {
-        //         setisLoading(true);
-		// 		const safeOwner = provider?.getSigner(0);
-		// 		const ethAdapter = new EthersAdapter({
-		// 			ethers,
-		// 			signerOrProvider: safeOwner as any,
-		// 		});
-		// 		const safeFactory = await SafeFactory.create({ethAdapter});
-		// 		const owners: any = state?.members?.map((result: any) => result.address);
-		// 		const threshold: number = state?.threshold;
-		// 		const safeAccountConfig: SafeAccountConfig = { owners, threshold };
+		if(!chainId) return;
+		if(+state?.selectedChainId !== +chainId) {
+            toast.custom(t => <SwitchChain t={t} nextChainId={+state?.selectedChainId}/>)
+        } else {
+			try {
+                setisLoading(true);
+				const safeOwner = provider?.getSigner();
+				const ethAdapter = new EthersAdapter({
+				  ethers,
+				  signerOrProvider: safeOwner as any,
+				});
+				const safeFactory = await SafeFactory.create({ ethAdapter });
+				const owners: any = state?.members?.map((result: any) => result.address);
+				const threshold: number = state?.threshold;
+				const safeAccountConfig: SafeAccountConfig = { owners, threshold };
 		
-		// 		let currentSafes: Array<string> = []
-		// 		if (chainId === SupportedChainId.POLYGON)
-		// 			currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
-		// 		await safeFactory
-		// 			.deploySafe({ safeAccountConfig })
-		// 			.then(async (tx) => {
-        //                 console.log("txn txn", tx)
-		// 				const value = state?.members?.reduce((final: any, current: any) => {
-		// 					let object = final.find(
-		// 						(item: any) => item.address === current.address
-		// 					);
-		// 					if (object) {
-		// 						return final;
-		// 					}
-		// 					return final.concat([current]);
-		// 				}, []);
-        //                 const params = {
-        //                     members: value.map((m: any) => {
-        //                         return {
-        //                             ...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
-        //                         }
-        //                     }),
-        //                     safe: {
-        //                         name: state?.safeName,
-        //                         address: tx.getAddress(),
-        //                         owners: owners,
-        //                         chainId: state?.selectedChainId
-        //                     }
-        //                 }
-        //                 axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
-        //                 .then(res => {
-        //                     setisLoading(false);
-        //                     window.location.href = `/${daoURL}`
-        //                 })
-		// 			})
-		// 			.catch(async (err) => {
-		// 				console.log("An error occured while creating safe", err);
-		// 				if (chainId === SupportedChainId.POLYGON) {
-		// 					checkNewSafe(currentSafes, owners)
-		// 				} else {
-		// 					setisLoading(false);
-		// 				}
-		// 			});
-		// 	} catch (e) {
-		// 		setisLoading(false);
-		// 		console.log(e)
-		// 	}
-		// }
+				let currentSafes: Array<string> = []
+				if (chainId === SupportedChainId.POLYGON)
+					currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+				console.log("safeFactory", safeFactory, safeAccountConfig)
+				await safeFactory
+					.deploySafe({ safeAccountConfig })
+					.then(async (tx) => {
+                        console.log("txn txn", tx, tx.getAddress())
+						const value = state?.members?.reduce((final: any, current: any) => {
+							let object = final.find(
+								(item: any) => item.address === current.address
+							);
+							if (object) {
+								return final;
+							}
+							return final.concat([current]);
+						}, []);
+                        const params = {
+                            members: value.map((m: any) => {
+                                return {
+                                    ...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
+                                }
+                            }),
+                            safe: {
+                                name: state?.safeName,
+								threshold: state?.threshold,
+                                address: await tx.getAddress(),
+                                owners: owners,
+                                chainId: state?.selectedChainId
+                            }
+                        }
+                        axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
+                        .then(res => {
+                            setisLoading(false);
+                            window.location.href = `/${daoURL}`
+                        })
+					})
+					.catch(async (err) => {
+						console.log("An error occured while creating safe", err);
+						if (chainId === SupportedChainId.POLYGON) {
+							checkNewSafe(currentSafes, owners)
+						} else {
+							setisLoading(false);
+						}
+					});
+			} catch (e) {
+				setisLoading(false);
+				console.log(e)
+			}
+		}
 	};
 
     const deployNewSafeDelayed = useCallback(_debounce(deployNewSafe, 1000), [deployNewSafe])

@@ -30,7 +30,7 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
     const { chainId: currentChainId } = useWeb3Auth()
     const { loadSafe } = useSafe()
     const { confirmTransaction, rejectTransaction, executeTransaction } = useGnosisSafeTransaction()
-    const { confirmTransaction: offChainConfirmTransaction} = useOffChainTransaction()
+    const { confirmTransaction: offChainConfirmTransaction, rejectTransaction: offChainRejectTransaction, executeTransaction: offChainExecuteTransaction } = useOffChainTransaction()
 
     const isMultiTxn = useMemo(() => txnCount > 1, [transaction, txnCount])
 
@@ -67,8 +67,10 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
             try {
                 setRejectLoading(true)
                 const payload: RejectTransaction = { safeAddress, chainId, _nonce: transaction?.nonce }
-                const txn = await rejectTransaction(payload)
-                console.log(txn)
+                if(transaction?.offChain)
+                    await offChainRejectTransaction({ ...payload, safeTxnHash: transaction?.rejectionSafeTxHash })
+                else 
+                    await rejectTransaction(payload)
                 setRejectLoading(false)
             } catch(e) {
                 console.log(e)
@@ -85,8 +87,10 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
             try {
                 setExecuteTxLoading(true)
                 const payload: ExecuteTransaction = { safeTxnHash, safeAddress, chainId }
-                const txn = await executeTransaction(payload)
-                console.log(txn)
+                if(transaction?.offChain)
+                    await offChainExecuteTransaction(payload)
+                else
+                    await executeTransaction(payload)
                 setExecuteTxLoading(false)
             } catch(e) {
                 console.log(e)
@@ -107,16 +111,16 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
                         <Box>
                             { 
                                 transaction?.canExecuteTxn ? 
-                                <Tooltip title={transaction.nonce !== executableNonce ? `Transaction from safe ${beautifyHexToken(safeAddress)} with nonce ${executableNonce} needs to be executed first` : `Execute nonce ${executableNonce}`} placement="top-start">
+                                <Tooltip title={!transaction.offChain && (transaction.nonce !== executableNonce) ? `Transaction from safe ${beautifyHexToken(safeAddress)} with nonce ${executableNonce} needs to be executed first` : `Execute nonce ${transaction?.nonce}`} placement="top-start">
                                     <span>
-                                        <Button loading={executeTxLoading} disabled={executeTxLoading || transaction.nonce !== executableNonce} onClick={() => handleExecuteTransaction(transaction?.safeTxHash)} sx={{ height: 30, padding: 0, minWidth: 120, width: 120, fontSize: 14 }} size="small" variant="contained" color="primary">Execute</Button>
+                                        <Button loading={executeTxLoading} disabled={executeTxLoading || (!transaction.offChain && (transaction.nonce !== executableNonce))} onClick={() => handleExecuteTransaction(transaction?.safeTxHash)} sx={{ height: 30, padding: 0, minWidth: 120, width: 120, fontSize: 14 }} size="small" variant="contained" color="primary">Execute</Button>
                                     </span>
                                 </Tooltip>
                                  : 
                                 transaction?.canRejectTxn ? 
-                                <Tooltip title={transaction.nonce !== executableNonce ? `Transaction from safe ${beautifyHexToken(safeAddress)} with nonce ${executableNonce} needs to be executed first` : `Execute nonce ${executableNonce}`} placement="top-start">
+                                <Tooltip title={!transaction.offChain && (transaction.nonce !== executableNonce) ? `Transaction from safe ${beautifyHexToken(safeAddress)} with nonce ${executableNonce} needs to be executed first` : `Execute nonce ${transaction?.nonce}`} placement="top-start">
                                     <span>
-                                        <Button loading={executeTxLoading}  disabled={executeTxLoading || transaction.nonce !== executableNonce} onClick={() => handleExecuteTransaction(transaction?.rejectionSafeTxHash)} sx={{ height: 30, padding: 0, minWidth: 120, width: 120, fontSize: 14 }} size="small" variant="contained" color="primary">Reject</Button> 
+                                        <Button loading={executeTxLoading}  disabled={executeTxLoading || (!transaction.offChain && (transaction.nonce !== executableNonce))}  onClick={() => handleExecuteTransaction(transaction?.rejectionSafeTxHash)} sx={{ height: 30, padding: 0, minWidth: 120, width: 120, fontSize: 14 }} size="small" variant="contained" color="primary">Reject</Button> 
                                     </span>
                                  </Tooltip>
                                 : null

@@ -1,5 +1,5 @@
 // @ts-nocheck 
-import Safe, { EthersAdapter } from '@safe-global/protocol-kit'
+import Safe, { EthersAdapter, SafeFactory, SafeAccountConfig  } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 // import Safe from "@gnosis.pm/safe-core-sdk";
 // import SafeServiceClient from "@gnosis.pm/safe-service-client";

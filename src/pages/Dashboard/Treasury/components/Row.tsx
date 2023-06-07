@@ -31,6 +31,9 @@ export default ({ transaction, executableNonce }: any) => {
     }, [transaction])
 
     if(!txn) return null
+    
+    if(transaction?.rawTx?.rejectedTxn)
+        console.log("transaction?.rejectedTxn", transaction?.rawTx?.rejectedTxn)
 
     return (
         <>

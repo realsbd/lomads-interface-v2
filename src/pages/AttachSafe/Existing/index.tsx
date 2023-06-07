@@ -402,6 +402,7 @@ export default () => {
             safe: {
                 name: state?.safeName,
                 address: selectedSafeAddress,
+				threshold: safe?.threshold,
                 owners: totalAddresses.map((a:any) => a.address),
                 chainId: state?.selectedChainId
             }
