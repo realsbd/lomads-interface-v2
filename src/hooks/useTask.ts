@@ -171,11 +171,91 @@ export default () => {
         }
     }
 
+    const getTaskBody = (task: any) => {
+        if(task.taskStatus === 'open' && !task.archivedAt && !task.deletedAt) {
+            if(amICreator(task)) {
+                if(task.contributionType === 'open' && task.isSingleContributor == false) {
+                    return { renderBody: 'SHOW_SUBMISSIONS' }
+                } else {
+                    return { renderBody: 'SHOW_APPLICATIONS' }
+                }
+            } else {
+                if(amIApplicant(task)) {
+                    if(amIRejected(task)) {
+                        return { renderBody: 'SUBMISSION_REJECTED' }
+                    } else {
+                        if(task.contributionType === 'open' && hasMySubmission(task)) {
+                            if(isMySubmissionAccepted(task)) {
+                                return { renderBody: 'WELL_DONE' }
+                            } else {
+                                return { renderBody: 'WAITING_FOR_VALIDATION' }
+                            }
+                        } else {
+                            return { renderBody: 'REVIEWER_LOOKING_AT_APPLICATION'  }
+                        }
+                    }
+                } else {
+                    if(task.validRoles.length > 0 && !task.archivedAt && !task.deletedAt) {
+                        if( amIEligible(task) || amIEligibleDiscord(task)) {
+                            if(task.isSingleContributor) {
+                                return { renderBody: 'FITS_YOUR_ROLE_APPLY'  }
+                            } else {
+                                return { renderBody: 'FITS_YOUR_ROLE_SUBMIT'  }
+                            }
+                        } else {
+                            return { renderBody: 'DOES_NOT_FIT_YOUR_ROLE'  }
+                        }
+                    } else if(!task.archivedAt && !task.deletedAt) {
+                        if(task.isSingleContributor) {
+                            return { renderBody: 'TASK_NEEDS_CONTRIBUTOR'  }
+                        } else {
+                            return { renderBody: 'OPEN_FOR_ALL'  }
+                        }
+                    }
+                }
+            }
+        } else if (task.taskStatus === 'assigned' && !task.archivedAt && !task.deletedAt) {
+            if(amIApproved(task)) {
+                return { renderBody: 'YOU_ARE_ASSIGNED'  }
+            } else {
+                if(amIRejected(task)) {
+                    return { renderBody: 'SUBMISSION_REJECTED'  }
+                } else {
+                    return { renderBody: 'USER_ASSIGNED'  }
+                }
+            }
+        } else if (task.taskStatus === 'submitted' && !task.archivedAt && !task.deletedAt) {
+            if(amIApproved(task)) {
+                return { renderBody: 'WAITING_FOR_VALIDATION' }
+            } else {
+                return { renderBody: 'TASK_SUBMITTED' }
+            }
+        } else if ((task.taskStatus === 'approved' || task.taskStatus === 'paid') && !task.archivedAt && !task.deletedAt) {
+            if(amIApproved(task)) {
+                return { renderBody: 'WELL_DONE' }
+            } else {
+                return { renderBody: 'TASK_STATUS' }
+            }
+        } else if ( task.taskStatus === 'rejected' && !task.archivedAt && !task.deletedAt) {
+            if(amIRejected(task)) {
+                if(task.reopenedAt) {
+                    return { renderBody: 'SUBMISSION_REJECTED' }
+                } else {
+                    return { renderBody: 'SUBMISSION_REJECTED_SUBMIT_AGAIN' }
+                }
+            } else {
+                return { renderBody: 'SUBMISSION_STATUS' }
+            }
+        }
+        return { renderBody: null }
+    }
+
     const transformTask = (task: any) => {
         return {
             ...task,
             visual: {
-                ...getTaskStatus(task)
+                ...getTaskStatus(task),
+                ...getTaskBody(task)
             }
         }
     }
