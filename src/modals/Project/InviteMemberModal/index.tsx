@@ -88,6 +88,7 @@ export default ({ open, closeModal }: Props) => {
                 </Box>
             )
         }
+        return null
     }
 
     return (
