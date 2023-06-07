@@ -17,6 +17,7 @@ import PassTokenModalV2 from "./Modals/PassToken/index.v2";
 import PassTokenModal from "./Modals/PassToken";
 import TerminologyModal from "./Modals/Terminology";
 import RolesModal from "./Modals/Roles";
+import XPPoints from "./Modals/XPPoints";
 import IconButton from "components/IconButton";
 import { useDAO } from "context/dao";
 import theme from "theme";
@@ -81,6 +82,8 @@ export default () => {
             return TerminologyModal
         if(activeModal === RolesModal.name)
             return RolesModal
+        if(activeModal === XPPoints.name)
+            return XPPoints
         return Fragment
     }, [activeModal])
 
@@ -100,7 +103,7 @@ export default () => {
                     <Content onClick={() => setActiveModal( +(_get(DAO, 'sbt.version', 0)) >= 2 ? PassTokenModalV2.name : PassTokenModal.name)} icon={PassTokens} title="Pass Tokens" />
                 </Grid>
                 <Grid item sm={6} md={4} xs={1}>
-                    <Content onClick={() => {}} icon={XpPoints} title="XP Points" />
+                    <Content onClick={() => setActiveModal(XPPoints.name)} icon={XpPoints} title="SWEAT Points" />
                 </Grid>
                 <Grid item sm={6} md={4} xs={1}>
                     <Content onClick={() => setActiveModal(TerminologyModal.name)}  icon={Terminology} title="Terminology" />

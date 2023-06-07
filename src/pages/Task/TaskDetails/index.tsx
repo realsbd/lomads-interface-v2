@@ -213,6 +213,21 @@ export default () => {
         )
     }
 
+    const showSubmissions = () => {
+        return <div>
+
+        </div>
+    }
+
+    const renderBody = (body: string) => {
+        switch(body) {
+            case 'SHOW_SUBMISSIONS': 
+                return showSubmissions()
+            default:
+                return null
+        }
+    }
+
     return (
         <Grid container className={classes.root}>
 
@@ -383,7 +398,8 @@ export default () => {
                             sx={{ fontSize: '14px', color: '#1B2B41' }}></Typography>
                     </Box>
                     <Box className={classes.detailsContainer} display="flex" flexWrap={"wrap"} alignItems="center" justifyContent={"center"}>
-                        <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenApplyModal(true)}>
+                        { renderBody(Task?.visual?.renderBody) }
+                        {/* <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenApplyModal(true)}>
                             APPLY
                         </Button>
                         <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenSubmitModal(true)}>
@@ -394,7 +410,7 @@ export default () => {
                         </Button>
                         <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenReviewModal(true)}>
                             REVIEW
-                        </Button>
+                        </Button> */}
                     </Box>
                 </Box>
 

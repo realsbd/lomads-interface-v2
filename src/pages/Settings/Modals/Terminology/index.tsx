@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: any) => ({
         fontWeight: '400 !important',
         fontSize: '14px !important',
         lineHeight: '19px !important',
-        color: '#1B2B41',
+        color: '#76808d',
         "& span": {
             fontWeight: '600 !important', 
         }
