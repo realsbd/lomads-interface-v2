@@ -5,7 +5,7 @@ import { useDAO } from "context/dao";
 export default () => {
     const { DAO } = useDAO();
 
-    const loadSafe = useCallback((safeAddress: string) => {
+    const loadSafe = useCallback((safeAddress: string = '') => {
         return _find(DAO?.safes, (safe:any) => safe?.address === safeAddress)
     }, [DAO])
 

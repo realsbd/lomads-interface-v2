@@ -209,10 +209,19 @@ const useStyles = makeStyles((theme: any) => ({
         color: "rgba(118, 128, 141, 0.5) !important"
     },
     subtitle: {
+        marginLeft: '20px !important',
         fontSize: '14px !important',
         fontWeight: "400 !important",
         lineHeight: '19px !important',
-        color: "#1b2b41 !important"
+        color: "#1b2b41 !important",
+        display: '-webkit-box',
+        maxWidth: '500px',
+        maxHeight: '60px',
+        margin: '0 auto',
+        '-webkit-line-clamp': '2',
+        '-webkit-box-orient': 'vertical',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
     },
   }));
 
@@ -282,7 +291,7 @@ export default ({ children }: any) => {
                                     <img src={LINK_SVG} />
                                   </IconButton>
                         </Box>
-                        <Typography sx={{ marginLeft: "20px", maxWidth: 500 }} className={classes.subtitle}>{_get(DAO, 'description', '')}</Typography>
+                        <Typography className={classes.subtitle}>{_get(DAO, 'description', '')}</Typography>
                     </Box>
                     <Account/>
                 </Box>
