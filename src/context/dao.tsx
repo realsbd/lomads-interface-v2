@@ -41,13 +41,19 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }
 
   useEffect(() => {
-    if (account && token && !DAOList)
+    if(!token)
+      navigate(`/login`)
+  }, [token])
+
+  useEffect(() => {
+    if ((!daoURL || daoURL) && account && token && !DAOList){
+      resetDAO()
       loadDAOList()
-  }, [account, token, DAOList])
+    }
+  }, [account, token, DAOList, daoURL])
 
   useEffect(() => {
     if (DAOList && !daoURL && window.location.pathname === '/') {
-      console.log("DAOList", DAOList)
       if (DAOList.length > 0)
         navigate(`/${_get(DAOList, '[0].url')}`)
       else
@@ -66,8 +72,12 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
             navigate(`/${DAO?.url}/mint/${DAO?.sbt?.address}`)
           } else {
             // NOT WHITELISTED
+            navigate(`/${DAO?.url}/only-whitelisted`)
           }
         }
+      })
+      .catch(e => {
+        console.log(e)
       })
     }
   }, [DAO?.url, provider, account])
@@ -92,7 +102,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }
 
   const contextProvider = {
-    DAO, DAOList, resetDAO, updateDAO
+    DAO, DAOList, resetDAO, updateDAO, loadDAO
   };
   return <DAOContext.Provider value={contextProvider}>
     {

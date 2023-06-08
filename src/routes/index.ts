@@ -3,6 +3,7 @@ import LandingLayout from 'layouts/LandingLayout';
 import DashboardLayout from 'layouts/DashboardLayout';
 import SettingsLayout from 'layouts/SettingsLayout';
 import PrimaryLayout from 'layouts/PrimaryLayout';
+import DefaultLayout from 'layouts/DefaultLayout';
 
 import LoginPage from 'pages/Login';
 import DashboardPage from 'pages/Dashboard';
@@ -16,6 +17,7 @@ import CreateOrganisation from 'pages/CreateOrganisation';
 import CreatePassTokenPage from 'pages/CreatePassToken'
 import DCAuthPage from 'pages/DCAuth';
 import MintPage from 'pages/Mint';
+import OnlyWhitelistedPage from 'pages/OnlyWhitelisted';
 
 export default [
 	{
@@ -47,6 +49,13 @@ export default [
 		component: AttachNewSafePage
 	},
 	{
+		path: '/:daoURL/only-whitelisted',
+		exact: true,
+		layout: DefaultLayout,
+		private: false,
+		component: OnlyWhitelistedPage
+	},
+	{
 		path: '/:daoURL/attach-safe/existing',
 		exact: true,
 		layout: LandingLayout,
@@ -56,7 +65,7 @@ export default [
 	{
 		path: '/:daoURL/project',
 		exact: true,
-		layout: LandingLayout,
+		layout: DefaultLayout,
 		private: true,
 		component: DashboardPage
 	},
@@ -105,14 +114,14 @@ export default [
 	{
 		path: '/:daoURL/project/:projectId',
 		exact: true,
-		layout: LandingLayout,
+		layout: DefaultLayout,
 		private: true,
 		component: ProjectDetailsPage
 	},
 	{
 		path: '/:daoURL/task/:taskId',
 		exact: true,
-		layout: LandingLayout,
+		layout: DefaultLayout,
 		private: true,
 		component: TaskDetailsPage
 	},

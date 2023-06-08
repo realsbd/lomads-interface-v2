@@ -17,6 +17,12 @@ import CurrencyInput from "components/CurrencyInput";
 import { useSafeTokens } from "context/safeTokens";
 import Avatar from "components/Avatar";
 import CreatableSelectTag from "components/CreatableSelectTag";
+import { CHAIN_INFO } from "constants/chainInfo";
+import useSafe from "hooks/useSafe";
+import useGnosisSafeTransaction from "hooks/useGnosisSafeTransaction";
+import { toast } from "react-hot-toast";
+import SwitchChain from "components/SwitchChain";
+import { useWeb3Auth } from "context/web3Auth";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -45,18 +51,50 @@ const useStyles = makeStyles((theme: any) => ({
 
 const XPPoints = ({ open, onClose }: any) => {
     const classes = useStyles()
+    const { chainId } = useWeb3Auth()
     const [activeTab, setActiveTab] = useState<number>(1)
+    const [txnLoading, setTxnLoading] = useState<boolean>(false)
     const { DAO } = useDAO()
+    const { loadSafe } = useSafe()
     const { safeTokens } = useSafeTokens()
+    const { createSafeTransaction } = useGnosisSafeTransaction()
     const [enabled, setEnabled] = useState(false);
     const [showDisableAlert, setShowDisableAlert] = useState(false);
-    const [state, setState] = useState<any>({})
+    const [state, setState] = useState<any>({
+        sweatValue: 0
+    })
+
+    const safe = useMemo(() => {
+        return loadSafe(state?.safeAddress)
+    }, [state?.safeAddress])
 
     useEffect(() => {
         if(DAO?.url) {
             setEnabled(DAO?.sweatPoints)
         }
     }, [DAO?.url])
+
+    const handleCreateTransaction = async () => {
+        if(+safe?.chainId !== +chainId) {
+            toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId}/>)
+        } else {
+            const send = sweatMembers?.map((member:any) => { return { recipient: member?.member?.wallet, amount: member?.amount, label: "Sweat conversion", tag: state?.tag, sweatConversion: true } })
+            try {
+                setTxnLoading(true)
+                await createSafeTransaction({
+                    safeAddress: state?.safeAddress,
+                    chainId: safe?.chainId,
+                    tokenAddress: state?.currency,
+                    send
+                })
+                setTxnLoading(false)
+                onClose()
+            } catch (e) {
+                setTxnLoading(false)
+                console.log(e)
+            }
+        }
+    }
 
     const sweatMembers = useMemo(() => {
         if(DAO) {
@@ -70,7 +108,9 @@ const XPPoints = ({ open, onClose }: any) => {
           return members
         }
         return []
-      }, [DAO])
+      }, [DAO.url, state?.sweatValue])
+
+    
 
     const total = useMemo(() => {
         let t = 0;
@@ -80,7 +120,7 @@ const XPPoints = ({ open, onClose }: any) => {
           t = t + (_get(sweat, 'value', 0) * (+state?.sweatValue))
         }
         return t;
-      }, [sweatMembers])
+      }, [sweatMembers, state?.sweatValue])
 
     const Tab1 = () => {
         return (
@@ -136,7 +176,11 @@ const XPPoints = ({ open, onClose }: any) => {
                 </Box>
                 <Box>
                     <Box sx={{ my: 4 }} component="form" noValidate autoComplete="off">
-                        <TextInput id="outlined-select-currency" select fullWidth label="Treasury" value={state?.safeAddress} onChange={(e:any) =>  setState((prev:any) => { return { ...prev, safeAddress: e.target.value } })}>
+                        <TextInput id="outlined-select-currency" select fullWidth label="Treasury" value={state?.safeAddress} 
+                            onChange={(e:any) =>  setState((prev:any) => {
+                                 return { ...prev, safeAddress: e.target.value, currency: _get(_get(safeTokens, e.target.value, ''), '[0].tokenAddress', null) } 
+                            })}
+                        >
                             {
                                 DAO?.safes?.map((safe:any) => {
                                     return (
@@ -170,7 +214,7 @@ const XPPoints = ({ open, onClose }: any) => {
                     <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
                         <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
                             <Button onClick={() => setActiveTab(1)} sx={{ mr:1 }} fullWidth variant='outlined' size="small">Cancel</Button>
-                            <Button onClick={() => setActiveTab(3)} sx={{ ml:1 }}  fullWidth variant='contained' size="small">Next</Button>
+                            <Button disabled={!(state?.safeAddress && state?.currency && (+state?.sweatValue > 0))} onClick={() => setActiveTab(3)} sx={{ ml:1 }}  fullWidth variant='contained' size="small">Next</Button>
                         </Box>
                     </Box>
                 </Box>
@@ -198,16 +242,16 @@ const XPPoints = ({ open, onClose }: any) => {
                                                     <Avatar name={member?.member?.name} wallet={member?.member?.wallet} />
                                                 </TableCell>
                                                 <TableCell padding="none" align="right">
-                                                    <img style={{ marginTop: 2, width: 16, height: 16 }} src={StarSvg} />
+                                                    <img style={{ marginTop: 2, width: 16, height: 16 }} src={XPPointsIconSvg} />
                                                 </TableCell>
                                                 <TableCell padding="none" align="right">
                                                     <Typography>{ sweat?.value } SWT   =</Typography>
                                                 </TableCell>
                                                 <TableCell padding="none" align="right">
-                                                        <Typography style={{ fontWeight: 700 }}>50</Typography>
+                                                        <Typography style={{ fontWeight: 700 }}>{ (sweat?.value * (+state?.sweatValue)).toFixed(3) }</Typography>
                                                 </TableCell>
                                                 <TableCell padding="none" align="left">
-                                                    <img style={{ marginLeft: 6, marginTop: 2, width: 16, height: 16 }} src={StarSvg} />
+                                                    <img style={{ marginLeft: 6, marginTop: 2, width: 16, height: 16 }} src={ state?.currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[safe?.chainId].logoUrl : StarSvg } />
                                                 </TableCell>
                                             </TableRow>
                                         )
@@ -224,10 +268,10 @@ const XPPoints = ({ open, onClose }: any) => {
                                         <Typography>Total =</Typography>
                                     </TableCell>
                                     <TableCell padding="none" align="right">
-                                            <Typography style={{ fontWeight: 700 }}>5</Typography>
+                                        <Typography style={{ fontWeight: 700 }}>{ (total).toFixed(3) }</Typography>
                                     </TableCell>
                                     <TableCell padding="none" align="left">
-                                        <img style={{ marginLeft: 6, marginTop: 2, width: 16, height: 16 }} src={StarSvg} />
+                                        <img style={{ marginLeft: 6, marginTop: 2, width: 16, height: 16 }} src={ state?.currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[safe?.chainId].logoUrl : StarSvg }/>
                                     </TableCell>
                                 </TableRow>
                             </TableBody>
@@ -236,7 +280,7 @@ const XPPoints = ({ open, onClose }: any) => {
                     <Box sx={{ p: 2 }}>
                         <Typography>All SWEAT counter will be reset to 0.</Typography>
                         <Box sx={{ mt: 3 }}>
-                            <CreatableSelectTag defaultMenuIsOpen={true} onChangeOption={(tag:any) => { 
+                            <CreatableSelectTag defaultMenuIsOpen={false} onChangeOption={(tag:any) => { 
                                 setState((prev:any) => { return { ...prev, tag } })
                             }}/>
                         </Box>
@@ -245,7 +289,7 @@ const XPPoints = ({ open, onClose }: any) => {
                 <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
                         <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
                             <Button onClick={() => setActiveTab(2)} sx={{ mr:1 }} fullWidth variant='outlined' size="small">Cancel</Button>
-                            <Button onClick={() => {}} sx={{ ml:1 }}  fullWidth variant='contained' size="small">Send</Button>
+                            <Button loading={txnLoading} disabled={txnLoading || total === 0 || sweatMembers.length == 0} onClick={() => handleCreateTransaction()} sx={{ ml:1 }}  fullWidth variant='contained' size="small">Send</Button>
                         </Box>
                     </Box>
             </Box>

@@ -275,14 +275,14 @@ export default ({ children }: any) => {
           >
             {
               DAO ?
-              <HeaderLogo dao={DAO} onMouseLeave={hideDrawer} onMouseEnter={showDrawer} /> : 
+              <HeaderLogo onClick={() => navigate(-1)} dao={DAO} onMouseLeave={hideDrawer} onMouseEnter={showDrawer} /> : 
               <Skeleton variant="rectangular" animation="wave" width={116} height={107} sx={{ borderBottomRightRadius: 30 }} />
             }
             { DAO ?
             <Box sx={{ mt: 0 }} style={{ padding: 0, height: '100%', flex: 1 }}>
                 <Box display="flex" minHeight={107} sx={{ pb: 2, background: "linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(251,244,242,1) 0%)", pt: 3, pr: 4 }} flexDirection="row" alignItems="flex-start">
                     <Box sx={{ flexGrow: 1, ml: 4 }}>
-                        <Box display="flex" flexDirection="row" alignItems="center">
+                        {/* <Box display="flex" flexDirection="row" alignItems="center">
                           <Typography sx={{ marginLeft: "20px" }} className={classes.title}>{_get(DAO, 'name', '')}</Typography>
                                   <IconButton onClick={() => { 
                                     navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/${_get(DAO, 'url', '')}`);
@@ -291,17 +291,17 @@ export default ({ children }: any) => {
                                     <img src={LINK_SVG} />
                                   </IconButton>
                         </Box>
-                        <Typography className={classes.subtitle}>{_get(DAO, 'description', '')}</Typography>
+                        <Typography className={classes.subtitle}>{_get(DAO, 'description', '')}</Typography> */}
                     </Box>
-                    <Account/>
+                    <Account options={false} />
                 </Box>
             </Box> : 
             <Box sx={{ mt: 0 }} style={{ padding: 0, height: '100%', flex: 1 }}>
                 <Box display="flex" minHeight={107} sx={{ pb: 2, pt: 3, pr: 4 }} flexDirection="row" alignItems="flex-start">
                     <Box sx={{ flexGrow: 1, ml: 4 }}>
-                        <Skeleton variant="text" animation="wave" className={classes.title} sx={{ marginLeft: "20px", width: 150 }} />
+                        {/* <Skeleton variant="text" animation="wave" className={classes.title} sx={{ marginLeft: "20px", width: 150 }} />
                         <Skeleton variant="text"  animation="wave" className={classes.subtitle} sx={{ marginLeft: "20px", width: 600 }} />
-                        <Skeleton variant="text" animation="wave" className={classes.subtitle} sx={{ marginLeft: "20px", width: 400 }} />
+                        <Skeleton variant="text" animation="wave" className={classes.subtitle} sx={{ marginLeft: "20px", width: 400 }} /> */}
                     </Box>
                     <Skeleton animation="wave" variant="rectangular" width={223} height={60} sx={{ borderRadius: 30 }} />
                 </Box>
@@ -310,7 +310,7 @@ export default ({ children }: any) => {
           </Toolbar>
         </AppBar>
         <Box style={{ width: drawerWidth, background: 'transparent' }} ></Box>
-        <Drawer  onMouseLeave={hideDrawer} onMouseEnter={showDrawer} variant="permanent" open={open}>
+        {/* <Drawer  onMouseLeave={hideDrawer} onMouseEnter={showDrawer} variant="permanent" open={open}>
           <List className={classes.strip}>
           {
               DAOList && DAOList.map((dao: any) => {
@@ -337,7 +337,7 @@ export default ({ children }: any) => {
                 <Typography className={classes.daoText}>CREATE</Typography>
               </Box> 
           </List>
-        </Drawer>
+        </Drawer> */}
         <Box
           component="main"
           className={classes.main}

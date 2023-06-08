@@ -104,7 +104,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
     const classes = useStyles();
     const { chainId } = useWeb3Auth()
     const dispatch = useAppDispatch()
-    const { DAO } = useDAO()
+    const { DAO, loadDAO } = useDAO()
     //@ts-ignore
     const { user } = useAppSelector(store => store.session)
     //const [showDrawer, setShowDrawer] = useState<boolean>(false)
@@ -258,7 +258,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
                     try {
                         const response  = await initBiconomyGasless({ dappName: contract?.name, chainId, contract: contract?.address })
                         await axiosHttp.patch(`contract/${contract?.address}`, { gasless: true, gasConfig: response })
-                        // dispatch(getDao(_get(DAO, 'url')))
+                        loadDAO(_get(DAO, 'url'))
                         setGaslessConfigLoading(false)
                     } catch (e) {
                         setGaslessConfigLoading(false)
@@ -389,7 +389,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
             }
             await axiosHttp.patch(`contract/${contract?.address}`, { ...res, contactDetail: state?.contact, image:  state?.logo, gasless: state?.gasless, token: state?.symbol, name: `${state?.symbol} SBT`, discountCodes: state?.discountCodes })
                 .then(result => {
-                    // dispatch(getDao(_get(DAO,'url')))
+                    loadDAO(_get(DAO,'url'))
                 })
                 .finally(() => setUpdateContractLoading(false))
         } catch (e) {
@@ -401,7 +401,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
     }
 
     return (
-        <Box>
+        <Box sx={{ pb: 8, pt: 6 }} style={{ position: 'relative' }}>
             { gaslessConfigLoading && <Box style={{ position: 'fixed', display: 'flex', alignItems: 'center', justifyContent: 'center', maxHeight: '100vh', zIndex: 9999999, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: "rgba(255, 255, 255, 0.5)" }}>
                 <LeapFrog color='#C94B32' />
             </Box> }
@@ -483,7 +483,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
                                 })
                             }}
                             checked={state?.whitelisted} label={`WHITELISTED ${members.length > 0 ? "(" + members.length + " members)" : ''}`} />
-                        {state?.whitelisted && <XlsxUpload onComplete={handleInsertWallets} />}
+                        { false && state?.whitelisted && <XlsxUpload onComplete={handleInsertWallets} />}
                     </Box>
                 </Box>
                 <Box my={4} mx={1}>
@@ -705,11 +705,17 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
                         }
                     </Box>
                 </Box>
-                <Box display="flex" mt={4} flexDirection="row">
+                {/* <Box display="flex" mt={4} flexDirection="row">
                     <Button onClick={() => onClose()} sx={{ mr: 1 }} fullWidth variant='outlined' size="small">Cancel</Button>
                     <Button disabled={updateContractLoading} loading={updateContractLoading} onClick={() => saveChanges()} sx={{ ml: 1 }} fullWidth variant='contained' size="small">Save</Button>
-                </Box>
+                </Box> */}
                 {networkError && <Typography style={{ textAlign: 'center', color: 'red' }}>{networkError}</Typography>}
+            </Box>
+            <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                    <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                        <Button onClick={() => onClose()} sx={{ mr:1 }} fullWidth variant='outlined' size="small">Cancel</Button>
+                        <Button disabled={updateContractLoading} loading={updateContractLoading} onClick={() => saveChanges()} sx={{ ml:1 }}  fullWidth variant='contained' size="small">Save</Button>
+                    </Box>
             </Box>
         </Box>
     )

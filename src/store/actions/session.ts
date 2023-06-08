@@ -21,6 +21,13 @@ export const createAccountAction = (payload: any | null) => {
     }
 }
 
+export const updateAccountAction = (payload: any | null) => {
+    return {
+        type: actionTypes.UPDATE_ACCOUNT_ACTION,
+        payload
+    }
+}
+
 export const setNetworkConfig = (payload: any) => {
     return {
         type: actionTypes.SET_NETWORK_CONFIG,

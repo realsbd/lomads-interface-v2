@@ -5,7 +5,7 @@ import {
 } from 'redux-saga/effects';
 import * as actionTypes from 'store/actionTypes';
 import { get as _get } from 'lodash';
-import { loadTreasuryService, createTreasuryTransactionService, updateTxLabelService, updateTreasuryTransactionService } from 'store/services/treasury'
+import { loadTreasuryService, createTreasuryTransactionService, syncSafeService, updateTxLabelService, updateTreasuryTransactionService } from 'store/services/treasury'
 
 function* loadTreasurySaga(action:any) {
 	try {
@@ -41,10 +41,19 @@ function* loadTreasurySaga(action:any) {
   }
 
 
-  function* updateTxLabelAction(action:any) {
+  function* updateTxLabelSaga(action:any) {
 	try {
 	  const { data } = yield call(updateTxLabelService, action.payload)
 	  yield put({ type: actionTypes.SET_TX_LABEL, payload: data })
+	  console.log('json, response', data)
+	} catch (e) {
+
+	}
+  }
+
+  function* syncSafeSaga(action:any) {
+	try {
+	  const { data } = yield call(syncSafeService, action.payload)
 	  console.log('json, response', data)
 	} catch (e) {
 
@@ -55,5 +64,6 @@ export default function* treasurySaga() {
 	yield takeLatest(actionTypes.LOAD_TREASURY_ACTION, loadTreasurySaga)
 	yield takeLatest(actionTypes.CREATE_TREASURY_TRANSACTION_ACTION, createTreasuryTransactionSaga)
 	yield takeLatest(actionTypes.UPDATE_TREASURY_TRANSACTION_ACTION, updateTreasuryTransactionSaga)
-	yield takeLatest(actionTypes.UPDATE_TX_LABEL_ACTION, updateTxLabelAction)
+	yield takeLatest(actionTypes.UPDATE_TX_LABEL_ACTION, updateTxLabelSaga)
+	yield takeLatest(actionTypes.SYNC_SAFE_ACTION, syncSafeSaga)
 }

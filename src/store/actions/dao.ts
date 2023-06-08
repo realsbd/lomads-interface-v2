@@ -39,3 +39,10 @@ export const updateDAOAction = (payload: any) => {
         payload
     }
 }
+
+export const addDAOMemberAction = (payload: any) => {
+    return {
+        type: actionTypes.ADD_DAO_MEMBER_ACTION,
+        payload
+    }
+}

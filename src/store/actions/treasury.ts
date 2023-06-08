@@ -27,3 +27,10 @@ export const updateTxLabelAction = (payload: any) => {
         payload
     } 
 }
+
+export const syncSafeAction = (payload: any) => {
+    return {
+        type: actionTypes.SYNC_SAFE_ACTION,
+        payload
+    } 
+}

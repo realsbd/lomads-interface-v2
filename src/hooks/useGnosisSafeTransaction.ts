@@ -130,7 +130,7 @@ export default () => {
             const payload = {
                 safeAddress,
                 rawTx: tx,
-                metadata: send.reduce((a, v) => ({ ...a, [v.recipient]: { label: v.label, tag: v.tag }}), {}) 
+                metadata: send.reduce((a, v) => ({ ...a, [v.recipient]: { label: v.label, tag: v.tag, sweatConversion: v.sweatConversion ? v.sweatConversion : undefined }}), {}) 
             }
             dispatch(CreateTreasuryTransactionAction(payload))
             return tx

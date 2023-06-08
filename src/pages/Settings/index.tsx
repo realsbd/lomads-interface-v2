@@ -18,7 +18,7 @@ import PassTokenModal from "./Modals/PassToken";
 import TerminologyModal from "./Modals/Terminology";
 import RolesModal from "./Modals/Roles";
 import XPPoints from "./Modals/XPPoints";
-import IconButton from "components/IconButton";
+import Organisation from "./Modals/Organisation";
 import { useDAO } from "context/dao";
 import theme from "theme";
 
@@ -84,6 +84,8 @@ export default () => {
             return RolesModal
         if(activeModal === XPPoints.name)
             return XPPoints
+        if(activeModal === Organisation.name)
+            return Organisation
         return Fragment
     }, [activeModal])
 
@@ -91,7 +93,7 @@ export default () => {
         <>
             <Grid container px={3} spacing={2}>
                 <Grid item sm={12}>
-                    <Content onClick={() => {}} icon={OrganistionDetails} title="Organisation Details" />
+                    <Content onClick={() => setActiveModal(Organisation.name)} icon={OrganistionDetails} title="Organisation Details" />
                 </Grid>
                 <Grid item sm={6} md={4} xs={1}>
                     <Content onClick={() => setActiveModal(RolesModal.name)} icon={RolesPermissions} title="Roles & Permissions" />

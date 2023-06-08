@@ -172,7 +172,7 @@ const SafeModal = ({ open, onClose }: any) => {
             <Box style={{ paddingTop: 24, paddingBottom: 80 }}>
                 <Box sx={{ mt: 2 }}>
                     <Typography style={{ fontSize: '12px', fontStyle: 'italic', fontWeight: 400 }}>Any transaction requires the confirmation of</Typography>
-                    <Stack sx={{ mt: 2 }} direction="row" alignItems="center">
+                    <Box sx={{ mt: 1 }} display="flex" flexDirection="row" alignItems="center">
                         {/* <Box onClick={handleClick} sx={{ p:2, cursor: 'pointer', width: 112, height: 40, borderRadius: '10px', backgroundColor: "#FFF" }} display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                             <Box>{ safe?.threshold }</Box>
                             <ArrowDropDownIcon/>
@@ -188,7 +188,7 @@ const SafeModal = ({ open, onClose }: any) => {
                                 }
                             </TextInput> }
                         <Typography style={{ marginLeft: 16, fontSize: '12px', fontStyle: 'italic', fontWeight: 400 }}>{ `of ${DAOMemberList.filter((mem: any) => mem.owner).length} Owners` }</Typography>
-                    </Stack>
+                    </Box>
                 </Box>
                 <Box sx={{ mt: 2 }} display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                     <Typography style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, color: "#76808d", fontSize: 14 }}>Select owners</Typography>

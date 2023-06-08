@@ -242,7 +242,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     }
 
     const handleChangeCompensationAmount = (e: any) => {
-        setAmount(parseFloat(e));
+        setAmount(e);
         setErrorProjectValue(false);
     }
 
@@ -391,7 +391,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                         <CurrencyInput
                             value={amount}
                             onChange={(value: any) => handleChangeCompensationAmount(value)}
-                            options={_get(safeTokens, safeAddress, [])}
+                            options={_get(safeTokens, safeAddress, []).map((tok:any) => { return { label: tok?.token?.symbol, value: tok?.tokenAddress } })}
                             dropDownvalue={currency}
                             onDropDownChange={(value: any) => {
                                 handleChangeCurrency(value)

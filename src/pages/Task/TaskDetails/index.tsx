@@ -45,10 +45,10 @@ import useTask from "hooks/useTask";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
-        height: '100vh',
-        overflowY: 'scroll',
-        display: 'flex',
-        flexDirection: 'column',
+        // height: '100vh',
+        // overflowY: 'scroll',
+        // display: 'flex',
+        // flexDirection: 'column',
     },
     arrowContainer: {
         width: '5% !important',
@@ -544,7 +544,7 @@ export default () => {
                 hideBackdrop={false}
             />
 
-            <Grid xs={10} item display="flex" flexDirection="column" sx={{ margin: '10vh 0' }}>
+            <Grid xs={10} item display="flex" flexDirection="column">
 
                 <Box sx={{ width: '100%', height: '32px' }}>
                     <Typography>{_get(Task, 'project.name', '')}</Typography>
