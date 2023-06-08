@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-
-import { Typography, Box, Drawer } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { uniqBy as _uniqBy, get as _get, find as _find } from 'lodash'
+import { Typography, Box, Drawer, InputAdornment } from "@mui/material";
 import { makeStyles } from '@mui/styles';
-
+import PercentIcon from '@mui/icons-material/Percent';
 import IconButton from 'components/IconButton';
 import TextInput from 'components/TextInput';
 import Button from "components/Button";
@@ -13,6 +13,16 @@ import Dropdown from "components/Dropdown";
 import Avatar from "components/Avatar";
 import LabelDropdown from "components/LabelDropdown";
 import theme from "theme";
+import { useAppSelector } from "helpers/useAppSelector";
+import CreatableSelectTag from "components/CreatableSelectTag";
+import AmountInput from "components/AmountInput";
+import useSafe from "hooks/useSafe";
+import useGnosisSafeTransaction from "hooks/useGnosisSafeTransaction";
+import useOffChainTransaction from "hooks/useOffChainTransaction";
+import { useDAO } from "context/dao";
+import { useWeb3Auth } from "context/web3Auth";
+import { useAppDispatch } from "helpers/useAppDispatch";
+import { updateMilestoneAction } from "store/actions/project";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -29,7 +39,7 @@ const useStyles = makeStyles((theme: any) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '27px !important',
+        padding: '27px 27px 90px 27px !important',
         marginTop: '60px !important'
     },
     modalTitle: {
@@ -81,11 +91,75 @@ const useStyles = makeStyles((theme: any) => ({
 
 interface Props {
     open: boolean;
+    selectedMilestone: any,
     closeModal(): any;
 }
 
-export default ({ open, closeModal }: Props) => {
+export default ({ open, selectedMilestone, closeModal }: Props) => {
     const classes = useStyles();
+    const dispatch = useAppDispatch()
+    const { DAO } = useDAO();
+    const { account } = useWeb3Auth()
+    const { Project } = useAppSelector((store:any) => store.project);
+    const [members, setMembers] = useState([])
+    const { createSafeTransaction } = useGnosisSafeTransaction();
+    const { createSafeTransaction: createOffChainSafeTransaction } = useOffChainTransaction();
+    const { loadSafe } = useSafe()
+    const [tag, setTag] = useState(null)
+    const [sendTokensLoading, setSendTokensLoading] = useState(false)
+
+    useEffect(() => {
+        if(Project)
+            setMembers(Project?.members)
+    }, [Project])
+
+    const handleCreateTransaction = async () => {
+        const totalAllotedAmount = members.reduce((a: number, b: any) =>  a + (!(b?.percentage || 0) ? 0 : (((b?.percentage) / 100) * ((+Project?.compensation?.amount * ( selectedMilestone?.amount /100))))), 0)
+        let sendArray: any = []
+        let total = 0;
+        for (var i = 0; i < _uniqBy(members, (t:any) => t._id).length; i++) {
+            const item = _uniqBy(members, (t:any) => t._id)[i];
+            total += item.percentage;
+            if (item.percentage > 0) {
+                sendArray.push({
+                    amount: ((item.percentage * totalAllotedAmount) / 100).toFixed(5),
+                    name: item.name,
+                    recipient: item.wallet,
+                    label: `${item.name} | ${_get(Project, 'name', 'x')} | ${selectedMilestone.name}`,
+                    tag
+                })
+            }
+        }
+        const safe = loadSafe(Project?.compensation?.safeAddress || _get(DAO, 'safes[0].address'))
+        if(!safe) return;
+
+        try {
+            setSendTokensLoading(true)
+            const method = Project?.compensation?.currency === "SWEAT" ? createOffChainSafeTransaction : createSafeTransaction
+            const txn = await method({
+                chainId: safe?.chainId,
+                safeAddress: Project?.compensation?.safeAddress || _get(DAO, 'safes[0].address'),
+                tokenAddress: Project?.compensation?.currency,
+                send: sendArray,
+                daoId: _get(DAO, '_id', null),
+                isSafeOwner: _find(safe.owners, (owner:any) => owner?.wallet === account) !== null
+            })
+            const newArray = _get(Project, 'milestones', []).map((item: any, i: number) => {
+                if (i === _get(selectedMilestone, 'pos', '')) {
+                    return { ...item, complete: true };
+                } else {
+                    return item;
+                }
+            });
+            dispatch(updateMilestoneAction({ projectId: Project._id, daoUrl: DAO?.url, payload: { milestones: newArray } }));
+            closeModal()
+            return setSendTokensLoading(false)
+        } catch (e) {
+            setSendTokensLoading(false)
+            console.log(e)
+            return;
+        }
+    }
 
     return (
         <Drawer
@@ -112,31 +186,57 @@ export default ({ open, closeModal }: Props) => {
                                 color="secondary"
                                 size="small"
                                 sx={{ width: 185, color: '#C94B32', fontSize: 14, marginRight: '16px' }}
-                                onClick={() => console.log("Clicked")}
+                                onClick={() => {
+                                    setMembers((prev:any) => 
+                                        prev.map(((member:any) => {
+                                                return { ...member, percentage: (100/ members.length).toFixed(2) }
+                                        }))
+                                    )
+                                }}
                             >
                                 SPLIT EQUALLY
                             </Button>
                             <Box sx={{ width: 185 }}>
-                                <LabelDropdown />
+                                <CreatableSelectTag onChangeOption={(e:any) => { setTag(e) }}/>
                             </Box>
                         </Box>
 
                         {
-                            [1, 2, 3].map((item, index) => {
+                            members.map((item:any) => {
                                 return (
-                                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ width: 350 }}>
+                                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ my: 1, width: 350 }}>
                                         <Box>
-                                            <Avatar name="Zohaib" wallet="0xA015C8B6844Fa3294209f413F32Da90e92c45F5a" />
+                                            <Avatar name={item?.name} wallet={item?.wallet} />
                                         </Box>
                                         <Box>
+                                        {/* <AmountInput height={40} 
+                                            onChange={(e:any) => { setMembers((prev:any) => 
+                                                prev.map(((member:any) => {
+                                                    if(member._id === item?._id)
+                                                        return { ...member, percentage: e }
+                                                    return member
+                                                }))
+                                            )}} 
+                                            value={item?.percentage || 0} /> */}
                                             <TextInput
                                                 type="number"
                                                 min={0}
+                                                InputProps={{
+                                                    endAdornment: <InputAdornment position="end">%</InputAdornment>
+                                                }}
                                                 max={100}
+                                                onChange={(e:any) => { setMembers((prev:any) => 
+                                                    prev.map(((member:any) => {
+                                                        if(member._id === item?._id)
+                                                            return { ...member, percentage: e.target.value }
+                                                        return member
+                                                    }))
+                                                )}}
+                                                value={item?.percentage || 0}
                                                 sx={{ width: 100 }} />
                                         </Box>
                                         <Box>
-                                            <Typography>= 0 SWEAT</Typography>
+                                            <Typography>= { !(item?.percentage || 0) ? 0 : (((item?.percentage) / 100) * ((+Project?.compensation?.amount * ( selectedMilestone?.amount /100)))).toFixed(3) } { Project?.compensation?.symbol }</Typography>
                                         </Box>
                                     </Box>
                                 )
@@ -144,10 +244,16 @@ export default ({ open, closeModal }: Props) => {
                         }
 
                     </Box>
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
+                    {/* <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
                         <Button fullWidth size="small" variant="outlined" sx={{ marginRight: '20px' }}>CANCEL</Button>
                         <Button fullWidth size="small" variant="contained">SAVE</Button>
-                    </Box>
+                    </Box> */}
+                </Box>
+                <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                        <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                            <Button sx={{ mr:1 }} onClick={() => closeModal()} fullWidth variant='outlined' size="small">Cancel</Button>
+                            <Button onClick={() => handleCreateTransaction()} loading={sendTokensLoading} disabled={sendTokensLoading} sx={{ ml:1 }} fullWidth variant='contained' size="small">Save</Button>
+                        </Box>
                 </Box>
             </Box>
         </Drawer>

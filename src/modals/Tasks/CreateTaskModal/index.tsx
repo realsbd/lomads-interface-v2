@@ -306,14 +306,14 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             }
             return;
         }
-        else if (dchannel === '') {
-            setErrorDchannel('Enter a link');
-            let e = document.getElementById('error-dchannel');
-            if (e) {
-                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
-            }
-            return;
-        }
+        // else if (dchannel === '') {
+        //     setErrorDchannel('Enter a link');
+        //     let e = document.getElementById('error-dchannel');
+        //     if (e) {
+        //         e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+        //     }
+        //     return;
+        // }
         else if (dchannel && !isValidUrl(dchannel)) {
             setErrorDchannel('Enter a valid link');
             let e = document.getElementById('error-dchannel');
@@ -698,7 +698,10 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                                     fullWidth
                                     label="Treasury"
                                     value={safeAddress}
-                                    onChange={(e: any) => setSafeAddress(e.target.value)}
+                                    onChange={(e: any) => { 
+                                        setSafeAddress(e.target.value) 
+                                        handleChangeCurrency(_get(_get(safeTokens, e.target.value, []), '[0].tokenAddress', 'SWEAT'))
+                                    }}
                                 >
                                     {
                                         DAO?.safes?.map((safe: any) => {
@@ -718,7 +721,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                             <CurrencyInput
                                 value={amount}
                                 onChange={(value: any) => handleChangeCompensationAmount(value)}
-                                options={_get(safeTokens, safeAddress, [])}
+                                options={_get(safeTokens, safeAddress, []).map((token:any) => { return { label: token?.token?.symbol, value: token?.tokenAddress } })}
                                 dropDownvalue={currency}
                                 onDropDownChange={(value: any) => {
                                     handleChangeCurrency(value)

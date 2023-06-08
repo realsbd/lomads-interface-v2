@@ -344,6 +344,8 @@ export default () => {
             project['inviteType'] = 'Roles';
         }
 
+        console.log(project)
+        
         dispatch(createProjectAction(project));
     }
 

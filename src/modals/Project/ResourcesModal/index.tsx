@@ -392,11 +392,11 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
                                     :
                                     null
                             }
-                            <Box style={{ display: 'flex', flexDirection: 'column' }}>
+                            {/* <Box style={{ display: 'flex', flexDirection: 'column' }}>
                                 <Typography sx={{ color: '#76808D', opacity: '0.6' }}>ACCESS CONTROL <AiFillQuestionCircle /></Typography>
                                 <Typography sx={{ color: 'rgba(118, 128, 141, 0.5)', fontStyle: 'italic', fontSize: '14px' }}>Currently available for Notion and Discord only</Typography>
                                 {accessControlError && <div><span style={{ color: 'red' }}>{accessControlError}</span></div>}
-                            </Box>
+                            </Box> */}
                         </Box>
                     }
 

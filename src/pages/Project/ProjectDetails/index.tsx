@@ -337,6 +337,7 @@ export default () => {
                 />
 
                 <AssignContributionModal
+                    selectedMilestone={selectedMilestone}
                     open={openAssignContribution}
                     closeModal={() => setOpenAssignContribution(false)}
                 />

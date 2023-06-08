@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { get as _get } from 'lodash';
 import Avatar from "boring-avatars";
 import { Box, Typography } from '@mui/material';
+import { beautifyHexToken } from 'utils';
 
 
 export default ({ name, wallet, hideDetails, ...props }: any) => {
@@ -34,7 +35,7 @@ export default ({ name, wallet, hideDetails, ...props }: any) => {
                     {
                         name && <Typography style={{ color: '#1b2b41', fontWeight: '700', fontSize: '12px', margin: '0' }}>{name}</Typography>
                     }
-                    <Typography style={{ color: '#1b2b41', fontWeight: '400', fontSize: '12px', margin: '0' }}>{wallet.slice(0, 6) + "..." + wallet.slice(-4)}</Typography>
+                    <Typography style={{ color: '#1b2b41', fontWeight: '400', fontSize: '12px', margin: '0' }}>{beautifyHexToken(wallet)}</Typography>
                 </Box>
             }
         </Box>

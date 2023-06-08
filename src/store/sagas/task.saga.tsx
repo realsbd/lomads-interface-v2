@@ -24,7 +24,7 @@ function* getTaskSaga(action: any) {
         const { data } = yield call(getTaskService, action.payload);
         yield put({ type: actionTypes.SET_TASK_ACTION, payload: data })
         yield put({ type: actionTypes.SET_TASK_LOADING, payload: false })
-        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
         yield put({ type: actionTypes.SET_TASK_LOADING, payload: null })
     } catch (e) {
         yield put({ type: actionTypes.SET_TASK_LOADING, payload: null })
@@ -39,7 +39,7 @@ function* createTaskSaga(action: any) {
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.CREATE_TASK_LOADING, payload: false })
-        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
         yield put({ type: actionTypes.CREATE_TASK_LOADING, payload: null })
     }
     catch (e) {
@@ -54,7 +54,7 @@ function* draftTaskSaga(action: any) {
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.DRAFT_TASK_LOADING, payload: false })
-        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
         yield put({ type: actionTypes.DRAFT_TASK_LOADING, payload: null })
     }
     catch (e) {
@@ -70,7 +70,7 @@ function* archiveTaskSaga(action: any) {
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.SET_TASK_ACTION, payload: data.task })
         yield put({ type: actionTypes.ARCHIVE_TASK_LOADING, payload: false })
-        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
         yield put({ type: actionTypes.ARCHIVE_TASK_LOADING, payload: null })
     } catch (e) {
         yield put({ type: actionTypes.ARCHIVE_TASK_LOADING, payload: null })
@@ -85,7 +85,7 @@ function* deleteTaskSaga(action: any) {
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.SET_TASK_ACTION, payload: data.task })
         yield put({ type: actionTypes.DELETE_TASK_LOADING, payload: false })
-        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
         yield put({ type: actionTypes.DELETE_TASK_LOADING, payload: null })
     } catch (e) {
         yield put({ type: actionTypes.DELETE_TASK_LOADING, payload: null })
@@ -99,7 +99,7 @@ function* applyTaskSaga(action: any) {
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_TASK_ACTION, payload: data.task })
         yield put({ type: actionTypes.APPLY_TASK_LOADING, payload: false })
-        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
         yield put({ type: actionTypes.APPLY_TASK_LOADING, payload: null })
     } catch (e) {
         yield put({ type: actionTypes.APPLY_TASK_LOADING, payload: null })
@@ -113,7 +113,7 @@ function* submitTaskSaga(action: any) {
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_TASK_ACTION, payload: data.task })
         yield put({ type: actionTypes.SUBMIT_TASK_LOADING, payload: false })
-        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
         yield put({ type: actionTypes.SUBMIT_TASK_LOADING, payload: null })
     } catch (e) {
         yield put({ type: actionTypes.SUBMIT_TASK_LOADING, payload: null })
@@ -127,7 +127,7 @@ function* assignTaskSaga(action: any) {
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_TASK_ACTION, payload: data.task })
         yield put({ type: actionTypes.ASSIGN_TASK_LOADING, payload: false })
-        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
         yield put({ type: actionTypes.ASSIGN_TASK_LOADING, payload: null })
     } catch (e) {
         yield put({ type: actionTypes.ASSIGN_TASK_LOADING, payload: null })
@@ -141,7 +141,7 @@ function* rejectTaskMemberSaga(action: any) {
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_TASK_ACTION, payload: data.task })
         yield put({ type: actionTypes.REJECT_TASK_MEMBER_LOADING, payload: false })
-        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
         yield put({ type: actionTypes.REJECT_TASK_MEMBER_LOADING, payload: null })
     } catch (e) {
         yield put({ type: actionTypes.REJECT_TASK_MEMBER_LOADING, payload: null })

@@ -25,6 +25,7 @@ import useTerminology from 'hooks/useTerminology';
 import { editProjectMilestonesAction } from "store/actions/project";
 import { beautifyHexToken } from "utils";
 import theme from "theme";
+import AmountInput from "components/AmountInput";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -268,7 +269,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
         }
         if (amount === 0) {
             setErrorProjectValue(true);
-            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency);
+            let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency);
             symbol = _get(symbol, 'token.symbol', null);
             if (!symbol)
                 symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
@@ -332,14 +333,14 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
         }
         if (flag !== -1) {
 
-            let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency);
-            symbol = _get(symbol, 'token.symbol', 'SWEAT');
+            let safeToken = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency);
+            let symbol = _get(safeToken, 'token.symbol', 'SWEAT');
 
             if (editMilestones) {
                 dispatch(editProjectMilestonesAction({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones, compensation: { currency, amount, symbol, safeAddress } } }));
             }
             else {
-                getCompensation({ currency: currency, amount, symbol, safeAddress })
+                getCompensation({ currency: currency, amount, symbol, tokenAddress: safeToken?.tokenAddress,  safeAddress })
                 getMilestones(milestones);
                 closeModal();
             }
@@ -377,7 +378,10 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                 fullWidth
                                 label="Treasury"
                                 value={safeAddress}
-                                onChange={(e: any) => setSafeAddress(e.target.value)}
+                                onChange={(e: any) => { 
+                                    setSafeAddress(e.target.value) 
+                                    handleChangeCurrency(_get(_get(safeTokens, e.target.value, []), '[0].tokenAddress'))
+                                }}
                             >
                                 {
                                     DAO?.safes?.map((safe: any) => {
@@ -439,24 +443,9 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                     </Box>
 
                                     {/* Milestone amount % */}
-                                    <Box display={"flex"} flexDirection={"column"} sx={{ marginBottom: '20px' }}>
+                                    <Box display={"flex"} flexDirection={"column"} sx={{ mt: 2, marginBottom: '20px' }}>
                                         <Box display={"flex"} alignItems={'center'}>
-                                            <TextInput
-                                                type="number"
-                                                InputProps={{
-                                                    inputProps: {
-                                                        max: 100, min: 0, step: 1
-                                                    }
-                                                }}
-                                                sx={{ width: 90 }}
-                                                value={item.amount}
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeAmount(e.target.value, index)}
-                                                placeholder={`${100 / milestoneCount}`}
-                                                disabled={item.complete}
-                                                error={errorAmount.includes(index)}
-                                                id={errorAmount.includes(index) ? "outlined-error-helper-text" : ""}
-                                                helperText={errorAmount.includes(index) ? "Enter %" : ""}
-                                            />
+                                            <AmountInput height={50} onChange={(e: any) => handleChangeAmount(e, index)} value={item.amount} />
                                             <Typography sx={{ fontWeight: '700', fontSize: 16, color: '#76808D', marginLeft: '13.5px' }}>% of {transformWorkspace().label} value</Typography>
                                         </Box>
                                         <Typography id={`amount${index}`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal' }}></Typography>
