@@ -35,3 +35,7 @@ export const assignTaskService = (params: any) => {
 export const rejectTaskMemberService = (params: any) => {
     return axiosHttp.patch(`task/${params.taskId}/reject-member?daoUrl=${params.daoUrl}`, params.payload);
 }
+
+export const rejectTaskSubmissionService = (params: any) => {
+    return axiosHttp.post(`task/${params.taskId}/reject?daoUrl=${params.daoUrl}`, params.payload);
+}

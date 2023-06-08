@@ -15,6 +15,7 @@ export function getInitialState() {
         submitTaskLoading: false,
         assignTaskLoading: false,
         rejectTaskMemberLoading: false,
+        rejectTaskSubmissionLoading: false,
     };
 }
 
@@ -70,6 +71,11 @@ const TaskReducer = (state: any = getInitialState(), action: any) =>
 
             case actionTypes.REJECT_TASK_MEMBER_LOADING: {
                 draft.rejectTaskMemberLoading = payload;
+                break;
+            }
+
+            case actionTypes.REJECT_TASK_SUBMISSION_LOADING: {
+                draft.rejectTaskSubmissionLoading = payload;
                 break;
             }
 

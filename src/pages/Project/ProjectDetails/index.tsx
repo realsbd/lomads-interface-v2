@@ -402,7 +402,7 @@ export default () => {
                     </Box>
                 }
 
-                <TaskSection />
+                <TaskSection onlyProjects={true} />
 
                 {/* <MembersSection
                     list={_sortBy(_uniqBy(Project?.members, '_id'), m => _get(m, 'name', '').toLowerCase())}

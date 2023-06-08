@@ -40,7 +40,7 @@ export default () => {
                 <Notifications isHelpIconOpen={false} />
             </Grid>
             <Grid sm={12}>
-                <TaskSection />
+                <TaskSection onlyProjects={false} />
             </Grid>
             <Grid sm={12}>
                 <ProjectSection />
