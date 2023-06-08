@@ -105,9 +105,9 @@ export default [
 		component: DashboardPage
 	},
 	{
-		path: '/:daoURL/createProject',
+		path: '/:daoURL/project/create',
 		exact: true,
-		layout: LandingLayout,
+		layout: DefaultLayout,
 		private: true,
 		component: CreateProjectPage
 	},
@@ -121,7 +121,7 @@ export default [
 	{
 		path: '/:daoURL/task/:taskId',
 		exact: true,
-		layout: DefaultLayout,
+		layout: LandingLayout,
 		private: true,
 		component: TaskDetailsPage
 	},

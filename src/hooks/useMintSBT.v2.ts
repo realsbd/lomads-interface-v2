@@ -45,9 +45,9 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
   }
 
     const balanceOf = async () => {
-      console.log("DAO?.url",mintContract?.signer)
       if(mintContract?.signer){
         if(account && chainId && provider) {
+          console.log(contractAddress, account, mintContract?.signer, mintContract)
           return mintContract?.balanceOf(account)
         }
         return null;

@@ -178,7 +178,7 @@ export default () => {
                     <IconButton sx={{ marginRight: '20px' }}>
                         <img src={archiveIcon} alt="archiveIcon" />
                     </IconButton>
-                    <Button size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/createProject`)}>
+                    <Button size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/project/create`)}>
                         <AddIcon sx={{ fontSize: 18 }} /> CREATE
                     </Button>
                 </Box>

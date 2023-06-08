@@ -263,7 +263,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
 
 
     const handleChangeCompensationAmount = (e: any) => {
-        setAmount(parseFloat(e));
+        setAmount(e);
         setErrorTaskValue(false);
     }
 
@@ -697,14 +697,12 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                     <CurrencyInput
                         value={amount}
                         onChange={(value: any) => handleChangeCompensationAmount(value)}
-                        options={_get(safeTokens, safeAddress, [])}
+                        options={_get(safeTokens, safeAddress, []).map((token:any) => { return { label: token?.token?.symbol, value: token?.tokenAddress } })}
                         dropDownvalue={currency}
                         onDropDownChange={(value: any) => {
                             handleChangeCurrency(value)
                         }}
                         variant="primary"
-                        errorCurrency={errorCurrency}
-                        errorProjectValue={errorTaskValue}
                     />
                 </Box>
 
