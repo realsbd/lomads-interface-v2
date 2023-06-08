@@ -22,6 +22,10 @@ export const updateTxLabelService = (payload: any) => {
     return axiosHttp.patch(`/gnosis-safe/tx-label`, payload)
 }
 
+export const syncSafeService = (payload: any) => {
+    return axiosHttp.post(`/gnosis-safe/sync-safe`, payload)
+}
+
 export const loadTreasuryService = (payload: any) => {
     return axiosHttp.get(`/gnosis-safe${getQueryString(payload)}`)
     .then(ptx => _get(ptx, 'data', []))

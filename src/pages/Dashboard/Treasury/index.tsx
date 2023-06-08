@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { find as _find, orderBy as _orderBy, get as _get } from 'lodash'
+import { IconButton as MuiIconButton } from "@mui/material";
 import clsx from "clsx";
 import { Grid, Box, Typography, Divider, Skeleton, TableContainer, Table, TableBody, Stack } from "@mui/material"
 import { makeStyles } from '@mui/styles';
@@ -7,7 +8,8 @@ import { useDAO } from "context/dao";
 import { useParams } from "react-router-dom";
 import { useAppSelector } from "helpers/useAppSelector";
 import { useAppDispatch } from "helpers/useAppDispatch";
-import { loadTreasuryAction } from "store/actions/treasury";
+import { loadTreasuryAction, syncSafeAction } from "store/actions/treasury";
+import SyncIcon from '@mui/icons-material/Sync';
 import Row from "./components/Row";
 import { useSafeTokens } from "context/safeTokens";
 import { values } from "lodash";
@@ -15,6 +17,7 @@ import { usePrevious } from "hooks/usePrevious";
 import Button from "components/Button";
 import palette from "theme/palette";
 import SendToken from "../SendToken";
+import IconButton from "components/IconButton";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -135,6 +138,10 @@ export default () => {
         return _get(txn, `[0].rawTx.nonce`, 0)
     }, [treasury])
 
+    const handleSyncSafe = () => 
+        dispatch(syncSafeAction({ safes: DAO?.safes?.map((safe:any) => safe?.address) }))
+    
+
     return (
         <Grid container>
             <Grid item sm={12}>
@@ -143,7 +150,9 @@ export default () => {
                 <Box className={classes.header}>
                     <Box className={classes.tabs}>
                         <Box className={classes.tab}>
-                            <Typography className={clsx([classes.tabItem, classes.tabItemActive])}>Treasury</Typography>
+                            <Typography className={clsx([classes.tabItem, classes.tabItemActive])}>Treasury
+                            {/* <MuiIconButton size="small" onClick={() => handleSyncSafe()}><SyncIcon/></MuiIconButton> */}
+                            </Typography>
                         </Box>
                         <Box className={classes.verDivider} />
                         <Box className={classes.tab}>
