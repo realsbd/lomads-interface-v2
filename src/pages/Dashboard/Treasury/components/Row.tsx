@@ -1,5 +1,5 @@
 import React, { useMemo } from "react"
-import { find as _find } from 'lodash'
+import { find as _find, get as _get } from 'lodash'
 import { TableCell, TableRow } from "@mui/material"
 import useGnosisTxnTransform from "hooks/useGnosisTxnTransform"
 
@@ -30,10 +30,23 @@ export default ({ transaction, executableNonce }: any) => {
         return transformTx(transaction?.rawTx, [])
     }, [transaction])
 
+    const handlePostExecution = () => {
+        for (let index = 0; index < txn.length; index++) {
+            const tx = txn[index];
+            const metadata = _get(transaction, `metadata.${tx.to}`)
+            if(metadata) {
+                if(metadata?.sweatConversion) {
+                    // reset sweat for recipient && update user earnings
+                } else if(metadata?.taskId) {
+                    // close task && update payment for user
+                } else {
+                    // update user earnings
+                }
+            }
+        }
+    }
+
     if(!txn) return null
-    
-    if(transaction?.rawTx?.rejectedTxn)
-        console.log("transaction?.rejectedTxn", transaction?.rawTx?.rejectedTxn)
 
     return (
         <>
@@ -45,7 +58,7 @@ export default ({ transaction, executableNonce }: any) => {
                         <Recipient safeAddress={transaction?.safeAddress} credit={tx?.isCredit} recipient={tx?.to} />
                         <Tag transaction={transaction} recipient={tx?.to} />
                         <Sign transaction={tx} index={_i} />
-                        <Action amount={tx?.formattedValue} token={tx?.symbol} executableNonce={executableNonce} safeAddress={transaction?.safeAddress} transaction={tx} txnCount={txn.length} chainId={loadSafe(transaction?.safeAddress)?.chainId} index={_i} />
+                        <Action amount={tx?.formattedValue} onPostExecution={handlePostExecution} token={tx?.symbol} executableNonce={executableNonce} safeAddress={transaction?.safeAddress} transaction={tx} txnCount={txn.length} chainId={loadSafe(transaction?.safeAddress)?.chainId} index={_i} />
                     </TableRow>
                 ))
             }

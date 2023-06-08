@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: any) => ({
     }
   }));
 
-export default ({ safeAddress, transaction, txnCount, chainId, index, executableNonce, amount, token }: any) => {
+export default ({ safeAddress, transaction, txnCount, chainId, index, executableNonce,  amount, token, onPostExecution }: any) => {
     const classes = useStyles()
     const { chainId: currentChainId } = useWeb3Auth()
     const { loadSafe } = useSafe()
@@ -52,6 +52,7 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
                 else
                     await confirmTransaction(payload)
                 setConfirmLoading(false)
+                onPostExecution()
             } catch(e) {
                 console.log(e)
                 setConfirmLoading(false)
