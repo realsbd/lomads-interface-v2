@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Typography, Box, Card, CardContent } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import submitted from 'assets/svg/submitted.svg';
 import calendarIcon from 'assets/svg/calendar.svg'
 
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
+import useTask from "hooks/useTask";
+
+import moment from "moment";
 
 const useStyles = makeStyles((theme: any) => ({
     taskCard: {
@@ -42,7 +45,6 @@ const useStyles = makeStyles((theme: any) => ({
     },
     statusText: {
         fontSize: '14px !important',
-        color: '#6B99F7 !important',
         lineHeight: '16px !important',
         marginLeft: '5px !important'
     },
@@ -63,9 +65,14 @@ interface CardProps {
 export default ({ task, daoUrl }: CardProps) => {
     const classes = useStyles();
     const navigate = useNavigate();
+    const { transformTask } = useTask();
+
+    const Task = useMemo(() => {
+        if (task)
+            return transformTask(task)
+    }, [task]);
 
     const handleCardClick = () => {
-        // dispatch(updateViewProject({ projectId: project._id, daoUrl: _get(DAO, 'url', '') }));
         navigate(`/${daoUrl}/task/${task._id}`, { state: { task } })
     }
 
@@ -80,18 +87,26 @@ export default ({ task, daoUrl }: CardProps) => {
                 onClick={handleCardClick}
             >
                 <CardContent className={classes.taskContent}>
-                    <Typography className={classes.projectText}>{task?.project?.name?.length > 20 ? task?.project?.name?.substring(0, 20) + "..." : task?.project?.name}</Typography>
-                    <Typography className={classes.taskText}>{task.name.length > 20 ? task.name.substring(0, 20) + "..." : task.name}</Typography>
-                    {/* <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                        <Box display={"flex"} alignItems={"center"}>
-                            <img src={submitted} alt="submitted-icon" />
-                            <Typography className={classes.statusText}>Submitted</Typography>
-                        </Box>
-                        <Box display={"flex"} alignItems={"center"}>
-                            <img src={calendarIcon} alt="calendarIcon" />
-                            <Typography className={classes.dateText}>2 days</Typography>
-                        </Box>
-                    </Box> */}
+                    <Typography className={classes.projectText}>{Task?.project?.name?.length > 20 ? Task?.project?.name?.substring(0, 20) + "..." : Task?.project?.name}</Typography>
+                    <Typography className={classes.taskText}>{Task.name.length > 20 ? Task.name.substring(0, 20) + "..." : Task.name}</Typography>
+                    {
+                        Task.draftedAt
+                            ?
+                            <Box style={{ border: '1px solid #C94B32', borderRadius: 16, padding: '4px 16px', width: '100px' }} display={"flex"} alignItems={"center"} justifyContent={"center"}>
+                                <Typography style={{ color: '#C94B32' }}>Draft</Typography>
+                            </Box>
+                            :
+                            <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                                <Box display={"flex"} alignItems={"center"}>
+                                    <img src={Task?.visual?.icon} alt="submitted-icon" />
+                                    <Typography className={classes.statusText} sx={{ color: Task?.visual?.color }}>{Task?.visual?.status}</Typography>
+                                </Box>
+                                <Box display={"flex"} alignItems={"center"}>
+                                    <img src={calendarIcon} alt="calendarIcon" />
+                                    <Typography className={classes.dateText}>{moment(task.deadline).fromNow()}</Typography>
+                                </Box>
+                            </Box>
+                    }
                 </CardContent>
             </Card>
         </>
