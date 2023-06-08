@@ -38,19 +38,29 @@ const useStyles = makeStyles((theme: any) => ({
         color: '#C94B32 !important'
     },
     rolePill: {
+        height: '22px !important',
         display: "flex !important",
         alignItems: "center !important",
         justifyContent: "flex-start !important",
         marginRight: '10px !important'
     },
+    roleCount: {
+        padding: '4px !important',
+        height: '22px !important',
+        minWidth: '36px !important',
+        background: '#FFFFFF !important',
+        boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1) !important',
+        borderRadius: '100px !important',
+        cursor: 'pointer'
+    }
 }));
 
 interface MembersProps {
-    showProjects: boolean;
     list: any[];
 }
 
-export default ({ showProjects, list }: MembersProps) => {
+export default ({ list }: MembersProps) => {
+    console.log("List : ", list)
     const classes = useStyles();
     const [openInviteModal, setOpenInviteModal] = useState<boolean>(false);
     const { DAO } = useDAO();
@@ -87,53 +97,59 @@ export default ({ showProjects, list }: MembersProps) => {
             <>
                 <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"} key={index}>
                     <Box sx={{ width: '250px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                        <Avatar name={user.name} wallet={user.wallet} />
+                        <Avatar name={props.name} wallet={props.address} />
                         <Box className={classes.lineSm}></Box>
                     </Box>
                     <Box sx={{ width: '300px' }} display={"flex"} alignItems={"center"}>
                         <Box sx={{ width: '150px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                            <Typography sx={{ marginLeft: '6px', fontSize: '14px', color: '#76808D' }}>{moment.utc(user.joined).local().format('MM/DD/YYYY')}</Typography>
+                            <Typography sx={{ marginLeft: '6px', fontSize: '14px', color: '#76808D' }}>{moment.utc(props.joined).local().format('MM/DD/YYYY')}</Typography>
                             <Box className={classes.lineSm}></Box>
                         </Box>
                         <Box sx={{ width: '150px', marginLeft: '10px' }}>
-                            <Typography sx={{ fontSize: '14px', fontWeight: '700', color: '#76808D' }}>{handleRenderRole(user)}</Typography>
+                            <Typography sx={{ fontSize: '14px', fontWeight: '700', color: '#76808D' }}>
+                                {/* {handleRenderRole(user)} */}
+                                {
+                                    props.role === 'role1' ? props.creator ? `${transformRole(props.role).label} (Creator)` : transformRole(props.role).label : transformRole(props.role).label
+                                }
+                            </Typography>
                         </Box>
                     </Box>
                     <Box sx={{ width: '300px' }} display={"flex"} alignItems={"center"}>
-                        <Chip
-                            label={'Senior marketing'}
-                            className={classes.rolePill}
-                            avatar={
-                                <Box sx={
-                                    index === 0 ? { background: 'rgba(146, 225, 168, 1)', borderRadius: '50% !important', } :
-                                        index === 1 ? { background: 'rgba(137,179,229,1)', borderRadius: '50% !important', } :
-                                            index === 2 ? { background: 'rgba(234,100,71,1)', borderRadius: '50% !important', } : { background: 'rgba(146, 225, 168, 1)', borderRadius: '50% !important', }
+                        {
+                            (show ? roles : roles.filter((_: any, i: any) => i < 5)).map((item: any, index: any) => {
+                                if (show || index <= 3) {
+                                    return (
+                                        <>
+                                            <Chip
+                                                label={item.name}
+                                                className={classes.rolePill}
+                                                sx={{
+                                                    '& .MuiChip-avatar': {
+                                                        height: '14px !important',
+                                                        width: '14px !important'
+                                                    }
+                                                }}
+                                                avatar={
+                                                    <Box style={{ backgroundColor: `${_get(item, "roleColor", '#99aab5')}`, borderRadius: '50%' }}></Box>
+                                                }
+                                                style={{ backgroundColor: `${_get(item, "roleColor", '#99aab5')}50` }}
+                                            />
+                                        </>
+                                    )
+                                }
+                                return (
+                                    <>
+                                        <Box className={classes.roleCount} onClick={() => setShow(prev => !prev)} display={"flex"} alignItems={"center"} justifyContent={"center"}>
+                                            <Typography>{show ? 'Hide' : `+${roles.length - 4}`}</Typography>
+                                        </Box>
+                                        {/* <div className={classes.roleCount} onClick={() => setShow(prev => !prev)}>
+                                            <span>{show ? 'Hide' : `+${roles.length - 4}`}</span>
+                                        </div> */}
+                                    </>
+                                )
+                            })
+                        }
 
-                                }></Box>
-                            }
-                            sx={
-                                index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } :
-                                    index === 1 ? { background: 'rgba(137,179,229,0.3)' } :
-                                        index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }
-                            }
-                        />
-                        <Chip
-                            label={'Developer'}
-                            className={classes.rolePill}
-                            avatar={
-                                <Box sx={
-                                    index === 0 ? { background: 'rgba(146, 225, 168, 1)', borderRadius: '50% !important', } :
-                                        index === 1 ? { background: 'rgba(137,179,229,1)', borderRadius: '50% !important', } :
-                                            index === 2 ? { background: 'rgba(234,100,71,1)', borderRadius: '50% !important', } : { background: 'rgba(146, 225, 168, 1)', borderRadius: '50% !important', }
-
-                                }></Box>
-                            }
-                            sx={
-                                index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } :
-                                    index === 1 ? { background: 'rgba(137,179,229,0.3)' } :
-                                        index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }
-                            }
-                        />
                     </Box>
                 </Box>
             </>
