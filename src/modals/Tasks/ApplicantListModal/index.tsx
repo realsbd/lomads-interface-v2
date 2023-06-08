@@ -15,6 +15,7 @@ import { useAppSelector } from "helpers/useAppSelector";
 
 import Avatar from "boring-avatars";
 import { assignTaskAction, rejectTaskMemberAction } from "store/actions/task";
+import theme from "theme";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -182,6 +183,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
             anchor={'right'}
             open={open}
+            sx={{ zIndex: theme.zIndex.appBar + 1  }}
             hideBackdrop={hideBackdrop}
         >
             <Box className={classes.modalConatiner}>

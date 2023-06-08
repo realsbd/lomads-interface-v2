@@ -24,6 +24,7 @@ import { useAppSelector } from "helpers/useAppSelector";
 import useTerminology from 'hooks/useTerminology';
 import { editProjectMilestonesAction } from "store/actions/project";
 import { beautifyHexToken } from "utils";
+import theme from "theme";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -345,7 +346,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     return (
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
-            sx={{ zIndex: 1 }}
+            sx={{ zIndex: theme.zIndex.appBar + 1  }}
             anchor={'right'}
             open={open}
             hideBackdrop={hideBackdrop}

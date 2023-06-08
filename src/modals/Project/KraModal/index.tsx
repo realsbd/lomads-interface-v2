@@ -17,6 +17,7 @@ import { useDAO } from "context/dao";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { useAppSelector } from "helpers/useAppSelector";
 import { editProjectKraAction } from "store/actions/project";
+import theme from "theme";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -191,7 +192,7 @@ export default ({ hideBackdrop, open, closeModal, list, freq, getResults, editKR
     return (
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
-            sx={{ zIndex: 1 }}
+            sx={{ zIndex: theme.zIndex.appBar + 1  }}
             anchor={'right'}
             open={open}
             hideBackdrop={hideBackdrop}

@@ -54,7 +54,7 @@ const XPPoints = ({ open, onClose }: any) => {
     const { chainId } = useWeb3Auth()
     const [activeTab, setActiveTab] = useState<number>(1)
     const [txnLoading, setTxnLoading] = useState<boolean>(false)
-    const { DAO } = useDAO()
+    const { DAO, updateDAO } = useDAO()
     const { loadSafe } = useSafe()
     const { safeTokens } = useSafeTokens()
     const { createSafeTransaction } = useGnosisSafeTransaction()
@@ -63,6 +63,10 @@ const XPPoints = ({ open, onClose }: any) => {
     const [state, setState] = useState<any>({
         sweatValue: 0
     })
+    
+    useEffect(() => {
+        updateDAO({ url: DAO?.url, payload: { sweatPoints: enabled } })
+    }, [enabled])
 
     const safe = useMemo(() => {
         return loadSafe(state?.safeAddress)

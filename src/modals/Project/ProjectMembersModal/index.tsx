@@ -19,6 +19,7 @@ import { useDAO } from "context/dao";
 
 import useTerminology from 'hooks/useTerminology';
 import { updateProjectMembersAction } from "store/actions/project";
+import theme from "theme";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -260,6 +261,7 @@ export default ({ open, closeModal }: Props) => {
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
             anchor={'right'}
+            sx={{ zIndex: theme.zIndex.appBar + 1  }}
             open={open}
             hideBackdrop={true}
         >

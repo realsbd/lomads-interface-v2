@@ -12,6 +12,7 @@ import MilestoneSVG from 'assets/svg/milestone.svg'
 import Dropdown from "components/Dropdown";
 import Avatar from "components/Avatar";
 import LabelDropdown from "components/LabelDropdown";
+import theme from "theme";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -89,7 +90,7 @@ export default ({ open, closeModal }: Props) => {
     return (
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
-            sx={{ zIndex: 1 }}
+            sx={{ zIndex: theme.zIndex.appBar + 1 }}
             anchor={'right'}
             open={open}
         >
