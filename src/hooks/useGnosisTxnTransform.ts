@@ -29,8 +29,8 @@ export default (safeAddress: string | undefined) => {
 
     const getNativeToken = useCallback(() => {
         if(safe?.chainId)
-            return CHAIN_INFO[safe?.chainId]?.nativeCurrency
-        return { name: '', symbol: '', decimals: 18 }
+            return { ...CHAIN_INFO[safe?.chainId]?.nativeCurrency, tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS }
+        return { name: '', symbol: '', decimals: 18, tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS }
     }, [safe?.chainId, safeAddress])
 
     const isNativeTokenSingleTransfer = (transaction: any) => {
@@ -79,6 +79,7 @@ export default (safeAddress: string | undefined) => {
             value: _get(transaction, 'value', 0),
             formattedValue: (+_get(transaction, 'value', 0) / ( 10 ** nativeToken?.decimals )),
             symbol: nativeToken?.symbol,
+            tokenAddress: nativeToken?.tokenAddress,
             decimals: nativeToken?.decimals,
             to: _get(transaction, 'to', "0x"),
             confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
@@ -124,6 +125,7 @@ export default (safeAddress: string | undefined) => {
                                     value: _get(decoded, 'value', 0),
                                     formattedValue: (+_get(decoded, 'value', 0) / ( 10 ** nativeToken?.decimals )),
                                     symbol: nativeToken?.symbol,
+                                    tokenAddress: nativeToken?.tokenAddress,
                                     decimals: nativeToken?.decimals,
                                     to: _get(decoded, 'to', "0x"),
                                     confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
@@ -155,6 +157,7 @@ export default (safeAddress: string | undefined) => {
                                     value: value,
                                     formattedValue: (+value / ( 10 ** (erc20Token?.token?.decimals || erc20Token?.token?.decimal || 18) )),
                                     symbol: erc20Token?.token?.symbol || transaction?.token?.symbol,
+                                    tokenAddress: erc20Token?.tokenAddress,
                                     decimals: erc20Token?.token?.decimal || erc20Token?.token?.decimals || 18,
                                     to: to,
                                     confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
@@ -190,6 +193,7 @@ export default (safeAddress: string | undefined) => {
                         value: value,
                         formattedValue: (+value / ( 10 ** (allowanceToken?.token?.decimal || allowanceToken?.token?.decimals) )),
                         symbol: allowanceToken?.token?.symbol,
+                        tokenAddress: allowanceToken?.tokenAddress,
                         decimals: (allowanceToken?.token?.decimal || allowanceToken?.token?.decimals),
                         to: to,
                         confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
@@ -222,6 +226,7 @@ export default (safeAddress: string | undefined) => {
                 formattedValue: value === '0x' ? '0x' : (+value / ( 10 ** (transaction?.token?.decimals || transaction?.token?.decimal || 18) )),
                 symbol: transaction?.token?.symbol,
                 decimals: transaction?.token?.decimals || transaction?.token?.decimal || 18,
+                tokenAddress: null,
                 to: to,
                 confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
                 confirmations: _get(transaction, 'confirmations', [])?.length || 0,
@@ -264,6 +269,7 @@ export default (safeAddress: string | undefined) => {
             formattedValue: (+value / ( 10 ** ( erc20Token?.token?.decimals || erc20Token?.token?.decimal || 18 ) )),
             symbol: erc20Token?.token?.symbol || transaction?.token?.symbol,
             decimals: erc20Token?.token?.decimal || erc20Token?.token?.decimals,
+            tokenAddress: erc20Token?.tokenAddress,
             to: to,
             confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
             confirmations: _get(transaction, 'confirmations', [])?.length || 0,
@@ -298,6 +304,7 @@ export default (safeAddress: string | undefined) => {
             formattedValue: "0",
             symbol: "",
             decimals: "",
+            tokenAddress: "0x",
             to: "0x",
             confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
             confirmations: _get(transaction, 'confirmations', [])?.length || 0,
@@ -331,6 +338,7 @@ export default (safeAddress: string | undefined) => {
             formattedValue: (+value / ( 10 ** (erc20Token?.token?.decimals || erc20Token?.token?.decimal) )),
             symbol: _get(transaction, 'transfers[0].tokenInfo.symbol', null),
             decimals: _get(transaction, 'transfers[0].tokenInfo.decimals', null),
+            tokenAddress: erc20Token?.tokenAddress,
             to: _get(transaction, 'to', "0x"),
             confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
             confirmations: _get(transaction, 'confirmations', [])?.length || 0,
