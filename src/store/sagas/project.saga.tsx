@@ -24,8 +24,10 @@ function* getProjectSaga(action: any) {
         const { data } = yield call(getProjectService, action.payload);
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data })
         yield put({ type: actionTypes.SET_PROJECT_LOADING, payload: false })
+        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield put({ type: actionTypes.SET_PROJECT_LOADING, payload: null })
     } catch (e) {
-
+        yield put({ type: actionTypes.SET_PROJECT_LOADING, payload: null })
     }
 }
 
@@ -35,8 +37,11 @@ function* createProjectSaga(action: any) {
         const { data } = yield call(createProjectService, action.payload)
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data })
         yield put({ type: actionTypes.CREATE_PROJECT_LOADING, payload: false })
-    } catch (e) {
-
+        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield put({ type: actionTypes.CREATE_PROJECT_LOADING, payload: null })
+    }
+    catch (e) {
+        yield put({ type: actionTypes.CREATE_PROJECT_LOADING, payload: null })
     }
 }
 
@@ -47,8 +52,10 @@ function* updateProjectDetailsSaga(action: any) {
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.UPDATE_PROJECT_DETAILS_LOADING, payload: false })
+        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield put({ type: actionTypes.UPDATE_PROJECT_DETAILS_LOADING, payload: null })
     } catch (e) {
-
+        yield put({ type: actionTypes.UPDATE_PROJECT_DETAILS_LOADING, payload: null })
     }
 }
 
@@ -59,8 +66,10 @@ function* archiveProjectSaga(action: any) {
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.ARCHIVE_PROJECT_LOADING, payload: false })
+        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield put({ type: actionTypes.ARCHIVE_PROJECT_LOADING, payload: null })
     } catch (e) {
-
+        yield put({ type: actionTypes.ARCHIVE_PROJECT_LOADING, payload: null })
     }
 }
 
@@ -71,8 +80,10 @@ function* deleteProjectSaga(action: any) {
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.DELETE_PROJECT_LOADING, payload: false })
+        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield put({ type: actionTypes.DELETE_PROJECT_LOADING, payload: null })
     } catch (e) {
-
+        yield put({ type: actionTypes.DELETE_PROJECT_LOADING, payload: null })
     }
 }
 
@@ -83,8 +94,10 @@ function* updateProjectKraSaga(action: any) {
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.UPDATE_PROJECT_KRA_LOADING, payload: false })
+        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield put({ type: actionTypes.UPDATE_PROJECT_KRA_LOADING, payload: null })
     } catch (e) {
-
+        yield put({ type: actionTypes.UPDATE_PROJECT_KRA_LOADING, payload: null })
     }
 }
 
@@ -95,8 +108,10 @@ function* editProjectKraSaga(action: any) {
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.EDIT_PROJECT_KRA_LOADING, payload: false })
+        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield put({ type: actionTypes.EDIT_PROJECT_KRA_LOADING, payload: null })
     } catch (e) {
-
+        yield put({ type: actionTypes.EDIT_PROJECT_KRA_LOADING, payload: null })
     }
 }
 
@@ -107,8 +122,10 @@ function* editProjectMilestonesSaga(action: any) {
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.EDIT_PROJECT_MILESTONES_LOADING, payload: false })
+        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield put({ type: actionTypes.EDIT_PROJECT_MILESTONES_LOADING, payload: null })
     } catch (e) {
-
+        yield put({ type: actionTypes.EDIT_PROJECT_MILESTONES_LOADING, payload: null })
     }
 }
 
@@ -118,8 +135,10 @@ function* updateProjectMembersSaga(action: any) {
         const { data } = yield call(updateProjectMembersService, action.payload)
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data })
         yield put({ type: actionTypes.UPDATE_PROJECT_MEMBERS_LOADING, payload: false })
+        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield put({ type: actionTypes.UPDATE_PROJECT_MEMBERS_LOADING, payload: null })
     } catch (e) {
-
+        yield put({ type: actionTypes.UPDATE_PROJECT_MEMBERS_LOADING, payload: null })
     }
 }
 
@@ -129,8 +148,10 @@ function* inviteProjectMembersSaga(action: any) {
         const { data } = yield call(inviteProjectMembersService, action.payload)
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data })
         yield put({ type: actionTypes.INVITE_PROJECT_MEMBERS_LOADING, payload: false })
+        yield call(() => new Promise(resolve => setTimeout(resolve, 2000)))
+        yield put({ type: actionTypes.INVITE_PROJECT_MEMBERS_LOADING, payload: null })
     } catch (e) {
-
+        yield put({ type: actionTypes.INVITE_PROJECT_MEMBERS_LOADING, payload: null })
     }
 }
 

@@ -126,7 +126,6 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     useEffect(() => {
         if (editProjectMilestonesLoading === false) {
             closeModal();
-            // navigate(-1);
         }
     }, [editProjectMilestonesLoading]);
 
@@ -336,7 +335,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                 dispatch(editProjectMilestonesAction({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones, compensation: { currency, amount, symbol, safeAddress } } }));
             }
             else {
-                getCompensation({ currency: currency, amount, symbol })
+                getCompensation({ currency: currency, amount, symbol, safeAddress })
                 getMilestones(milestones);
                 closeModal();
             }
@@ -346,7 +345,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     return (
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
-            sx={{ zIndex: theme.zIndex.appBar + 1  }}
+            sx={{ zIndex: theme.zIndex.appBar + 1 }}
             anchor={'right'}
             open={open}
             hideBackdrop={hideBackdrop}
@@ -392,7 +391,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                         <CurrencyInput
                             value={amount}
                             onChange={(value: any) => handleChangeCompensationAmount(value)}
-                            options={_get(safeTokens, safeAddress, []).map((tok:any) => { return { label: tok?.token?.symbol, value: tok?.tokenAddress } })}
+                            options={_get(safeTokens, safeAddress, []).map((tok: any) => { return { label: tok?.token?.symbol, value: tok?.tokenAddress } })}
                             dropDownvalue={currency}
                             onDropDownChange={(value: any) => {
                                 handleChangeCurrency(value)

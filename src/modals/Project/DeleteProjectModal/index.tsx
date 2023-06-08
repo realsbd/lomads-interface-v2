@@ -61,7 +61,7 @@ export default ({ open, closeModal }: Props) => {
     useEffect(() => {
         if (deleteProjectLoading === false) {
             closeModal();
-            // navigate(-1);
+            navigate(-1);
         }
     }, [deleteProjectLoading]);
 

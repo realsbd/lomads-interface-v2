@@ -110,7 +110,6 @@ export default ({ hideBackdrop, open, closeModal, list, freq, getResults, editKR
     useEffect(() => {
         if (editProjectKraLoading === false) {
             closeModal();
-            // navigate(-1);
         }
     }, [editProjectKraLoading]);
 
@@ -192,7 +191,7 @@ export default ({ hideBackdrop, open, closeModal, list, freq, getResults, editKR
     return (
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
-            sx={{ zIndex: theme.zIndex.appBar + 1  }}
+            sx={{ zIndex: theme.zIndex.appBar + 1 }}
             anchor={'right'}
             open={open}
             hideBackdrop={hideBackdrop}
