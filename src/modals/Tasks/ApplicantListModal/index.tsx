@@ -139,9 +139,8 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                     <Box sx={{ width: '300px', margin: '35px 0' }}>
                         <Typography sx={{ fontSize: '16px', color: '#76808D', marginBottom: '14px', fontWeight: '700' }}>Note</Typography>
                         <Typography
-                        // dangerouslySetInnerHTML={{ __html: _get(applicant, 'note', '') }}
+                            dangerouslySetInnerHTML={{ __html: _get(applicant, 'note', '') }}
                         >
-                            I want to do this task because … ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam.
                         </Typography>
                     </Box>
 

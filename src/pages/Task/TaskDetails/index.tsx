@@ -32,6 +32,7 @@ import {
 
 import copyIcon from "assets/svg/copyIcon.svg";
 import shareIcon from 'assets/svg/share.svg';
+import applicants from 'assets/svg/applicants.svg'
 import moment from "moment";
 import Avatar from "components/Avatar";
 import CloseTaskModal from "modals/Tasks/CloseTaskModal";
@@ -178,6 +179,60 @@ export default () => {
             return user.member
     }, [Task]);
 
+    const amICreator = useMemo(() => {
+        if (DAO && Task) {
+            let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
+            if (user && Task.reviewer) {
+                if (user.member._id === Task.reviewer._id) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            return false;
+        }
+        return false;
+    }, [account, DAO, Task])
+
+    const applicationCount = useMemo(() => {
+        if (Task) {
+            let applications = _get(Task, 'members', []).filter((m: any) => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+            if (applications)
+                return applications.length
+            return 0
+        }
+        return 0;
+    }, [Task]);
+
+    const submissionCount = useMemo(() => {
+        if (Task) {
+            let submissions = _get(Task, 'members', [])?.filter((m: any) => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+            if (submissions)
+                return submissions.length
+            return 0
+        }
+        return 0;
+    }, [Task]);
+
+    const taskMembers = useMemo(() => {
+        return _get(Task, 'members', []).filter((m: any) => m.status !== 'rejected');
+    }, [Task])
+
+    const handleOpenApplicantsSlider = () => {
+        if (taskMembers.length > 0) {
+            setOpenApplicantsModal(true);
+        }
+    }
+
+    const handleRenderRejectionNote = useMemo(() => {
+        if (Task) {
+            let user = _find(_get(Task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.status === 'submission_rejected')
+            if (user)
+                return user.rejectionNote;
+        }
+    }, [account, Task]);
+
     const handleParseUrl = (url: string) => {
         try {
             const link = new URL(url);
@@ -214,17 +269,241 @@ export default () => {
     }
 
     const showSubmissions = () => {
-        return <div>
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Box display={"flex"} alignItems={"center"}>
+                    <img style={{ marginRight: '10px' }} src={applicants} />
+                    <Typography sx={{ fontSize: 30, color: '#FFF' }}>{submissionCount}</Typography>
+                </Box>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0' }}>{submissionCount > 1 ? 'Submissions' : 'Submission'}</Typography>
+                {
+                    !Task.draftedAt &&
+                    <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => { submissionCount > 0 && setOpenReviewModal(true) }}>CHECK</Button>
+                }
+            </Box>
+        )
+    }
 
-        </div>
+    const showApplicants = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Box display={"flex"} alignItems={"center"}>
+                    <img style={{ marginRight: '10px' }} src={applicants} />
+                    <Typography sx={{ fontSize: 30, color: '#FFF' }}>{applicationCount}</Typography>
+                </Box>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0' }}>{applicationCount > 1 ? 'Applicants' : 'Applicant'}</Typography>
+                {
+                    !Task.draftedAt &&
+                    <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={handleOpenApplicantsSlider}>CHECK</Button>
+                }
+            </Box>
+        )
+    }
+
+    const showRejected = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>Your submission was rejected</Typography>
+                <Typography dangerouslySetInnerHTML={{ __html: handleRenderRejectionNote() }}></Typography>
+            </Box>
+        )
+    }
+
+    const showWellDone = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>Well Done!</Typography>
+            </Box>
+        )
+    }
+
+    const showWaitingValidation = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>Waiting<br />for validation</Typography>
+            </Box>
+        )
+    }
+
+    const showReviewerCheckingApplication = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>The reviewer is<br />looking at your<br />application.</Typography>
+            </Box>
+        )
+    }
+
+    const showFitRoleApply = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task<br />fits your role.</Typography>
+                {
+                    moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt && !Task.isDummy
+                        ?
+                        null
+                        :
+                        <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => setOpenApplyModal(true)}>APPLY</Button>
+                }
+            </Box>
+        )
+    }
+
+    const showFitRoleSubmit = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task<br />fits your role.</Typography>
+                {
+                    !Task.draftedAt && <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => setOpenSubmitModal(true)}>SUBMIT WORK</Button>
+                }
+            </Box>
+        )
+    }
+
+    const showDoesNotFitRole = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task does not<br />fits your role.</Typography>
+            </Box>
+        )
+    }
+
+    const showNeedContributor = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task needs a<br />contributor.</Typography>
+                {
+                    moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt && !Task.isDummy
+                        ?
+                        null
+                        :
+                        <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => setOpenApplyModal(true)}>APPLY</Button>
+                }
+            </Box>
+        )
+    }
+
+    const showOpenForAll = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>Open for all.</Typography>
+                {
+                    !Task.draftedAt && <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => setOpenSubmitModal(true)}>SUBMIT WORK</Button>
+                }
+            </Box>
+        )
+    }
+
+    const showYouAreAssigned = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>You are assigned.</Typography>
+                {
+                    !Task.draftedAt && <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => setOpenSubmitModal(true)}>SUBMIT WORK</Button>
+                }
+            </Box>
+        )
+    }
+
+    const showUserAssigned = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>{assignedUser?.name} is assigned</Typography>
+            </Box>
+        )
+    }
+
+    const showTaskSubmitted = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>Task is submitted</Typography>
+                {
+                    amICreator && !Task.draftedAt && <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => setOpenReviewModal(true)}>CHECK</Button>
+                }
+            </Box>
+        )
+    }
+
+    const showTaskStatus = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>Task has been<br />{Task.taskStatus}</Typography>
+            </Box>
+        )
+    }
+
+    const showRejectedSubmitAgain = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>Your submission has been rejected</Typography>
+                <Typography dangerouslySetInnerHTML={{ __html: handleRenderRejectionNote() }}></Typography>
+                <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => setOpenSubmitModal(true)}>SUBMIT AGAIN</Button>
+            </Box>
+        )
+    }
+
+    const showSubmissionStatus = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>Submission has been<br /> {Task.taskStatus}</Typography>
+            </Box>
+        )
     }
 
     const renderBody = (body: string) => {
-        switch(body) {
-            case 'SHOW_SUBMISSIONS': 
-                return showSubmissions()
+        switch (body) {
+            case 'SHOW_SUBMISSIONS':
+                return showSubmissions();
+
+            case 'SHOW_APPLICATIONS':
+                return showApplicants();
+
+            case 'SUBMISSION_REJECTED':
+                return showRejected();
+
+            case 'WELL_DONE':
+                return showWellDone();
+
+            case 'WAITING_FOR_VALIDATION':
+                return showWaitingValidation();
+
+            case 'REVIEWER_LOOKING_AT_APPLICATION':
+                return showReviewerCheckingApplication();
+
+            case 'FITS_YOUR_ROLE_APPLY':
+                return showFitRoleApply();
+
+            case 'FITS_YOUR_ROLE_SUBMIT':
+                return showFitRoleSubmit();
+
+            case 'DOES_NOT_FIT_YOUR_ROLE':
+                return showDoesNotFitRole();
+
+            case 'TASK_NEEDS_CONTRIBUTOR':
+                return showNeedContributor();
+
+            case 'OPEN_FOR_ALL':
+                return showOpenForAll();
+
+            case 'YOU_ARE_ASSIGNED':
+                return showYouAreAssigned();
+
+            case 'USER_ASSIGNED':
+                return showUserAssigned();
+
+            case 'TASK_SUBMITTED':
+                return showTaskSubmitted();
+
+            case 'TASK_STATUS':
+                return showTaskStatus();
+
+            case 'SUBMISSION_REJECTED_SUBMIT_AGAIN':
+                return showRejectedSubmitAgain();
+
+            case 'SUBMISSION_STATUS':
+                return showSubmissionStatus();
+
             default:
-                return null
+                return null;
         }
     }
 
@@ -398,7 +677,7 @@ export default () => {
                             sx={{ fontSize: '14px', color: '#1B2B41' }}></Typography>
                     </Box>
                     <Box className={classes.detailsContainer} display="flex" flexWrap={"wrap"} alignItems="center" justifyContent={"center"}>
-                        { renderBody(Task?.visual?.renderBody) }
+                        {renderBody(Task?.visual?.renderBody)}
                         {/* <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenApplyModal(true)}>
                             APPLY
                         </Button>
