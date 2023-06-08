@@ -73,7 +73,6 @@ export default ({ open, closeModal }: Props) => {
     useEffect(() => {
         if (updateProjectDetailsLoading === false) {
             closeModal();
-            // navigate(-1);
         }
     }, [updateProjectDetailsLoading]);
 

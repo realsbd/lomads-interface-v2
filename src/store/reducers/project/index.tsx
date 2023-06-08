@@ -6,16 +6,16 @@ import * as actionTypes from 'store/actionTypes';
 export function getInitialState() {
     return {
         Project: null,
-        setProjectLoading: false,
-        createProjectLoading: false,
-        updateProjectDetailsLoading: false,
-        archiveProjectLoading: false,
-        deleteProjectLoading: false,
-        updateProjectKraLoading: false,
-        editProjectKraLoading: false,
-        editProjectMilestonesLoading: false,
-        updateProjectMembersLoading: false,
-        inviteProjectMembersLoading: false,
+        setProjectLoading: null,
+        createProjectLoading: null,
+        updateProjectDetailsLoading: null,
+        archiveProjectLoading: null,
+        deleteProjectLoading: null,
+        updateProjectKraLoading: null,
+        editProjectKraLoading: null,
+        editProjectMilestonesLoading: null,
+        updateProjectMembersLoading: null,
+        inviteProjectMembersLoading: null,
     };
 }
 

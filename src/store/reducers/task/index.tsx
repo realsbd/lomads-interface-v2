@@ -6,16 +6,16 @@ import * as actionTypes from 'store/actionTypes';
 export function getInitialState() {
     return {
         Task: null,
-        setTaskLoading: false,
-        createTaskLoading: false,
-        draftTaskLoading: false,
-        archiveTaskLoading: false,
-        deleteTaskLoading: false,
-        applyTaskLoading: false,
-        submitTaskLoading: false,
-        assignTaskLoading: false,
-        rejectTaskMemberLoading: false,
-        rejectTaskSubmissionLoading: false,
+        setTaskLoading: null,
+        createTaskLoading: null,
+        draftTaskLoading: null,
+        archiveTaskLoading: null,
+        deleteTaskLoading: null,
+        applyTaskLoading: null,
+        submitTaskLoading: null,
+        assignTaskLoading: null,
+        rejectTaskMemberLoading: null,
+        rejectTaskSubmissionLoading: null,
     };
 }
 

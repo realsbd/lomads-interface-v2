@@ -27,6 +27,7 @@ export default () => {
     const { daoURL } = useParams();
     const navigate = useNavigate();
     const { DAO, DAOList } = useDAO();
+    console.log("DAO", DAO);
     const { account } = useWeb3Auth();
     const { myRole, can } = useRole(DAO, account);
     // @ts-ignore
@@ -45,15 +46,16 @@ export default () => {
             <Grid sm={12}>
                 <ProjectSection />
             </Grid>
-            {/* <Grid sm={12}>
+
+            {can(myRole, 'transaction.view') && <Grid mt={1} item sm={12}>
+                <Treasury />
+            </Grid>}
+
+            <Grid sm={12} sx={{ marginTop: '20px' }}>
                 <MembersSection
                     list={_get(DAO, 'members', [])}
-                    showProjects={false}
                 />
-            </Grid> */}
-            { can(myRole, 'transaction.view') && <Grid mt={1} item sm={12}>
-                <Treasury />
-            </Grid> }
+            </Grid>
         </Grid>
     )
 }

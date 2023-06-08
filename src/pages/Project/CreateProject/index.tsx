@@ -34,6 +34,7 @@ import { DEFAULT_ROLES } from "constants/terminology";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { createProjectAction } from "store/actions/project";
 import { useAppSelector } from "helpers/useAppSelector";
+import { useNavigate } from "react-router-dom";
 
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
@@ -129,7 +130,7 @@ export default () => {
     const { account } = useWeb3Auth();
     const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'));
     console.log("DAO in createProject : ", DAO);
-
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     // @ts-ignore
     const { createProjectLoading } = useAppSelector(store => store.project);
@@ -166,6 +167,15 @@ export default () => {
         if (DAO)
             setMemberList(DAO.members)
     }, [DAO])
+
+    useEffect(() => {
+        if (createProjectLoading === false) {
+            setSuccess(true);
+            setTimeout(() => {
+                navigate(-1);
+            }, 2000);
+        }
+    }, [createProjectLoading])
 
     useEffect(() => {
         const rolesArr = _get(DAO, 'terminologies.roles', DEFAULT_ROLES);
@@ -363,7 +373,7 @@ export default () => {
                 </Box> */}
                 <List style={{ maxHeight: 300, overflow: 'hidden', overflowY: 'auto' }}>
                     {
-                            _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').filter((member:any) => toChecksumAddress(member?.member.wallet) !== account).map((item:any, index:number) => {
+                        _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').filter((member: any) => toChecksumAddress(member?.member.wallet) !== account).map((item: any, index: number) => {
                             const labelId = `checkbox-list-label-${item.member.wallet}`;
                             return (
                                 <ListItem disablePadding key={item.member.wallet}>
@@ -738,8 +748,24 @@ export default () => {
         )
     }
 
+    const _renderSuccess = () => {
+        return (
+            <Grid container className={classes.root}>
+                <Grid xs={12} item display="flex" flexDirection="column" alignItems="center" justifyContent={"center"} sx={{ margin: '10vh 0' }}>
+                    <img src={createProjectSvg} alt="frame-icon" />
+                    <Typography color="primary" variant="subtitle1" className={classes.heading}>Success!</Typography>
+                    <Typography style={{ textAlign: 'center', fontStyle: 'italic', color: ' #76808D' }}>The new project is created. <br /> You will be redirected in a few seconds.</Typography>
+                </Grid>
+            </Grid>
+        )
+    }
+
     if (showMore) {
         return _renderAddProjectDetails();
+    }
+
+    if (success) {
+        return _renderSuccess();
     }
 
     return _renderCreateProject();
