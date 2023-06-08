@@ -6,7 +6,7 @@ import clsx from "clsx";
 
 type propTypes = {
 	options?: any[],
-	selected?: number,
+	selected?: any,
 	selectStyle?: any,
 	errorSelect?: string,
 	setSelectedValue: (event: any) => void

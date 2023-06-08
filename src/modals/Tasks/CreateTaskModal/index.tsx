@@ -29,6 +29,7 @@ import { isValidUrl } from 'utils';
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { createTaskAction, draftTaskAction } from "store/actions/task";
 import useSafe from "hooks/useSafe";
+import theme from "theme";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -439,7 +440,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
             anchor={'right'}
             open={open}
-            sx={{ zIndex: '1102' }}
+            sx={{ zIndex: theme.zIndex.appBar + 1  }}
         >
             <RolesListModal
                 open={openRolesList}

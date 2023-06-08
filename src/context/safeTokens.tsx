@@ -89,7 +89,7 @@ export const SafeTokensProvider = ({ children }: any) => {
                 })
                 .catch(e => console.log(e))
         }
-    }, [DAO?.url])
+    }, [DAO?.url, DAO?.sweatPoints])
 
     const contextProvider = {
         safeTokens,

@@ -52,7 +52,6 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
                 else
                     await confirmTransaction(payload)
                 setConfirmLoading(false)
-                onPostExecution()
             } catch(e) {
                 console.log(e)
                 setConfirmLoading(false)
@@ -92,6 +91,7 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
                     await offChainExecuteTransaction(payload)
                 else
                     await executeTransaction(payload)
+                onPostExecution()
                 setExecuteTxLoading(false)
             } catch(e) {
                 console.log(e)

@@ -18,6 +18,7 @@ import DetailsModal from "../DetailsModal";
 import ProjectMembersModal from "../ProjectMembersModal";
 
 import { useAppSelector } from "helpers/useAppSelector";
+import theme from "theme";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -96,7 +97,7 @@ export default ({ open, closeModal }: Props) => {
     return (
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
-            sx={{ zIndex: 1 }}
+            sx={{ zIndex: theme.zIndex.appBar + 1  }}
             anchor={'right'}
             open={open}
         >

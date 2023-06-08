@@ -27,6 +27,7 @@ import compensationStar from 'assets/svg/compensationStar.svg';
 import editToken from 'assets/svg/editToken.svg';
 import compensationIcon from 'assets/svg/compensation.svg';
 import { assignTaskAction, rejectTaskMemberAction, rejectTaskSubmissionAction } from "store/actions/task";
+import theme from "theme";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -229,6 +230,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                 anchor={'right'}
                 open={showModifyCompensation}
                 hideBackdrop={false}
+                sx={{ zIndex: theme.zIndex.appBar + 1  }}
             >
                 <Box className={classes.modalConatiner}>
                     <Box sx={{ width: '100%', padding: '0 27px' }} display="flex" alignItems="center" justifyContent={"space-between"}>

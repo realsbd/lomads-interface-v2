@@ -22,6 +22,7 @@ import { useDAO } from "context/dao";
 import AddDiscordLink from "components/AddDiscordLink";
 import AddNotionLink from "components/AddNotionLink";
 import Switch from "components/Switch";
+import theme from "theme";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -292,6 +293,7 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
             anchor={'right'}
             open={open}
+            sx={{ zIndex: theme.zIndex.appBar + 1  }}
             hideBackdrop={hideBackdrop}
         >
             <Box className={classes.modalConatiner}>
