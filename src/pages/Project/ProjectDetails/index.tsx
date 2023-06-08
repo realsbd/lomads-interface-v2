@@ -33,6 +33,7 @@ import AssignContributionModal from "modals/Project/AssignContributionModal";
 import Button from "components/Button";
 import KraReviewModal from "modals/Project/KraReviewModal";
 import TaskSection from "sections/TaskSection";
+import InviteMemberModal from "modals/Project/InviteMemberModal";
 
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { useAppSelector } from "helpers/useAppSelector";
@@ -101,7 +102,8 @@ const useStyles = makeStyles((theme: any) => ({
         boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), - 3px - 3px 8px rgba(201, 75, 50, 0.1) !important',
         borderRadius: '5px !important',
         fontSize: '14px !important',
-        color: '#C94B32 !important'
+        color: '#C94B32 !important',
+        marginLeft: '20px !important'
     },
     lineSm: {
         border: '1px solid rgba(118, 128, 141, 0.5) !important',
@@ -174,6 +176,7 @@ export default () => {
     const { provider, account, chainId } = useWeb3Auth();
     const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'));
     const { myRole, can } = useRole(DAO, account);
+    const [openInviteModal, setOpenInviteModal] = useState<boolean>(false);
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -341,6 +344,11 @@ export default () => {
                 <KraReviewModal
                     open={openKraReview}
                     closeModal={() => setOpenKraReview(false)}
+                />
+
+                <InviteMemberModal
+                    open={openInviteModal}
+                    closeModal={() => setOpenInviteModal(false)}
                 />
 
                 {/* Name */}
@@ -532,21 +540,13 @@ export default () => {
 
                 <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
 
-                    {/* <InviteMemberModal
-                        open={openInviteModal}
-                        closeModal={() => setOpenInviteModal(false)}
-                    /> */}
-
                     <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                         <Typography sx={{ fontSize: '22px', fontWeight: '400', color: '#76808D' }}>Members</Typography>
                         <Box display={"flex"} alignItems={"center"}>
                             <img src={membersGroup} alt="membersGroup" />
                             <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{Project?.members.length} {Project?.members.length > 1 ? 'members' : 'member'}</Typography>
-                            <Box sx={{ cursor: 'pointer', margin: '0 20px' }}>
-                                <img src={editSvg} alt="edit-svg" style={{ height: '40px', width: '40px' }} />
-                            </Box>
                             <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn}
-                            // onClick={() => setOpenInviteModal(true)}
+                                onClick={() => setOpenInviteModal(true)}
                             >
                                 <AddIcon sx={{ fontSize: 18 }} /> MEMBER
                             </Button>

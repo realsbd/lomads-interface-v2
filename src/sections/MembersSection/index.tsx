@@ -12,7 +12,7 @@ import Avatar from "components/Avatar";
 import moment from "moment";
 import { useDAO } from "context/dao";
 import useTerminology from 'hooks/useTerminology';
-import InviteMemberModal from "modals/Project/InviteMemberModal";
+
 import editSvg from 'assets/svg/editToken.svg';
 
 const useStyles = makeStyles((theme: any) => ({
@@ -63,7 +63,7 @@ interface MembersProps {
 export default ({ list }: MembersProps) => {
     console.log("List : ", list)
     const classes = useStyles();
-    const [openInviteModal, setOpenInviteModal] = useState<boolean>(false);
+
     const { DAO } = useDAO();
     const { transformRole } = useTerminology(_get(DAO, 'terminologies'))
 
@@ -150,22 +150,17 @@ export default ({ list }: MembersProps) => {
     return (
         <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
 
-            <InviteMemberModal
-                open={openInviteModal}
-                closeModal={() => setOpenInviteModal(false)}
-            />
-
             <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                 <Typography sx={{ fontSize: '22px', fontWeight: '400', color: '#76808D' }}>Members</Typography>
                 <Box display={"flex"} alignItems={"center"}>
                     <img src={membersGroup} alt="membersGroup" />
                     <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{list.length} {list.length > 1 ? 'members' : 'member'}</Typography>
-                    <Box sx={{ cursor: 'pointer', margin: '0 20px' }}>
+                    {/* <Box sx={{ cursor: 'pointer', margin: '0 20px' }}>
                         <img src={editSvg} alt="edit-svg" style={{ height: '40px', width: '40px' }} />
                     </Box>
-                    <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn} onClick={() => setOpenInviteModal(true)}>
+                    <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn}>
                         <AddIcon sx={{ fontSize: 18 }} /> MEMBER
-                    </Button>
+                    </Button> */}
                 </Box>
             </Box>
 
