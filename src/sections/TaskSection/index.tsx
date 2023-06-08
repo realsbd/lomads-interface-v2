@@ -83,7 +83,6 @@ function a11yProps(index: number) {
 export default ({ onlyProjects }: any) => {
     const classes = useStyles();
     const { projectId } = useParams();
-    console.log("ProjectId : ", projectId);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { DAO } = useDAO();
@@ -111,6 +110,7 @@ export default ({ onlyProjects }: any) => {
             <CreateTaskModal
                 open={openCreateTask}
                 closeModal={() => setOpenCreateTask(false)}
+                selectedProject={onlyProjects ? Project : null}
             />
             <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                 <Tabs
