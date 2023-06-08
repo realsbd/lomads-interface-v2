@@ -163,6 +163,13 @@ export default ({ open, closeModal, selectedProject }: Props) => {
 
     // const { loadSafe } = useSafe();
 
+    useEffect(() => {
+        if(open && selectedProject) {
+            setTimeout(() => {
+                setProjectId(selectedProject?._id)
+            }, 100)
+        }
+    }, [selectedProject, open])
 
     const [errorName, setErrorName] = useState('');
     const [errorDesc, setErrorDesc] = useState('');
@@ -214,8 +221,11 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     }, [DAO, reviewer, selectedUser]);
 
     const eligibleProjects = useMemo(() => {
+        if(selectedProject) {
+            return [{ label: selectedProject?.name, value: selectedProject?._id }]
+        }
         return _get(DAO, 'projects', []).filter((p: any) => _find(p.members, m => m._id === user._id)).map((item: any) => { return { label: item.name, value: item._id } })
-    }, [DAO, reviewer, selectedUser]);
+    }, [DAO, reviewer, selectedUser, selectedProject]);
 
     const getrolename = (roleId: any) => {
 
@@ -525,6 +535,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                     <Box sx={{ width: '100%' }}>
                         <MuiSelect
                             options={eligibleProjects}
+                            selected={projectId}
                             setSelectedValue={(value) => setProjectId(value)}
                         />
                     </Box>
