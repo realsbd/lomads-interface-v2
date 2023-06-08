@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { get as _get } from 'lodash'
 import { Box, Grid, Typography, Drawer } from "@mui/material";
 import { makeStyles } from '@mui/styles';
@@ -21,6 +21,7 @@ import XPPoints from "./Modals/XPPoints";
 import Organisation from "./Modals/Organisation";
 import { useDAO } from "context/dao";
 import theme from "theme";
+import { useLocation } from "react-router-dom";
 
 const useStyles = makeStyles((theme: any) => ({
     item: {
@@ -70,6 +71,7 @@ export default () => {
 
     const [activeModal, setActiveModal] = useState<string | null>(null);
     const { DAO } = useDAO()
+    const location = useLocation();
 
     const Modal = useMemo(() => {
         if(activeModal === SafeModal.name)
@@ -88,6 +90,11 @@ export default () => {
             return Organisation
         return Fragment
     }, [activeModal])
+
+    useEffect(() => {
+        if(DAO?.url && location?.state?.openDefault)
+            setActiveModal(location?.state?.openDefault)
+    }, [DAO?.url, location?.state?.openDefault])
 
     return (
         <>

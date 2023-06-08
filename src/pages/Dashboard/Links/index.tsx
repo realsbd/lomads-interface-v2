@@ -10,6 +10,7 @@ import Skeleton from '@mui/material/Skeleton';
 import { useNavigate } from "react-router-dom";
 import useRole from "hooks/useRole";
 import { useWeb3Auth } from "context/web3Auth";
+import Organisation from "pages/Settings/Modals/Organisation";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -67,7 +68,9 @@ export default () => {
                     {
                         _get(DAO, 'links', []).length > 0 ?
                         _get(DAO, 'links', []).map((link:any) => <LinkChip url={_get(link, 'link')} name={_get(link, 'title')} />) : 
-                        <Box className={classes.empty}>
+                        <Box onClick={() => {
+                            navigate(`/${DAO?.url}/settings`, { state: { openDefault: Organisation.name } })
+                        }} className={classes.empty}>
                             <Typography className={classes.emptyText} >ADD USEFUL LINKS HERE</Typography>
                         </Box>
                     }

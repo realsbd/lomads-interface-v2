@@ -28,6 +28,7 @@ export default ({ labelChip, fullWidth, height, width, placeholder, value, onCha
                         default_link_target: "_blank",
                         extended_valid_elements: "a[href|target=_blank]",
                         link_assume_external_targets: true,
+                        content_css:'/tinymce.css',
                         plugins: [
                             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { find as _find, get as _get, debounce as _debounce, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 
-import { Grid, Paper, Typography, Box, Chip } from "@mui/material";
+import { Grid, Paper, Typography, Box, Chip, List, ListItem, ListItemButton } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -36,10 +36,13 @@ import { createProjectAction } from "store/actions/project";
 import { useAppSelector } from "helpers/useAppSelector";
 import { useNavigate } from "react-router-dom";
 
+const { toChecksumAddress } = require('ethereum-checksum-address')
+
 const useStyles = makeStyles((theme: any) => ({
     root: {
-        height: '100vh',
-        overflowY: 'scroll',
+        // height: '100vh',
+        // overflowY: 'scroll',
+        paddingBottom: 32,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -351,21 +354,42 @@ export default () => {
                     <Typography sx={{ fontWeight: 700, fontSize: 16, color: '#76808D' }}>Invite members</Typography>
                     <Button variant="contained" color="secondary" className={classes.addMemberBtn}>ADD NEW MEMBER</Button>
                 </Box>
-                {
-                    _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item: any, index: number) => {
-                        if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
+                {/* <Box style={{ maxHeight: 300, overflow: 'hidden', overflowY: 'auto' }}>
+                    {
+                        _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item:any, index:number) => {
+                            if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
+                                return (
+                                    <>
+                                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} key={index} onClick={() => handleAddMember(item.member)}>
+                                            <Avatar name={item.member.name} wallet={item.member.wallet} />
+                                            <Checkbox />
+                                        </Box>
+                                    </>
+                                )
+                            }
+                            return null
+                        })
+                    }
+                </Box> */}
+                <List style={{ maxHeight: 300, overflow: 'hidden', overflowY: 'auto' }}>
+                    {
+                        _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').filter((member: any) => toChecksumAddress(member?.member.wallet) !== account).map((item: any, index: number) => {
+                            const labelId = `checkbox-list-label-${item.member.wallet}`;
                             return (
-                                <>
-                                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} key={index} onClick={() => handleAddMember(item.member)}>
-                                        <Avatar name={item.member.name} wallet={item.member.wallet} />
-                                        <Checkbox />
+                                <ListItem disablePadding key={item.member.wallet}>
+                                    <Box width={"100%"} display={"flex"} alignItems={"center"} justifyContent={"space-between"} onClick={() => handleAddMember(item.member)}>
+                                        <Avatar name={_get(item.member, 'name', '')} wallet={_get(item.member, 'wallet', '')} />
+                                        <Checkbox
+                                            edge="center"
+                                            tabIndex={-1}
+                                            inputProps={{ 'aria-labelledby': labelId }}
+                                        />
                                     </Box>
-                                </>
+                                </ListItem>
                             )
-                        }
-                        return null
-                    })
-                }
+                        })
+                    }
+                </List>
             </Paper>
         )
     }
@@ -437,7 +461,7 @@ export default () => {
     const _renderCreateProject = () => {
         return (
             <Grid container className={classes.root}>
-                <Grid xs={12} item display="flex" flexDirection="column" alignItems="center" sx={{ margin: '10vh 0' }}>
+                <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
                     <img src={createProjectSvg} alt="frame-icon" />
                     <Typography color="primary" variant="subtitle1" className={classes.heading}>Create New {transformWorkspace().label}</Typography>
                     {
@@ -575,7 +599,7 @@ export default () => {
                     editKRA={false}
                     hideBackdrop={false}
                 />
-                <Grid xs={12} item display="flex" flexDirection="column" alignItems="center" sx={{ margin: '10vh 0' }}>
+                <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
                     <img src={createProjectSvg} alt="frame-icon" />
                     <Typography color="primary" variant="subtitle1" className={classes.heading}>{transformWorkspace().label} Details</Typography>
 

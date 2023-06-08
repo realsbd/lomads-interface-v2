@@ -271,7 +271,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
 
 
     const handleChangeCompensationAmount = (e: any) => {
-        setAmount(parseFloat(e));
+        setAmount(e);
         setErrorTaskValue(false);
     }
 
