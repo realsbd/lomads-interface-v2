@@ -196,6 +196,10 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     }
 
     const handleChangeAmount = (e: string, index: number) => {
+        var x = document.getElementById(`amount${milestones.length - 1}`);
+        if (x) {
+            x.innerHTML = '';
+        }
         let amt: number = parseInt(e);
         if (errorAmount.includes(index)) {
             setErrorAmount(errorAmount.filter((i) => i !== index));
@@ -288,7 +292,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                 }
                 return;
             }
-            else if (ob.amount === '') {
+            else if (ob.amount === '' || ob.amount === 0) {
                 flag = -1;
                 if (!errorAmount.includes(i)) {
                     setErrorAmount([...errorAmount, i])
@@ -316,14 +320,14 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
             if (x) {
                 x.innerHTML = 'Total Project Value should be 100 %';
             }
-            for (var i = 0; i < milestones.length; i++) {
-                if (!milestones[i].complete) {
-                    var el = document.getElementById(`inputBox${i}`);
-                    if (el) {
-                        el.style.background = 'rgba(217, 83, 79, 0.75)';
-                    }
-                }
-            }
+            // for (var i = 0; i < milestones.length; i++) {
+            //     if (!milestones[i].complete) {
+            //         var el = document.getElementById(`inputBox${i}`);
+            //         if (el) {
+            //             el.style.background = 'rgba(217, 83, 79, 0.75)';
+            //         }
+            //     }
+            // }
             return;
         }
         if (flag !== -1) {
@@ -435,28 +439,29 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                     </Box>
 
                                     {/* Milestone amount % */}
-                                    <Box display={"flex"} alignItems={'center'} sx={{ marginBottom: '20px' }}>
-                                        <TextInput
-                                            type="number"
-                                            InputProps={{
-                                                inputProps: {
-                                                    max: 100, min: 0, step: 1,
-                                                    onKeyDown: (event: any) => {
-                                                        event.preventDefault();
-                                                    },
-                                                }
-                                            }}
-                                            sx={{ width: 90 }}
-                                            value={item.amount}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeAmount(e.target.value, index)}
-                                            placeholder={`${100 / milestoneCount}`}
-                                            disabled={item.complete}
-                                            error={errorAmount.includes(index)}
-                                            id={errorAmount.includes(index) ? "outlined-error-helper-text" : ""}
-                                            helperText={errorAmount.includes(index) ? "Enter %" : ""}
-                                        />
-                                        <Typography sx={{ fontWeight: '700', fontSize: 16, color: '#76808D', marginLeft: '13.5px' }}>% of {transformWorkspace().label} value</Typography>
+                                    <Box display={"flex"} flexDirection={"column"} sx={{ marginBottom: '20px' }}>
+                                        <Box display={"flex"} alignItems={'center'}>
+                                            <TextInput
+                                                type="number"
+                                                InputProps={{
+                                                    inputProps: {
+                                                        max: 100, min: 0, step: 1
+                                                    }
+                                                }}
+                                                sx={{ width: 90 }}
+                                                value={item.amount}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeAmount(e.target.value, index)}
+                                                placeholder={`${100 / milestoneCount}`}
+                                                disabled={item.complete}
+                                                error={errorAmount.includes(index)}
+                                                id={errorAmount.includes(index) ? "outlined-error-helper-text" : ""}
+                                                helperText={errorAmount.includes(index) ? "Enter %" : ""}
+                                            />
+                                            <Typography sx={{ fontWeight: '700', fontSize: 16, color: '#76808D', marginLeft: '13.5px' }}>% of {transformWorkspace().label} value</Typography>
+                                        </Box>
+                                        <Typography id={`amount${index}`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal' }}></Typography>
                                     </Box>
+
 
                                     {/* Milestone deadline */}
                                     <Box sx={{ marginBottom: '20px' }}>
