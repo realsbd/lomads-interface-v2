@@ -42,12 +42,13 @@ const useStyles = makeStyles((theme: any) => ({
         display: "flex !important",
         alignItems: "center !important",
         justifyContent: "flex-start !important",
-        marginRight: '10px !important'
+        margin: '0 10px 10px 0 !important'
     },
     roleCount: {
         padding: '4px !important',
         height: '22px !important',
         minWidth: '36px !important',
+        marginBottom: '10px !important',
         background: '#FFFFFF !important',
         boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1) !important',
         borderRadius: '100px !important',
@@ -65,11 +66,6 @@ export default ({ list }: MembersProps) => {
     const [openInviteModal, setOpenInviteModal] = useState<boolean>(false);
     const { DAO } = useDAO();
     const { transformRole } = useTerminology(_get(DAO, 'terminologies'))
-
-    const handleRenderRole = (item: any) => {
-        const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === item.member.wallet.toLowerCase());
-        return transformRole(_get(user, 'role', '')).label
-    }
 
     const NameAndAvatar = (props: any) => {
         const [show, setShow] = useState(false);
@@ -107,14 +103,13 @@ export default ({ list }: MembersProps) => {
                         </Box>
                         <Box sx={{ width: '150px', marginLeft: '10px' }}>
                             <Typography sx={{ fontSize: '14px', fontWeight: '700', color: '#76808D' }}>
-                                {/* {handleRenderRole(user)} */}
                                 {
                                     props.role === 'role1' ? props.creator ? `${transformRole(props.role).label} (Creator)` : transformRole(props.role).label : transformRole(props.role).label
                                 }
                             </Typography>
                         </Box>
                     </Box>
-                    <Box sx={{ width: '300px' }} display={"flex"} alignItems={"center"}>
+                    <Box sx={{ width: '400px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                         {
                             (show ? roles : roles.filter((_: any, i: any) => i < 5)).map((item: any, index: any) => {
                                 if (show || index <= 3) {
@@ -142,14 +137,10 @@ export default ({ list }: MembersProps) => {
                                         <Box className={classes.roleCount} onClick={() => setShow(prev => !prev)} display={"flex"} alignItems={"center"} justifyContent={"center"}>
                                             <Typography>{show ? 'Hide' : `+${roles.length - 4}`}</Typography>
                                         </Box>
-                                        {/* <div className={classes.roleCount} onClick={() => setShow(prev => !prev)}>
-                                            <span>{show ? 'Hide' : `+${roles.length - 4}`}</span>
-                                        </div> */}
                                     </>
                                 )
                             })
                         }
-
                     </Box>
                 </Box>
             </>
@@ -168,7 +159,7 @@ export default ({ list }: MembersProps) => {
                 <Typography sx={{ fontSize: '22px', fontWeight: '400', color: '#76808D' }}>Members</Typography>
                 <Box display={"flex"} alignItems={"center"}>
                     <img src={membersGroup} alt="membersGroup" />
-                    <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{list.length} members</Typography>
+                    <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{list.length} {list.length > 1 ? 'members' : 'member'}</Typography>
                     <Box sx={{ cursor: 'pointer', margin: '0 20px' }}>
                         <img src={editSvg} alt="edit-svg" style={{ height: '40px', width: '40px' }} />
                     </Box>
@@ -189,20 +180,22 @@ export default ({ list }: MembersProps) => {
                     </Box>
                 </Box>
 
-                {_sortBy(_uniqBy(list, (m: any) => m.member.wallet.toLowerCase()), (m: any) => _get(m, 'member.name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
-                    return (
-                        <NameAndAvatar
-                            index={index}
-                            user={result}
-                            name={_get(result, 'member.name', '')}
-                            position={index}
-                            joined={_get(result, 'joined')}
-                            creator={_get(result, 'creator', false)}
-                            role={_get(result, 'role', 'role4')}
-                            address={_get(result, 'member.wallet', '')}
-                        />
-                    );
-                })}
+                <Box sx={{ width: '100%', height: '220px', overflow: 'auto' }}>
+                    {_sortBy(_uniqBy(list, (m: any) => m.member.wallet.toLowerCase()), (m: any) => _get(m, 'member.name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
+                        return (
+                            <NameAndAvatar
+                                index={index}
+                                user={result}
+                                name={_get(result, 'member.name', '')}
+                                position={index}
+                                joined={_get(result, 'joined')}
+                                creator={_get(result, 'creator', false)}
+                                role={_get(result, 'role', 'role4')}
+                                address={_get(result, 'member.wallet', '')}
+                            />
+                        );
+                    })}
+                </Box>
             </Box>
         </Box>
     )
