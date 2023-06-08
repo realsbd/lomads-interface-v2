@@ -131,6 +131,7 @@ interface Props {
 }
 
 export default ({ open, closeModal, selectedProject }: Props) => {
+    console.log("Selected Project : ", selectedProject);
     const classes = useStyles();
     const dispatch = useAppDispatch();
     const { DAO } = useDAO();
@@ -199,7 +200,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     //     }
     // }, [account, chainId, user])
 
-    useEffect(() => { if(user) setReviewer(user?._id) }, [user])
+    useEffect(() => { if (user) setReviewer(user?._id) }, [user])
 
     const eligibleContributors = useMemo(() => {
         return _get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id)
