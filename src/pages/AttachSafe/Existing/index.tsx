@@ -346,8 +346,9 @@ export default () => {
     const loadSafe = useCallback(async (safeAddress: string) => {
         try {
             setSafeLoading(true)
-            let currSafe: any = { address: null, owners: [], tokens: [] }
-            const safeowners: string[] = await axios.get(`${GNOSIS_SAFE_BASE_URLS[state?.selectedChainId]}/api/v1/safes/${safeAddress}`).then(res => res?.data?.owners)
+            let currSafe: any = { address: null, owners: [], tokens: [], threshold: 0 }
+            const s: string[] = await axios.get(`${GNOSIS_SAFE_BASE_URLS[state?.selectedChainId]}/api/v1/safes/${safeAddress}`).then(res => res?.data)
+			const safeowners: string[] = _.get(s, 'owners', []);
             const tokens = await axios.get(`${GNOSIS_SAFE_BASE_URLS[state?.selectedChainId]}/api/v1/safes/${safeAddress}/balances/usd/`).then(res => res?.data)
 
             for (let index = 0; index < safeowners.length; index++) {
@@ -357,6 +358,7 @@ export default () => {
             }
 
             currSafe.tokens = tokens
+			currSafe.threshold = _.get(s, 'threshold', 0);
             console.log("safeowners", { ...currSafe, address: safeAddress })
             setSafe({ ...currSafe, address: safeAddress })
             setSafeLoading(false)
@@ -407,6 +409,7 @@ export default () => {
                 chainId: state?.selectedChainId
             }
         }
+		console.log(safe)
         axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
         .then(res => {
             setisLoading(false);

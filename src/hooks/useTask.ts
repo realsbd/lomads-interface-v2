@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAppSelector } from "helpers/useAppSelector";
 import { find as _find, get as _get } from 'lodash';
 import { useWeb3Auth } from "context/web3Auth";
@@ -19,13 +19,21 @@ import paid from 'assets/svg/paid.svg'
 import approved from 'assets/svg/approved.svg'
 import rejected from 'assets/svg/rejected.svg'
 import iconSvg from 'assets/svg/createProject.svg';
+import { useAppDispatch } from "helpers/useAppDispatch";
+import { createAccountAction } from "store/actions/session";
 
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 export default () => {
-
+    const dispatch = useAppDispatch()
     const { account } = useWeb3Auth()
+    const { user: currentUser } = useAppSelector((store:any) => store?.session)
     const { DAO } = useDAO();
+
+    useEffect(() => {
+        if(!currentUser)
+            dispatch(createAccountAction({}))
+    }, [currentUser])
 
     const amIApplicant = (task: any) => Boolean(_find(_get(task, 'members', []), m => toChecksumAddress(_get(m, 'member.wallet', '')) === toChecksumAddress(account)))
 
@@ -51,7 +59,7 @@ export default () => {
     }
 
     const amIEligible = (task: any) => {
-        const user = _find(_get(task, 'members', []), m => toChecksumAddress(_get(m, 'member.wallet', '')) === toChecksumAddress(account))
+        const user = _find(_get(DAO, 'members', []), m => toChecksumAddress(_get(m, 'member.wallet', '')) === toChecksumAddress(account))
         if (user) {
             let index = task?.validRoles.findIndex((item: any) => item.toLowerCase() === user?.role?.toLowerCase());
             return index > -1
@@ -60,7 +68,7 @@ export default () => {
     }
 
     const amIEligibleDiscord = (task: any) => {
-        const user = _find(_get(task, 'members', []), m => toChecksumAddress(_get(m, 'member.wallet', '')) === toChecksumAddress(account))
+        const user = _find(_get(DAO, 'members', []), m => toChecksumAddress(_get(m, 'member.wallet', '')) === toChecksumAddress(account))
         if (user) {
             let flag = false;
             if (user?.discordRoles) {
@@ -78,7 +86,7 @@ export default () => {
     }
 
     const amICreator = (task: any) => {
-        const user = _find(_get(task, 'members', []), m => toChecksumAddress(_get(m, 'member.wallet', '')) === toChecksumAddress(account))
+        const user = _find(_get(DAO, 'members', []), m => toChecksumAddress(_get(m, 'member.wallet', '')) === account)
         return user?.member?._id === task?.reviewer?._id
     }
 
@@ -173,6 +181,7 @@ export default () => {
 
     const getTaskBody = (task: any) => {
         if (task.taskStatus === 'open' && !task.archivedAt && !task.deletedAt) {
+            console.log("amICreator(task)", amICreator(task))
             if (amICreator(task)) {
                 if (task.contributionType === 'open' && task.isSingleContributor == false) {
                     return { renderBody: 'SHOW_SUBMISSIONS' }

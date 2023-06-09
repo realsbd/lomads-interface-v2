@@ -450,6 +450,7 @@ export default () => {
     }
 
     const renderBody = (body: string) => {
+        console.log("SHOW_SUBMISSIONS", body)
         switch (body) {
             case 'SHOW_SUBMISSIONS':
                 return showSubmissions();
