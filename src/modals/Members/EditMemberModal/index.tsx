@@ -80,7 +80,7 @@ export default ({ open, closeModal }: Props) => {
 
     console.log("user : ", user)
 
-    const { myRole, can } = useRole(DAO, account)
+    const { myRole, can } = useRole(DAO, account, undefined)
     const { transformRole } = useTerminology(_get(DAO, 'terminologies'))
 
     const [deleteMembers, setDeleteMembers] = useState<any[]>([]);
