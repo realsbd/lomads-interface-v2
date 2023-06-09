@@ -25,10 +25,6 @@ const SessionReducer = (state: any = getInitialState(), action: any) =>
         draft.user = payload;
         break;
       }
-      case actionTypes.UPDATE_USER_ACTION: {
-        draft.user = payload;
-        break;
-      }
       case actionTypes.SET_NETWORK_CONFIG: {
         draft.web3AuthNetwork = payload.web3AuthNetwork;
         draft.chain = payload.chain;
