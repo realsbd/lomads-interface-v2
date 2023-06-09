@@ -75,6 +75,10 @@ export default ({ open, closeModal }: Props) => {
     const { account } = useWeb3Auth();
     // @ts-ignore
     const { updateDaoMembersLoading } = useAppSelector(store => store.dao);
+    // @ts-ignore
+    const { user } = useAppSelector(store => store?.session);
+
+    console.log("user : ", user)
 
     const { myRole, can } = useRole(DAO, account)
     const { transformRole } = useTerminology(_get(DAO, 'terminologies'))
@@ -87,7 +91,6 @@ export default ({ open, closeModal }: Props) => {
         if (updateDaoMembersLoading === false) {
             setDeleteMembers([]);
             setUpdateMembers([]);
-            setEditableName('');
             closeModal();
         }
     }, [updateDaoMembersLoading]);
@@ -120,6 +123,8 @@ export default ({ open, closeModal }: Props) => {
         members.push(user)
         return members
     }, [DAO])
+
+    console.log("editable members : ", editableMembers)
 
     const eligibleRoles = useMemo(() => {
         return Object.keys(_get(DAO, 'terminologies.roles', DEFAULT_ROLES)).filter((i: any) => i !== 'role1').map((item: any) => { return { label: _get(transformRole(item), 'label'), value: item } });

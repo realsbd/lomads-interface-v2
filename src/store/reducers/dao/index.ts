@@ -51,8 +51,8 @@ const DAOReducer = (state: any = getInitialState(), action: any) =>
 				draft.DAO = {
 					...(draft.DAO ? draft.DAO : {}),
 					members: _get(draft, 'DAO.members', []).map((member: any) => {
-						if (member.member._id === action.payload._id)
-							return { ...member, member: action.payload };
+						if (member.member._id === payload._id)
+							return { ...member, member: payload };
 						return member;
 					})
 				}
