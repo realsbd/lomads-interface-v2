@@ -36,6 +36,13 @@ export const setNetworkConfig = (payload: any) => {
     }
 }
 
+export const updateCurrentUser = (payload: any) => {
+    return {
+        type: actionTypes.UPDATE_USER_ACTION,
+        payload
+    }
+}
+
 export const logoutAction = () => {
     return {
         type: actionTypes.LOGOUT_ACTION

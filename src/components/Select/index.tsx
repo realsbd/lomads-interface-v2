@@ -9,6 +9,7 @@ type propTypes = {
 	selected?: any,
 	selectStyle?: any,
 	errorSelect?: string,
+	disabled?: boolean,
 	setSelectedValue: (event: any) => void
 }
 
@@ -29,7 +30,8 @@ export default function MuiSelect({
 	selected,
 	selectStyle,
 	errorSelect,
-	setSelectedValue
+	setSelectedValue,
+	disabled,
 }: propTypes) {
 	const classes = useStyles();
 	const [activeOption, setActiveOption] = useState<number | string | undefined | null>(selected ? selected : 'Select');
@@ -63,6 +65,7 @@ export default function MuiSelect({
 					onClose={() => {
 						setShowMenuItem((prev) => true);
 					}}
+					disabled={disabled}
 				>
 					<MenuItem value="Select" style={{ display: showMenuItem ? "block" : "none" }}>Select</MenuItem>
 					{options?.map((option, index) => (
