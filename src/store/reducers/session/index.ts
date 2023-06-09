@@ -25,15 +25,19 @@ const SessionReducer = (state: any = getInitialState(), action: any) =>
         draft.user = payload;
         break;
       }
-      case actionTypes.SET_NETWORK_CONFIG : {
+      case actionTypes.UPDATE_USER_ACTION: {
+        draft.user = payload;
+        break;
+      }
+      case actionTypes.SET_NETWORK_CONFIG: {
         draft.web3AuthNetwork = payload.web3AuthNetwork;
         draft.chain = payload.chain;
         draft.selectedChainId = payload.selectedChainId;
         break;
       }
-      case actionTypes.LOGOUT_ACTION : {
-        draft.token= null;
-        draft.user=null;
+      case actionTypes.LOGOUT_ACTION: {
+        draft.token = null;
+        draft.user = null;
         break;
       }
     }

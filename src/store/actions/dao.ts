@@ -26,6 +26,13 @@ export const setDAOAction = (payload: any) => {
     }
 }
 
+export const setDAOMemberAction = (payload: any) => {
+    return {
+        type: actionTypes.SET_DAO_ACTION,
+        payload
+    }
+}
+
 export const setDAOTagOptionsAction = (payload: any) => {
     return {
         type: actionTypes.SET_DAO_OPTION_ACTION,
@@ -43,6 +50,34 @@ export const updateDAOAction = (payload: any) => {
 export const addDAOMemberAction = (payload: any) => {
     return {
         type: actionTypes.ADD_DAO_MEMBER_ACTION,
+        payload
+    }
+}
+
+export const addSingleMemberAction = (payload: any) => {
+    return {
+        type: actionTypes.ADD_SINGLE_MEMBER_ACTION,
+        payload
+    }
+}
+
+export const addMultiMemberAction = (payload: any) => {
+    return {
+        type: actionTypes.ADD_MULTI_MEMBER_ACTION,
+        payload
+    }
+}
+
+export const editDaoMemberAction = (payload: any) => {
+    return {
+        type: actionTypes.EDIT_DAO_MEMBER_ACTION,
+        payload
+    }
+}
+
+export const updateDaoMembersAction = (payload: any) => {
+    return {
+        type: actionTypes.UPDATE_DAO_MEMBERS_ACTION,
         payload
     }
 }

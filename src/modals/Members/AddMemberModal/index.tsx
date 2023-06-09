@@ -8,18 +8,24 @@ import Button from "components/Button";
 import Uploader from 'components/XlsxUploader';
 import { LeapFrog } from "@uiball/loaders";
 
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ethers } from "ethers";
 import { SupportedChainId } from "constants/chains";
 import { useDAO } from "context/dao";
 import { useWeb3Auth } from "context/web3Auth";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { useAppSelector } from "helpers/useAppSelector";
-import { archiveTaskAction } from "store/actions/task";
 
 import { DEFAULT_ROLES } from "constants/terminology";
 import useTerminology from 'hooks/useTerminology';
 import useEns from 'hooks/useENS';
+
+import createProjectSvg from 'assets/svg/createProject.svg';
+import Avatar from "boring-avatars";
+
+import binRed from 'assets/svg/bin-red.svg';
+import binWhite from 'assets/svg/bin-white.svg';
+import { addMultiMemberAction, addSingleMemberAction } from "store/actions/dao";
 
 const useStyles = makeStyles((theme: any) => ({
     modalTitle: {
@@ -35,6 +41,24 @@ const useStyles = makeStyles((theme: any) => ({
         fontWeight: '400 !important',
         lineHeight: '16px !important',
         textAlign: 'center',
+    },
+    deleteBtn: {
+        width: '50px',
+        height: '50px',
+        display: 'flex !important',
+        alignItems: 'center !important',
+        justifyContent: 'center !important',
+        borderRadius: ' 3px !important',
+        zIndex: '999 !important',
+        border: 'none !important',
+        cursor: 'pointer !important',
+    },
+    rowOvercast: {
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(255, 255, 255, 0.5) !important',
+        position: 'absolute',
+        zIndex: '998 !important'
     }
 }));
 
@@ -62,10 +86,10 @@ export default ({ open, closeModal }: Props) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { DAO } = useDAO();
-    const { provider, account, chainId } = useWeb3Auth();
+    const { provider, chainId } = useWeb3Auth();
     const { transformRole } = useTerminology(_.get(DAO, 'terminologies'))
     // @ts-ignore
-    const { Task, archiveTaskLoading } = useAppSelector(store => store.task);
+    const { addSingleMemberLoading, addMultiMemberLoading } = useAppSelector(store => store.dao);
 
     const [ownerName, setOwnerName] = useState<string>("");
     const [errorName, setErrorName] = useState('');
@@ -74,15 +98,37 @@ export default ({ open, closeModal }: Props) => {
     const [ownerRole, setOwnerRole] = useState<string>("role4");
     const [errorRole, setErrorRole] = useState('');
     const [uploadLoading, setUploadLoading] = useState<boolean>(false);
+    const [deleteMembers, setDeleteMembers] = useState<string[]>([]);
     const [validMembers, setValidMembers] = useState<{ address: string; name: string, role: string }[]>([]);
     const [showModal, setShowModal] = useState(false);
     const { getENSAddress, getENSName } = useEns();
 
+    useEffect(() => {
+        isAddressValid(ownerAddress);
+    }, [ownerAddress]);
+
+    useEffect(() => {
+        isPresent(ownerAddress);
+    }, [ownerAddress]);
+
+    useEffect(() => {
+        if (addSingleMemberLoading === false) {
+            setOwnerName("");
+            setOwnerAddress("");
+            closeModal();
+        }
+    }, [addSingleMemberLoading])
+
+    useEffect(() => {
+        if (addMultiMemberLoading === false) {
+            setShowModal(false);
+            closeModal();
+        }
+    }, [addMultiMemberLoading])
+
     const eligibleRoles = useMemo(() => {
         return Object.keys(_.get(DAO, 'terminologies.roles', DEFAULT_ROLES)).filter((i: any) => i !== 'role1').map((item: any) => { return { label: _.get(transformRole(item), 'label'), value: item } });
     }, [DAO]);
-
-    console.log("Eligible Roles : ", eligibleRoles);
 
     const isAddressValid = (holderAddress: string) => {
         const ENSdomain = holderAddress.slice(-4);
@@ -188,7 +234,7 @@ export default ({ open, closeModal }: Props) => {
             }
         }
         if (!isPresent(member.address) && isRightAddress(member.address)) {
-            // dispatch(addDaoMember({ url: DAO?.url, payload: member }))
+            dispatch(addSingleMemberAction({ url: DAO?.url, payload: member }));
             // if (props.addToList) {
             //     props.addToList([member.address]);
             // }
@@ -209,6 +255,66 @@ export default ({ open, closeModal }: Props) => {
         }
     };
 
+    const handleChangeState = (e: any, index: any) => {
+        const newArray = validMembers.map((item, i) => {
+            if (index === i) {
+                return { ...item, [e.target.name]: e.target.value };
+            }
+            else {
+                return item;
+            }
+        });
+        setValidMembers(newArray);
+    }
+
+    const handleChangeRole = (value: any, index: any) => {
+        const newArray = validMembers.map((item, i) => {
+            if (index === i) {
+                return { ...item, role: value };
+            }
+            else {
+                return item;
+            }
+        });
+        setValidMembers(newArray);
+    }
+
+    const handleDeleteUser = (address: any) => {
+        if (deleteMembers.includes(address)) {
+            setDeleteMembers(deleteMembers.filter((m: any) => m !== address));
+        }
+        else {
+            setDeleteMembers([...deleteMembers, address]);
+        }
+    }
+
+    const handleCloseModal = () => {
+        setValidMembers([]);
+        setDeleteMembers([]);
+        setShowModal(false);
+    }
+
+    const handleAddMembers = () => {
+        try {
+            let tempArray = [];
+            let newArray = [];
+            for (var i = 0; i < validMembers.length; i++) {
+                if (deleteMembers.includes(validMembers[i].address) === false) {
+                    tempArray.push(validMembers[i]);
+                    newArray.push(validMembers[i].address);
+                }
+            }
+            dispatch(addMultiMemberAction({ url: DAO?.url, payload: { list: tempArray } }));
+            // if (props.addToList) {
+            //     props.addToList(newArray);
+            // }
+        }
+        catch (e) {
+            console.log(e)
+            setShowModal(false);
+            closeModal();
+        }
+    }
 
     return (
         <Modal
@@ -217,63 +323,133 @@ export default ({ open, closeModal }: Props) => {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-            <Box sx={style} display={"flex"} flexDirection={"column"} alignItems={"center"}>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} style={{ width: '100%', marginBottom: '10px' }}>
-                    <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Add member</Typography>
-                    {uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} />}
-                </Box>
-                <Box display={"flex"} alignItems={"center"}>
-                    <Box sx={{ width: '150px', marginRight: '10px' }}>
-                        <TextInput
-                            placeholder="Name"
-                            fullWidth
-                            value={ownerName}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setOwnerName(e.target.value); setErrorName('') }}
-                            error={errorName !== ''}
-                            id={errorName !== '' ? "outlined-error-helper-text" : ""}
-                            helperText={errorName}
-                        />
+            {
+                showModal
+                    ?
+                    <Box sx={style} style={{ padding: '22px 60px', height: '768px' }} display={"flex"} flexDirection={"column"} alignItems={"center"}>
+                        <Box sx={{ width: '100%', marginBottom: '20px' }} display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                            <img src={createProjectSvg} alt="create-project-svg" />
+                            <Typography sx={{ color: '#c94b32', marginTop: '20px', fontSize: '30px' }}>Add Members</Typography>
+                        </Box>
+
+                        <Box sx={{ width: '100%', overflowY: 'scroll' }} display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                            {
+                                validMembers.length > 0
+                                    ?
+                                    <>
+                                        {
+                                            validMembers.map((item, index) => (
+                                                <Box sx={{ width: '100%', marginBottom: '20px', position: 'relative' }} key={index} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                                                    {
+                                                        deleteMembers.includes(item.address)
+                                                            ?
+                                                            <Box className={classes.rowOvercast}></Box>
+                                                            :
+                                                            null
+                                                    }
+                                                    <Box display={"flex"} alignItems={"center"}>
+                                                        <Avatar
+                                                            key={`${item.name}-${item.address}`}
+                                                            size={50}
+                                                            name={item.address}
+                                                            variant="marble"
+                                                            colors={["#E67C40", "#EDCD27", "#8ECC3E", "#2AB87C", "#188C8C"]}
+                                                        />
+                                                        <Box sx={{ width: '150px', marginLeft: '10px' }}>
+                                                            <TextInput
+                                                                placeholder="Name"
+                                                                fullWidth
+                                                                value={item.name}
+                                                                name="name"
+                                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeState(e, index)}
+                                                            />
+                                                        </Box>
+                                                    </Box>
+                                                    <Typography sx={{ color: '#76808D', margin: '0 50px', fontStyle: 'italic' }}>{item.address.slice(0, 6) + "..." + item.address.slice(-4)}</Typography>
+                                                    <Box sx={{ width: '150px', marginRight: '50px' }}>
+                                                        <MuiSelect
+                                                            selected={item.role}
+                                                            options={eligibleRoles}
+                                                            setSelectedValue={(value) => handleChangeRole(value, index)}
+                                                        />
+                                                    </Box>
+                                                    {
+                                                        deleteMembers.includes(item.address)
+                                                            ?
+                                                            <button style={{ background: '#B12F15' }} className={classes.deleteBtn} onClick={() => handleDeleteUser(item.address)}>
+                                                                <img src={binWhite} alt="bin-white" />
+                                                            </button>
+                                                            :
+                                                            <button style={{ background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)' }} className={classes.deleteBtn} onClick={() => handleDeleteUser(item.address)}>
+                                                                <img src={binRed} alt="bin-red" />
+                                                            </button>
+                                                    }
+                                                </Box>
+                                            ))
+                                        }
+                                    </>
+                                    :
+                                    <Typography>All the users have been already added</Typography>
+                            }
+                        </Box>
+
+                        <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%', marginTop: '20px' }}>
+                            <Button variant="outlined" sx={{ marginRight: '20px' }} onClick={handleCloseModal}>CANCEL</Button>
+                            {
+                                validMembers.length > 0 &&
+                                <Button variant="contained" onClick={handleAddMembers} loading={addMultiMemberLoading}>ADD MEMBERS</Button>
+                            }
+                        </Box>
+
                     </Box>
-                    <Box sx={{ width: '250px', marginRight: '10px' }}>
-                        <TextInput
-                            placeholder="ENS Domain and Wallet Address"
-                            fullWidth
-                            value={ownerAddress}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setOwnerAddress(e.target.value); setErrorAddress('') }}
-                            error={errorAddress !== ''}
-                            id={errorAddress !== '' ? "outlined-error-helper-text" : ""}
-                            helperText={errorAddress}
-                        />
+                    :
+                    <Box sx={style} display={"flex"} flexDirection={"column"} alignItems={"center"}>
+                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} style={{ width: '100%', marginBottom: '20px' }}>
+                            <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Add member</Typography>
+                            {uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} />}
+                        </Box>
+                        <Box display={"flex"} alignItems={"center"}>
+                            <Box sx={{ width: '150px', marginRight: '10px' }}>
+                                <TextInput
+                                    placeholder="Name"
+                                    fullWidth
+                                    value={ownerName}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setOwnerName(e.target.value); setErrorName('') }}
+                                    error={errorName !== ''}
+                                    id={errorName !== '' ? "outlined-error-helper-text" : ""}
+                                    helperText={errorName}
+                                />
+                            </Box>
+                            <Box sx={{ width: '250px', marginRight: '10px' }}>
+                                <TextInput
+                                    placeholder="ENS Domain and Wallet Address"
+                                    fullWidth
+                                    value={ownerAddress}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setOwnerAddress(e.target.value); setErrorAddress('') }}
+                                    error={errorAddress !== ''}
+                                    id={errorAddress !== '' ? "outlined-error-helper-text" : ""}
+                                    helperText={errorAddress}
+                                />
+                            </Box>
+                            <Box sx={{ width: '150px', transform: 'translateY(5px)' }}>
+                                <MuiSelect
+                                    selected={ownerRole}
+                                    options={eligibleRoles}
+                                    setSelectedValue={(value) => { setOwnerRole(value); setErrorRole('') }}
+                                />
+                            </Box>
+                        </Box>
+                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} style={{ width: '100%', marginTop: '20px' }}>
+                            <Button variant="outlined" sx={{ marginRight: '20px' }} onClick={closeModal}>CANCEL</Button>
+                            <Button
+                                variant="contained"
+                                loading={addSingleMemberLoading}
+                                onClick={() => {
+                                    handleClick(ownerName, ownerAddress, ownerRole);
+                                }}>ADD</Button>
+                        </Box>
                     </Box>
-                    <Box sx={{ width: '150px' }}>
-                        {/* {
-                            eligibleRoles.map((key: any) => {
-                                console.log("Key role : ", key);
-                                if (key !== 'role1') {
-                                    return (
-                                        <option value={key}>{_.get(transformRole(key), 'label')}</option>
-                                    )
-                                }
-                                return null
-                            })
-                        } */}
-                        <MuiSelect
-                            selected={ownerRole}
-                            options={eligibleRoles}
-                            setSelectedValue={(value) => { setOwnerRole(value); setErrorRole('') }}
-                            errorSelect={errorRole}
-                        />
-                    </Box>
-                </Box>
-                <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} style={{ width: '100%', marginTop: '20px' }}>
-                    <Button variant="outlined" sx={{ marginRight: '20px' }} onClick={closeModal}>CANCEL</Button>
-                    <Button
-                        variant="contained"
-                        onClick={() => {
-                            handleClick(ownerName, ownerAddress, ownerRole);
-                        }}>ADD</Button>
-                </Box>
-            </Box>
+            }
         </Modal>
     )
 }
