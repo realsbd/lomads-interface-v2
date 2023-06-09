@@ -136,7 +136,7 @@ export default () => {
     const navigate = useNavigate()
     const { daoURL } = useParams()
     const { DAO, loadDAO } = useDAO()
-    const { myRole } = useRole(DAO, account)
+    const { myRole } = useRole(DAO, account, undefined)
     const classes = useStyles()
     const dispatch = useAppDispatch()
     const { user, token } = useSelector((store: any) => store.session)

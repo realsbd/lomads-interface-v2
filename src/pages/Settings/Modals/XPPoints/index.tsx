@@ -295,7 +295,7 @@ const XPPoints = ({ open, onClose }: any) => {
                             <Button onClick={() => setActiveTab(2)} sx={{ mr:1 }} fullWidth variant='outlined' size="small">Cancel</Button>
                             <Button loading={txnLoading} disabled={txnLoading || total === 0 || sweatMembers.length == 0} onClick={() => handleCreateTransaction()} sx={{ ml:1 }}  fullWidth variant='contained' size="small">Send</Button>
                         </Box>
-                    </Box>
+                </Box>
             </Box>
         )
     }

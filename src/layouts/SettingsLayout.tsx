@@ -11,7 +11,7 @@ import { useDAO } from 'context/dao';
 import palette from 'theme/palette';
 import Skeleton from '@mui/material/Skeleton';
 import { Close } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -95,6 +95,7 @@ const useStyles = makeStyles((theme: any) => ({
 export default ({ children } : any) => {
   const navigate = useNavigate()
   const classes = useStyles();
+  const { daoURL } = useParams();
   const { DAO } = useDAO()
 
   const initials = useMemo(() => {
@@ -132,7 +133,7 @@ export default ({ children } : any) => {
                       <Skeleton animation="wave" variant="rectangular" className={classes.settings} sx={{ width: 100 }} />
                     }
                   </Box>
-                  <IconButton onClick={() => navigate(-1)} sx={{ width: 37, height: 37, borderRadius: 1, backgroundColor: 'rgba(27, 43, 65, 0.2)' }}>
+                  <IconButton onClick={() => navigate(`/${daoURL}`)} sx={{ width: 37, height: 37, borderRadius: 1, backgroundColor: 'rgba(27, 43, 65, 0.2)' }}>
                     <Close sx={{ color: '#FFF' }} />
                   </IconButton>
                 </Box>

@@ -13,7 +13,7 @@ import starDashboard from "assets/svg/star_dashboard.svg";
 import tokenDashboard from "assets/svg/token_dashboard.svg";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useDispatch, useSelector } from 'react-redux';
-import { setNetworkConfig, setTokenAction, setUserAction } from 'store/actions/session';
+import { logoutAction, setNetworkConfig, setTokenAction, setUserAction } from 'store/actions/session';
 import { useWeb3Auth } from 'context/web3Auth';
 import ChainSwitchList from 'components/ChainSwitchList';
 import { useAppSelector } from 'helpers/useAppSelector';
@@ -60,10 +60,10 @@ const useStyles = makeStyles((theme: any) => ({
     padding: "12px 42px 12px 11px",
     borderRadius: "30px 0 0 30px",
     backgroundColor: 'hsla(214,9%,51%,.05)',
-    transition: '0.5s',
+    //transition: '0.5s',
     '&:hover': {
-      transition: '0.5s',
-      right: 200
+      //transition: '0.5s',
+      //right: 200
     }
   },
   rolePill: {
@@ -100,7 +100,7 @@ export default ({ children, options = true, ...props } : any) => {
   const { user } = useAppSelector(store => store?.session);
   const { DAO } = useDAO();
   const { safeTokens } = useSafeTokens();
-  const { displayRole } = useRole(DAO, account)
+  const { displayRole } = useRole(DAO, account, undefined)
   const { getENSName } = useENS();
   const [accountName, setAccountName] = useState<string>();
   const [anchorEl, setAnchorEl] = useState<any>(null);
@@ -130,6 +130,7 @@ export default ({ children, options = true, ...props } : any) => {
     sessionStorage.clear()
     dispatch(setTokenAction(null))
     dispatch(setUserAction(null))
+    dispatch(logoutAction())
   };
 
   // const swtBalance = useMemo(() => {

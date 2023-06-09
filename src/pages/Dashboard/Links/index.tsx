@@ -49,7 +49,7 @@ export default () => {
     const classes = useStyles();
     const { DAO } = useDAO()
     const { account } = useWeb3Auth();
-    const { myRole, can } = useRole(DAO, account);
+    const { myRole, can } = useRole(DAO, account, undefined)
 
     if(!DAO) {
         return (

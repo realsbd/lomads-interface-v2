@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import _ from "lodash";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import coin from "assets/svg/coin.svg";
 import axiosHttp from 'api'
 import { ethers } from "ethers";
@@ -21,6 +21,7 @@ import { useAppDispatch } from "helpers/useAppDispatch";
 import { useAppSelector } from "helpers/useAppSelector";
 import { useWeb3Auth } from "context/web3Auth";
 import { isAddressValid } from "utils";
+import { useDAO } from "context/dao";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -327,9 +328,11 @@ const useStyles = makeStyles((theme: any) => ({
 
 export default () => {
 	const classes = useStyles()
+	const location = useLocation();
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { daoURL } = useParams()
+	const { DAO } = useDAO()
     const [errors, setErrors] = useState<any>({})
 	const [isLoading, setisLoading] = useState<boolean>(false);
     const [safeLoading, setSafeLoading] = useState<boolean>(false);
@@ -339,8 +342,6 @@ export default () => {
 	const { provider, account, chainId } = useWeb3Auth();
     const [selectedSafeAddress, setSelectedSafeAddress] = useState<string | null>(null);
     const [state, setState] = useState<any>({})
-	const params = new URLSearchParams(window.location.search) // id=123
-	let fromFlow = params.get('createflow') 
 
 
     const loadSafe = useCallback(async (safeAddress: string) => {
@@ -379,7 +380,9 @@ export default () => {
         if(state?.selectedChainId) {
             setSafeListLoading(true)
             axios.get(`${GNOSIS_SAFE_BASE_URLS[state?.selectedChainId]}/api/v1/owners/${account}/safes/`)
-            .then(res => setSafeList(res.data.safes))
+            .then(res => setSafeList(res.data.safes.filter((safe:any) => {
+				return !_.find(DAO?.safes, (s:any) => s.address === safe)
+			})))
             .finally(() => setSafeListLoading(false))
         }
     }, [state?.selectedChainId])
@@ -413,7 +416,10 @@ export default () => {
         axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
         .then(res => {
             setisLoading(false);
-            window.location.href = `/${daoURL}`
+			if(location?.state?.createFlow)
+            	window.location.href = `/${daoURL}/welcome`
+			else
+				window.location.href = `/${daoURL}/settings`
         })
         .finally(() => setisLoading(false))
 	}, [state, safe]);
@@ -520,7 +526,7 @@ export default () => {
 		<Container>
 			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
-					<Box className={classes.headerText}>{ !fromFlow ? '' : '2/2'} Organisation Multi-sig Wallet</Box>
+					<Box className={classes.headerText}>{ !location?.state?.createFlow ? '' : '2/2'} Organisation Multi-sig Wallet</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
@@ -533,7 +539,7 @@ export default () => {
 									color: 'rgba(201, 75, 50, 0.6)'
 								}}
 								onClick={() => {
-									navigate(`/${daoURL}/attach-safe/new${fromFlow ? '?createflow=1' : ''}`)
+									navigate(`/${daoURL}/attach-safe/new`, location?.state?.createFlow ? { state: { createFlow: true } } : {} )
 								}}
 								variant='contained'>
 								CREATE

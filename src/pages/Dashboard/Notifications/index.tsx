@@ -162,8 +162,7 @@ const useStyles = makeStyles((theme: any) => ({
 export default ({ isHelpIconOpen }: { isHelpIconOpen: any }) => {
     const classes = useStyles();
 	const { daoURL } = useParams();
-    //@ts-expect-error
-    const { user, token } = useAppSelector((state) => state.session);
+    const { user, token } = useAppSelector((state:any) => state.session);
     const { DAO } = useDAO()
 	const { provider, account, chainId } = useWeb3Auth();
     const [myNotifications, setMyNotifications] = useState<Array<any> | null>(null)

@@ -88,10 +88,10 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }, [account, token, daoURL, console, DAOList])
 
   useEffect(() => {
-    if (DAO && (!DAO.safes || (DAO.safes && DAO.safes.length == 0))) {
-      navigate(`/${DAO?.url}/attach-safe/new`)
+    if (window.location.pathname.indexOf('attach-safe/new') == -1 && DAO && (!DAO.safes || (DAO.safes && DAO.safes.length == 0))) {
+      navigate(`/${DAO?.url}/attach-safe/new`, { state: { createFlow: true } })
     }
-  }, [DAO])
+  }, [DAO?.safes])
 
   const resetDAO = () => {
     dispatch(resetDAOAction())

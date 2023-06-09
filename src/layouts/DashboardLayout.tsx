@@ -163,7 +163,7 @@ const useStyles = makeStyles((theme: any) => ({
       lineHeight: '18px !important',
       textAlign: 'center',
       letterSpacing: '-0.011em !important',
-      color: `${'#FFF'} !important`,
+      color: `#FFF !important`,
       transform: `rotate(-45deg)`,
     },
     initials: {
@@ -332,7 +332,7 @@ export default ({ children }: any) => {
             }
             <Box onClick={() => navigate('/organisation/create')}  className={classes.stripItem}>
                 <Box className={classes.invertedBox} sx={{ backgroundColor: 'transparent' }}>
-                  <Typography variant='h6' className={classes.create}>+</Typography>
+                  <Typography className={classes.create}>+</Typography>
                 </Box>
                 <Typography className={classes.daoText}>CREATE</Typography>
               </Box> 

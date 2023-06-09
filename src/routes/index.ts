@@ -18,6 +18,7 @@ import CreatePassTokenPage from 'pages/CreatePassToken'
 import DCAuthPage from 'pages/DCAuth';
 import MintPage from 'pages/Mint';
 import OnlyWhitelistedPage from 'pages/OnlyWhitelisted';
+import WelcomePage from 'pages/Welcome';
 
 export default [
 	{
@@ -40,6 +41,13 @@ export default [
 		layout: PrimaryLayout,
 		private: false,
 		component: DCAuthPage
+	},
+	{
+		path: '/:daoURL/welcome',
+		exact: true,
+		layout: LandingLayout,
+		private: true,
+		component: WelcomePage
 	},
 	{
 		path: '/:daoURL/attach-safe/new',

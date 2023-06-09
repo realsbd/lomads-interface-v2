@@ -175,7 +175,7 @@ export default () => {
     const { DAO } = useDAO();
     const { provider, account, chainId } = useWeb3Auth();
     const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'));
-    const { myRole, can } = useRole(DAO, account);
+    const { myRole, can } = useRole(DAO, account, undefined)
     const [openInviteModal, setOpenInviteModal] = useState<boolean>(false);
 
     const [anchorEl, setAnchorEl] = useState(null);

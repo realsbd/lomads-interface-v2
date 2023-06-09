@@ -48,8 +48,7 @@ interface IWeb3AuthProps {
 }
 
 export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }: IWeb3AuthProps) => {
-  // @ts-expect-error
-  const { web3AuthNetwork = "", chain = ""} = useAppSelector(store => store.session) 
+  const { web3AuthNetwork = "", chain = ""} = useAppSelector((store:any) => store.session) 
   const [web3Auth, setWeb3Auth] = useState<Web3AuthNoModal | null>(null);
   const [state, setState] = useState<any>({
     w3Provider: null,

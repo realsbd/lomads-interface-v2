@@ -29,7 +29,7 @@ export default () => {
     const { DAO, DAOList } = useDAO();
     console.log("DAO", DAO);
     const { account } = useWeb3Auth();
-    const { myRole, can } = useRole(DAO, account);
+    const { myRole, can } = useRole(DAO, account, undefined)
     // @ts-ignore
     const { setProjectLoading, Project } = useAppSelector(store => store.project);
     return (
@@ -41,10 +41,10 @@ export default () => {
                 <Notifications isHelpIconOpen={false} />
             </Grid>
             <Grid sm={12}>
-                <TaskSection onlyProjects={false} />
+                <ProjectSection />
             </Grid>
             <Grid sm={12}>
-                <ProjectSection />
+                <TaskSection onlyProjects={false} />
             </Grid>
 
             {can(myRole, 'transaction.view') && <Grid mt={1} item sm={12}>

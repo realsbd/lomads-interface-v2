@@ -7,6 +7,13 @@ export const getTaskAction = (payload: string) => {
     }
 }
 
+export const setTaskAction = (payload: string) => {
+    return {
+        type: actionTypes.SET_TASK_ACTION,
+        payload
+    }
+}
+
 export const createTaskAction = (payload: any) => {
     return {
         type: actionTypes.CREATE_TASK_ACTION,

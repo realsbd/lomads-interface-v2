@@ -91,7 +91,7 @@ export default () => {
     const [myProjects, setMyProjects] = useState<any[]>([]);
     const [otherProjects, setOtherProjects] = useState<any[]>([]);
     const [initialCheck, setInitialCheck] = useState<boolean>(false);
-    const { myRole, can } = useRole(DAO, account)
+    const { myRole, can } = useRole(DAO, account, undefined)
     const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies', null))
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {

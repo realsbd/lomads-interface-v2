@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { get as _get, find as _find, isEmpty as _isEmpty, debounce as _debounce } from 'lodash'
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Select from 'components/Select'
 import _ from "lodash";
 import TextInput from 'components/TextInput'
@@ -424,6 +424,7 @@ const useStyles = makeStyles((theme: any) => ({
 
 export default () => {
 	const classes = useStyles()
+	const location = useLocation();
     //@ts-ignore
     const { user } = useAppSelector(store => store.session)
 	const dispatch = useAppDispatch();
@@ -438,8 +439,6 @@ export default () => {
     const [validSafeDetails, setValidSafeDetails] = useState<boolean>(false);
     const [state, setState] = useState<any>({})
     const [isLoading, setisLoading] = useState<boolean>(false)
-	const params = new URLSearchParams(window.location.search) // id=123
-	let fromFlow = params.get('createflow') 
 
     useEffect(() => {
         setState((prev: any) => {
@@ -585,7 +584,10 @@ export default () => {
         }
         axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
         .then(res => {
-            window.location.href = `/${daoURL}`
+			if(location?.state?.createFlow)
+            	window.location.href = `/${daoURL}/welcome`
+			else
+				window.location.href = `/${daoURL}/settings`
         })
 		setisLoading(false);
 	}
@@ -658,7 +660,10 @@ export default () => {
                         axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
                         .then(res => {
                             setisLoading(false);
-                            window.location.href = `/${daoURL}`
+							if(location?.state?.createFlow)
+								window.location.href = `/${daoURL}/welcome`
+							else
+								window.location.href = `/${daoURL}/settings`
                         })
 					})
 					.catch(async (err) => {
@@ -811,7 +816,7 @@ export default () => {
 				<Box className={classes.StartSafe}>
 					{ !DAO ? 
 					  <Skeleton variant="text" sx={{ mb: 2 }} className={classes.headerText} width={400} /> :
-					  <Box className={classes.headerText}>{ !fromFlow ? '' : '2/2'} Organisation Multi-sig Wallet</Box> 
+					  <Box className={classes.headerText}>{ !location?.state?.createFlow  ? '' : '2/2'} Organisation Multi-sig Wallet</Box> 
 					}
 					<Box className={classes.buttonArea}>
 						<Box>
@@ -844,7 +849,7 @@ export default () => {
 									width: 228
 								}}
 								onClick={() => {
-									navigate(`/${daoURL}/attach-safe/existing${fromFlow ? '?createflow=1' : ''}`)
+									navigate(`/${daoURL}/attach-safe/existing`, location?.state?.createFlow ? { state: { createFlow: true } } : {})
 								}}
 								variant='contained'>
 								ADD EXISTING

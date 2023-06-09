@@ -1,5 +1,6 @@
 import { get as _get, find as _find } from 'lodash';
 import useTerminology from './useTerminology';
+import useSafe from './useSafe';
 
 const capitalizeFirstLetter = (string: string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -66,11 +67,16 @@ const can = (role: string , permission: string) => {
     return _get(permissions, role, []).indexOf(permission) > -1
 }
 
-const useRole = (DAO: any, account: string | undefined) => {
+const useRole = (DAO: any, account: string | undefined, safeAddress: string | undefined | null) => {
     const { transformRole } = useTerminology(_get(DAO, 'terminologies'))
+    const { loadSafe } = useSafe()
+    let isSafeOwner = false;
     if(DAO && account) {
         let role = _get(_find(DAO.members, m => m.member.wallet.toLowerCase() === account?.toLowerCase()), 'role', '')
-        let isSafeOwner = _find(_get(DAO, 'safe.owners'), (m: any) => m.wallet.toLowerCase() === account.toLowerCase());
+        if(safeAddress){
+            let safe = loadSafe(safeAddress)
+            isSafeOwner = _find(_get(safe, 'owners'), (m: any) => m.wallet.toLowerCase() === account.toLowerCase());
+        }
         return { 
             myRole: role, 
             displayRole: _get(transformRole(role), 'label', ''),

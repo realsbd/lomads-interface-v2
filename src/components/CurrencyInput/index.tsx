@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default ({ options, onChange, value, dropDownvalue, onDropDownChange, disabled, disableSelect }: any) => {
-    console.log(value)
+    console.log("options", options)
     const classes = useStyles()
     return (
         <div className={classes.pickerContainer}>

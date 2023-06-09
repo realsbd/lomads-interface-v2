@@ -8,6 +8,7 @@ import localforage from 'localforage';
 import storage from 'redux-persist/lib/storage'
 import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2';
 import taskReducer from './task';
+import * as actionTypes from 'store/actionTypes';
 
 // const isRemember = async()=> await getValue(REMEBER_DATA)
 
@@ -20,12 +21,20 @@ const rootPersistConfig = {
 };
 
 
-const rootReducer: any = combineReducers({
+const appReducer: any = combineReducers({
   session: sessionReducer,
   dao: DAOReducer,
   project: projectReducer,
   task: taskReducer,
   treasury: TreasuryReducer
 });
+
+const rootReducer = (state: any, action: any) => {
+  if (action.type === actionTypes.LOGOUT_ACTION) {
+    storage.removeItem('persist:root')
+    return appReducer(undefined, action)
+  }
+  return appReducer(state, action)
+}
 
 export default persistReducer(rootPersistConfig, rootReducer);
