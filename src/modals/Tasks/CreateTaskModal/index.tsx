@@ -30,6 +30,7 @@ import { CHAIN_INFO } from 'constants/chainInfo';
 import { createTaskAction, draftTaskAction } from "store/actions/task";
 import useSafe from "hooks/useSafe";
 import theme from "theme";
+import moment from "moment";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -47,7 +48,7 @@ const useStyles = makeStyles((theme: any) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '27px !important',
+        padding: ' 27px 27px 80px 27px !important',
         marginTop: '60px !important'
     },
     modalTitle: {
@@ -396,7 +397,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             task.applicant = selectedUser;
             task.projectId = selectedProject ? selectedProject._id : projectId;
             task.discussionChannel = tempLink;
-            task.deadline = deadline;
+            task.deadline = moment(deadline).format('YYYY-MM-DD');
             task.submissionLink = tempSub ? tempSub : '';
             task.compensation = { currency: currency, amount, symbol, safeAddress: safeAddress };
             task.reviewer = reviewer;
@@ -441,7 +442,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
         task.applicant = selectedUser;
         task.projectId = selectedProject ? selectedProject._id : projectId;;
         task.discussionChannel = tempLink;
-        task.deadline = deadline;
+        task.deadline =  moment(deadline).format('YYYY-MM-DD');;
         task.submissionLink = tempSub ? tempSub : '';
         task.compensation = { currency: currency, amount, symbol, safeAddress: safeAddress };
         task.reviewer = reviewer;
@@ -536,9 +537,10 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                                 <TextInput
                                     label="Deadline"
                                     fullWidth
-                                    value={deadline}
-                                    type={"date"}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setDeadline(e.target.value); setErrorDeadline('') }}
+                                    date
+                                    minDate={moment()}
+                                    value={deadline || undefined}
+                                    onChange={(e: any) => { setDeadline(e); setErrorDeadline('') }}
                                     error={errorDeadline !== ''}
                                     id={errorDeadline !== '' ? "outlined-error-helper-text" : ""}
                                     helperText={errorDeadline}
@@ -582,14 +584,14 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                             <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                                 <Box
                                     className={contributionType === 'assign' ? `${classes.tabBtn} active` : `${classes.tabBtn}`}
-                                    sx={{ width: '204px', height: '60px' }}
+                                    sx={{ width: '204px', height: '50px' }}
                                     onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }}
                                 >
                                     <Typography sx={{ fontSize: '20px' }}>ASSIGN MEMBER</Typography>
                                 </Box>
                                 <Box
                                     className={contributionType === 'open' ? `${classes.tabBtn} active` : `${classes.tabBtn}`}
-                                    sx={{ width: '176px', height: '60px' }}
+                                    sx={{ width: '176px', height: '50px' }}
                                     onClick={() => { setContributionType('open'); setSelectedUser(null); }}
                                 >
                                     <Typography sx={{ fontSize: '20px' }}>OPEN</Typography>
@@ -732,10 +734,17 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                             />
                         </Box>
 
-                        <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
+                        {/* <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
                             <Button variant="outlined" sx={{ marginRight: '20px', width: '240px' }} onClick={handleDraftTask} loading={draftTaskLoading}>SAVE AS DRAFT</Button>
                             <Button variant="contained" sx={{ width: '240px' }} onClick={handleCreateTask} loading={createTaskLoading}>CREATE</Button>
-                        </Box>
+                        </Box> */}
+
+                    <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                            <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                                <Button sx={{ mr:1 }} onClick={() => handleDraftTask()} fullWidth variant='outlined' size="small">Save draft</Button>
+                                <Button sx={{ ml:1 }} onClick={() => handleCreateTask()} loading={createTaskLoading} disabled={createTaskLoading} fullWidth variant='contained' size="small">Create</Button>
+                            </Box>
+                    </Box>
 
                     </Box>
             }

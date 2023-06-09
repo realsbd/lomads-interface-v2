@@ -26,6 +26,7 @@ import { editProjectMilestonesAction } from "store/actions/project";
 import { beautifyHexToken } from "utils";
 import theme from "theme";
 import AmountInput from "components/AmountInput";
+import moment from "moment";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -42,7 +43,7 @@ const useStyles = makeStyles((theme: any) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '27px !important',
+        padding: '27px 27px 80px 27px !important',
         marginTop: '60px !important'
     },
     modalTitle: {
@@ -460,11 +461,12 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                                 <TextInput
                                                     sx={{ width: 172 }}
                                                     label="Due date"
-                                                    type="date"
-                                                    value={item.deadline}
-                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeDeadline(e.target.value, index)}
+                                                    date
+                                                    value={ moment(item.deadline, 'YYYY-MM-DD') || undefined}
+                                                    onChange={(e: any) => handleChangeDeadline(moment(e).format('YYYY-MM-DD'), index)}
                                                     disabled={item.complete}
                                                     error
+                                                    minDate={moment()}
                                                     id="outlined-error-helper-text"
                                                     helperText="Please enter deadline"
                                                 />
@@ -472,9 +474,10 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                                 <TextInput
                                                     sx={{ width: 172 }}
                                                     label="Due date"
-                                                    type="date"
-                                                    value={item.deadline}
-                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeDeadline(e.target.value, index)}
+                                                    date
+                                                    minDate={moment()}
+                                                    value={ moment(item.deadline, 'YYYY-MM-DD') || undefined}
+                                                    onChange={(e: any) => handleChangeDeadline(moment(e).format('YYYY-MM-DD'), index)}
                                                     disabled={item.complete}
                                                 />
                                         }
@@ -497,7 +500,15 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                         })
                     }
 
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
+
+                    <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                            <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                                <Button sx={{ mr:1 }} onClick={() => closeModal()} fullWidth variant='outlined' size="small">Cancel</Button>
+                                <Button sx={{ ml:1 }} onClick={() => handleSubmit()} disabled={editProjectMilestonesLoading} loading={editProjectMilestonesLoading} fullWidth variant='contained' size="small">{ editMilestones? 'SAVE' : 'ADD' }</Button>
+                            </Box>
+                    </Box>
+
+                    {/* <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
                         <Button variant="outlined" sx={{ marginRight: '20px', width: '169px' }} onClick={closeModal}>CANCEL</Button>
                         <Button variant="contained" onClick={handleSubmit} sx={{ width: '184px' }} loading={editProjectMilestonesLoading}>
                             {
@@ -508,7 +519,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                     'ADD'
                             }
                         </Button>
-                    </Box>
+                    </Box> */}
 
                 </Box>
             </Box>
