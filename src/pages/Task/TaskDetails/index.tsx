@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme: any) => ({
         height: '100% !important',
         borderRadius: '5px !important',
         background: '#FFF !important',
-        padding: '0 32px !important'
+        padding: '22px !important'
     },
     nameText: {
         fontSize: '22px !important',
@@ -551,7 +551,7 @@ export default () => {
                     <Typography>{_get(Task, 'project.name', '')}</Typography>
                 </Box>
 
-                <Box sx={{ width: '100%', height: 74, marginBottom: '0.2rem' }} display="flex" alignItems="center">
+                <Box sx={{ width: '100%', marginBottom: '0.2rem' }} display="flex" alignItems="center">
                     <Box className={classes.arrowContainer} display="flex" alignItems="center" justifyContent={"center"} onClick={() => navigate(-1)}>
                         <IoIosArrowBack size={20} color="#C94B32" />
                     </Box>

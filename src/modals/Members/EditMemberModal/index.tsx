@@ -91,6 +91,7 @@ export default ({ open, closeModal }: Props) => {
         if (updateDaoMembersLoading === false) {
             setDeleteMembers([]);
             setUpdateMembers([]);
+            setEditableName('');
             closeModal();
         }
     }, [updateDaoMembersLoading]);
@@ -98,7 +99,7 @@ export default ({ open, closeModal }: Props) => {
     useEffect(() => {
         let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
         setEditableName(user.member.name)
-    }, []);
+    }, [DAO]);
 
     const amIAdmin = useMemo(() => {
         if (DAO) {
