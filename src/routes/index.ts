@@ -121,7 +121,7 @@ export default [
 	{
 		path: '/:daoURL/task/:taskId',
 		exact: true,
-		layout: LandingLayout,
+		layout: DefaultLayout,
 		private: true,
 		component: TaskDetailsPage
 	},

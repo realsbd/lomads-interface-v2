@@ -12,7 +12,10 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import routes from 'routes'
 import PrivateRoute from 'components/PrivateRoute';
 import { Toaster } from 'react-hot-toast';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 export const store = configureStore();
+
 
 export type AppState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
@@ -23,44 +26,45 @@ const App = () => {
             <Provider store={store}>
                 <PersistGate persistor={persistor}>
                     <Web3AuthProvider>
-                        <Router basename={''}>
-
-                            <Routes>
-                                {routes.map((route, index) => {
-                                    return (
-                                        <Route
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <Router basename={''}>
+                                <Routes>
+                                    {routes.map((route, index) => {
+                                        return (
+                                            <Route
+                                                element={
+                                                    <DAOProvider privateRoute={route.private}>
+                                                        <SafeTokensProvider>
+                                                            <PrivateRoute
+                                                                orRender={
+                                                                    <route.layout>
+                                                                        <route.component />
+                                                                    </route.layout>
+                                                                }
+                                                                private={route.private}
+                                                            />
+                                                        </SafeTokensProvider>
+                                                    </DAOProvider>
+                                                }
+                                                path={route.path}
+                                            />
+                                        );
+                                    })}
+                                    {/* <Route
                                             element={
-                                                <DAOProvider privateRoute={route.private}>
-                                                    <SafeTokensProvider>
-                                                        <PrivateRoute
-                                                            orRender={
-                                                                <route.layout>
-                                                                    <route.component />
-                                                                </route.layout>
-                                                            }
-                                                            private={route.private}
-                                                        />
-                                                    </SafeTokensProvider>
-                                                </DAOProvider>
-                                            }
-                                            path={route.path}
-                                        />
-                                    );
-                                })}
-                                {/* <Route
-                                        element={
-                                                <PrivateRoute orRender= {
-                                                <Landing>
-                                                    <PageNotFound />
-                                                </Landing>
-                                            } 
-                                        private={false}
-                                        />}
-                                        key={'notfound'}
-                                        path={'*'}
-                                    /> */}
-                            </Routes>
-                        </Router>
+                                                    <PrivateRoute orRender= {
+                                                    <Landing>
+                                                        <PageNotFound />
+                                                    </Landing>
+                                                } 
+                                            private={false}
+                                            />}
+                                            key={'notfound'}
+                                            path={'*'}
+                                        /> */}
+                                </Routes>
+                            </Router>
+                        </LocalizationProvider>
                     </Web3AuthProvider>
                     <Toaster position="bottom-right" />
                 </PersistGate>
