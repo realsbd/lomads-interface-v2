@@ -55,7 +55,7 @@ export default ({ safeAddress, recipient, credit }: any) => {
                     </Box>
                     {/* <Avatar sx={{ width: 32, height: 32 }} src={CHAIN_INFO[safe?.chainId]?.logoUrl} /> */}
                     <Box sx={{ ml: 1 }}>
-                        { safe?.name && <Typography style={{ color:"#1B2B41", fontWeight: 700, fontSize: 12, fontFamily: 'Inter, sans-serif' }}>{ safe?.name }</Typography> }
+                        { <Typography style={{  whiteSpace: 'nowrap', color:"#1B2B41", fontWeight: 700, fontSize: 12, fontFamily: 'Inter, sans-serif' }}>{ safe?.name || 'Multi-sig wallet' }</Typography> }
                         <Typography style={{ color:"#1B2B41", fontWeight: 400, fontSize: 12, fontFamily: 'Inter, sans-serif' }}>{ beautifyHexToken(safe?.address) }</Typography>
                     </Box>
                 </Box>

@@ -41,7 +41,7 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
 
     const handleConfirmTransaction = async () => {
         const safe = loadSafe(safeAddress)
-        if(+safe?.chainId !== +currentChainId) {
+        if((+safe?.chainId !== +currentChainId) && token !== 'SWEAT') {
             toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId}/>)
         } else {
             try {
@@ -61,7 +61,7 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
 
     const handleRejectTransaction = async () => {
         const safe = loadSafe(safeAddress)
-        if(+safe?.chainId !== +currentChainId) {
+        if((+safe?.chainId !== +currentChainId) && token !== 'SWEAT') {
             toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId}/>)
         } else {
             try {
@@ -81,7 +81,7 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
 
     const handleExecuteTransaction = async (safeTxnHash: string) => {
         const safe = loadSafe(safeAddress)
-        if(+safe?.chainId !== +currentChainId) {
+        if((+safe?.chainId !== +currentChainId) && token !== 'SWEAT') {
             toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId}/>)
         } else {
             try {

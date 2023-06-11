@@ -23,6 +23,8 @@ import { useDAO } from "context/dao";
 import { useWeb3Auth } from "context/web3Auth";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { updateMilestoneAction } from "store/actions/project";
+import { toast } from "react-hot-toast";
+import SwitchChain from "components/SwitchChain";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -39,7 +41,7 @@ const useStyles = makeStyles((theme: any) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '27px 27px 90px 27px !important',
+        padding: '27px 27px 100px 27px !important',
         marginTop: '60px !important'
     },
     modalTitle: {
@@ -99,7 +101,7 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
     const classes = useStyles();
     const dispatch = useAppDispatch()
     const { DAO } = useDAO();
-    const { account } = useWeb3Auth()
+    const { account, chainId } = useWeb3Auth()
     const { Project } = useAppSelector((store:any) => store.project);
     const [members, setMembers] = useState([])
     const { createSafeTransaction } = useGnosisSafeTransaction();
@@ -131,7 +133,12 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
             }
         }
         const safe = loadSafe(Project?.compensation?.safeAddress || _get(DAO, 'safes[0].address'))
+
         if(!safe) return;
+
+        if((chainId !== safe?.chainId) && Project?.compensation?.currency === "SWEAT") {
+            return toast.custom(t => <SwitchChain t={t} nextChainId={safe?.chainId}/>)
+        }
 
         try {
             setSendTokensLoading(true)

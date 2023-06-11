@@ -178,13 +178,19 @@ export default ({ children, options = true, ...props } : any) => {
 		if (DAO && user && safeTokens) {
 			let usdVal = 0
 			const myTokens = _get(user, 'earnings', []).filter((e: any) => e.daoId === _get(DAO, '_id'))
+      console.log("tokenDollarBalance", safeTokens, myTokens);
 			for (let index = 0; index < myTokens.length; index++) {
 				const myToken = myTokens[index];
         let safeTkn  = null;
         let tkns = Object.values(safeTokens);
         for (let index = 0; index < tkns.length; index++) {
           const element: any = tkns[index];
-          safeTkn = _find(element, (st: any) => (st?.tokenAddress || process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) === myToken?.currency)
+          safeTkn = _find(element, (st: any) => {
+            if(element?.symbol === "GOR" || element?.symbol === "GörETH") {
+              return ((st?.tokenAddress || process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) && st?.token?.symbol === "GörETH") === myToken?.currency
+            }
+            return ((st?.tokenAddress || process.env.REACT_APP_NATIVE_TOKEN_ADDRESS)) === myToken?.currency
+          })
           if(safeTkn) break;
         }
 				if (safeTkn) {
@@ -195,7 +201,7 @@ export default ({ children, options = true, ...props } : any) => {
 			return (usdVal || 0).toFixed(2)
 		}
 		return 0
-	}, [user, safeTokens, DAO])
+	}, [user, safeTokens, DAO?.url])
 
   return (
     <Box display="flex" position="relative">

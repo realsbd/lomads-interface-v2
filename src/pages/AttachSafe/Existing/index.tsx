@@ -278,7 +278,7 @@ const useStyles = makeStyles((theme: any) => ({
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		alignItems: 'flex-end',
+		alignItems: 'center',
 		marginTop: 10,
 		width: 325
 	},
@@ -342,6 +342,7 @@ export default () => {
 	const { provider, account, chainId } = useWeb3Auth();
     const [selectedSafeAddress, setSelectedSafeAddress] = useState<string | null>(null);
     const [state, setState] = useState<any>({})
+	const [noSafeError, setNoSafeError] = useState<any>(null)
 
 
     const loadSafe = useCallback(async (safeAddress: string) => {
@@ -380,9 +381,15 @@ export default () => {
         if(state?.selectedChainId) {
             setSafeListLoading(true)
             axios.get(`${GNOSIS_SAFE_BASE_URLS[state?.selectedChainId]}/api/v1/owners/${account}/safes/`)
-            .then(res => setSafeList(res.data.safes.filter((safe:any) => {
-				return !_.find(DAO?.safes, (s:any) => s.address === safe)
-			})))
+            .then(res => {
+				const safeList = res.data.safes.filter((safe:any) => !_.find(DAO?.safes, (s:any) => s.address === safe))
+				if(!safeList || safeList?.length === 0) {
+					setNoSafeError(true)
+					setTimeout(() => setNoSafeError(null), 2000)
+				} else {
+					setSafeList(safeList)
+				}
+			})
             .finally(() => setSafeListLoading(false))
         }
     }, [state?.selectedChainId])
@@ -471,7 +478,7 @@ export default () => {
 								<>
 									<Box className={classes.safeOwner} key={index}>
 										<Box className={classes.userDetail}>
-											<Box sx={{marginTop: 1.5}}>
+											<Box sx={{marginTop: 1.2}}>
 											<Avatar
 												size={32}
 												name={result.address}
@@ -615,8 +622,9 @@ export default () => {
 								<Button disabled={isLoading || !selectedSafeAddress || !safe} loading={isLoading} onClick={handleClickDelayed} variant='contained'>ADD</Button>
 							</Box>
 						</Box>
-						: <Box style={{ margin: 25 }}>
+						: <Box style={{ margin: 25, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 							<Button loading={safeListLoading} onClick={loadSafes} variant='contained'>FIND MY SAFE</Button>
+							<Typography color="error" style={{ margin: '12px 0' }}>{ state?.selectedChainId && noSafeError && `You have no safe on ${CHAIN_INFO[state?.selectedChainId]?.chainName}` }</Typography>
 						</Box>
 					}
 				</Box>

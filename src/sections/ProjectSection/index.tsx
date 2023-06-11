@@ -109,34 +109,27 @@ export default () => {
             const provider = Object.keys(grp)[index];
             count.push({ provider, count: grp[provider].reduce((p, c) => (p + (+_get(c, 'notification', 0))), 0) })
         }
-        return count;
+        return count.length;
     }
 
     useEffect(() => {
         if (DAO && DAO.url === daoURL) {
-            // @ts-ignore
-            let myProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.draftedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()));
-            // @ts-ignore
-            myProjects = myProjects.map(p => {
+            let myProjects = _get(DAO, 'projects', []).filter((project:any) => !project.deletedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()));
+            myProjects = myProjects.map((p:any) => {
                 let prj = { ...p, notification: 0 }
-                // @ts-ignore
                 if (notificationCount(prj) > 0)
                     prj.notification = 1
                 return prj;
             })
             setMyProjects(_orderBy(myProjects, ['notification', p => moment(p.createdAt).unix()], ['desc', 'desc']))
-
-            // @ts-ignore
-            let otherProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.draftedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()))
-            // @ts-ignore
-            otherProjects = otherProjects.map(p => {
+            let otherProjects = _get(DAO, 'projects', []).filter((project:any) => !project.deletedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()))
+            otherProjects = otherProjects.map((p:any) => {
                 let prj = { ...p, notification: 0 }
-                // @ts-ignore
                 if (notificationCount(prj) > 0)
                     prj.notification = 1
                 return prj;
             })
-            setOtherProjects(_orderBy(otherProjects, p => moment(p.createdAt).unix(), 'desc'))
+            setOtherProjects(_orderBy(myProjects.concat(otherProjects), p => moment(p.createdAt).unix(), 'desc'))
         }
     }, [DAO, value]);
 

@@ -126,6 +126,14 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     const [errorProjectValue, setErrorProjectValue] = useState<boolean>(false);
 
     useEffect(() => {
+        if(editMilestones && Project && Project?._id) {
+            const safeAddress = Project?.compensation?.safeAddress || _get(DAO, 'safes[0].address', '')
+            setSafeAddress(safeAddress)
+            setCurrency(Project?.compensation?.currency)
+        }
+    }, [editMilestones && Project?._id])
+
+    useEffect(() => {
         if (editProjectMilestonesLoading === false) {
             closeModal();
         }

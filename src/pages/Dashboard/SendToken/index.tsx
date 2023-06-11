@@ -98,7 +98,7 @@ export default ({ open, onClose }: any) => {
     const handleSendTokens = async () => {
         const safe = loadSafe(state?.safeAddress)
         console.log("safe", safe)
-        if(+safe?.chainId !== +currentChainId)
+        if((+safe?.chainId !== +currentChainId) && state?.token !== "SWEAT")
             return toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId}/>)
         const send = state?.members?.filter((member:any) => member?.selected).map((member:any) => { return { recipient: member?.address, amount: member?.amount, label: member?.label, tag: member?.tag } })
         try {

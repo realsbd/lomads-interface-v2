@@ -16,7 +16,9 @@ import {
     updateProjectDetailsService,
     updateProjectKraService,
     updateProjectMembersService,
-    updateMilestoneService
+    updateMilestoneService,
+    updateProjectLinkService,
+    editProjectLinkService
 } from 'store/services/project'
 
 function* getProjectSaga(action: any) {
@@ -166,6 +168,26 @@ function* updateMilestoneSaga(action: any) {
     }
 }
 
+function* updateProjectLinkSaga(action: any) {
+    try {
+        const { data } = yield call(updateProjectLinkService, action.payload)
+        yield put({ type: actionTypes.LOAD_DAO_SUCCESS, payload: data?.dao })
+        yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data?.project })
+    } catch (e) {
+        
+    }
+}
+
+function* editProjectLinkSaga(action: any) {
+    try {
+        const { data } = yield call(editProjectLinkService, action.payload)
+        yield put({ type: actionTypes.LOAD_DAO_SUCCESS, payload: data?.dao })
+        yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data?.project })
+    } catch (e) {
+        
+    }
+}
+
 export default function* projectSaga() {
     yield takeLatest(actionTypes.GET_PROJECT_ACTION, getProjectSaga)
     yield takeLatest(actionTypes.CREATE_PROJECT_ACTION, createProjectSaga)
@@ -178,4 +200,6 @@ export default function* projectSaga() {
     yield takeLatest(actionTypes.UPDATE_PROJECT_MEMBERS_ACTION, updateProjectMembersSaga)
     yield takeLatest(actionTypes.INVITE_PROJECT_MEMBERS_ACTION, inviteProjectMembersSaga)
     yield takeLatest(actionTypes.UPDATE_MILESTONE_ACTION, updateMilestoneSaga)
+    yield takeLatest(actionTypes.UPDATE_PROJECT_LINK_ACTION, updateProjectLinkSaga)
+    yield takeLatest(actionTypes.EDIT_PROJECT_LINK_ACTION, editProjectLinkSaga)
 }

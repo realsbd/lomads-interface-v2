@@ -562,7 +562,7 @@ export default () => {
                         <Box display="flex" alignItems="center">
                             <Box display="flex" alignItems="center">
                                 <img src={Task?.visual?.icon} alt="submitted-icon" />
-                                <Typography sx={{ fontSize: '14px', marginLeft: '5px', color: Task?.visual?.color }}>{Task?.visual?.status}</Typography>
+                                <Typography sx={{ fontSize: '14px', marginLeft: '5px', textWrap: 'nowrap', color: Task?.visual?.color }}>{Task?.visual?.status}</Typography>
                             </Box>
                             {/* <Box sx={{ marginLeft: '22px', cursor: 'pointer' }}>
                                 <img src={editToken} alt="edit-icon" />

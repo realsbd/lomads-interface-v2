@@ -105,8 +105,8 @@ export default () => {
                 if(exists){
                     token = {
                         ...token,
-                        balance: +token.balance + exists.balance,
-                        fiatBalance: +token.fiatBalance + exists.fiatBalance,
+                        balance: +token.balance + (+exists.balance),
+                        fiatBalance: +token.fiatBalance + (+exists.fiatBalance),
                     }
                     final = final.map((t: any) => {
                         if(t.tokenAddress === token.tokenAddress && token.token.symbol === t.token.symbol) {

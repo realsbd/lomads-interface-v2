@@ -104,6 +104,7 @@ export default ({ onlyProjects }: any) => {
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
+    
 
     return (
         <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>

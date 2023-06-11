@@ -5,8 +5,22 @@ import SimpleLoadButton from "components/SimpleLoadButton";
 import { toast } from "react-toastify";
 import { AiOutlinePlus } from "react-icons/ai";
 import axiosHttp from 'api';
+import { LeapFrog } from "@uiball/loaders";
+import { Box } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 
-export default ({ title, desc, link, spaceDomain, accessControl, okButton, onNotionCheckStatus, ...props }) => {
+const useStyles = makeStyles((theme: any) => ({
+    addLinkBtn: {
+        width: 50,
+        height: 50,
+        borderRadius: '5px',
+        cursor: 'pointer',
+        margin: '0 !important'
+    }
+}));
+
+export default ({ title, desc, link, spaceDomain, accessControl, okButton, onNotionCheckStatus, ...props }: any) => {
+    const classes = useStyles()
     const [linkLoading, setLinkLoading] = useState(false)
 
     const handleAddResource = async () => {
@@ -37,11 +51,22 @@ export default ({ title, desc, link, spaceDomain, accessControl, okButton, onNot
                 onNotionCheckStatus({ status: true })
             }
         }
+        return;
     }
 
     return (
         <>
-            {
+            <Box
+                className={classes.addLinkBtn}
+                sx={link !== '' && title !== '' ? { background: '#C84A32' } : { background: 'rgba(27, 43, 65, 0.2)', }}
+                display={"flex"}
+                alignItems={"center"}
+                justifyContent={"center"}
+                onClick={() => handleAddResource()}
+            > { linkLoading ? <LeapFrog size={20} color="#FFF" /> :
+                <AiOutlinePlus color="#FFF" size={25} /> }
+            </Box>
+            {/* {
                 okButton ?
                     <SimpleLoadButton
                         disabled={linkLoading}
@@ -63,7 +88,7 @@ export default ({ title, desc, link, spaceDomain, accessControl, okButton, onNot
                             <AiOutlinePlus color="#FFF" size={25} />
                         }
                     </button>
-            }
+            } */}
         </>
 
     )

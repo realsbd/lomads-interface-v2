@@ -76,3 +76,17 @@ export const updateMilestoneAction = (payload: any) => {
         payload
     }
 }
+
+export const updateProjectLinkAction = (payload: any) => {
+    return {
+        type: actionTypes.UPDATE_PROJECT_LINK_ACTION,
+        payload
+    }
+}
+
+export const editProjectLinksAction = (payload: any) => {
+    return {
+        type: actionTypes.EDIT_PROJECT_LINK_ACTION,
+        payload
+    }
+}
