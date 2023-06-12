@@ -1,5 +1,5 @@
 import React, { useMemo } from "react"
-import { Grid, Box, Stack, Typography } from "@mui/material"
+import { Grid, Stack, Typography, Container, Box } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 
 import POLYGON_GREY from 'assets/svg/polygonGray.svg'
@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme: any) => ({
     }
   }));
 
-export default ({ theme="light" }: { theme: string }) => {
+export default ({ theme="light", ...props }: any) => {
 
     const classes = useStyles()
 
@@ -50,28 +50,38 @@ export default ({ theme="light" }: { theme: string }) => {
         return { polygon: POLYGON_WHITE, safe: GNOSIS_WHITE, ipfs: IPFS_WHITE, lomads: LOMADS_WHITE }
     }, [theme])
 
-    return (
-        <Box component="footer" className={classes.root}>
-            <Grid container alignItems="center">
-                <Grid item sm={8}>
-                    <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
-                            <Box display="flex" flexDirection="row" alignItems="center">
-                                <Typography sx={{ color: theme == 'light' ? '#76808D' : '#FFF' }} className={classes.poweredBy}>Powered by</Typography>
-                                <img className={classes.logo} src={icons.polygon} />
-                                <img className={classes.logo} src={icons.safe} />
-                                <img className={classes.logo} src={icons.ipfs}/>
-                            </Box>
-                    </Box>
+    const renderFooter = () => {
+        return (
+            <Box component="footer" className={classes.root} style={{ ...(props?.style || {}) }}>
+                <Grid container alignItems="center">
+                    <Grid item sm={8}>
+                        <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
+                                <Box display="flex" flexDirection="row" alignItems="center">
+                                    <Typography sx={{ color: theme == 'light' ? '#76808D' : '#FFF' }} className={classes.poweredBy}>Powered by</Typography>
+                                    <img className={classes.logo} src={icons.polygon} />
+                                    <img className={classes.logo} src={icons.safe} />
+                                    <img className={classes.logo} src={icons.ipfs}/>
+                                </Box>
+                        </Box>
+                    </Grid>
+                    <Grid item sm={4}>
+                        <Box display="flex" flexDirection="row" alignItems="center" justifyContent="flex-end">
+                                <Box display="flex" flexDirection="row" alignItems="center">
+                                    <Typography sx={{ color: theme == 'light' ? '#76808D' : '#FFF' }} className={classes.madeWith}>Made with ❤️ by</Typography>
+                                    <img className={classes.logo} src={icons.lomads} />
+                                </Box>
+                        </Box>
+                    </Grid>
                 </Grid>
-                <Grid item sm={4}>
-                    <Box display="flex" flexDirection="row" alignItems="center" justifyContent="flex-end">
-                            <Box display="flex" flexDirection="row" alignItems="center">
-                                <Typography sx={{ color: theme == 'light' ? '#76808D' : '#FFF' }} className={classes.madeWith}>Made with ❤️ by</Typography>
-                                <img className={classes.logo} src={icons.lomads} />
-                            </Box>
-                    </Box>
-                </Grid>
-            </Grid>
+            </Box>
+        )
+    }
+    if(props?.container) {
+        return <Box style={{ width: '100%', ...props?.style }}>
+            <Container maxWidth={props?.container}>
+                { renderFooter() }
+            </Container>
         </Box>
-    )
+    }
+    return renderFooter()
 }

@@ -165,7 +165,7 @@ export default ({ onlyProjects }: any) => {
                                     <Box
                                         key={index}
                                         className={classes.showAllCard}
-                                    // onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}
+                                        onClick={() => { navigate(`/${DAO.url}/tasks`) }}
                                     >
                                         <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
                                     </Box>
@@ -196,7 +196,7 @@ export default ({ onlyProjects }: any) => {
                                     <Box
                                         key={index}
                                         className={classes.showAllCard}
-                                    // onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}
+                                        onClick={() => { navigate(`/${DAO.url}/tasks`) }}
                                     >
                                         <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
                                     </Box>
@@ -227,7 +227,7 @@ export default ({ onlyProjects }: any) => {
                                     <Box
                                         key={index}
                                         className={classes.showAllCard}
-                                    // onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}
+                                        onClick={() => { navigate(`/${DAO.url}/tasks`) }}
                                     >
                                         <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
                                     </Box>
@@ -258,7 +258,7 @@ export default ({ onlyProjects }: any) => {
                                     <Box
                                         key={index}
                                         className={classes.showAllCard}
-                                    // onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}
+                                        onClick={() => { navigate(`/${DAO.url}/tasks`) }}
                                     >
                                         <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
                                     </Box>
