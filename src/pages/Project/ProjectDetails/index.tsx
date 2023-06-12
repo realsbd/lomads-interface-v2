@@ -194,6 +194,11 @@ export default () => {
 
     const [selectedMilestone, setSelectedMilestone] = useState(null);
 
+    // useEffect(() => {
+    //     if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
+    //         dispatch(getDao(daoURL))
+    // }, [DAO, daoURL])
+
     useEffect(() => {
         if (projectId && (!Project || (Project && Project._id !== projectId))) {
             dispatch(getProjectAction(projectId));
@@ -244,6 +249,8 @@ export default () => {
         let roles: any = [];
         const discordOb = _get(DAO, 'discord', null);
         const userTemp = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === props.address.toLowerCase());
+        console.log("address : ", props.address);
+        console.log("user : ", userTemp);
         const index = props.index;
 
         if (userTemp?.discordId && discordOb) {
@@ -564,7 +571,7 @@ export default () => {
                             </Box>
                         </Box>
 
-                        <Box sx={{ width: '100%', height: '220px', overflow: 'auto' }}>
+                        <Box sx={{ width: '100%', maxHeight: '220px', overflow: 'auto' }}>
                             {_sortBy(_uniqBy(Project?.members, (m: any) => m.wallet.toLowerCase()), (m: any) => _get(m, 'name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
                                 return (
                                     <NameAndAvatar

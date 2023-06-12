@@ -19,6 +19,7 @@ import TerminologyModal from "./Modals/Terminology";
 import RolesModal from "./Modals/Roles";
 import XPPoints from "./Modals/XPPoints";
 import Organisation from "./Modals/Organisation";
+import IntegrationModal from "./Modals/Integration";
 import { useDAO } from "context/dao";
 import theme from "theme";
 import { useLocation } from "react-router-dom";
@@ -44,14 +45,14 @@ const useStyles = makeStyles((theme: any) => ({
         letterSpacing: '-0.011em',
         color: '#C94B32'
     }
-  }));
+}));
 
 const Content = ({ icon, title, onClick }: { icon: any | undefined, title: string | undefined, onClick: any }) => {
     const classes = useStyles();
     const { DAO } = useDAO()
-    if(!DAO) {
+    if (!DAO) {
         return (
-            <Skeleton variant="rectangular"  animation="wave" height={130} className={classes.item} width={'100%'} />
+            <Skeleton variant="rectangular" animation="wave" height={130} className={classes.item} width={'100%'} />
         )
     }
     return (
@@ -60,8 +61,8 @@ const Content = ({ icon, title, onClick }: { icon: any | undefined, title: strin
                 <img src={icon} />
             </Box>
             <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
-                <Typography className={classes.title}>{ title }</Typography>
-                <ChevronRight color="primary"/>
+                <Typography className={classes.title}>{title}</Typography>
+                <ChevronRight color="primary" />
             </Box>
         </Box>
     )
@@ -74,25 +75,27 @@ export default () => {
     const location = useLocation();
 
     const Modal = useMemo(() => {
-        if(activeModal === SafeModal.name)
+        if (activeModal === SafeModal.name)
             return SafeModal
-        if(activeModal === PassTokenModal.name)
+        if (activeModal === PassTokenModal.name)
             return PassTokenModal
-        if(activeModal === PassTokenModalV2.name)
+        if (activeModal === PassTokenModalV2.name)
             return PassTokenModalV2
-        if(activeModal === TerminologyModal.name)
+        if (activeModal === TerminologyModal.name)
             return TerminologyModal
-        if(activeModal === RolesModal.name)
+        if (activeModal === RolesModal.name)
             return RolesModal
-        if(activeModal === XPPoints.name)
+        if (activeModal === XPPoints.name)
             return XPPoints
-        if(activeModal === Organisation.name)
+        if (activeModal === Organisation.name)
             return Organisation
+        if (activeModal === IntegrationModal.name)
+            return IntegrationModal
         return Fragment
     }, [activeModal])
 
     useEffect(() => {
-        if(DAO?.url && location?.state?.openDefault)
+        if (DAO?.url && location?.state?.openDefault)
             setActiveModal(location?.state?.openDefault)
     }, [DAO?.url, location?.state?.openDefault])
 
@@ -109,16 +112,16 @@ export default () => {
                     <Content onClick={() => setActiveModal(SafeModal.name)} icon={Safe} title="Safes" />
                 </Grid>
                 <Grid item sm={6} md={4} xs={1}>
-                    <Content onClick={() => setActiveModal( +(_get(DAO, 'sbt.version', 0)) >= 2 ? PassTokenModalV2.name : PassTokenModal.name)} icon={PassTokens} title="Pass Tokens" />
+                    <Content onClick={() => setActiveModal(+(_get(DAO, 'sbt.version', 0)) >= 2 ? PassTokenModalV2.name : PassTokenModal.name)} icon={PassTokens} title="Pass Tokens" />
                 </Grid>
                 <Grid item sm={6} md={4} xs={1}>
                     <Content onClick={() => setActiveModal(XPPoints.name)} icon={XpPoints} title="SWEAT Points" />
                 </Grid>
                 <Grid item sm={6} md={4} xs={1}>
-                    <Content onClick={() => setActiveModal(TerminologyModal.name)}  icon={Terminology} title="Terminology" />
+                    <Content onClick={() => setActiveModal(TerminologyModal.name)} icon={Terminology} title="Terminology" />
                 </Grid>
                 <Grid item sm={6} md={4} xs={1}>
-                    <Content onClick={() => {}} icon={IntegrationGrey} title="Integrations"/>
+                    <Content onClick={() => setActiveModal(IntegrationModal.name)} icon={IntegrationGrey} title="Integrations" />
                 </Grid>
             </Grid>
             <Drawer
@@ -127,13 +130,13 @@ export default () => {
                 anchor={'right'}
                 open={activeModal !== null}
                 onClose={() => setActiveModal(null)}>
-                    <Box sx={{ width: activeModal === RolesModal.name ? '960px' : '575px', flex: 1, padding: activeModal === RolesModal.name ? '32px 0px 32px 0px' : '32px 72px 32px 72px', borderRadius: '20px 0px 0px 20px' }}>
-                        <Modal 
-                            //@ts-ignore
-                            open={activeModal !== null} 
-                            onClose={() => setActiveModal(null)
-                        }/>
-                    </Box>
+                <Box sx={{ width: activeModal === RolesModal.name ? '960px' : '575px', flex: 1, padding: activeModal === RolesModal.name ? '32px 0px 32px 0px' : '32px 72px 32px 72px', borderRadius: '20px 0px 0px 20px' }}>
+                    <Modal
+                        //@ts-ignore
+                        open={activeModal !== null}
+                        onClose={() => setActiveModal(null)
+                        } />
+                </Box>
             </Drawer>
         </>
     )
