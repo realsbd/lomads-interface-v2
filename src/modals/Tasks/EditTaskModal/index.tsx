@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { find as _find, get as _get, debounce as _debounce } from 'lodash';
+import { find as _find, get as _get, debounce as _debounce, isEqual as _isEqual, } from 'lodash';
 import { Typography, Box, Drawer, Chip, Menu, MenuItem } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
@@ -27,7 +27,7 @@ import RolesListModal from "../RolesListModal";
 import useTerminology from 'hooks/useTerminology';
 import { isValidUrl } from 'utils';
 import { CHAIN_INFO } from 'constants/chainInfo';
-import { createTaskAction, draftTaskAction } from "store/actions/task";
+import { editDraftTaskAction, editTaskAction, convertDraftTaskAction } from "store/actions/task";
 import useSafe from "hooks/useSafe";
 import theme from "theme";
 import moment from "moment";
@@ -132,52 +132,38 @@ const useStyles = makeStyles((theme: any) => ({
 interface Props {
     open: boolean;
     closeModal(): any;
-    selectedProject?: any;
+    task: any;
 }
 
-export default ({ open, closeModal, selectedProject }: Props) => {
-    console.log("Selected Project : ", selectedProject);
+export default ({ open, closeModal, task }: Props) => {
     const classes = useStyles();
     const dispatch = useAppDispatch();
     const { DAO } = useDAO();
     // @ts-ignore
     const { user } = useAppSelector(store => store.session);
     // @ts-ignore
-    const { createTaskLoading, draftTaskLoading } = useAppSelector(store => store.task);
+    const { editTaskLoading, editDraftTaskLoading, convertDraftTaskLoading } = useAppSelector(store => store.task);
     const { safeTokens } = useSafeTokens();
     const { account, chainId } = useWeb3Auth();
     const { transformTask, transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies', null));
 
-    const [contributionType, setContributionType] = useState('open');
-    const [isSingleContributor, setIsSingleContributor] = useState(false);
-    const [isFilterRoles, setIsFilterRoles] = useState(false);
+    const [contributionType, setContributionType] = useState(task.contributionType);
+    const [isSingleContributor, setIsSingleContributor] = useState(task.isSingleContributor);
+    const [isFilterRoles, setIsFilterRoles] = useState(task.isFilterRoles);
     const [openRolesList, setOpenRolesList] = useState(false);
-    const [validRoles, setValidRoles] = useState([]);
-    const [selectedUser, setSelectedUser] = useState<any>(null);
-    const [name, setName] = useState<string>('');
-    const [desc, setDesc] = useState<string>('');
-    const [dchannel, setDChannel] = useState('');
-    const [deadline, setDeadline] = useState('');
-    const [projectId, setProjectId] = useState(null);
-    const [subLink, setSubLink] = useState('');
-    const [reviewer, setReviewer] = useState(null);
-    const [amount, setAmount] = useState(0);
-    const [currency, setCurrency] = useState<string>('');
+    const [validRoles, setValidRoles] = useState(task.validRoles);
+    const [selectedUser, setSelectedUser] = useState<any>(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?._id || null);
+    const [name, setName] = useState<string>(task.name);
+    const [desc, setDesc] = useState<string>(task.description);
+    const [dchannel, setDChannel] = useState(task.discussionChannel);
+    const [deadline, setDeadline] = useState(task.deadline ? moment(task.deadline, 'YYYY-MM-DD') : moment());
+    const [projectId, setProjectId] = useState(task.project ? task.project._id : null);
+    const [subLink, setSubLink] = useState(task.submissionLink);
+    const [reviewer, setReviewer] = useState(task.reviewer ? task.reviewer._id : null);
+    const [amount, setAmount] = useState(task.compensation?.amount || 0);
+    const [currency, setCurrency] = useState<string>(task.compensation?.currency || '');
+    const [safeAddress, setSafeAddress] = useState<string>(task.compensation?.safeAddress || _get(DAO, 'safes[0].address', null));
     const [showSuccess, setShowSuccess] = useState(false);
-
-    const [safeAddress, setSafeAddress] = useState<string>('');
-
-    const [creationType, setCreationType] = useState('');
-
-    // const { loadSafe } = useSafe();
-
-    useEffect(() => {
-        if (open && selectedProject) {
-            setTimeout(() => {
-                setProjectId(selectedProject?._id)
-            }, 100)
-        }
-    }, [selectedProject, open])
 
     const [errorName, setErrorName] = useState('');
     const [errorDesc, setErrorDesc] = useState('');
@@ -189,55 +175,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     const [errorCurrency, setErrorCurrency] = useState<boolean>(false);
     const [errorTaskValue, setErrorTaskValue] = useState<boolean>(false);
 
-    useEffect(() => {
-        if (createTaskLoading === false || draftTaskLoading === false) {
-            setShowSuccess(true);
-            setContributionType('open');
-            setIsSingleContributor(false);
-            setIsFilterRoles(false);
-            setValidRoles([]);
-            setSelectedUser(null);
-            setName('');
-            setDesc('');
-            setDChannel('');
-            setDeadline('');
-            setProjectId(null);
-            setSubLink('');
-            setReviewer(null);
-            setCurrency('');
-            setAmount(0);
-            setTimeout(() => {
-                setShowSuccess(false);
-                closeModal();
-            }, 3000);
-        }
-    }, [createTaskLoading, draftTaskLoading]);
-
-    // useEffect(() => {
-    //     if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
-    //         dispatch(getCurrentUser({}))
-    //     }
-    // }, [account, chainId, user])
-
-    useEffect(() => { if (user) setReviewer(user?._id) }, [user])
-
-    const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id)
-            .map((item: any) => { return { label: item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet), value: item.member._id } });
-    }, [DAO, selectedUser, reviewer]);
-
-    const eligibleReviewers = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: any) => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && (m.role === 'role1' || m.role === 'role2'))
-            .map((item: any) => { return { label: item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet), value: item.member._id } });
-
-    }, [DAO, reviewer, selectedUser]);
-
-    const eligibleProjects = useMemo(() => {
-        if (selectedProject) {
-            return [{ label: selectedProject?.name, value: selectedProject?._id }]
-        }
-        return _get(DAO, 'projects', []).filter((p: any) => _find(p.members, m => m._id === user._id)).map((item: any) => { return { label: item.name, value: item._id } })
-    }, [DAO, reviewer, selectedUser, selectedProject]);
+    const [editType, setEditType] = useState('');
 
     const getrolename = (roleId: any) => {
 
@@ -273,6 +211,52 @@ export default ({ open, closeModal, selectedProject }: Props) => {
         return { pill: '#99aab550', circle: '#99aab5' };
     };
 
+    useEffect(() => { setReviewer(task.reviewer ? task?.reviewer?._id : null) }, [task])
+
+    useEffect(() => {
+        if (editTaskLoading === false) {
+            setShowSuccess(true);
+            setTimeout(() => {
+                setShowSuccess(false);
+                closeModal();
+            }, 3000);
+        }
+    }, [editTaskLoading]);
+
+    useEffect(() => {
+        if (editDraftTaskLoading === false) {
+            setShowSuccess(true);
+            setTimeout(() => {
+                setShowSuccess(false);
+                closeModal();
+            }, 3000);
+        }
+    }, [editDraftTaskLoading]);
+
+    useEffect(() => {
+        if (convertDraftTaskLoading === false) {
+            setShowSuccess(true);
+            setTimeout(() => {
+                setShowSuccess(false);
+                closeModal();
+            }, 3000);
+        }
+    }, [convertDraftTaskLoading]);
+
+    const eligibleContributors = useMemo(() => {
+        return _get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id)
+            .map((item: any) => { return { label: item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet), value: item.member._id } });
+    }, [DAO, selectedUser, reviewer]);
+
+    const eligibleReviewers = useMemo(() => {
+        return _get(DAO, 'members', []).filter((m: any) => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && (m.role === 'role1' || m.role === 'role2'))
+            .map((item: any) => { return { label: item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet), value: item.member._id } });
+
+    }, [DAO, reviewer, selectedUser]);
+
+    const eligibleProjects = useMemo(() => {
+        return _get(DAO, 'projects', []).filter((p: any) => _find(p.members, m => m._id === user._id)).map((item: any) => { return { label: item.name, value: item._id } })
+    }, [DAO, reviewer, selectedUser]);
 
     const handleChangeCompensationAmount = (e: any) => {
         setAmount(e);
@@ -290,10 +274,10 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     }
 
     const handleRemoveRole = (role: any) => {
-        setValidRoles(validRoles.filter((item) => item !== role))
+        setValidRoles(validRoles.filter((item: any) => item !== role))
     }
 
-    const handleCreateTask = () => {
+    const handleEditTask = () => {
         if (name === '') {
             setErrorName('Enter name');
             let e = document.getElementById('error-name');
@@ -318,7 +302,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             }
             return;
         }
-        else if (deadline === '') {
+        else if (deadline === null) {
             setErrorDeadline('Enter deadline')
             let e = document.getElementById('error-deadline');
             if (e) {
@@ -367,7 +351,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             return;
         }
         else {
-            setCreationType('Create');
+            setEditType('Edit');
             let tempLink, tempSub = null;
             if (dchannel && dchannel !== '') {
                 tempLink = dchannel;
@@ -382,30 +366,41 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                 }
             }
 
-            // const safe = loadSafe(safeAddress);
             let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency)
             symbol = _get(symbol, 'token.symbol', 'SWEAT')
 
-            let task: any = {};
-            task.daoId = DAO?._id;
-            task.name = name;
-            task.description = desc;
-            task.applicant = selectedUser;
-            task.projectId = selectedProject ? selectedProject._id : projectId;
-            task.discussionChannel = tempLink;
-            task.deadline = moment(deadline).format('YYYY-MM-DD');
-            task.submissionLink = tempSub ? tempSub : '';
-            task.compensation = { currency: currency, amount, symbol, safeAddress: safeAddress };
-            task.reviewer = reviewer;
-            task.contributionType = contributionType;
-            task.isSingleContributor = isSingleContributor;
-            task.isFilterRoles = isFilterRoles;
-            task.validRoles = isFilterRoles ? validRoles : [];
-            dispatch(createTaskAction(task))
+            let members = _get(task, 'members', [])
+
+            if (
+                (task.contributionType !== contributionType) ||
+                (task.isSingleContributor !== isSingleContributor) ||
+                (task.isFilterRoles !== isFilterRoles) ||
+                !_isEqual(task.validRoles, validRoles)
+            ) {
+                members = []
+            }
+
+            members = contributionType === 'assign' && selectedUser ? [{ member: selectedUser._id, status: 'approved' }] : members;
+
+            let taskOb: any = {};
+            taskOb.name = name;
+            taskOb.description = desc;
+            taskOb.project = projectId;
+            taskOb.discussionChannel = tempLink;
+            taskOb.deadline = moment(deadline).format('YYYY-MM-DD');
+            taskOb.submissionLink = tempSub ? tempSub : '';
+            taskOb.compensation = { currency: currency, amount, symbol, safeAddress: safeAddress };
+            taskOb.contributionType = contributionType;
+            taskOb.isSingleContributor = isSingleContributor;
+            taskOb.isFilterRoles = isFilterRoles;
+            taskOb.validRoles = isFilterRoles ? validRoles : [];
+            taskOb.reviewer = reviewer;
+            taskOb.members = members;
+            dispatch(editTaskAction({ payload: taskOb, daoUrl: _get(DAO, 'url', ''), taskId: task._id }))
         }
     }
 
-    const handleDraftTask = () => {
+    const handleEditDraftTask = () => {
         let tempLink, tempSub = null;
         if (name === '') {
             setErrorName('Enter name');
@@ -427,27 +422,137 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                 tempSub = 'https://' + tempSub;
             }
         }
-        setCreationType('Draft');
         let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency)
-        symbol = _get(symbol, 'token.symbol', 'SWEAT')
+        symbol = _get(symbol, 'token.symbol', 'SWEAT');
 
-        let task: any = {};
-        task.daoId = DAO?._id;
-        task.name = name;
-        task.description = desc;
-        task.applicant = selectedUser;
-        task.projectId = selectedProject ? selectedProject._id : projectId;;
-        task.discussionChannel = tempLink;
-        task.deadline = deadline;
-        task.submissionLink = tempSub ? tempSub : '';
-        task.compensation = { currency: currency, amount, symbol, safeAddress: safeAddress };
-        task.reviewer = reviewer;
-        task.contributionType = contributionType;
-        task.isSingleContributor = isSingleContributor;
-        task.isFilterRoles = isFilterRoles;
-        task.validRoles = validRoles;
+        setEditType('Edit');
 
-        dispatch(draftTaskAction(task))
+        let tsk: any = {};
+        tsk.name = name;
+        tsk.description = desc;
+        tsk.applicant = selectedUser;
+        tsk.projectId = projectId;
+        tsk.discussionChannel = tempLink;
+        tsk.deadline = deadline;
+        tsk.submissionLink = tempSub ? tempSub : '';
+        tsk.compensation = { currency: currency, amount, symbol, safeAddress: safeAddress };
+        tsk.reviewer = reviewer;
+        tsk.contributionType = contributionType;
+        tsk.isSingleContributor = isSingleContributor;
+        tsk.isFilterRoles = isFilterRoles;
+        tsk.validRoles = validRoles;
+
+        dispatch(editDraftTaskAction({ payload: tsk, daoUrl: _get(DAO, 'url', ''), taskId: _get(task, '_id', '') }))
+    }
+
+    const handleConvertDraftTask = () => {
+        if (name === '') {
+            setErrorName('Enter name');
+            let e = document.getElementById('error-name');
+            if (e) {
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            }
+            return;
+        }
+        else if (desc === '') {
+            let e = document.getElementById('error-desc');
+            setErrorDesc('Enter description');
+            if (e) {
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            }
+            return;
+        }
+        else if (dchannel && !isValidUrl(dchannel)) {
+            setErrorDchannel('Enter a valid link');
+            let e = document.getElementById('error-dchannel');
+            if (e) {
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            }
+            return;
+        }
+        else if (deadline === null) {
+            setErrorDeadline('Enter deadline')
+            let e = document.getElementById('error-deadline');
+            if (e) {
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            }
+            return;
+        }
+        else if (subLink && !isValidUrl(subLink)) {
+            setErrorSublink('Enter a valid link');
+            let e = document.getElementById('error-sublink');
+            if (e) {
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            }
+            return;
+        }
+        else if (contributionType === 'assign' && selectedUser === null) {
+            setErrorApplicant('Select an applicant');
+            let e = document.getElementById('error-applicant');
+            if (e) {
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            }
+            return;
+        }
+        else if (currency === '') {
+            setErrorCurrency(true);
+            let e = document.getElementById('error-currency-amt');
+            if (e) {
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            }
+            return;
+        }
+        else if (amount === 0) {
+            setErrorTaskValue(true);
+            let e = document.getElementById('error-currency-amt');
+            if (e) {
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            }
+            return;
+        }
+        else if (reviewer === null) {
+            setErrorReviewer('Select a reviewer');
+            let e = document.getElementById('error-reviewer');
+            if (e) {
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            }
+            return;
+        }
+        else {
+            setEditType('Convert');
+            let tempLink, tempSub = null;
+            if (dchannel && dchannel !== '') {
+                tempLink = dchannel;
+                if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+                    tempLink = 'https://' + tempLink;
+                }
+            }
+            if (subLink && subLink !== '') {
+                tempSub = subLink;
+                if (tempSub !== '' && tempSub.indexOf('https://') === -1 && tempSub.indexOf('http://') === -1) {
+                    tempSub = 'https://' + tempSub;
+                }
+            }
+            let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency)
+            symbol = _get(symbol, 'token.symbol', 'SWEAT')
+
+            let taskOb: any = {};
+            taskOb.daoId = DAO?._id;
+            taskOb.name = name;
+            taskOb.description = desc;
+            taskOb.applicant = selectedUser;
+            taskOb.projectId = projectId;
+            taskOb.discussionChannel = tempLink;
+            taskOb.deadline = moment(deadline).format('YYYY-MM-DD');
+            taskOb.submissionLink = tempSub ? tempSub : '';
+            taskOb.compensation = { currency: currency, amount, symbol, safeAddress: safeAddress };
+            taskOb.reviewer = reviewer;
+            taskOb.contributionType = contributionType;
+            taskOb.isSingleContributor = isSingleContributor;
+            taskOb.isFilterRoles = isFilterRoles;
+            taskOb.validRoles = isFilterRoles ? validRoles : [];
+            dispatch(convertDraftTaskAction({ payload: taskOb, daoUrl: _get(DAO, 'url', ''), taskId: _get(task, '_id', '') }))
+        }
     }
 
     return (
@@ -473,8 +578,8 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                                 <img src={CloseSVG} />
                             </IconButton>
                             <img src={createTaskSvg} alt="frame-icon" />
-                            <Typography color="primary" variant="subtitle1" className={classes.heading}>New task {creationType === 'Create' ? 'created!' : 'drafted!'}</Typography>
-                            <Typography style={{ textAlign: 'center', fontStyle: 'italic', color: ' #76808D' }}>The new task is {creationType === 'Create' ? 'created' : 'drafted'}.<br />You will be redirected in a few seconds.</Typography>
+                            <Typography color="primary" variant="subtitle1" className={classes.heading}>Task {editType === 'Edit' ? 'edited!' : 'converted!'}</Typography>
+                            <Typography style={{ textAlign: 'center', fontStyle: 'italic', color: ' #76808D' }}>The Task has been {editType === 'Edit' ? 'edited' : 'converted'} successfully.<br />You will be redirected in a few seconds.</Typography>
                         </Box>
                     </Box>
                     :
@@ -485,7 +590,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
 
                         <Box display="flex" flexDirection="column" alignItems="center" className={classes.modalRow}>
                             <img src={createTaskSvg} alt="project-resource" />
-                            <Typography className={classes.modalTitle}>Create Task</Typography>
+                            <Typography className={classes.modalTitle}>Edit Task</Typography>
                         </Box>
 
                         <Box className={classes.modalRow} id="error-name">
@@ -569,6 +674,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                             <Box sx={{ width: '100%' }}>
                                 <MuiSelect
                                     options={eligibleReviewers}
+                                    selected={reviewer}
                                     setSelectedValue={(value) => { setReviewer(value); setErrorReviewer('') }}
                                     errorSelect={errorReviewer}
                                 />
@@ -603,6 +709,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                                     <Box sx={{ width: '100%' }} id="error-applicant">
                                         <MuiSelect
                                             options={eligibleContributors}
+                                            selected={selectedUser}
                                             setSelectedValue={(value) => { handleSetApplicant(value); setErrorApplicant('') }}
                                             errorSelect={errorApplicant}
                                         />
@@ -614,14 +721,14 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                                 contributionType === 'open' &&
                                 <Box sx={{ width: '100%', marginTop: '18px' }} display={"flex"} flexDirection={"column"}>
                                     <Box sx={{ width: '100%', marginBottom: '20px' }} display={"flex"} alignItems={"flex-start"}>
-                                        <Switch checkedSVG="checkmark" onChange={() => setIsSingleContributor(prev => !prev)} />
+                                        <Switch checkedSVG="checkmark" onChange={() => setIsSingleContributor((prev: boolean) => !prev)} />
                                         <Box>
                                             <Typography sx={{ fontSize: '16px', color: '#76808D', marginBottom: '6px' }}>SINGLE CONTRIBUTOR</Typography>
                                             <Typography sx={{ fontSize: '14px', color: '#76808D', opacity: '0.5' }}>The reviewer will pick a contributor from the applicants (if unchecked, everyone can contribute)</Typography>
                                         </Box>
                                     </Box>
                                     <Box sx={{ width: '100%' }} display={"flex"} alignItems={"center"}>
-                                        <Switch checkedSVG="checkmark" onChange={() => setIsFilterRoles(prev => !prev)} />
+                                        <Switch checkedSVG="checkmark" onChange={() => setIsFilterRoles((prev: boolean) => !prev)} />
                                         <Box>
                                             <Typography sx={{ fontSize: '16px', color: '#76808D', marginBottom: '6px' }}>FILTER BY ROLES (DISCORD)</Typography>
                                         </Box>
@@ -634,7 +741,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                                 <Box className={classes.rolesBox} display={"flex"} justifyContent={"space-between"} alignItems={"flex-start"}>
                                     <Box display={"flex"} flexDirection={"column"}>
                                         {
-                                            validRoles.map((item, index) => {
+                                            validRoles.map((item: any, index: number) => {
                                                 return (
                                                     <Box display={"flex"} alignItems={"center"} sx={index === validRoles.length - 1 ? { marginBottom: '0px' } : { marginBottom: '10px' }} key={index}>
                                                         <Chip
@@ -730,17 +837,23 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                             />
                         </Box>
 
-                        {/* <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
-                            <Button variant="outlined" sx={{ marginRight: '20px', width: '240px' }} onClick={handleDraftTask} loading={draftTaskLoading}>SAVE AS DRAFT</Button>
-                            <Button variant="contained" sx={{ width: '240px' }} onClick={handleCreateTask} loading={createTaskLoading}>CREATE</Button>
-                        </Box> */}
-
-                        <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
-                            <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
-                                <Button sx={{ mr: 1 }} onClick={() => handleDraftTask()} loading={draftTaskLoading} disabled={draftTaskLoading} fullWidth variant='outlined' size="small">Save draft</Button>
-                                <Button sx={{ ml: 1 }} onClick={() => handleCreateTask()} loading={createTaskLoading} disabled={createTaskLoading} fullWidth variant='contained' size="small">Create</Button>
-                            </Box>
-                        </Box>
+                        {
+                            task.draftedAt
+                                ?
+                                <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
+                                    <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                                        <Button sx={{ mr: 1 }} onClick={() => handleEditDraftTask()} loading={editDraftTaskLoading} disabled={editDraftTaskLoading} fullWidth variant='outlined' size="small">SAVE DRAFT</Button>
+                                        <Button sx={{ ml: 1 }} onClick={() => handleConvertDraftTask()} loading={convertDraftTaskLoading} disabled={convertDraftTaskLoading} fullWidth variant='contained' size="small">CREATE</Button>
+                                    </Box>
+                                </Box>
+                                :
+                                <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
+                                    <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                                        <Button sx={{ mr: 1 }} onClick={() => closeModal()} fullWidth variant='outlined' size="small">CANCEL</Button>
+                                        <Button sx={{ ml: 1 }} onClick={() => handleEditTask()} loading={editTaskLoading} disabled={editTaskLoading} fullWidth variant='contained' size="small">SAVE</Button>
+                                    </Box>
+                                </Box>
+                        }
 
                     </Box>
             }

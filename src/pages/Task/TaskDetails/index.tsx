@@ -42,6 +42,7 @@ import SubmitTaskModal from "modals/Tasks/SubmitTaskModal";
 import ApplicantListModal from "modals/Tasks/ApplicantListModal";
 import ReviewModal from "modals/Tasks/ReviewModal";
 import useTask from "hooks/useTask";
+import EditTaskModal from "modals/Tasks/EditTaskModal";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -167,6 +168,7 @@ export default () => {
     const [openSubmitModal, setOpenSubmitModal] = useState<boolean>(false);
     const [openApplicantsModal, setOpenApplicantsModal] = useState<boolean>(false);
     const [openReviewModal, setOpenReviewModal] = useState<boolean>(false);
+    const [openEditModal, setOpenEditModal] = useState<boolean>(false);
 
     useEffect(() => {
         if (DAO && taskId && (!Task || (Task && Task._id !== taskId)))
@@ -545,6 +547,12 @@ export default () => {
                 hideBackdrop={false}
             />
 
+            <EditTaskModal
+                open={openEditModal}
+                closeModal={() => setOpenEditModal(false)}
+                task={Task}
+            />
+
             <Grid xs={10} item display="flex" flexDirection="column">
 
                 <Box sx={{ width: '100%', height: '32px' }}>
@@ -560,13 +568,21 @@ export default () => {
                             <Typography className={classes.nameText}>{_get(Task, 'name', '')}</Typography>
                         </Box>
                         <Box display="flex" alignItems="center">
-                            <Box display="flex" alignItems="center">
-                                <img src={Task?.visual?.icon} alt="submitted-icon" />
-                                <Typography sx={{ fontSize: '14px', marginLeft: '5px', textWrap: 'nowrap', color: Task?.visual?.color }}>{Task?.visual?.status}</Typography>
-                            </Box>
-                            {/* <Box sx={{ marginLeft: '22px', cursor: 'pointer' }}>
+                            {
+                                Task?.draftedAt
+                                    ?
+                                    <Box style={{ border: '1px solid #C94B32', borderRadius: 16, padding: '4px 16px' }}>
+                                        <Typography style={{ color: '#C94B32' }}>Draft</Typography>
+                                    </Box>
+                                    :
+                                    <Box display="flex" alignItems="center">
+                                        <img src={Task?.visual?.icon} alt="submitted-icon" />
+                                        <Typography sx={{ fontSize: '14px', marginLeft: '5px', textWrap: 'nowrap', color: Task?.visual?.color }}>{Task?.visual?.status}</Typography>
+                                    </Box>
+                            }
+                            <Box sx={{ marginLeft: '22px', cursor: 'pointer' }} onClick={() => setOpenEditModal(true)}>
                                 <img src={editToken} alt="edit-icon" />
-                            </Box> */}
+                            </Box>
                             <Box sx={{ marginLeft: '22px', cursor: 'pointer' }} onClick={() => setOpenDeleteModal(true)}>
                                 <img src={deleteIcon} alt="delete-icon" />
                             </Box>
@@ -650,7 +666,7 @@ export default () => {
                     </Box>
                     <Box display="flex" alignItems="center">
                         {
-                            _get(Task, 'compensation', null) && _get(Task, 'compensation.amount', 0) !== 0 &&
+                            _get(Task, 'compensation', null) !== null &&
                             <>
                                 <Typography sx={{ color: '#76808D', fontSize: '16px' }}>Compensation</Typography>
                                 <Box display="flex" alignItems="center" justifyContent={"center"} sx={{ width: '127px', height: '35px', }}>

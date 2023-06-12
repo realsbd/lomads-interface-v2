@@ -35,6 +35,13 @@ export const editTaskAction = (payload: any) => {
     }
 }
 
+export const editDraftTaskAction = (payload: any) => {
+    return {
+        type: actionTypes.EDIT_DRAFT_TASK_ACTION,
+        payload
+    }
+}
+
 export const convertDraftTaskAction = (payload: any) => {
     return {
         type: actionTypes.CONVERT_DRAFT_TASK_ACTION,

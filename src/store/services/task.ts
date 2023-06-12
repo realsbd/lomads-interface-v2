@@ -16,6 +16,14 @@ export const editTaskService = (params: any) => {
     return axiosHttp.patch(`task/${params.taskId}/edit?daoUrl=${params.daoUrl}`, params.payload);
 }
 
+export const editDraftTaskService = (params: any) => {
+    return axiosHttp.patch(`task/${params.taskId}/editDraft?daoUrl=${params.daoUrl}`, params.payload);
+}
+
+export const convertDraftTaskService = (params: any) => {
+    return axiosHttp.patch(`task/${params.taskId}/convertDraft?daoUrl=${params.daoUrl}`, params.payload);
+}
+
 export const archiveTaskService = (params: any) => {
     return axiosHttp.patch(`task/${params.taskId}/archive?daoUrl=${params.daoUrl}`);
 }

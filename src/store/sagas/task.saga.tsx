@@ -16,7 +16,9 @@ import {
     rejectTaskMemberService,
     submitTaskService,
     rejectTaskSubmissionService,
-    editTaskService
+    editTaskService,
+    convertDraftTaskService,
+    editDraftTaskService
 }
     from 'store/services/task';
 
@@ -67,7 +69,7 @@ function* draftTaskSaga(action: any) {
 function* editTaskSaga(action: any) {
     try {
         yield put({ type: actionTypes.EDIT_TASK_LOADING, payload: true })
-        const { data } = yield call(archiveTaskService, action.payload)
+        const { data } = yield call(editTaskService, action.payload)
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.SET_TASK_ACTION, payload: data.task })
@@ -79,10 +81,40 @@ function* editTaskSaga(action: any) {
     }
 }
 
+function* editDraftTaskSaga(action: any) {
+    try {
+        yield put({ type: actionTypes.EDIT_DRAFT_TASK_LOADING, payload: true })
+        const { data } = yield call(editDraftTaskService, action.payload)
+        yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
+        yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
+        yield put({ type: actionTypes.SET_TASK_ACTION, payload: data.task })
+        yield put({ type: actionTypes.EDIT_DRAFT_TASK_LOADING, payload: false })
+        yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
+        yield put({ type: actionTypes.EDIT_DRAFT_TASK_LOADING, payload: null })
+    } catch (e) {
+        yield put({ type: actionTypes.EDIT_DRAFT_TASK_LOADING, payload: null })
+    }
+}
+
+function* convertDraftTaskSaga(action: any) {
+    try {
+        yield put({ type: actionTypes.CONVERT_DRAFT_TASK_LOADING, payload: true })
+        const { data } = yield call(convertDraftTaskService, action.payload)
+        yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
+        yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
+        yield put({ type: actionTypes.SET_TASK_ACTION, payload: data.task })
+        yield put({ type: actionTypes.CONVERT_DRAFT_TASK_LOADING, payload: false })
+        yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
+        yield put({ type: actionTypes.CONVERT_DRAFT_TASK_LOADING, payload: null })
+    } catch (e) {
+        yield put({ type: actionTypes.CONVERT_DRAFT_TASK_LOADING, payload: null })
+    }
+}
+
 function* archiveTaskSaga(action: any) {
     try {
         yield put({ type: actionTypes.ARCHIVE_TASK_LOADING, payload: true })
-        const { data } = yield call(editTaskService, action.payload)
+        const { data } = yield call(archiveTaskService, action.payload)
         yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
         yield put({ type: actionTypes.SET_PROJECT_ACTION, payload: data.project })
         yield put({ type: actionTypes.SET_TASK_ACTION, payload: data.task })
@@ -184,6 +216,8 @@ export default function* taskSaga() {
     yield takeLatest(actionTypes.CREATE_TASK_ACTION, createTaskSaga)
     yield takeLatest(actionTypes.DRAFT_TASK_ACTION, draftTaskSaga)
     yield takeLatest(actionTypes.EDIT_TASK_ACTION, editTaskSaga)
+    yield takeLatest(actionTypes.EDIT_DRAFT_TASK_ACTION, editDraftTaskSaga)
+    yield takeLatest(actionTypes.CONVERT_DRAFT_TASK_ACTION, convertDraftTaskSaga)
     yield takeLatest(actionTypes.ARCHIVE_TASK_ACTION, archiveTaskSaga)
     yield takeLatest(actionTypes.DELETE_TASK_ACTION, deleteTaskSaga)
     yield takeLatest(actionTypes.APPLY_TASK_ACTION, applyTaskSaga)
