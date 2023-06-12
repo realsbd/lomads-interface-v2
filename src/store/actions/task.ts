@@ -28,6 +28,20 @@ export const draftTaskAction = (payload: any) => {
     }
 }
 
+export const editTaskAction = (payload: any) => {
+    return {
+        type: actionTypes.EDIT_TASK_ACTION,
+        payload
+    }
+}
+
+export const convertDraftTaskAction = (payload: any) => {
+    return {
+        type: actionTypes.CONVERT_DRAFT_TASK_ACTION,
+        payload
+    }
+}
+
 export const archiveTaskAction = (payload: any) => {
     return {
         type: actionTypes.ARCHIVE_TASK_ACTION,
