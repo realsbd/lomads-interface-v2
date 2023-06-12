@@ -326,7 +326,7 @@ export default ({ open, closeModal }: Props) => {
             {
                 showModal
                     ?
-                    <Box sx={style} style={{ padding: '22px 60px', height: '768px' }} display={"flex"} flexDirection={"column"} alignItems={"center"}>
+                    <Box sx={style} style={{ padding: '22px 60px', maxHeight: '768px' }} display={"flex"} flexDirection={"column"} alignItems={"center"}>
                         <Box sx={{ width: '100%', marginBottom: '20px' }} display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
                             <img src={createProjectSvg} alt="create-project-svg" />
                             <Typography sx={{ color: '#c94b32', marginTop: '20px', fontSize: '30px' }}>Add Members</Typography>
