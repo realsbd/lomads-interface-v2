@@ -100,7 +100,7 @@ export default ({ open, closeModal }: Props) => {
         >
             <Box sx={style} display={"flex"} flexDirection={"column"}>
                 <Typography className={classes.modalTitle}>Invite members</Typography>
-                <Box sx={{ width: '100%' }} display={"flex"} flexDirection={"column"}>
+                <Box sx={{ width: '100%', maxHeight: 300, overflow: 'hidden', overflowY: 'auto' }}>
                     {
                         _get(DAO, 'members', []).map((item: any, index: number) => handleUsers(item, index))
                     }
