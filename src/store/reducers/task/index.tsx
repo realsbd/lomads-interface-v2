@@ -9,6 +9,9 @@ export function getInitialState() {
         setTaskLoading: null,
         createTaskLoading: null,
         draftTaskLoading: null,
+        editTaskLoading: null,
+        editDraftTaskLoading: null,
+        convertDraftTaskLoading: null,
         archiveTaskLoading: null,
         deleteTaskLoading: null,
         applyTaskLoading: null,
@@ -41,6 +44,21 @@ const TaskReducer = (state: any = getInitialState(), action: any) =>
 
             case actionTypes.DRAFT_TASK_LOADING: {
                 draft.draftTaskLoading = payload;
+                break;
+            }
+
+            case actionTypes.EDIT_TASK_LOADING: {
+                draft.editTaskLoading = payload;
+                break;
+            }
+
+            case actionTypes.EDIT_DRAFT_TASK_LOADING: {
+                draft.editDraftTaskLoading = payload;
+                break;
+            }
+
+            case actionTypes.CONVERT_DRAFT_TASK_LOADING: {
+                draft.convertDraftTaskLoading = payload;
                 break;
             }
 
