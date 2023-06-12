@@ -12,7 +12,7 @@ import APPLE from 'assets/images/apple.png'
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chains';
 import toast from 'react-hot-toast';
-import { createAccountAction, setTokenAction, setNetworkConfig, logoutAction } from 'store/actions/session';
+import { createAccountAction, setTokenAction, setNetworkConfig, logoutAction, setUserAction } from 'store/actions/session';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from "components/Button";
@@ -85,6 +85,7 @@ export default () => {
 
     console.log("provider", provider)
 
+
     useEffect(() => {
         if(window?.ethereum){
             const chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', 5)]
@@ -98,7 +99,7 @@ export default () => {
             if(!isNaN(+message?.data?.data?.data?.params?.networkVersion)) {
                 const chainInfo = CHAIN_INFO[+message?.data?.data?.data?.params?.networkVersion]
                 if(chainInfo) {
-                    dispatch(setNetworkConfig({ selectedChainId: +message?.data?.data?.data?.params?.networkVersion, chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+                    //dispatch(setNetworkConfig({ selectedChainId: +message?.data?.data?.data?.params?.networkVersion, chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
                 }
             }
         }

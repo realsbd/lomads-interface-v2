@@ -125,7 +125,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
         token: "0x0000000000000000000000000000000000000000",
         value: 5
     })
-    const { updateContract } = useMintSBT(_get(contract, 'address', ''), _get(contract, 'version', ''))
+    const { updateContract } = useMintSBT(_get(contract, 'address', ''), _get(contract, 'version', ''), contract?.chainId)
     const [state, setState] = useState<any>({
         symbol: null,
         whitelisted: false,

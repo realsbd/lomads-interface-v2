@@ -60,7 +60,7 @@ export default ({ link, key }: ProjectLinkCardProps) => {
     const [unlockLoading, setUnlockLoading] = useState<any>(null)
     const [hasClickedAuth, setHasClickedAuth]= useState<any>(null)
     const { DAO } = useDAO()
-    const { balanceOf } = useMintSBT(DAO?.sbt?.address, DAO?.sbt?.version)
+    const { balanceOf } = useMintSBT(DAO?.sbt?.address, DAO?.sbt?.version, +DAO?.sbt?.chainId)
     const { Project, updateProjectDetailsLoading } = useAppSelector((store:any) => store.project);
 
     const handleParseUrl = (url: string, accessControl: boolean, locked: any) => {

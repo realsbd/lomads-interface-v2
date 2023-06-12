@@ -154,10 +154,10 @@ export default () => {
                             {/* <MuiIconButton size="small" onClick={() => handleSyncSafe()}><SyncIcon/></MuiIconButton> */}
                             </Typography>
                         </Box>
-                        <Box className={classes.verDivider} />
+                        {/* <Box className={classes.verDivider} />
                         <Box className={classes.tab}>
                             <Typography className={classes.tabItem}>Recurring payments</Typography>
-                        </Box>
+                        </Box> */}
                     </Box>
                     <Button onClick={() => setShowSendToken(true)} sx={{ color: palette?.primary?.main }} size="small" variant="contained" color="secondary">SEND TOKEN</Button>
                 </Box> }

@@ -98,7 +98,7 @@ export default [
 		path: '/:daoURL/mint/:contractId',
 		exact: true,
 		layout: LandingLayout,
-		private: false,
+		private: true,
 		component: MintPage
 	},
 	{

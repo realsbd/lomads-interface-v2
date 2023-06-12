@@ -13,6 +13,8 @@ import { WEB3AUTH_NETWORK, WEB3AUTH_NETWORK_TYPE } from "constants/chains";
 import { MetamaskAdapter } from "@web3auth/metamask-adapter";
 import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 import { useAppSelector } from "helpers/useAppSelector";
+import { useAppDispatch } from 'helpers/useAppDispatch';
+import { logoutAction, setTokenAction, setUserAction } from 'store/actions/session';
 
 const whiteLabel = {
   name: "Lomads",
@@ -48,6 +50,7 @@ interface IWeb3AuthProps {
 }
 
 export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }: IWeb3AuthProps) => {
+  const dispatch = useAppDispatch()
   const { web3AuthNetwork = "", chain = ""} = useAppSelector((store:any) => store.session) 
   const [web3Auth, setWeb3Auth] = useState<Web3AuthNoModal | null>(null);
   const [state, setState] = useState<any>({
@@ -57,6 +60,31 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
   })
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleOnMessage = async (message: any) => {
+    if(state?.account) {
+      console.log(message?.data?.data?.data?.params, state?.account)
+      if(message?.data?.data?.data?.method === "metamask_accountsChanged" && message?.data?.data?.data?.params.indexOf(state?.account) === -1) {
+        try {
+          localStorage.clear()
+          sessionStorage.clear()
+          dispatch(setTokenAction(null))
+          dispatch(setUserAction(null))
+          dispatch(logoutAction())
+          await logout()
+        } catch(e) {
+          console.log(e)
+        }
+      }
+    }
+}
+
+useEffect(() => {
+    window.addEventListener("message", handleOnMessage);
+    return () => {
+      window.removeEventListener("message", handleOnMessage);
+    };
+  }, []);
 
   useEffect(() => {
     const subscribeAuthEvents = (web3auth: Web3AuthNoModal) => {
