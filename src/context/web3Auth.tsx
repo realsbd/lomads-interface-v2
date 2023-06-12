@@ -141,6 +141,11 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
           setState({
             provider: provider, account: account, chainId, w3Provider: web3AuthInstance?.provider
           })
+        } else {
+          console.log("window.ethereum", window?.ethereum)
+          console.log("web3AuthInstance", "Need to login")
+          if(window?.location?.pathname.indexOf('/login') === -1)
+            window.location.href = '/login'
         }
       } catch (error) {
         console.error(error);

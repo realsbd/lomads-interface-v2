@@ -46,6 +46,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }, [token])
 
   useEffect(() => {
+    console.log("loadDAOList", account, token)
     if ((!daoURL || daoURL) && account && token && !DAOList){
       resetDAO()
       loadDAOList()
