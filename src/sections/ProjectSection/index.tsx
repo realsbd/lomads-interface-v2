@@ -152,9 +152,7 @@ export default () => {
                     value={value}
                     onChange={handleChange}
                     aria-label="basic tabs example"
-                    TabIndicatorProps={{
-                        hidden: true
-                    }}
+                    TabIndicatorProps={{ hidden: true }}
                     sx={{
                         '& button': { color: 'rgba(118, 128, 141,0.5)', marginRight: '10px', textTransform: 'capitalize', fontSize: '22px', fontWeight: '400' },
                         '& button.Mui-selected': { color: 'rgba(118, 128, 141,1)' },
@@ -198,7 +196,7 @@ export default () => {
                                     <Box
                                         key={index}
                                         className={classes.showAllCard}
-                                    // onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}
+                                        onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: value } }) }}
                                     >
                                         <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
                                     </Box>
@@ -230,7 +228,7 @@ export default () => {
                                     <Box
                                         key={index}
                                         className={classes.showAllCard}
-                                    // onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}
+                                        onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: value } }) }}
                                     >
                                         <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
                                     </Box>

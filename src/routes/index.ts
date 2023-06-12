@@ -10,6 +10,8 @@ import DashboardPage from 'pages/Dashboard';
 import CreateProjectPage from 'pages/Project/CreateProject';
 import ProjectDetailsPage from 'pages/Project/ProjectDetails';
 import TaskDetailsPage from 'pages/Task/TaskDetails';
+import AllTasksPage from 'pages/Task/AllTasks';
+import AllProjectsPage from 'pages/Project/AllProjects';
 import SettingsPage from 'pages/Settings';
 import AttachNewSafePage from 'pages/AttachSafe/New';
 import AttachExistingSafePage from 'pages/AttachSafe/Existing';
@@ -19,6 +21,7 @@ import DCAuthPage from 'pages/DCAuth';
 import MintPage from 'pages/Mint';
 import OnlyWhitelistedPage from 'pages/OnlyWhitelisted';
 import WelcomePage from 'pages/Welcome';
+import DefaultFullWidthLayout from 'layouts/DefaultFullWidthLayout';
 
 export default [
 	{
@@ -125,6 +128,20 @@ export default [
 		layout: DefaultLayout,
 		private: true,
 		component: ProjectDetailsPage
+	},
+	{
+		path: '/:daoURL/tasks',
+		exact: true,
+		layout: DefaultFullWidthLayout,
+		private: true,
+		component: AllTasksPage
+	},
+	{
+		path: '/:daoURL/projects',
+		exact: true,
+		layout: DefaultFullWidthLayout,
+		private: true,
+		component: AllProjectsPage
 	},
 	{
 		path: '/:daoURL/task/:taskId',
