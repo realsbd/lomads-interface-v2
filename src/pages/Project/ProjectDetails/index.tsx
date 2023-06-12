@@ -243,14 +243,13 @@ export default () => {
         const [show, setShow] = useState(false);
         let roles: any = [];
         const discordOb = _get(DAO, 'discord', null);
-        const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === props.address.toLowerCase());
-        console.log("user : ", user)
+        const userTemp = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === props.address.toLowerCase());
         const index = props.index;
 
-        if (user.discordId && discordOb) {
+        if (userTemp?.discordId && discordOb) {
             Object.keys(discordOb).forEach(function (key, _index) {
                 const discordChannel = discordOb[key];
-                let person = _find(_get(discordChannel, 'members', []), m => _get(m, 'displayName', '').toLowerCase() === user.discordId.toLowerCase());
+                let person = _find(_get(discordChannel, 'members', []), m => _get(m, 'displayName', '').toLowerCase() === userTemp?.discordId?.toLowerCase());
                 if (person) {
                     person.roles.forEach(function (item: any) {
                         _get(discordChannel, 'roles', []).map((i: any) => {
@@ -267,7 +266,7 @@ export default () => {
             <>
                 <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"} key={index}>
                     <Box sx={{ width: '250px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                        <Avatar name={user.member.name} wallet={user.member.wallet} />
+                        <Avatar name={userTemp?.member.name} wallet={userTemp?.member.wallet} />
                         <Box className={classes.lineSm}></Box>
                     </Box>
                     <Box sx={{ width: '300px' }} display={"flex"} alignItems={"center"}>
@@ -278,7 +277,7 @@ export default () => {
                         <Box sx={{ width: '150px', marginLeft: '10px' }}>
                             <Typography sx={{ fontSize: '14px', fontWeight: '700', color: '#76808D' }}>
                                 {
-                                    user.role === 'role1' ? user.creator ? `${transformRole(user.role).label} (Creator)` : transformRole(user.role).label : transformRole(user.role).label
+                                    userTemp?.role === 'role1' ? userTemp?.creator ? `${transformRole(userTemp?.role).label} (Creator)` : transformRole(userTemp?.role).label : transformRole(userTemp?.role).label
                                 }
                             </Typography>
                         </Box>
