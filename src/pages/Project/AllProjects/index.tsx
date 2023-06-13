@@ -152,7 +152,7 @@ export default () => {
                         <Box className={classes.headerContainer}>
                              <Box className={classes.header}>
                                 <Box sx={{ pl: 6 }} display="flex" flexDirection="row" alignItems="center">
-                                    <IconButton onClick={() => navigate(-1)} size="small" color="primary">
+                                    <IconButton disableRipple onClick={() => navigate(-1)} size="small" color="primary">
                                         <ArrowBackIosIcon/>
                                     </IconButton>
                                     <Typography variant="h3">{ transformWorkspace().labelPlural }</Typography>
@@ -176,7 +176,7 @@ export default () => {
                                                 <Tab label={`All ${transformWorkspace().labelPlural}`} id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`} />
                                             </Tabs>
                                         </Box>
-                                        <Box>
+                                        <Box display="flex" flexDirection="row" alignItems="center">
                                             <LomadsIconButton>
                                                 <img src={ArchiveIcon} />
                                             </LomadsIconButton>
@@ -210,7 +210,7 @@ export default () => {
                                     {
                                         otherProjects.map((taskItem: any) => {
                                             return (
-                                                <Grid item sm={3}>
+                                                <Grid item xs={1} sm={2} md={3}>
                                                     <ProjectCard tab={tab+1} project={taskItem} daoUrl={DAO?.url} />
                                                 </Grid>
                                             )

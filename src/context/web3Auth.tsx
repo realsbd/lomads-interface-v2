@@ -62,7 +62,6 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
   const [isLoading, setIsLoading] = useState(false);
 
   const handleOnMessage = async (message: any) => {
-    if(state?.account) {
       console.log(message?.data?.data?.data?.params, state?.account)
       if(message?.data?.data?.data?.method === "metamask_accountsChanged" && message?.data?.data?.data?.params.indexOf(state?.account) === -1) {
         try {
@@ -76,7 +75,6 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
           console.log(e)
         }
       }
-    }
 }
 
 useEffect(() => {

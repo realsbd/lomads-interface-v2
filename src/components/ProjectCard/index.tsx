@@ -13,6 +13,7 @@ import StepperProgress from "components/StepperProgress";
 
 const useStyles = makeStyles((theme: any) => ({
     taskCard: {
+        position: 'relative',
         width: '315px',
         height: '110px',
         padding: '20px !important',

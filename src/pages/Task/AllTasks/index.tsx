@@ -1,7 +1,7 @@
 import { Box, Chip, Container, Grid, IconButton, List, Tab, Tabs, Typography } from "@mui/material";
 import { get as _get, groupBy as _groupBy } from 'lodash'
 import { makeStyles } from "@mui/styles";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import LomadsIconButton from 'components/IconButton'
 import ArchiveIcon from 'assets/svg/archiveIcon.svg'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -74,7 +74,7 @@ const useStyles = makeStyles((theme: any) => ({
 		position: 'relative',
 	},
 	contentWrapper: {
-		padding: 16,
+		padding: `16px 16px 16px 16px`,
         display:'flex',
         flexDirection: 'row',
         //overflow: 'auto'
@@ -98,6 +98,7 @@ export default () => {
     const { transformTask } = useTask()
     const { transformWorkspace, transformTask: transformTaskLabel } = useTerminology(_get(DAO, 'terminologies', null))
     const [tab, setTab] = useState(0);
+    const [initialLoad, setInitialLoad] = useState(true);
     const { parsedTasks } = useTasks(_get(DAO, 'tasks', []))
 
     const myTasks = useMemo(() => {
@@ -122,6 +123,22 @@ export default () => {
         return arr.map((a:any) => transformTask(a))
     }, [parsedTasks])
 
+    useEffect(() => {
+        if(initialLoad) {
+            let activeTab: number = 0;
+            if(parsedTasks) {
+                console.log("parsedTasks?.myTask",parsedTasks?.myTask)
+                if((parsedTasks?.myTask || []).length == 0){
+                    activeTab = 1
+                    if((parsedTasks?.manage || []).length == 0)
+                        activeTab = 3
+                }
+            }
+            setTab(activeTab)
+            setInitialLoad(false)
+        }
+    }, [parsedTasks, initialLoad])
+
     return (
         <Box className={classes.root}>
 				<Box className={classes.mainContainer}>
@@ -129,7 +146,7 @@ export default () => {
                         <Box className={classes.headerContainer}>
                              <Box className={classes.header}>
                                 <Box sx={{ pl: 6 }} display="flex" flexDirection="row" alignItems="center">
-                                    <IconButton onClick={() => navigate(-1)} size="small" color="primary">
+                                    <IconButton disableRipple onClick={() => navigate(-1)} size="small" color="primary">
                                         <ArrowBackIosIcon/>
                                     </IconButton>
                                     <Typography variant="h3">{ transformTaskLabel().labelPlural }</Typography>
@@ -155,7 +172,7 @@ export default () => {
                                                 <Tab label={`All ${transformTaskLabel().labelPlural}`} id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`} />
                                             </Tabs>
                                         </Box>
-                                        <Box>
+                                        <Box display="flex" flexDirection="row" alignItems="center">
                                             <LomadsIconButton>
                                                 <img src={ArchiveIcon} />
                                             </LomadsIconButton>
