@@ -81,3 +81,17 @@ export const updateDaoMembersAction = (payload: any) => {
         payload
     }
 }
+
+export const syncTrelloDataAction = (payload: any) => {
+    return {
+        type: actionTypes.SYNC_TRELLO_DATA_ACTION,
+        payload
+    }
+}
+
+export const storeGithubIssuesAction = (payload: any) => {
+    return {
+        type: actionTypes.STORE_GITHUB_ISSUES_ACTION,
+        payload
+    }
+}
