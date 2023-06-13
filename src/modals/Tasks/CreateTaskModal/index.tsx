@@ -223,12 +223,12 @@ export default ({ open, closeModal, selectedProject }: Props) => {
 
     const eligibleContributors = useMemo(() => {
         return _get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id)
-            .map((item: any) => { return { label: item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet), value: item.member._id } });
+            .map((item: any) => { return { label: { name: item.member.name, wallet: item.member.wallet }, value: item.member._id } });
     }, [DAO, selectedUser, reviewer]);
 
     const eligibleReviewers = useMemo(() => {
         return _get(DAO, 'members', []).filter((m: any) => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && (m.role === 'role1' || m.role === 'role2'))
-            .map((item: any) => { return { label: item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet), value: item.member._id } });
+            .map((item: any) => { return { label: { name: item.member.name, wallet: item.member.wallet }, value: item.member._id } });
 
     }, [DAO, reviewer, selectedUser]);
 
@@ -571,6 +571,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                                     options={eligibleReviewers}
                                     setSelectedValue={(value) => { setReviewer(value); setErrorReviewer('') }}
                                     errorSelect={errorReviewer}
+                                    type={"members"}
                                 />
                             </Box>
                         </Box>
@@ -605,6 +606,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                                             options={eligibleContributors}
                                             setSelectedValue={(value) => { handleSetApplicant(value); setErrorApplicant('') }}
                                             errorSelect={errorApplicant}
+                                            type={'members'}
                                         />
                                     </Box>
                                 </>
