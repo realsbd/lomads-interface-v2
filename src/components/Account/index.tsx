@@ -211,7 +211,7 @@ export default ({ children, options = true, ...props }: any) => {
 				<Box sx={{ pl: 2 }} display="flex" flexDirection="row" alignItems="center" flexGrow={1}>
 					<Avatar
 						name={user?.name}
-						wallet={accountName}
+						wallet={account}
 					/>
 				</Box>
 				<Box sx={{ p: 2 }} className={classes.dropdown}>
