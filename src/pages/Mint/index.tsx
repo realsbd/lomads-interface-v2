@@ -832,13 +832,14 @@ export default () => {
                 contract: contract?.address,
             };
             //const ipfsURL: any =  await uploadNFT(metadataJSON, `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}`)
+            await axiosHttp.post(`metadata`, metadataJSON);
             if (+contract?.version >= 1) {
                 const ipfsURL: string = await axiosHttp.post(`metadata/ipfs-metadata`, { metadata: metadataJSON, tokenURI: `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}` }).then(res => res.data)
                 const token = await mint(ipfsURL, payment, signature, tokenContract, contract?.gasless, contract?.gasConfig?.apiKey);
             } else {
                 const token = await mint(undefined, undefined, undefined, undefined, false, undefined);
             }
-            await axiosHttp.post(`metadata`, metadataJSON);
+            await axiosHttp.post(`metadata?link=true`, metadataJSON);
             if(state.email) {
                 try {
                     await axiosHttp.post(`utility/send-alert`, { alertType: 'mint-success', to: [state?.email], data: {

@@ -127,7 +127,6 @@ export default () => {
         if(initialLoad) {
             let activeTab: number = 0;
             if(parsedTasks) {
-                console.log("parsedTasks?.myTask",parsedTasks?.myTask)
                 if((parsedTasks?.myTask || []).length == 0){
                     activeTab = 1
                     if((parsedTasks?.manage || []).length == 0)
