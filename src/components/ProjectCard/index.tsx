@@ -10,6 +10,8 @@ import { useAppDispatch } from "helpers/useAppDispatch";
 import { useAppSelector } from "helpers/useAppSelector";
 import { useNavigate } from "react-router-dom"
 import StepperProgress from "components/StepperProgress";
+import { updateProjectViewAction } from "store/actions/project";
+import { useDAO } from "context/dao";
 
 const useStyles = makeStyles((theme: any) => ({
     taskCard: {
@@ -73,6 +75,8 @@ export default ({ project, daoUrl, tab }: CardProps) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
+    const { DAO } = useDAO();
+
     // @ts-ignore
     const { user } = useAppSelector(store => store.session);
 
@@ -91,7 +95,7 @@ export default ({ project, daoUrl, tab }: CardProps) => {
     }, [project]);
 
     const handleCardClick = () => {
-        // dispatch(updateViewProject({ projectId: project._id, daoUrl: _get(DAO, 'url', '') }));
+        dispatch(updateProjectViewAction({ projectId: project._id, daoUrl: _get(DAO, 'url', '') }));
         navigate(`/${daoUrl}/project/${project._id}`, { state: { project } })
     }
 

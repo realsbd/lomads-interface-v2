@@ -27,11 +27,11 @@ const { toChecksumAddress } = require('ethereum-checksum-address')
 export default () => {
     const dispatch = useAppDispatch()
     const { account } = useWeb3Auth()
-    const { user: currentUser } = useAppSelector((store:any) => store?.session)
+    const { user: currentUser } = useAppSelector((store: any) => store?.session)
     const { DAO } = useDAO();
 
     useEffect(() => {
-        if(!currentUser)
+        if (!currentUser)
             dispatch(createAccountAction({}))
     }, [currentUser])
 

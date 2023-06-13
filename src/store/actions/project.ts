@@ -90,3 +90,10 @@ export const editProjectLinksAction = (payload: any) => {
         payload
     }
 }
+
+export const updateProjectViewAction = (payload: any) => {
+    return {
+        type: actionTypes.UPDATE_PROJECT_VIEW_ACTION,
+        payload
+    }
+}
