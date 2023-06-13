@@ -102,10 +102,13 @@ export default ({ task, daoUrl }: CardProps) => {
                                     <img src={Task?.visual?.icon} alt="submitted-icon" />
                                     <Typography className={classes.statusText} sx={{ color: Task?.visual?.color }}>{Task?.visual?.status}</Typography>
                                 </Box>
-                                <Box display={"flex"} alignItems={"center"}>
-                                    <img src={calendarIcon} alt="calendarIcon" />
-                                    <Typography className={classes.dateText}>{moment(task.deadline).fromNow()}</Typography>
-                                </Box>
+                                {
+                                    Task.deadline &&
+                                    <Box display={"flex"} alignItems={"center"}>
+                                        <img src={calendarIcon} alt="calendarIcon" />
+                                        <Typography className={classes.dateText}>{moment(Task.deadline).fromNow()}</Typography>
+                                    </Box>
+                                }
                             </Box>
                     }
                 </CardContent>
