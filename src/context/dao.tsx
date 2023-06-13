@@ -65,24 +65,28 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }, [DAOList])
 
   useEffect(() => {
-    if (provider && account && DAO?.url && DAO?.sbt) {
-      // isNFTMinted({ chainId: DAO?.sbt?.chainId, tokenAddress: DAO?.sbt?.address })
-      balanceOf().then(res => {
-        console.log("Balance of...", parseInt(res._hex, 16))
-        if (parseInt(res._hex, 16) === 1) {
-
-        } else {
-          if (!DAO?.sbt?.whitelisted || (DAO?.sbt?.whitelisted && _find(DAO?.members, (member: any) => toChecksumAddress(member.member.wallet) === account))) {
-            navigate(`/${DAO?.url}/mint/${DAO?.sbt?.address}`)
+    if (provider && account && DAO?.url) {
+      if(DAO?.sbt) {
+        balanceOf().then(res => {
+          console.log("Balance of...", parseInt(res._hex, 16))
+          if (parseInt(res._hex, 16) === 1) {
+  
           } else {
-            // NOT WHITELISTED
-            navigate(`/${DAO?.url}/only-whitelisted`)
+            if (!DAO?.sbt?.whitelisted || (DAO?.sbt?.whitelisted && _find(DAO?.members, (member: any) => toChecksumAddress(member.member.wallet) === account))) {
+              navigate(`/${DAO?.url}/mint/${DAO?.sbt?.address}`)
+            } else {
+              // NOT WHITELISTED
+              navigate(`/${DAO?.url}/only-whitelisted`)
+            }
           }
-        }
-      })
-      .catch(e => {
-        console.log(e)
-      })
+        })
+        .catch(e => {
+          console.log(e)
+        })
+      } else {
+        if(!_find(DAO?.members, (member: any) => toChecksumAddress(member.member.wallet) === account))
+          navigate(`/${DAO?.url}/no-access`)
+      }
     }
   }, [DAO?.url, provider, account])
 

@@ -98,7 +98,8 @@ export default ({ open, closeModal }: Props) => {
 
     useEffect(() => {
         let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
-        setEditableName(user.member.name)
+        if(user)
+            setEditableName(user.member.name)
     }, [DAO]);
 
     const amIAdmin = useMemo(() => {
@@ -121,7 +122,8 @@ export default ({ open, closeModal }: Props) => {
             members = _get(DAO, 'members', []).filter((m: any) => m.role !== 'role1')
         }
         let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
-        members.push(user)
+        if(user)
+            members.push(user)
         return members
     }, [DAO])
 
@@ -189,6 +191,7 @@ export default ({ open, closeModal }: Props) => {
                 <Box sx={{ width: '100%', height: '100%', overflowY: 'scroll', marginBottom: '100px' }}>
                     {
                         editableMembers.map((item: any, index: number) => {
+                            if(!item.member) return;
                             return (
                                 <Box sx={{ width: '100%', marginBottom: '20px', position: 'relative' }} key={index} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                                     {
