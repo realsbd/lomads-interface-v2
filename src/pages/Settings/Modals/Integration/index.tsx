@@ -66,10 +66,10 @@ const useStyles = makeStyles((theme: any) => ({
 }));
 
 const integrationAccounts = [
-    // {
-    //     icon: Integrationgithub,
-    //     name: "GitHub"
-    // },
+    {
+        icon: Integrationgithub,
+        name: "GitHub"
+    },
     {
         icon: Integrationdiscord,
         name: "Discord"
