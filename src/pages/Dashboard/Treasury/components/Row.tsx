@@ -70,6 +70,9 @@ export default ({ transaction, executableNonce }: any) => {
 
     if(transaction?.rawTx?.daoId && transaction?.rawTx?.token?.tokenAddress === 'SWEAT' && transaction?.rawTx?.daoId !== DAO?._id)
         return null
+    
+    if(transaction?.daoId && transaction?.rawTx?.token?.tokenAddress === 'SWEAT' && transaction?.daoId !== DAO?._id)
+        return null
 
     if(!txn) return null
 

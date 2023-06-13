@@ -236,6 +236,7 @@ export default () => {
             if (user)
                 return user.rejectionNote;
         }
+        return ''
     }, [account, Task]);
 
     const handleParseUrl = (url: string) => {
@@ -309,7 +310,7 @@ export default () => {
         return (
             <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
                 <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>Your submission was rejected</Typography>
-                <Typography dangerouslySetInnerHTML={{ __html: handleRenderRejectionNote() }}></Typography>
+                <Typography dangerouslySetInnerHTML={{ __html: handleRenderRejectionNote }}></Typography>
             </Box>
         )
     }
@@ -440,7 +441,7 @@ export default () => {
         return (
             <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
                 <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>Your submission has been rejected</Typography>
-                <Typography dangerouslySetInnerHTML={{ __html: handleRenderRejectionNote() }}></Typography>
+                <Typography dangerouslySetInnerHTML={{ __html: handleRenderRejectionNote }}></Typography>
                 <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => setOpenSubmitModal(true)}>SUBMIT AGAIN</Button>
             </Box>
         )

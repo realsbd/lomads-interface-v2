@@ -238,7 +238,7 @@ const Organisation = ({ open, onClose }: any) => {
             </Box>
             <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
                     <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
-                        <Button sx={{ mr:1 }} fullWidth variant='outlined' size="small">Cancel</Button>
+                        <Button onClick={() => onClose()} sx={{ mr:1 }} fullWidth variant='outlined' size="small">Cancel</Button>
                         <Button onClick={() => handleSave()} sx={{ ml:1 }} disabled={updateDAOLoading} loading={updateDAOLoading} fullWidth variant='contained' size="small">Save</Button>
                     </Box>
                 </Box>

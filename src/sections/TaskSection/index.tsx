@@ -19,6 +19,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import moment from 'moment';
 import { getProjectAction } from "store/actions/project";
 import useTasks from 'hooks/useTasks';
+import useTerminology from "hooks/useTerminology";
 
 const useStyles = makeStyles((theme: any) => ({
     addMemberBtn: {
@@ -98,6 +99,7 @@ export default ({ onlyProjects }: any) => {
     const { account } = useWeb3Auth();
     //@ts-ignore
     const { user } = useAppSelector(store => store.session);
+    const { transformTask } = useTerminology(_get(DAO, 'terminologies', null))
     // @ts-ignore
     const { Project } = useAppSelector(store => store.project);
     const { parsedTasks } = useTasks(onlyProjects ? _get(Project, 'tasks', []) : _get(DAO, 'tasks', []))
@@ -183,7 +185,7 @@ export default ({ onlyProjects }: any) => {
                         '& button.Mui-selected': { color: 'rgba(118, 128, 141,1)' },
                     }}
                 >
-                    <Tab label="My Tasks" {...a11yProps(0)} />
+                    <Tab label={`My ${ transformTask().labelPlural}`} {...a11yProps(0)} />
                     <Tab
                         label="Manage"
                         {...a11yProps(1)}
@@ -224,7 +226,7 @@ export default ({ onlyProjects }: any) => {
                                 <></>
                         }
                     />
-                    <Tab label="All Tasks" {...a11yProps(3)} />
+                    <Tab label={`All ${transformTask().labelPlural}`} {...a11yProps(3)} />
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
