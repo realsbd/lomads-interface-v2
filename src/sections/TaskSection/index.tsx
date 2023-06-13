@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { get as _get, find as _find, orderBy as _orderBy, uniqBy as _uniqBy } from 'lodash';
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { makeStyles } from '@mui/styles';
@@ -42,6 +42,15 @@ const useStyles = makeStyles((theme: any) => ({
         marginBottom: '15px !important',
         marginRight: '20px !important',
         position: 'relative'
+    },
+    iconContainer: {
+        height: '40px',
+        width: '50px',
+        padding: '0 10px !important',
+        background: '#B12F15 !important',
+        boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18) !important',
+        borderRadius: '20px !important',
+        marginLeft: '10px !important'
     }
 }));
 
@@ -107,21 +116,52 @@ export default ({ onlyProjects }: any) => {
     };
 
     useEffect(() => {
-        if(initialLoad) {
+        if (initialLoad) {
             let activeTab: number = 0;
-            if(parsedTasks) {
-                console.log("parsedTasks?.myTask",parsedTasks?.myTask)
-                if((parsedTasks?.myTask || []).length == 0){
+            if (parsedTasks) {
+                if ((parsedTasks?.myTask || []).length == 0) {
                     activeTab = 1
-                    if((parsedTasks?.manage || []).length == 0)
+                    if ((parsedTasks?.manage || []).length == 0)
                         activeTab = 3
                 }
             }
             setValue(activeTab)
             setInitialLoad(false)
         }
-    }, [parsedTasks, initialLoad])
-    
+    }, [parsedTasks, initialLoad]);
+
+    const applicationCount = useMemo(() => {
+        let sum = 0;
+        if (parsedTasks['manage'].length > 0) {
+            for (let index = 0; index < parsedTasks['manage'].length; index++) {
+                const task = parsedTasks['manage'][index];
+                if (task.taskStatus === 'open' && task.isSingleContributor) {
+                    let applications = _get(task, 'members', []).filter((m: any) => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+                    if (applications)
+                        sum = sum + applications.length
+                }
+            }
+            return sum
+        }
+        return 0;
+    }, [parsedTasks['manage']]);
+
+    const submissionCount = useMemo(() => {
+        let sum = 0;
+        if (parsedTasks['manage'].length > 0) {
+            for (let index = 0; index < parsedTasks['manage'].length; index++) {
+                const task = parsedTasks['manage'][index];
+                if ((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
+                    let submissions = _get(task, 'members', [])?.filter((m: any) => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+                    if (submissions)
+                        sum = sum + submissions.length
+                }
+            }
+            return sum
+        }
+        return 0;
+    }, [parsedTasks['manage']]);
+
 
     return (
         <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
@@ -130,7 +170,7 @@ export default ({ onlyProjects }: any) => {
                 closeModal={() => setOpenCreateTask(false)}
                 selectedProject={onlyProjects ? Project : null}
             />
-            <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+            <Box sx={{ width: '100%', background: '#FFF', height: '75px', padding: '0px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                 <Tabs
                     value={value}
                     onChange={handleChange}
@@ -144,13 +184,51 @@ export default ({ onlyProjects }: any) => {
                     }}
                 >
                     <Tab label="My Tasks" {...a11yProps(0)} />
-                    <Tab label="Manage" {...a11yProps(1)} />
-                    <Tab label="Drafts" {...a11yProps(2)} />
+                    <Tab
+                        label="Manage"
+                        {...a11yProps(1)}
+                        iconPosition="end"
+                        icon={
+                            (applicationCount + submissionCount) > 0
+                                ?
+                                <Box
+                                    sx={value === 1 ? { opacity: '1' } : { opacity: '0.5' }}
+                                    className={classes.iconContainer}
+                                    display={"flex"}
+                                    alignItems={"center"}
+                                    justifyContent={"center"}
+                                >
+                                    <Typography sx={{ fontSize: 14, color: '#FFF' }}>{(applicationCount + submissionCount)}</Typography>
+                                </Box>
+                                :
+                                <></>
+                        }
+                    />
+                    <Tab
+                        label="Drafts"
+                        {...a11yProps(2)}
+                        iconPosition="end"
+                        icon={
+                            parsedTasks['drafts'].length > 0
+                                ?
+                                <Box
+                                    sx={value === 2 ? { opacity: '1' } : { opacity: '0.5' }}
+                                    className={classes.iconContainer}
+                                    display={"flex"}
+                                    alignItems={"center"}
+                                    justifyContent={"center"}
+                                >
+                                    <Typography sx={{ fontSize: 14, color: '#FFF' }}>{parsedTasks['drafts'].length}</Typography>
+                                </Box>
+                                :
+                                <></>
+                        }
+                    />
                     <Tab label="All Tasks" {...a11yProps(3)} />
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
-                    <IconButton onClick={() => navigate(`/${DAO.url}/tasks`)}  sx={{ marginRight: '20px' }}>
+                    <IconButton onClick={() => navigate(`/${DAO.url}/tasks`)} sx={{ marginRight: '20px' }}>
                         <img src={expandIcon} alt="archive-icon" />
                     </IconButton>
                     <IconButton sx={{ marginRight: '20px' }}>

@@ -114,16 +114,16 @@ export default () => {
 
     useEffect(() => {
         if (DAO && DAO.url === daoURL) {
-            let myProjects = _get(DAO, 'projects', []).filter((project:any) => !project.deletedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()));
-            myProjects = myProjects.map((p:any) => {
+            let myProjects = _get(DAO, 'projects', []).filter((project: any) => !project.deletedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()));
+            myProjects = myProjects.map((p: any) => {
                 let prj = { ...p, notification: 0 }
                 if (notificationCount(prj) > 0)
                     prj.notification = 1
                 return prj;
             })
             setMyProjects(_orderBy(myProjects, ['notification', p => moment(p.createdAt).unix()], ['desc', 'desc']))
-            let otherProjects = _get(DAO, 'projects', []).filter((project:any) => !project.deletedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()))
-            otherProjects = otherProjects.map((p:any) => {
+            let otherProjects = _get(DAO, 'projects', []).filter((project: any) => !project.deletedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()))
+            otherProjects = otherProjects.map((p: any) => {
                 let prj = { ...p, notification: 0 }
                 if (notificationCount(prj) > 0)
                     prj.notification = 1
@@ -147,7 +147,7 @@ export default () => {
 
     return (
         <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
-            <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+            <Box sx={{ width: '100%', background: '#FFF', height: '75px', padding: '0px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                 <Tabs
                     value={value}
                     onChange={handleChange}
