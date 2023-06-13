@@ -99,7 +99,7 @@ export default () => {
             if(!isNaN(+message?.data?.data?.data?.params?.networkVersion)) {
                 const chainInfo = CHAIN_INFO[+message?.data?.data?.data?.params?.networkVersion]
                 if(chainInfo) {
-                    //dispatch(setNetworkConfig({ selectedChainId: +message?.data?.data?.data?.params?.networkVersion, chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+                    dispatch(setNetworkConfig({ selectedChainId: +message?.data?.data?.data?.params?.networkVersion, chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
                 }
             }
         }
