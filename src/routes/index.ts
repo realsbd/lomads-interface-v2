@@ -21,6 +21,7 @@ import DCAuthPage from 'pages/DCAuth';
 import GithubAuthPage from 'pages/GithubAuth';
 import MintPage from 'pages/Mint';
 import OnlyWhitelistedPage from 'pages/OnlyWhitelisted';
+import NoAccessPage from 'pages/NoAccess'
 import WelcomePage from 'pages/Welcome';
 import DefaultFullWidthLayout from 'layouts/DefaultFullWidthLayout';
 
@@ -73,6 +74,13 @@ export default [
 		layout: DefaultLayout,
 		private: false,
 		component: OnlyWhitelistedPage
+	},
+	{
+		path: '/:daoURL/no-access',
+		exact: true,
+		layout: DefaultLayout,
+		private: false,
+		component: NoAccessPage
 	},
 	{
 		path: '/:daoURL/attach-safe/existing',
