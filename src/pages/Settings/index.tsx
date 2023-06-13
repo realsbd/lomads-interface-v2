@@ -120,9 +120,9 @@ export default () => {
                 <Grid item sm={6} md={4} xs={1}>
                     <Content onClick={() => setActiveModal(TerminologyModal.name)} icon={Terminology} title="Terminology" />
                 </Grid>
-                <Grid item sm={6} md={4} xs={1}>
+                {/* <Grid item sm={6} md={4} xs={1}>
                     <Content onClick={() => setActiveModal(IntegrationModal.name)} icon={IntegrationGrey} title="Integrations" />
-                </Grid>
+                </Grid> */}
             </Grid>
             <Drawer
                 PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}

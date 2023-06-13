@@ -163,7 +163,7 @@ export default () => {
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
-                    <IconButton sx={{ marginRight: '20px' }}>
+                    <IconButton onClick={() => navigate(`/${DAO.url}/projects`)} sx={{ marginRight: '20px' }}>
                         <img src={expandIcon} alt="archive-icon" />
                     </IconButton>
                     <IconButton sx={{ marginRight: '20px' }}>

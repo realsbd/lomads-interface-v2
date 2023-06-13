@@ -2,6 +2,8 @@ import { get as _get, find as _find } from 'lodash'
 import { useContract } from "hooks/useContract";
 import { ethers } from "ethers";
 import axiosHttp from 'api'
+import axios from 'axios'
+import MultiCall from "@indexed-finance/multicall";
 import { USDC } from 'constants/tokens';
 import { USDC_GOERLI, USDC_POLYGON } from 'constants/tokens'
 import { useCallback, useEffect, useState } from 'react';
@@ -9,6 +11,8 @@ import { INFURA_NETWORK_URLS } from 'constants/infura';
 import { CHAIN_INFO } from 'constants/chainInfo';
 import useBiconomyGasless from './useBiconomyGasless';
 import { useWeb3Auth } from 'context/web3Auth';
+import { getRpcUrls } from 'constants/rpcUrl';
+import { SupportedChainId } from 'constants/chains';
 
 export type SBTParams = {
     name: string,
@@ -18,7 +22,7 @@ export type SBTParams = {
     whitelisted: number
 }
 
-const useMintSBT = (contractAddress: string | undefined, version: string | undefined = "0") => {
+const useMintSBT = (contractAddress: string | undefined, version: string | undefined = "0", contractChainId: SupportedChainId) => {
     const { account, provider, chainId } = useWeb3Auth();
 
     const { safeMintGasless } = useBiconomyGasless(chainId)
@@ -44,15 +48,43 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
       return ethers.utils.parseUnits(price, payToken?.decimals)
   }
 
-    const balanceOf = async () => {
-      if(mintContract?.signer){
-        if(account && chainId && provider) {
-          console.log(contractAddress, account, mintContract?.signer, mintContract)
-          return mintContract?.balanceOf(account)
-        }
-        return null;
-      }
+  const isNFTMinted = async ({ chainId, tokenAddress }: any) => {
+    try {
+      const nft = await axios.get(`https://nft.api.infura.io/networks/${chainId}/nfts/${tokenAddress}/owners`, 
+      //@ts-ignore
+      { auth: { username: process.env.REACT_APP_INFURA_KEY, password: process.env.REACT_APP_INFURA_SECRET } }).then(res => {
+        console.log("isNFTMinted", res.data)
+      })
+    } catch (e) {
+      console.log(e)
     }
+  }
+
+  const balanceOf = async () => {
+    try {
+      const rpcUrl = getRpcUrls(contractChainId)
+      let provider = new ethers.providers.JsonRpcProvider(rpcUrl[0])
+      const multicall = new MultiCall(provider);
+      const calls: any = [
+        {
+          target: contractAddress,
+          function: "balanceOf",
+          args: [account],
+        },
+      ]
+      const [, res] = await multicall.multiCall(require('abis/SBT.v2.json'), calls);
+      return res[0]
+    } catch (e) {
+      throw e
+    }
+
+    // if(mintContract?.signer){
+    //   if(account && chainId && provider) {
+    //     return mintContract?.balanceOf(account)
+    //   }
+    //   return null;
+    // }
+  }
 
     const getCurrentTokenId = async () => {
         if(mintContract?.signer){
@@ -316,7 +348,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
       }
     }
 
-    return { balanceOf, getTreasury, getCurrentTokenId, mint, estimateGas, checkDiscount, updateContract, withdraw, payByCrypto, payByCryptoEstimate }
+    return { isNFTMinted, balanceOf, getTreasury, getCurrentTokenId, mint, estimateGas, checkDiscount, updateContract, withdraw, payByCrypto, payByCryptoEstimate }
 
 }
 

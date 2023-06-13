@@ -93,6 +93,7 @@ export default ({ onlyProjects }: any) => {
     const { Project } = useAppSelector(store => store.project);
     const { parsedTasks } = useTasks(onlyProjects ? _get(Project, 'tasks', []) : _get(DAO, 'tasks', []))
     const [value, setValue] = useState<number>(0);
+    const [initialLoad, setInitialLoad] = useState<boolean>(true);
 
     const [openCreateTask, setOpenCreateTask] = useState<boolean>(false);
 
@@ -104,6 +105,22 @@ export default ({ onlyProjects }: any) => {
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
+
+    useEffect(() => {
+        if(initialLoad) {
+            let activeTab: number = 0;
+            if(parsedTasks) {
+                console.log("parsedTasks?.myTask",parsedTasks?.myTask)
+                if((parsedTasks?.myTask || []).length == 0){
+                    activeTab = 1
+                    if((parsedTasks?.manage || []).length == 0)
+                        activeTab = 3
+                }
+            }
+            setValue(activeTab)
+            setInitialLoad(false)
+        }
+    }, [parsedTasks, initialLoad])
     
 
     return (
@@ -133,7 +150,7 @@ export default ({ onlyProjects }: any) => {
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
-                    <IconButton sx={{ marginRight: '20px' }}>
+                    <IconButton onClick={() => navigate(`/${DAO.url}/tasks`)}  sx={{ marginRight: '20px' }}>
                         <img src={expandIcon} alt="archive-icon" />
                     </IconButton>
                     <IconButton sx={{ marginRight: '20px' }}>

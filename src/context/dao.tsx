@@ -10,6 +10,8 @@ import FullScreenLoader from 'components/FullScreenLoader';
 import { useAppDispatch } from 'helpers/useAppDispatch';
 import { loadDAOAction, loadDAOListAction, resetDAOAction, updateDAOAction } from 'store/actions/dao';
 import useMintSBT from 'hooks/useMintSBT.v2';
+import { CHAIN_INFO } from 'constants/chainInfo';
+import { logoutAction, setTokenAction, setUserAction } from 'store/actions/session';
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 export const DAOContext = createContext<any>({
@@ -30,7 +32,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   //@ts-ignore
   const { DAO, DAOList } = useAppSelector(store => store?.dao)
 
-  const { balanceOf } = useMintSBT(DAO?.sbt?.address, DAO?.sbt?.version)
+  const { balanceOf, isNFTMinted } = useMintSBT(DAO?.sbt?.address, DAO?.sbt?.version, +DAO?.sbt?.chainId)
 
   const loadDAOList = async () => {
     dispatch(loadDAOListAction())
@@ -39,7 +41,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   const loadDAO = async (url: string) => {
     dispatch(loadDAOAction(url))
   }
-
+  
   useEffect(() => {
     if(!token)
       navigate(`/login`)
@@ -64,6 +66,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
 
   useEffect(() => {
     if (provider && account && DAO?.url && DAO?.sbt) {
+      // isNFTMinted({ chainId: DAO?.sbt?.chainId, tokenAddress: DAO?.sbt?.address })
       balanceOf().then(res => {
         console.log("Balance of...", parseInt(res._hex, 16))
         if (parseInt(res._hex, 16) === 1) {

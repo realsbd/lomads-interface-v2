@@ -66,26 +66,30 @@ export const SafeTokensProvider = ({ children }: any) => {
                     })
                 }
                 const safe: any = await axios.get(`${GNOSIS_SAFE_BASE_URLS[chain]}/api/v1/safes/${safeAddress}/`, { withCredentials: false }).then(res => res.data)
+                console.log("SAFE", safe)
                 if (tokens && tokens.length > 0) {
                     let total = tokens.reduce((a: any, b: any) => {
                         return a + parseFloat(_get(b, 'fiatBalance', 0))
                     }, 0);
                     axiosHttp.post(`/safe/${safeAddress}/sync`, { tokens, balance: total, threshold: safe?.threshold })
                 }
-                return { [`${safeAddress}`]: tokens }
+                return { [`${safeAddress}`]: tokens, owners: safe?.owners }
             })
     }
 
     useEffect(() => {
         if (DAO?.url) {
             Promise.all(DAO?.safes?.map((s: any) => getTokens(s.chainId, s.address)))
-                .then(res => {
+                .then(async res => {
                     let tokens: any = {}
+                    let owners: any = []
                     for (let index = 0; index < res.length; index++) {
                         const element = res[index];
                         tokens[`${Object.keys(element)[0]}`] = element[`${Object.keys(element)[0]}`]
+                        owners = owners.concat(element['owners'])
                     }
                     setSafeTokens(tokens)
+                    await axiosHttp.patch(`dao/${DAO.url}/sync-safe-owners`, owners)
                 })
                 .catch(e => console.log(e))
         }

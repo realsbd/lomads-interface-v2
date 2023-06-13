@@ -11,6 +11,7 @@ import { CreateTreasuryTransactionAction, updateTreasuryTransactionAction } from
 import { useAppDispatch } from "helpers/useAppDispatch"
 import { AddOwnerTxParams, EthSafeSignature, SafeTransactionOptionalProps } from "@safe-global/protocol-kit"
 import { beautifyHexToken, retry } from "utils"
+import { useDAO } from "context/dao"
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 
@@ -42,6 +43,7 @@ export type ExecuteTransaction = {
 
 export default () => {
     const dispatch = useAppDispatch()
+    const { DAO } = useDAO();
     const { provider, account } = useWeb3Auth();
     const { safeTokens, tokenBalance } = useSafeTokens()
 

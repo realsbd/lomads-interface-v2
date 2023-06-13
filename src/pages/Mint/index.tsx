@@ -159,7 +159,7 @@ export default () => {
     const [userInfo, setUserInfo] = useState<any>(null)
     const [price, setPrice] = useState<any>({})
     const [hasClickedAuth, setHasClickedAuth] = useState<any>(false)
-    const { mint, getTreasury, estimateGas, checkDiscount, payByCrypto, payByCryptoEstimate, balanceOf, getCurrentTokenId } = useMintSBT(contractId, contract?.version)
+    const { mint, getTreasury, estimateGas, checkDiscount, payByCrypto, payByCryptoEstimate, balanceOf, getCurrentTokenId } = useMintSBT(contractId, contract?.version, +contract?.chainId)
     const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("identify")
     const { encryptMessage, decryptMessage } = useEncryptDecrypt()
     const tokenContract = useTokenContract(contract?.mintPriceToken || undefined)
@@ -909,22 +909,6 @@ export default () => {
         }
     }
 
-    const handleLogin = async (loginType = WALLET_ADAPTERS.METAMASK, provider: undefined | string = undefined) => {
-        dispatch(logoutAction())
-        await logout()
-        let token = null;
-        if (loginType === WALLET_ADAPTERS.METAMASK) {
-            token = await login(loginType);
-        } else if (loginType === WALLET_ADAPTERS.OPENLOGIN) {
-            token = await login(WALLET_ADAPTERS.OPENLOGIN, provider);
-        }
-        console.log(token)
-        if (token) {
-            dispatch(createAccountAction({ token }))
-        }
-    }
-
-    console.log("user, token, account", user, token, account, balance) 
 
     return (
         <Box>
@@ -1179,21 +1163,7 @@ export default () => {
                                         </>
                                     :
                                     <Box display="flex" flex={1} flexDirection="column" alignItems="center" justifyContent={"center"} style={{ height: isMobile ? 350 : '100%' }}>
-                                        { !isMobile && <>
-                                            <Typography mb={2} color="primary" variant="h2" style={{ fontSize: '24px' }}>Connect Your Wallet</Typography>
-                                            <Button onClick={() => handleLogin(WALLET_ADAPTERS.METAMASK)} className={classes.metamaskButton} variant='contained' color='secondary'>
-                                                <img src={METAMASK} />
-                                            </Button>
-                                        </> }
-                                        <Typography mt={2} variant="h2" style={{ fontSize: '16px', color: 'rgba(27, 43, 65, 0.5)', cursor: 'pointer' }}>Continue without wallet</Typography>
-                                        <Box sx={{ mt: 2 }}  display="flex" flexDirection="row" justifyContent="center" alignItems="center">
-                                                <Box onClick={() => handleLogin(WALLET_ADAPTERS.OPENLOGIN, 'google')} style={{ marginRight: 8 }}>
-                                                    <img style={{ width: 100, cursor: 'pointer' }} src={GMAIL} />
-                                                </Box>
-                                                <Box onClick={() => handleLogin(WALLET_ADAPTERS.OPENLOGIN, 'apple')} style={{ marginLeft: 8 }}>
-                                                    <img style={{ width: 80, cursor: 'pointer' }} src={APPLE} />
-                                                </Box>
-                                        </Box>
+                                       
                                     </Box>
                                 }
                             </Grid>
