@@ -5,7 +5,7 @@ import {
 } from 'redux-saga/effects';
 import * as actionTypes from 'store/actionTypes';
 import { get as _get } from 'lodash';
-import { loadDAOListService, loadDAOService, updateDAOService, addDAOMemberService, addSingleMemberService, addMultiMemberService, editDaoMemberService, updateDaoMembersService } from 'store/services/dao';
+import { loadDAOListService, loadDAOService, updateDAOService, addDAOMemberService, addSingleMemberService, addMultiMemberService, editDaoMemberService, updateDaoMembersService, syncTrelloDataService, storeGithubIssuesService } from 'store/services/dao';
 
 function* loadDAOListSaga() {
 	try {
@@ -112,6 +112,32 @@ function* updateDaoMembersSaga(action: any) {
 	}
 }
 
+function* syncTrelloDataSaga(action: any) {
+	try {
+		yield put({ type: actionTypes.SYNC_TRELLO_DATA_LOADING, payload: true })
+		const { data } = yield call(syncTrelloDataService, action.payload)
+		yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
+		yield put({ type: actionTypes.SYNC_TRELLO_DATA_LOADING, payload: false })
+		yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
+		yield put({ type: actionTypes.SYNC_TRELLO_DATA_LOADING, payload: null })
+	} catch (e) {
+		yield put({ type: actionTypes.SYNC_TRELLO_DATA_LOADING, payload: null })
+	}
+}
+
+function* storeGithubIssuesSaga(action: any) {
+	try {
+		yield put({ type: actionTypes.STORE_GITHUB_ISSUES_LOADING, payload: true })
+		const { data } = yield call(storeGithubIssuesService, action.payload)
+		yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
+		yield put({ type: actionTypes.STORE_GITHUB_ISSUES_LOADING, payload: false })
+		yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
+		yield put({ type: actionTypes.STORE_GITHUB_ISSUES_LOADING, payload: null })
+	} catch (e) {
+		yield put({ type: actionTypes.STORE_GITHUB_ISSUES_LOADING, payload: null })
+	}
+}
+
 export default function* daoSaga() {
 	yield takeLatest(actionTypes.LOAD_DAOLIST_ACTION, loadDAOListSaga)
 	yield takeLatest(actionTypes.LOAD_DAO_ACTION, loadDAOSaga)
@@ -121,4 +147,6 @@ export default function* daoSaga() {
 	yield takeLatest(actionTypes.ADD_MULTI_MEMBER_ACTION, addMultiMemberSaga)
 	yield takeLatest(actionTypes.EDIT_DAO_MEMBER_ACTION, editDaoMemberSaga)
 	yield takeLatest(actionTypes.UPDATE_DAO_MEMBERS_ACTION, updateDaoMembersSaga)
+	yield takeLatest(actionTypes.SYNC_TRELLO_DATA_ACTION, syncTrelloDataSaga)
+	yield takeLatest(actionTypes.STORE_GITHUB_ISSUES_ACTION, storeGithubIssuesSaga)
 }

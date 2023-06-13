@@ -30,3 +30,11 @@ export const editDaoMemberService = (params: any) => {
 export const updateDaoMembersService = (params: any) => {
     return axiosHttp.patch(`dao/${params.url}/manage-member`, params.payload)
 }
+
+export const syncTrelloDataService = (params: any) => {
+    return axiosHttp.post(`utility/sync-trello-data`, params.payload)
+}
+
+export const storeGithubIssuesService = (params: any) => {
+    return axiosHttp.post(`utility/store-issues`, params.payload)
+}

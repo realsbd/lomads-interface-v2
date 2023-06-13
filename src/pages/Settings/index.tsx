@@ -23,6 +23,7 @@ import IntegrationModal from "./Modals/Integration";
 import { useDAO } from "context/dao";
 import theme from "theme";
 import { useLocation } from "react-router-dom";
+import axiosHttp from 'api';
 
 const useStyles = makeStyles((theme: any) => ({
     item: {
@@ -99,6 +100,8 @@ export default () => {
             setActiveModal(location?.state?.openDefault)
     }, [DAO?.url, location?.state?.openDefault])
 
+    console.log("activeModal : ", activeModal);
+
     return (
         <>
             <Grid container px={3} spacing={2}>
@@ -120,9 +123,9 @@ export default () => {
                 <Grid item sm={6} md={4} xs={1}>
                     <Content onClick={() => setActiveModal(TerminologyModal.name)} icon={Terminology} title="Terminology" />
                 </Grid>
-                {/* <Grid item sm={6} md={4} xs={1}>
+                <Grid item sm={6} md={4} xs={1}>
                     <Content onClick={() => setActiveModal(IntegrationModal.name)} icon={IntegrationGrey} title="Integrations" />
-                </Grid> */}
+                </Grid>
             </Grid>
             <Drawer
                 PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
@@ -134,8 +137,8 @@ export default () => {
                     <Modal
                         //@ts-ignore
                         open={activeModal !== null}
-                        onClose={() => setActiveModal(null)
-                        } />
+                        onClose={() => setActiveModal(null)}
+                    />
                 </Box>
             </Drawer>
         </>

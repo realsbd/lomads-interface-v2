@@ -42,6 +42,7 @@ import SubmitTaskModal from "modals/Tasks/SubmitTaskModal";
 import ApplicantListModal from "modals/Tasks/ApplicantListModal";
 import ReviewModal from "modals/Tasks/ReviewModal";
 import useTask from "hooks/useTask";
+import useRole from "hooks/useRole";
 import EditTaskModal from "modals/Tasks/EditTaskModal";
 
 const useStyles = makeStyles((theme: any) => ({
@@ -144,7 +145,9 @@ export default () => {
     const { taskId, daoURL } = useParams();
     // @ts-ignore
     const { setTaskLoading, Task: storeTask } = useAppSelector(store => store.task);
-    const { transformTask } = useTask()
+    const { transformTask } = useTask();
+
+    const { myRole, can } = useRole(DAO, account, undefined);
 
     const Task = useMemo(() => {
         if (storeTask)
@@ -580,64 +583,87 @@ export default () => {
                                         <Typography sx={{ fontSize: '14px', marginLeft: '5px', textWrap: 'nowrap', color: Task?.visual?.color }}>{Task?.visual?.status}</Typography>
                                     </Box>
                             }
-                            <Box sx={{ marginLeft: '22px', cursor: 'pointer' }} onClick={() => setOpenEditModal(true)}>
-                                <img src={editToken} alt="edit-icon" />
-                            </Box>
-                            <Box sx={{ marginLeft: '22px', cursor: 'pointer' }} onClick={() => setOpenDeleteModal(true)}>
-                                <img src={deleteIcon} alt="delete-icon" />
-                            </Box>
-                            <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenCloseModal(true)}>
-                                CLOSE TASK
-                            </Button>
-                            <Box
-                                className={classes.iconContainer}
-                                display="flex"
-                                alignItems="center"
-                                justifyContent={"center"}
-                                onClick={handleClick}
-                            >
-                                <img src={shareIcon} alt="share-icon" style={{ width: 18, height: 18 }} />
-                            </Box>
-                            <Menu
-                                anchorEl={anchorEl}
-                                open={open}
-                                onClose={handleClose}
-                            >
-                                <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                    <TwitterShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
-                                        <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <TwitterIcon size={32} />
-                                            <div style={{ marginLeft: 16 }}>Twitter</div>
-                                        </div>
-                                    </TwitterShareButton>
-                                </MenuItem>
-                                <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                    <TelegramShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
-                                        <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <TelegramIcon size={32} />
-                                            <div style={{ marginLeft: 16 }}>Telegram</div>
-                                        </div>
-                                    </TelegramShareButton>
-                                </MenuItem>
-                                <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                    <WhatsappShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
-                                        <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <WhatsappIcon size={32} />
-                                            <div style={{ marginLeft: 16 }}>Whatsapp</div>
-                                        </div>
-                                    </WhatsappShareButton>
-                                </MenuItem>
-                                <MenuItem onClick={() => {
-                                    navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`)
-                                }} style={{ marginLeft: 0, height: 40 }}>
-                                    <div style={{}}>
-                                        <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <img style={{ marginLeft: 8 }} src={copyIcon} />
-                                            <div style={{ marginLeft: 24 }}>Copy to clipboard</div>
-                                        </div>
-                                    </div>
-                                </MenuItem>
-                            </Menu>
+                            {
+                                amICreator || can(myRole, 'task.edit') || can(myRole, 'task.delete') || can(myRole, 'task.close')
+                                    ?
+                                    <>
+                                        {
+                                            (amICreator || can(myRole, 'task.edit')) && (Task.isDummy === false) &&
+                                            <Box sx={{ marginLeft: '22px', cursor: 'pointer' }} onClick={() => setOpenEditModal(true)}>
+                                                <img src={editToken} alt="edit-icon" />
+                                            </Box>
+                                        }
+                                        {
+                                            (amICreator || can(myRole, 'task.delete')) &&
+                                            <Box sx={{ marginLeft: '22px', cursor: 'pointer' }} onClick={() => setOpenDeleteModal(true)}>
+                                                <img src={deleteIcon} alt="delete-icon" />
+                                            </Box>
+                                        }
+                                        {
+                                            Task?.archivedAt === null && (amICreator || can(myRole, 'task.close')) &&
+                                            <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenCloseModal(true)}>
+                                                CLOSE TASK
+                                            </Button>
+                                        }
+                                    </>
+                                    :
+                                    null
+                            }
+                            {
+                                (amICreator || can(myRole, 'task.share')) && (Task.isDummy === false) &&
+                                <>
+                                    <Box
+                                        className={classes.iconContainer}
+                                        display="flex"
+                                        alignItems="center"
+                                        justifyContent={"center"}
+                                        onClick={handleClick}
+                                    >
+                                        <img src={shareIcon} alt="share-icon" style={{ width: 18, height: 18 }} />
+                                    </Box>
+                                    <Menu
+                                        anchorEl={anchorEl}
+                                        open={open}
+                                        onClose={handleClose}
+                                    >
+                                        <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                            <TwitterShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
+                                                <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                    <TwitterIcon size={32} />
+                                                    <div style={{ marginLeft: 16 }}>Twitter</div>
+                                                </div>
+                                            </TwitterShareButton>
+                                        </MenuItem>
+                                        <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                            <TelegramShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
+                                                <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                    <TelegramIcon size={32} />
+                                                    <div style={{ marginLeft: 16 }}>Telegram</div>
+                                                </div>
+                                            </TelegramShareButton>
+                                        </MenuItem>
+                                        <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                            <WhatsappShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
+                                                <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                    <WhatsappIcon size={32} />
+                                                    <div style={{ marginLeft: 16 }}>Whatsapp</div>
+                                                </div>
+                                            </WhatsappShareButton>
+                                        </MenuItem>
+                                        <MenuItem onClick={() => {
+                                            navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`)
+                                        }} style={{ marginLeft: 0, height: 40 }}>
+                                            <div style={{}}>
+                                                <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                    <img style={{ marginLeft: 8 }} src={copyIcon} />
+                                                    <div style={{ marginLeft: 24 }}>Copy to clipboard</div>
+                                                </div>
+                                            </div>
+                                        </MenuItem>
+                                    </Menu>
+                                </>
+                            }
+
                         </Box>
                     </Box>
                 </Box>
@@ -695,18 +721,6 @@ export default () => {
                     </Box>
                     <Box className={classes.detailsContainer} display="flex" flexWrap={"wrap"} alignItems="center" justifyContent={"center"}>
                         {renderBody(Task?.visual?.renderBody)}
-                        {/* <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenApplyModal(true)}>
-                            APPLY
-                        </Button>
-                        <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenSubmitModal(true)}>
-                            SUBMIT
-                        </Button>
-                        <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenApplicantsModal(true)}>
-                            APPLICANTS
-                        </Button>
-                        <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenReviewModal(true)}>
-                            REVIEW
-                        </Button> */}
                     </Box>
                 </Box>
 

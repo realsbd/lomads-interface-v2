@@ -51,3 +51,7 @@ export const updateProjectLinkService = (params: any) => {
 export const editProjectLinkService = (params: any) => {
     return axiosHttp.patch(`project/${params.projectId}/edit-links?daoUrl=${params.daoUrl}`, params.payload)
 }
+
+export const updateProjectViewService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/updateView?daoUrl=${params.daoUrl}`)
+}

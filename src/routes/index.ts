@@ -18,6 +18,7 @@ import AttachExistingSafePage from 'pages/AttachSafe/Existing';
 import CreateOrganisation from 'pages/CreateOrganisation';
 import CreatePassTokenPage from 'pages/CreatePassToken'
 import DCAuthPage from 'pages/DCAuth';
+import GithubAuthPage from 'pages/GithubAuth';
 import MintPage from 'pages/Mint';
 import OnlyWhitelistedPage from 'pages/OnlyWhitelisted';
 import NoAccessPage from 'pages/NoAccess'
@@ -45,6 +46,13 @@ export default [
 		layout: PrimaryLayout,
 		private: false,
 		component: DCAuthPage
+	},
+	{
+		path: "/githubauth",
+		exact: true,
+		layout: PrimaryLayout,
+		private: false,
+		component: GithubAuthPage
 	},
 	{
 		path: '/:daoURL/welcome',

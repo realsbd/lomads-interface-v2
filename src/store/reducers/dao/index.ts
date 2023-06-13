@@ -14,6 +14,8 @@ export function getInitialState() {
 		addMultiMemberLoading: null,
 		editDaoMemberLoading: null,
 		updateDaoMembersLoading: null,
+		syncTrelloDataLoading: null,
+		storeGithubIssuesLoading: null,
 	};
 }
 
@@ -81,6 +83,14 @@ const DAOReducer = (state: any = getInitialState(), action: any) =>
 			}
 			case actionTypes.UPDATE_DAO_MEMBERS_LOADING: {
 				draft.updateDaoMembersLoading = payload;
+				break;
+			}
+			case actionTypes.SYNC_TRELLO_DATA_LOADING: {
+				draft.syncTrelloDataLoading = payload;
+				break;
+			}
+			case actionTypes.STORE_GITHUB_ISSUES_LOADING: {
+				draft.storeGithubIssuesLoading = payload;
 				break;
 			}
 		}
