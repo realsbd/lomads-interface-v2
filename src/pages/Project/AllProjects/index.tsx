@@ -33,58 +33,58 @@ const useStyles = makeStyles((theme: any) => ({
         width: '100% !important',
         height: 'calc(100vh - 80px) !important',
     },
-	mainContainer: {
-		position: 'relative',
-		display: 'flex',
-		flexDirection: 'row',
-		height: '100%',
-		overflow: 'auto',
-		border: '',
-		boxSizing: 'border-box',
-	},
-    contentContainer: {
-		order: 1,
-		flexGrow: 1,
-		flexBasis: '65%',
-		display: 'flex',
-        overflow: 'hidden',
-		flexDirection: 'column',
-		justifyContent: 'flex-end',
-	},
-    headerContainer: {
-		boxSizing: 'border-box',
-		flexShrink: 0,
-		'-webkit-user-select': 'none',
-		'-ms-user-select': 'none',
-		'user-select': 'none',
-		backgroundColor: '#FFF',
-	},
-    header: {
-        height : 107,
-        paddingLeft: 116 ,
+    mainContainer: {
+        position: 'relative',
         display: 'flex',
-		flexDirection: 'row',
-		alignItems: 'flex-end',
+        flexDirection: 'row',
+        height: '100%',
+        overflow: 'auto',
+        border: '',
+        boxSizing: 'border-box',
+    },
+    contentContainer: {
+        order: 1,
+        flexGrow: 1,
+        flexBasis: '65%',
+        display: 'flex',
+        overflow: 'hidden',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+    },
+    headerContainer: {
+        boxSizing: 'border-box',
+        flexShrink: 0,
+        '-webkit-user-select': 'none',
+        '-ms-user-select': 'none',
+        'user-select': 'none',
+        backgroundColor: '#FFF',
+    },
+    header: {
+        height: 107,
+        paddingLeft: 116,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'flex-end',
     },
     headerTab: {
         padding: '8px 0px 8px 0px'
     },
     content: {
-		boxSizing: 'border-box',
-		width: '100%',
-		height: '100%',
-		overflow: 'hidden',
-		minHeight: '1.25em',
-		overflowY: 'auto',
+        boxSizing: 'border-box',
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        minHeight: '1.25em',
+        overflowY: 'auto',
         overflowX: 'auto',
-		position: 'relative',
-	},
-	contentWrapper: {
-		padding: 16,
-        display:'flex',
+        position: 'relative',
+    },
+    contentWrapper: {
+        padding: 16,
+        display: 'flex',
         flexDirection: 'row',
         //overflow: 'auto'
-	},
+    },
 }));
 
 export default () => {
@@ -93,19 +93,19 @@ export default () => {
     const dispatch = useAppDispatch()
     const { account } = useWeb3Auth()
     const { DAO } = useDAO();
-    const { user } = useAppSelector((store:any) => store?.session)
+    const { user } = useAppSelector((store: any) => store?.session)
     const { transformWorkspace, transformTask: transformTaskLabel } = useTerminology(_get(DAO, 'terminologies', null))
     const [tab, setTab] = useState(0);
 
     useEffect(() => {
-        if(!user) {
+        if (!user) {
             dispatch(createAccountAction({}))
         }
     }, [user])
 
     const notificationCount = (project: any) => {
         let count = [];
-        let links = project.links.map((l:any) => {
+        let links = project.links.map((l: any) => {
             return { ...l, provider: new URL(l.link).hostname }
         })
         let grp = _groupBy(links, l => l.provider)
@@ -118,22 +118,22 @@ export default () => {
     }
 
     const myProjects = useMemo(() => {
-        if(DAO?.url && user) {
-            let myProjects = _get(DAO, 'projects', []).filter((project:any) => !project.deletedAt && !project.archivedAt && _find(project.members, (m:any) => m.wallet.toLowerCase() === account.toLowerCase()));
+        if (DAO?.url && user) {
+            let myProjects = _get(DAO, 'projects', []).filter((project: any) => !project.deletedAt && !project.archivedAt && _find(project.members, (m: any) => m.wallet.toLowerCase() === account.toLowerCase()));
             myProjects = myProjects.map((p: any) => {
                 let prj = { ...p, notification: 0 }
                 if (notificationCount(prj).length > 0)
                     prj.notification = 1
                 return prj;
             })
-            return _orderBy(myProjects, ['notification', (p:any) => moment(p.createdAt).unix()], ['desc', 'desc'])
+            return _orderBy(myProjects, ['notification', (p: any) => moment(p.createdAt).unix()], ['desc', 'desc'])
         }
         return []
     }, [DAO?.url, user])
 
     const otherProjects = useMemo(() => {
-        if(DAO?.url && user) {
-            let otherProjects = _get(DAO, 'projects', []).filter((project:any) => !project.deletedAt && !project.archivedAt && !_find(project.members, (m:any) => m.wallet.toLowerCase() === account.toLowerCase()))
+        if (DAO?.url && user) {
+            let otherProjects = _get(DAO, 'projects', []).filter((project: any) => !project.deletedAt && !project.archivedAt && !_find(project.members, (m: any) => m.wallet.toLowerCase() === account.toLowerCase()))
             otherProjects = otherProjects.map((p: any) => {
                 let prj = { ...p, notification: 0 }
                 if (notificationCount(prj).length > 0)
@@ -147,81 +147,81 @@ export default () => {
 
     return (
         <Box className={classes.root}>
-				<Box className={classes.mainContainer}>
-                    <Box className={classes.contentContainer}>
-                        <Box className={classes.headerContainer}>
-                             <Box className={classes.header}>
-                                <Box sx={{ pl: 6 }} display="flex" flexDirection="row" alignItems="center">
-                                    <IconButton disableRipple onClick={() => navigate(-1)} size="small" color="primary">
-                                        <ArrowBackIosIcon/>
-                                    </IconButton>
-                                    <Typography variant="h3">{ transformWorkspace().labelPlural }</Typography>
-                                </Box>
+            <Box className={classes.mainContainer}>
+                <Box className={classes.contentContainer}>
+                    <Box className={classes.headerContainer}>
+                        <Box className={classes.header}>
+                            <Box sx={{ pl: 6 }} display="flex" flexDirection="row" alignItems="center">
+                                <IconButton disableRipple onClick={() => navigate(-1)} size="small" color="primary">
+                                    <ArrowBackIosIcon />
+                                </IconButton>
+                                <Typography variant="h3">{transformWorkspace().labelPlural}</Typography>
                             </Box>
-                            <Box className={classes.headerTab}>
-                                <Container maxWidth="lg">
-                                    <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
-                                        <Box>
-                                            <Tabs
-                                                value={tab}
-                                                onChange={(event: React.SyntheticEvent, newValue: number) => setTab(newValue)}
-                                                aria-label="basic tabs example"
-                                                TabIndicatorProps={{ hidden: true }}
-                                                sx={{
-                                                    '& button': { color: 'rgba(118, 128, 141,0.5)', marginRight: '10px', textTransform: 'capitalize', fontSize: '22px', fontWeight: '400' },
-                                                    '& button.Mui-selected': { color: 'rgba(118, 128, 141,1)' },
-                                                }}
-                                            >
-                                                <Tab label={`My ${transformWorkspace().labelPlural}`} id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`} />
-                                                <Tab label={`All ${transformWorkspace().labelPlural}`} id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`} />
-                                            </Tabs>
-                                        </Box>
-                                        <Box display="flex" flexDirection="row" alignItems="center">
-                                            <LomadsIconButton>
-                                                <img src={ArchiveIcon} />
-                                            </LomadsIconButton>
-                                            <Button sx={{ ml: 2 }} size="small" variant="contained" color="secondary">
-                                                Create
-                                            </Button>
-                                        </Box>
+                        </Box>
+                        <Box className={classes.headerTab}>
+                            <Container maxWidth="lg">
+                                <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
+                                    <Box>
+                                        <Tabs
+                                            value={tab}
+                                            onChange={(event: React.SyntheticEvent, newValue: number) => setTab(newValue)}
+                                            aria-label="basic tabs example"
+                                            TabIndicatorProps={{ hidden: true }}
+                                            sx={{
+                                                '& button': { color: 'rgba(118, 128, 141,0.5)', marginRight: '10px', textTransform: 'capitalize', fontSize: '22px', fontWeight: '400' },
+                                                '& button.Mui-selected': { color: 'rgba(118, 128, 141,1)' },
+                                            }}
+                                        >
+                                            <Tab label={`My ${transformWorkspace().labelPlural}`} id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`} />
+                                            <Tab label={`All ${transformWorkspace().labelPlural}`} id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`} />
+                                        </Tabs>
                                     </Box>
-                                </Container>
-                            </Box>
-						</Box>
-                        <Box className={classes.content}>
-                            { tab === 0 &&
-							<Box className={classes.contentWrapper}>
-                                <Grid container justifyContent="flex-start">
+                                    <Box display="flex" flexDirection="row" alignItems="center">
+                                        <LomadsIconButton>
+                                            <img src={ArchiveIcon} />
+                                        </LomadsIconButton>
+                                        <Button sx={{ ml: 2 }} size="small" variant="contained" color="secondary">
+                                            Create
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            </Container>
+                        </Box>
+                    </Box>
+                    <Box className={classes.content} sx={{ paddingTop: '20px' }}>
+                        {tab === 0 &&
+                            <Box className={classes.contentWrapper}>
+                                <Grid columnSpacing={2} container justifyContent="flex-start">
                                     {
                                         myProjects.map((taskItem: any) => {
                                             return (
-                                                <Grid item sm={3}>
-                                                    <ProjectCard tab={tab+1} project={taskItem} daoUrl={DAO?.url} />
+                                                <Grid item xs={1} sm={2} md={3} mt={2}>
+                                                    <ProjectCard tab={tab + 1} project={taskItem} daoUrl={DAO?.url} />
                                                 </Grid>
                                             )
                                         })
                                     }
                                 </Grid>
-							</Box>
-                            }
-                            { tab === 1 &&
-							<Box className={classes.contentWrapper}>
-                                <Grid container justifyContent="flex-start">
+                            </Box>
+                        }
+                        {tab === 1 &&
+                            <Box className={classes.contentWrapper}>
+                                <Grid columnSpacing={2} container justifyContent="flex-start">
                                     {
                                         otherProjects.map((taskItem: any) => {
                                             return (
-                                                <Grid item xs={1} sm={2} md={3}>
-                                                    <ProjectCard tab={tab+1} project={taskItem} daoUrl={DAO?.url} />
+                                                <Grid item xs={1} sm={2} md={3} mt={2}>
+                                                    <ProjectCard tab={tab + 1} project={taskItem} daoUrl={DAO?.url} />
                                                 </Grid>
                                             )
                                         })
                                     }
                                 </Grid>
-							</Box>
-                            }
-						</Box>
+                            </Box>
+                        }
                     </Box>
                 </Box>
+            </Box>
         </Box>
     )
 }
