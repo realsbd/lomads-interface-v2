@@ -60,6 +60,7 @@ const XPPoints = ({ open, onClose }: any) => {
     const { createSafeTransaction } = useGnosisSafeTransaction()
     const [enabled, setEnabled] = useState(false);
     const [showDisableAlert, setShowDisableAlert] = useState(false);
+    const [networkError, setNetworkError] = useState<string | null>(null)
     const [state, setState] = useState<any>({
         sweatValue: 0
     })
@@ -96,6 +97,12 @@ const XPPoints = ({ open, onClose }: any) => {
             } catch (e) {
                 setTxnLoading(false)
                 console.log(e)
+                if(typeof e === 'string'){
+                    setNetworkError(e)
+                } else {
+                    setNetworkError(_get(e, 'message', 'Unable to create transaction. Please Try again'))
+                }
+                setTimeout(() => setNetworkError(null), 3000)
             }
         }
     }
@@ -290,6 +297,7 @@ const XPPoints = ({ open, onClose }: any) => {
                         </Box>
                     </Box>
                 </Box>
+                { networkError && <Typography color="error" variant="body1" sx={{ textAlign: 'center' }}>{ networkError }</Typography> }
                 <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
                         <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
                             <Button onClick={() => setActiveTab(2)} sx={{ mr:1 }} fullWidth variant='outlined' size="small">Cancel</Button>

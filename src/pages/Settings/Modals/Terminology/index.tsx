@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react"
-import { get as _get, find as _find } from 'lodash'
+import { get as _get, find as _find, pick as _pick } from 'lodash'
 import { Drawer, Box, Grid, Typography, Stack, Avatar, List, ListItem, ListItemButton, MenuItem } from "@mui/material"
 import IconButton from "components/IconButton"
 import CloseSVG from 'assets/svg/close-new.svg'
@@ -107,7 +107,7 @@ const TerminologyModal = ({ open, onClose }: any) => {
 		const terminologies = {
 			workspace: _find(WORKSPACE_OPTIONS, wo => wo.value === workspaceTerminology),
 			task: _find(TASK_OPTIONS, to => to.value === taskTerminology),
-			roles: r
+			roles: _pick(r, ["role1", "role2", "role3", "role4"])
 		}
 		updateDAO({ url: _get(DAO, 'url', ''), payload: { terminologies } });
 	}
@@ -184,19 +184,19 @@ const TerminologyModal = ({ open, onClose }: any) => {
                     </Box>
                     <Box sx={{ my: 2 }} display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                         <Typography  className={classes.key}>Role 1</Typography>
-                        <TextInput style={{  minWidth: 200 }} value={_get(roles, 'role1.label')} onChange={(e:any) => handleChange(e)} />
+                        <TextInput style={{  minWidth: 200 }} name="role1" value={_get(roles, 'role1.label')} onChange={(e:any) => handleChange(e)} />
                     </Box>
                     <Box sx={{ my: 2 }} display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                         <Typography  className={classes.key}>Role 2</Typography>
-                        <TextInput style={{  minWidth: 200 }} value={_get(roles, 'role2.label')} onChange={(e:any) => handleChange(e)} />
+                        <TextInput style={{  minWidth: 200 }} name="role2" value={_get(roles, 'role2.label')} onChange={(e:any) => handleChange(e)} />
                     </Box>
                     <Box sx={{ my: 2 }} display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                         <Typography  className={classes.key}>Role 3</Typography>
-                        <TextInput style={{  minWidth: 200 }} value={_get(roles, 'role3.label')} onChange={(e:any) => handleChange(e)} />
+                        <TextInput style={{  minWidth: 200 }} name="role3" value={_get(roles, 'role3.label')} onChange={(e:any) => handleChange(e)} />
                     </Box>
                     <Box sx={{ my: 2 }} display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                         <Typography  className={classes.key}>Role 4</Typography>
-                        <TextInput style={{  minWidth: 200 }} value={_get(roles, 'role4.label')} onChange={(e:any) => handleChange(e)} />
+                        <TextInput style={{  minWidth: 200 }} name="role4" value={_get(roles, 'role4.label')} onChange={(e:any) => handleChange(e)} />
                     </Box>
                 </Box>
                 <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>

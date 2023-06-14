@@ -1,5 +1,5 @@
 import { Box, Chip, Container, Grid, IconButton, List, Tab, Tabs, Typography } from "@mui/material";
-import { get as _get, groupBy as _groupBy } from 'lodash'
+import { get as _get, groupBy as _groupBy, uniq as _uniq, find as _find } from 'lodash'
 import { makeStyles } from "@mui/styles";
 import React, { useEffect, useMemo, useState } from "react";
 import LomadsIconButton from 'components/IconButton'
@@ -19,7 +19,8 @@ import AppliedSvg from 'assets/svg/applied.svg'
 import RejectedSvg from 'assets/svg/rejected.svg'
 import ApprovedSvg from 'assets/svg/approved.svg'
 import PaidSvg from 'assets/svg/paid.svg'
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import CreateTaskModal from "modals/Tasks/CreateTaskModal";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -79,6 +80,15 @@ const useStyles = makeStyles((theme: any) => ({
         flexDirection: 'row',
         //overflow: 'auto'
 	},
+    iconContainer: {
+        height: '40px',
+        width: '50px',
+        padding: '0 10px !important',
+        background: '#B12F15 !important',
+        boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18) !important',
+        borderRadius: '20px !important',
+        marginLeft: '10px !important'
+    }
 }));
 
 const TASK_STATUS: any = [
@@ -91,15 +101,31 @@ const TASK_STATUS: any = [
     { label: "Paid", color: "#74d415", icon: PaidSvg },
 ]
 
+const MANAGE_TASK_STATUS: any = [
+    { label: "Open", color: "#4ba1db", icon: OpenSvg },
+    { label: "Submitted", color: "#6b99f7", icon: SubmittedSvg },
+    { label: "Assigned", color: "#0ec1b0", icon: AssignSvg },
+    { label: "Approved", color: "#27c46e", icon: ApprovedSvg },
+    { label: "Paid", color: "#74d415", icon: PaidSvg },
+]
+
 export default () => {
     const classes = useStyles();
     const navigate = useNavigate()
+    const location = useLocation()
     const { DAO } = useDAO();
     const { transformTask } = useTask()
+    const [openCreateTask, setOpenCreateTask] = useState(false);
     const { transformWorkspace, transformTask: transformTaskLabel } = useTerminology(_get(DAO, 'terminologies', null))
     const [tab, setTab] = useState(0);
     const [initialLoad, setInitialLoad] = useState(true);
     const { parsedTasks } = useTasks(_get(DAO, 'tasks', []))
+
+    // useEffect(() => {
+    //     console.log("location?.state?.active", location?.state?.active)
+    //     if(location?.state?.active)
+    //         setTab(location?.state?.active)
+    // }, [location?.state?.active])
 
     const myTasks = useMemo(() => {
         let arr: any = parsedTasks['myTask']
@@ -110,7 +136,22 @@ export default () => {
     const manageTasks = useMemo(() => {
         let arr: any = parsedTasks['manage']
         arr = arr.map((a:any) => transformTask(a))
-        return _groupBy(arr, (a: any) => a?.visual?.status)
+        console.log("FILTERED", _find(arr, (ar:any) => ar?._id === "64834a13f8d25c69be221248"))
+        console.log("FILTERED", _find(arr, (ar:any) => ar?.visual?.group.indexOf('Submitted') > -1))
+        let groups: Array<string> = _uniq(arr.reduce((a:any, b:any) => a.concat(b?.visual?.group), []))
+        let op: any = {}
+        for (let index = 0; index < groups.length; index++) {
+            const group: string = groups[index];
+            console.log(group)
+            let tsks = []
+            for (let index = 0; index < arr.length; index++) {
+                const tsk = arr[index];
+                if(tsk?.visual?.group.indexOf(group) > -1)
+                    tsks.push(tsk)
+            }
+            op[group] = tsks;
+        }
+        return op
     }, [parsedTasks])
 
     const drafts = useMemo(() => {
@@ -133,10 +174,45 @@ export default () => {
                         activeTab = 3
                 }
             }
-            setTab(activeTab)
+            if(location?.state?.active)
+                setTab(location?.state?.active)
+            else
+                setTab(activeTab)
             setInitialLoad(false)
         }
-    }, [parsedTasks, initialLoad])
+    }, [parsedTasks, initialLoad, location?.state?.active])
+
+    const applicationCount = useMemo(() => {
+        let sum = 0;
+        if (parsedTasks['manage'].length > 0) {
+            for (let index = 0; index < parsedTasks['manage'].length; index++) {
+                const task = parsedTasks['manage'][index];
+                if (task.taskStatus === 'open' && task.isSingleContributor) {
+                    let applications = _get(task, 'members', []).filter((m: any) => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+                    if (applications)
+                        sum = sum + applications.length
+                }
+            }
+            return sum
+        }
+        return 0;
+    }, [parsedTasks['manage']]);
+
+    const submissionCount = useMemo(() => {
+        let sum = 0;
+        if (parsedTasks['manage'].length > 0) {
+            for (let index = 0; index < parsedTasks['manage'].length; index++) {
+                const task = parsedTasks['manage'][index];
+                if ((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
+                    let submissions = _get(task, 'members', [])?.filter((m: any) => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+                    if (submissions)
+                        sum = sum + submissions.length
+                }
+            }
+            return sum
+        }
+        return 0;
+    }, [parsedTasks['manage']]);
 
     return (
         <Box className={classes.root}>
@@ -166,8 +242,48 @@ export default () => {
                                                 }}
                                             >
                                                 <Tab label={`My ${ transformTaskLabel().labelPlural}`} id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`} />
-                                                <Tab label={`Manage`} id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`} />
-                                                <Tab label={`Drafts`} id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`} />
+                                                {/* <Tab label={`Manage`} id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`} />
+                                                <Tab label={`Drafts`} id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`} /> */}
+                                                <Tab
+                                                    label="Manage"
+                                                    id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`}
+                                                    iconPosition="end"
+                                                    icon={
+                                                        (applicationCount + submissionCount) > 0
+                                                            ?
+                                                            <Box
+                                                                sx={tab === 1 ? { opacity: '1' } : { opacity: '0.5' }}
+                                                                className={classes.iconContainer}
+                                                                display={"flex"}
+                                                                alignItems={"center"}
+                                                                justifyContent={"center"}
+                                                            >
+                                                                <Typography sx={{ fontSize: 14, color: '#FFF' }}>{(applicationCount + submissionCount)}</Typography>
+                                                            </Box>
+                                                            :
+                                                            <></>
+                                                    }
+                                                />
+                                                <Tab
+                                                    label="Drafts"
+                                                    id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`}
+                                                    iconPosition="end"
+                                                    icon={
+                                                        parsedTasks['drafts'].length > 0
+                                                            ?
+                                                            <Box
+                                                                sx={tab === 2 ? { opacity: '1' } : { opacity: '0.5' }}
+                                                                className={classes.iconContainer}
+                                                                display={"flex"}
+                                                                alignItems={"center"}
+                                                                justifyContent={"center"}
+                                                            >
+                                                                <Typography sx={{ fontSize: 14, color: '#FFF' }}>{parsedTasks['drafts'].length}</Typography>
+                                                            </Box>
+                                                            :
+                                                            <></>
+                                                    }
+                                                />
                                                 <Tab label={`All ${transformTaskLabel().labelPlural}`} id={`simple-tab-${tab}`} aria-controls={`simple-tabpanel-${tab}`} />
                                             </Tabs>
                                         </Box>
@@ -175,7 +291,7 @@ export default () => {
                                             <LomadsIconButton>
                                                 <img src={ArchiveIcon} />
                                             </LomadsIconButton>
-                                            <Button sx={{ ml: 2 }} size="small" variant="contained" color="secondary">
+                                            <Button onClick={() => setOpenCreateTask(true)} sx={{ ml: 2 }} size="small" variant="contained" color="secondary">
                                                 Create
                                             </Button>
                                         </Box>
@@ -201,7 +317,9 @@ export default () => {
                                                     {
                                                         _get(myTasks, taskStatus?.label, []).map((taskItem: any) => {
                                                             return (
-                                                                <TaskCard task={taskItem} daoUrl={DAO?.url} />
+                                                                <Box pt={2}>
+                                                                    <TaskCard task={taskItem} daoUrl={DAO?.url} />
+                                                                </Box>
                                                             )
                                                         })
                                                     }
@@ -215,7 +333,7 @@ export default () => {
                             { tab === 1 &&
 							<Box className={classes.contentWrapper}>
                                 {
-                                    TASK_STATUS.map((taskStatus: any, _index: number) => {
+                                    MANAGE_TASK_STATUS.map((taskStatus: any, _index: number) => {
                                         return (
                                             <Box key={taskStatus?.label} style={{ 
                                                 minWidth: 340, 
@@ -229,7 +347,9 @@ export default () => {
                                                     {
                                                         _get(manageTasks, taskStatus?.label, []).map((taskItem: any) => {
                                                             return (
-                                                                <TaskCard task={taskItem} daoUrl={DAO?.url} />
+                                                                <Box pt={2}>
+                                                                    <TaskCard task={taskItem} daoUrl={DAO?.url} />
+                                                                </Box>
                                                             )
                                                         })
                                                     }
@@ -261,7 +381,7 @@ export default () => {
                                     {
                                         allTasks.map((taskItem: any) => {
                                             return (
-                                                <Grid item sm={3}>
+                                                <Grid pt={2} item sm={3}>
                                                     <TaskCard task={taskItem} daoUrl={DAO?.url} />
                                                 </Grid>
                                             )
@@ -273,6 +393,11 @@ export default () => {
 						</Box>
                     </Box>
                 </Box>
+                <CreateTaskModal
+                    open={openCreateTask}
+                    closeModal={() => setOpenCreateTask(false)}
+                    selectedProject={null}
+                />
         </Box>
     )
 }

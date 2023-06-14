@@ -90,11 +90,12 @@ export default (rawTasks: Array<any>) => {
             manage = _orderBy(manage, ['notification', mt => moment(mt.updatedAt).unix()], ['desc', 'desc'])
      
             let myTask = _orderBy(_filter(tasks, tsk => {
+                console.log(tsk?.name, canApply(tsk))
                 return tsk.reviewer !== user._id && 
                 (canApply(tsk) ||
                 ( 
                     tsk.contributionType === 'open' && tsk.isSingleContributor && !isOthersApproved(tsk) ||
-                    tsk.contributionType === 'open' && !tsk.isSingleContributor || 
+                    tsk.contributionType === 'open' && !tsk.isSingleContributor && canApply(tsk) || 
                     _find(tsk.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())
                 ))
             }), (mt: any) => moment(mt.updatedAt).unix(), 'desc');

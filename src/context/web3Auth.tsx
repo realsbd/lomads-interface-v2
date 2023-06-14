@@ -1,5 +1,5 @@
 import React from 'react';
-import {  get as _get } from 'lodash'
+import {  get as _get, find as _find } from 'lodash'
 import { ADAPTER_EVENTS, getChainConfig, SafeEventEmitterProvider, WALLET_ADAPTERS, WALLET_ADAPTER_TYPE } from "@web3auth/base";
 import type { LOGIN_PROVIDER_TYPE } from "@toruslabs/openlogin";
 import { ethers } from "ethers";
@@ -14,7 +14,8 @@ import { MetamaskAdapter } from "@web3auth/metamask-adapter";
 import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 import { useAppSelector } from "helpers/useAppSelector";
 import { useAppDispatch } from 'helpers/useAppDispatch';
-import { logoutAction, setTokenAction, setUserAction } from 'store/actions/session';
+import { logoutAction, setNetworkConfig, setTokenAction, setUserAction } from 'store/actions/session';
+import { CHAIN_INFO } from 'constants/chainInfo';
 
 const whiteLabel = {
   name: "Lomads",
@@ -61,28 +62,56 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleOnMessage = async (message: any) => {
-      console.log(message?.data?.data?.data?.params, state?.account)
-      if(message?.data?.data?.data?.method === "metamask_accountsChanged" && message?.data?.data?.data?.params.indexOf(state?.account) === -1) {
-        try {
-          localStorage.clear()
-          sessionStorage.clear()
-          dispatch(setTokenAction(null))
-          dispatch(setUserAction(null))
-          dispatch(logoutAction())
-          await logout()
-        } catch(e) {
-          console.log(e)
-        }
-      }
+const handleAccountsChanged = async () => {
+    try {
+      localStorage.clear()
+      sessionStorage.clear()
+      dispatch(setTokenAction(null))
+      dispatch(setUserAction(null))
+      dispatch(logoutAction())
+      await logout()
+    } catch(e) {
+      console.log(e)
+    }
+}
+
+const handleNetworkChanged = async (chainId: any) => {
+    try {
+      window.location.reload();
+    } catch(e) {
+      console.log(e)
+    }
 }
 
 useEffect(() => {
-    window.addEventListener("message", handleOnMessage);
-    return () => {
-      window.removeEventListener("message", handleOnMessage);
-    };
+  if(window?.ethereum) {
+      console.log("+_get(window?.ethereum, 'networkVersion', 5)", +_get(window?.ethereum, 'networkVersion', 5))
+      const chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', 5)]
+      dispatch(setNetworkConfig({ selectedChainId: +_get(window?.ethereum, 'networkVersion', 5), chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+  }
+}, [])
+
+useEffect(() => {
+  if(window?.ethereum)
+    //@ts-ignore
+    window?.ethereum.on('accountsChanged', handleAccountsChanged);
+  return () => {
+    if(window?.ethereum)
+      //@ts-ignore
+      window?.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+  };
   }, []);
+
+  // useEffect(() => {
+  //   if(window?.ethereum)
+  //     //@ts-ignore
+  //     window?.ethereum.on('networkChanged', handleNetworkChanged);
+  //   return () => {
+  //     if(window?.ethereum)
+  //       //@ts-ignore
+  //       window?.ethereum.removeListener('networkChanged', handleNetworkChanged);
+  //   };
+  //   }, []);
 
   useEffect(() => {
     const subscribeAuthEvents = (web3auth: Web3AuthNoModal) => {

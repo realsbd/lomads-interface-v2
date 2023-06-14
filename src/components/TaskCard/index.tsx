@@ -4,7 +4,8 @@ import { makeStyles } from '@mui/styles';
 
 import submitted from 'assets/svg/submitted.svg';
 import calendarIcon from 'assets/svg/calendar.svg'
-
+import applicationDashboard from 'assets/svg/application_dashboard.svg'
+import submissionDashboard from 'assets/svg/submission_dashboard.svg'
 import { useNavigate } from "react-router-dom";
 import useTask from "hooks/useTask";
 
@@ -57,6 +58,29 @@ const useStyles = makeStyles((theme: any) => ({
         lineHeight: '16px !important',
         marginLeft: '5px !important'
     },
+    iconContainer: {
+        width: '100%',
+        height: '40px',
+        padding: '0 10px !important',
+        position: 'absolute',
+        top: '-20px !important',
+        right: '0 !important',
+        display: 'flex !important',
+        alignItems: 'center !important',
+        justifyContent: 'flex-end !important',
+    },
+    iconPill: {
+        height: '40px',
+        width: '30%',
+        padding: '0 10px !important',
+        background: '#B12F15 !important',
+        boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18) !important',
+        borderRadius: '20px !important',
+        display: 'flex !important',
+        alignItems: 'center !important',
+        justifyContent: 'center!important',
+        marginLeft: '10px !important'
+    },
 }));
 
 interface CardProps {
@@ -78,16 +102,27 @@ export default ({ task, daoUrl }: CardProps) => {
         navigate(`/${daoUrl}/task/${task._id}`, { state: { task } })
     }
 
+    if(Task?._id === "64834a13f8d25c69be221248") {
+        console.log("64834a13f8d25c69be221248", Task)
+    }
+
     return (
         <>
             <Card
                 className={classes.taskCard}
                 sx={{
+                    overflow: 'inherit',
                     background: '#FFF',
                     boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
                 }}
                 onClick={handleCardClick}
             >
+                { Task?.visual?.notification?.count ? <Box className={classes.iconContainer}>
+                    <Box className={classes.iconPill}>
+                        <img src={Task?.visual?.notification?.icon} />
+                        <Typography style={{ color:'#fff', fontSize: 14, fontWeight: 400 }}>+{Task?.visual?.notification?.count}</Typography>
+                    </Box>
+                </Box> : null }
                 <CardContent className={classes.taskContent}>
                     <Typography className={classes.projectText}>{Task?.project?.name?.length > 20 ? Task?.project?.name?.substring(0, 20) + "..." : Task?.project?.name}</Typography>
                     <Typography className={classes.taskText}>{Task.name.length > 20 ? Task.name.substring(0, 20) + "..." : Task.name}</Typography>
