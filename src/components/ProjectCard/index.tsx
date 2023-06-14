@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme: any) => ({
         position: 'relative',
         width: '315px',
         height: '110px',
-        padding: '20px !important',
+        padding: '0px !important',
         marginRight: '20px !important',
         marginBottom: '15px !important',
         borderRadius: '5px !important',
@@ -157,7 +157,8 @@ export default ({ project, daoUrl, tab }: CardProps) => {
                 }
 
                 <CardContent className={classes.taskContent}>
-                    <Typography className={classes.taskText}>{_get(project, 'name', '')}</Typography>
+                    <Typography className={classes.taskText}>{_get(project, 'name', '').length > 20 ? _get(project, 'name', '').substring(0, 20) + '...' : _get(project, 'name', '')}</Typography>
+
                     {
                         _get(project, 'milestones', []).length > 0 &&
                         <Box sx={{ width: '100%' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>

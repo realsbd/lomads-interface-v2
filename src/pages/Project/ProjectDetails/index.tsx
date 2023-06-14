@@ -74,7 +74,7 @@ const useStyles = makeStyles((theme: any) => ({
         height: '100% !important',
         borderRadius: '5px !important',
         background: '#FFF !important',
-        padding: '0 22px !important'
+        padding: '22px !important'
     },
     nameText: {
         fontSize: '30px !important',
@@ -248,7 +248,7 @@ export default () => {
         const [show, setShow] = useState(false);
         let roles: any = [];
         const discordOb = _get(DAO, 'discord', null);
-        const userTemp = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === props.address.toLowerCase());
+        const userTemp = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === props.address.toLowerCase() && m.deletedAt === null);
         console.log("address : ", props.address);
         console.log("user : ", userTemp);
         const index = props.index;
@@ -269,63 +269,67 @@ export default () => {
             });
         }
 
-        return (
-            <>
-                <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"} key={index}>
-                    <Box sx={{ width: '250px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                        <Avatar name={userTemp?.member.name} wallet={userTemp?.member.wallet} />
-                        <Box className={classes.lineSm}></Box>
-                    </Box>
-                    <Box sx={{ width: '300px' }} display={"flex"} alignItems={"center"}>
-                        <Box sx={{ width: '150px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                            <Typography sx={{ marginLeft: '6px', fontSize: '14px', color: '#76808D' }}>{moment.utc(props.joined).local().format('MM/DD/YYYY')}</Typography>
+        if (userTemp) {
+            return (
+                <>
+                    <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"} key={index}>
+                        <Box sx={{ width: '250px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                            <Avatar name={userTemp?.member.name} wallet={userTemp?.member.wallet} />
                             <Box className={classes.lineSm}></Box>
                         </Box>
-                        <Box sx={{ width: '150px', marginLeft: '10px' }}>
-                            <Typography sx={{ fontSize: '14px', fontWeight: '700', color: '#76808D' }}>
-                                {
-                                    userTemp?.role === 'role1' ? userTemp?.creator ? `${transformRole(userTemp?.role).label} (Creator)` : transformRole(userTemp?.role).label : transformRole(userTemp?.role).label
-                                }
-                            </Typography>
+                        <Box sx={{ width: '300px' }} display={"flex"} alignItems={"center"}>
+                            <Box sx={{ width: '150px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                                <Typography sx={{ marginLeft: '6px', fontSize: '14px', color: '#76808D' }}>{moment.utc(props.joined).local().format('MM/DD/YYYY')}</Typography>
+                                <Box className={classes.lineSm}></Box>
+                            </Box>
+                            <Box sx={{ width: '150px', marginLeft: '10px' }}>
+                                <Typography sx={{ fontSize: '14px', fontWeight: '700', color: '#76808D' }}>
+                                    {
+                                        userTemp?.role === 'role1' ? userTemp?.creator ? `${transformRole(userTemp?.role).label} (Creator)` : transformRole(userTemp?.role).label : transformRole(userTemp?.role).label
+                                    }
+                                </Typography>
+                            </Box>
                         </Box>
-                    </Box>
-                    <Box sx={{ width: '400px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
-                        {
-                            (show ? roles : roles.filter((_: any, i: any) => i < 5)).map((item: any, index: any) => {
-                                if (show || index <= 3) {
+                        <Box sx={{ width: '400px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                            {
+                                (show ? roles : roles.filter((_: any, i: any) => i < 5)).map((item: any, index: any) => {
+                                    if (show || index <= 3) {
+                                        return (
+                                            <>
+                                                <Chip
+                                                    label={item.name}
+                                                    className={classes.rolePill}
+                                                    sx={{
+                                                        '& .MuiChip-avatar': {
+                                                            height: '14px !important',
+                                                            width: '14px !important'
+                                                        }
+                                                    }}
+                                                    avatar={
+                                                        <Box style={{ backgroundColor: `${_get(item, "roleColor", '#99aab5')}`, borderRadius: '50%' }}></Box>
+                                                    }
+                                                    style={{ backgroundColor: `${_get(item, "roleColor", '#99aab5')}50` }}
+                                                />
+                                            </>
+                                        )
+                                    }
                                     return (
                                         <>
-                                            <Chip
-                                                label={item.name}
-                                                className={classes.rolePill}
-                                                sx={{
-                                                    '& .MuiChip-avatar': {
-                                                        height: '14px !important',
-                                                        width: '14px !important'
-                                                    }
-                                                }}
-                                                avatar={
-                                                    <Box style={{ backgroundColor: `${_get(item, "roleColor", '#99aab5')}`, borderRadius: '50%' }}></Box>
-                                                }
-                                                style={{ backgroundColor: `${_get(item, "roleColor", '#99aab5')}50` }}
-                                            />
+                                            <Box className={classes.roleCount} onClick={() => setShow(prev => !prev)} display={"flex"} alignItems={"center"} justifyContent={"center"}>
+                                                <Typography>{show ? 'Hide' : `+${roles.length - 4}`}</Typography>
+                                            </Box>
                                         </>
                                     )
-                                }
-                                return (
-                                    <>
-                                        <Box className={classes.roleCount} onClick={() => setShow(prev => !prev)} display={"flex"} alignItems={"center"} justifyContent={"center"}>
-                                            <Typography>{show ? 'Hide' : `+${roles.length - 4}`}</Typography>
-                                        </Box>
-                                    </>
-                                )
-                            })
-                        }
+                                })
+                            }
+                        </Box>
                     </Box>
-                </Box>
-            </>
-        );
+                </>
+            );
+        }
+        else return null;
     };
+
 
     if (!Project || setProjectLoading || (projectId && (Project && Project._id !== projectId))) {
         return (
@@ -359,7 +363,7 @@ export default () => {
                 />
 
                 {/* Name */}
-                <Box sx={{ width: '100%', height: 74, marginBottom: '20px' }} display="flex" alignItems="center">
+                <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" alignItems="center">
                     <Box onClick={() => navigate(-1)} className={classes.arrowContainer} display="flex" alignItems="center" justifyContent={"center"}>
                         <IoIosArrowBack size={20} color="#C94B32" />
                     </Box>

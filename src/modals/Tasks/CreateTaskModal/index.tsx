@@ -222,12 +222,12 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     useEffect(() => { if (user) setReviewer(user?._id) }, [user])
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id)
+        return _get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id && m.deletedAt === null)
             .map((item: any) => { return { label: { name: item.member.name, wallet: item.member.wallet }, value: item.member._id } });
     }, [DAO, selectedUser, reviewer]);
 
     const eligibleReviewers = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: any) => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && (m.role === 'role1' || m.role === 'role2'))
+        return _get(DAO, 'members', []).filter((m: any) => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && (m.role === 'role1' || m.role === 'role2') && m.deletedAt === null)
             .map((item: any) => { return { label: { name: item.member.name, wallet: item.member.wallet }, value: item.member._id } });
 
     }, [DAO, reviewer, selectedUser]);

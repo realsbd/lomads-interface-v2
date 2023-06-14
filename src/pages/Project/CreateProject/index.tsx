@@ -140,7 +140,7 @@ export default () => {
     const [next, setNext] = useState<boolean>(false);
 
     const [showAddMember, setShowAddMember] = useState(false);
-    const [memberList, setMemberList] = useState(DAO?.members);
+    const [memberList, setMemberList] = useState([]);
     const [selectedMembers, setSelectedMembers] = useState<any[]>([]);
     const [resourceList, setResourceList] = useState<any[]>([]);
     const [showMore, setShowMore] = useState<boolean>(false);
@@ -165,7 +165,7 @@ export default () => {
 
     useEffect(() => {
         if (DAO)
-            setMemberList(DAO.members)
+            setMemberList(_get(DAO, 'members', []).filter((m: any) => m.deletedAt === null))
     }, [DAO])
 
     useEffect(() => {
@@ -305,7 +305,9 @@ export default () => {
             let arr = [];
             for (let i = 0; i < DAO.members.length; i++) {
                 let user = DAO.members[i];
-                arr.push({ name: user.member.name, address: user.member.wallet })
+                if (user.deletedAt === null) {
+                    arr.push({ name: user.member.name, address: user.member.wallet })
+                }
             }
             project['members'] = arr;
             project['validRoles'] = [];
@@ -322,20 +324,22 @@ export default () => {
             let arr = [];
             for (let i = 0; i < DAO.members.length; i++) {
                 let user = DAO.members[i];
-                if (user.discordRoles) {
-                    let myDiscordRoles: any[] = [];
-                    Object.keys(user.discordRoles).forEach(function (key, index) {
-                        myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
-                    })
-                    let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
+                if (user.deletedAt === null) {
+                    if (user.discordRoles) {
+                        let myDiscordRoles: any[] = [];
+                        Object.keys(user.discordRoles).forEach(function (key, index) {
+                            myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
+                        })
+                        let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
 
-                    if (index > -1) {
-                        arr.push({ name: user.member.name, address: user.member.wallet })
+                        if (index > -1) {
+                            arr.push({ name: user.member.name, address: user.member.wallet })
+                        }
                     }
-                }
-                else {
-                    if (selectedRoles.includes(user.role)) {
-                        arr.push({ name: user.member.name, address: user.member.wallet })
+                    else {
+                        if (selectedRoles.includes(user.role)) {
+                            arr.push({ name: user.member.name, address: user.member.wallet })
+                        }
                     }
                 }
             }
@@ -345,7 +349,7 @@ export default () => {
         }
 
         console.log(project)
-        
+
         dispatch(createProjectAction(project));
     }
 

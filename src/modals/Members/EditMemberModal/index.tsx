@@ -98,7 +98,7 @@ export default ({ open, closeModal }: Props) => {
 
     useEffect(() => {
         let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
-        if(user)
+        if (user)
             setEditableName(user.member.name)
     }, [DAO]);
 
@@ -119,15 +119,13 @@ export default ({ open, closeModal }: Props) => {
     const editableMembers = useMemo(() => {
         let members = []
         if (myRole === 'role1') {
-            members = _get(DAO, 'members', []).filter((m: any) => m.role !== 'role1')
+            members = _get(DAO, 'members', []).filter((m: any) => m.role !== 'role1' && m.deletedAt === null)
         }
-        let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
-        if(user)
+        let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.deletedAt === null)
+        if (user)
             members.push(user)
         return members
     }, [DAO])
-
-    console.log("editable members : ", editableMembers)
 
     const eligibleRoles = useMemo(() => {
         return Object.keys(_get(DAO, 'terminologies.roles', DEFAULT_ROLES)).filter((i: any) => i !== 'role1').map((item: any) => { return { label: _get(transformRole(item), 'label'), value: item } });
@@ -191,7 +189,7 @@ export default ({ open, closeModal }: Props) => {
                 <Box sx={{ width: '100%', height: '100%', overflowY: 'scroll', marginBottom: '100px' }}>
                     {
                         editableMembers.map((item: any, index: number) => {
-                            if(!item.member) return;
+                            if (!item.member) return;
                             return (
                                 <Box sx={{ width: '100%', marginBottom: '20px', position: 'relative' }} key={index} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                                     {

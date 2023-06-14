@@ -431,7 +431,7 @@ export default ({ open, closeModal }: Props) => {
                                     helperText={errorAddress}
                                 />
                             </Box>
-                            <Box sx={{ width: '150px', transform: 'translateY(5px)' }}>
+                            <Box sx={{ width: '150px', transform: 'translateY(0px)' }}>
                                 <MuiSelect
                                     selected={ownerRole}
                                     options={eligibleRoles}
