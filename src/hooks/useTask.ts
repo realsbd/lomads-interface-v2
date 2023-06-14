@@ -4,6 +4,9 @@ import { find as _find, get as _get } from 'lodash';
 import { useWeb3Auth } from "context/web3Auth";
 import { useDAO } from "context/dao";
 
+import applicationDashboard from 'assets/svg/application_dashboard.svg'
+import submissionDashboard from 'assets/svg/submission_dashboard.svg'
+
 import assign from 'assets/svg/assign.svg'
 import submitted from 'assets/svg/submitted.svg'
 import applied from 'assets/svg/applied.svg'
@@ -86,8 +89,9 @@ export default () => {
     }
 
     const amICreator = (task: any) => {
+        console.log("amICreator", task)
         const user = _find(_get(DAO, 'members', []), m => toChecksumAddress(_get(m, 'member.wallet', '')) === account)
-        return user?.member?._id === task?.reviewer?._id
+        return user?.member?._id === task?.reviewer?._id || user?.member?._id === task?.reviewer
     }
 
     const assignedUser = (task: any) => {
@@ -99,81 +103,95 @@ export default () => {
     }
 
     const applicationCount = (task: any) => {
-        let applications = _get(task, 'members', []).filter((m: any) => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+        let applications = _get(task, 'members', [])?.filter((m: any) => (m.status !== 'approved' && m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
         if (applications)
             return applications.length
         return 0
     };
 
     const submissionCount = (task: any) => {
-        let submissions = _get(task, 'members', [])?.filter((m: any) => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+        let submissions = _get(task, 'members', [])?.filter((m: any) => m.submission && m.status !== 'submission_accepted' && m.status !== 'submission_rejected')
         if (submissions)
             return submissions.length
         return 0
     };
+    
 
     const getTaskStatus = (task: any) => {
+        let notification = {}
+        if(((((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' ) && submissionCount(task) > 0  ) || applicationCount(task) > 0) && amICreator(task)) {
+            if(((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' ) && submissionCount(task) > 0 ) {
+                notification = { icon: submissionDashboard, count: submissionCount(task) }
+            } else if (applicationCount(task) > 0) {
+                notification = { icon: applicationDashboard, count: applicationCount(task) }
+            }
+        }
+
         /* If task was manually assigned---check if current user is approved applicant or other user*/
         if (task.taskStatus === 'submitted' && (task.contributionType === 'assign' || task.contributionType === 'open')) {
             if (amIApproved(task))
-                return { status: 'Under review', color: '#6B99F7', icon: submitted }
-            return { status: 'Submitted', color: '#6B99F7', icon: submitted }
+                return { notification, status: 'Under review', color: '#6B99F7', icon: submitted, group: ["Under review"] }
+            return { notification, status: 'Submitted', color: '#6B99F7', icon: submitted, group: ["Submitted"] }
         }
         /* If task was manually assigned---check if current user is approved applicant or other user*/
         else if (task.contributionType === 'assign' && task.taskStatus === 'assigned') {
             if (amIApproved(task))
-                return { status: "Assigned to me", color: '#0EC1B0', icon: assign }
+                return { notification, status: "Assigned to me", color: '#0EC1B0', icon: assign, group: ["Assigned to me"]  }
             else {
                 if (amIRejected(task))
-                    return { status: "Rejected", color: '#E23B53', icon: rejected }
-                return { status: 'assigned', color: '#0EC1B0', icon: assign }
+                    return { status: "Rejected", color: '#E23B53', icon: rejected, group: ["Rejected"] }
+                return { notification, status: 'Assigned', color: '#0EC1B0', icon: assign, group: ["Assigned"] }
             }
         }
         // if task was open for all and task status is still open --- check if current user has applied or not
         else if (task.contributionType === 'open' && task.taskStatus === 'open' && task.reopenedAt === null) {
             if (hasMySubmission(task)) {
                 if (amIRejected(task)) {
-                    return { status: "Rejected", color: "#E23B53", icon: rejected }
+                    return { notification, status: "Rejected", color: "#E23B53", icon: rejected, group: ['Rejected'] }
                 } else if (isMySubmissionAccepted(task)) {
-                    return { status: "Approved", color: "#27C46E", icon: approved }
+                    return { notification, status: "Approved", color: "#27C46E", icon: approved, group: ['Approved'] }
                 } else {
-                    return { status: "Under review", color: "#6B99F7", icon: submitted }
+                    return { notification, status: "Under review", color: "#6B99F7", icon: submitted, group: ['Under review'] }
                 }
             } else {
                 if (amIApplicant(task))
-                    return { status: "Applied", color: "#FFB600", icon: applied }
-                return { status: "Open", color: "#4BA1DB", icon: openSvg }
+                    return { notification, status: "Applied", color: "#FFB600", icon: applied, group: ['Applied'] }
+                return { notification, status: "Open", color: "#4BA1DB", icon: openSvg, 
+                    group: amICreator(task) &&  submissionCount(task) > 0 ? ['Open', 'Submitted'] : ['Open']
+                }
             }
         }
         //if task was open for all and task has been assigned --- check if current user is approved or other
         else if (task.contributionType === 'open' && task.taskStatus === 'assigned' && task.reopenedAt === null) {
             if (amIApplicant(task)) {
                 if (amIApproved(task))
-                    return { status: "Assigned to me", color: "#0EC1B0", icon: assign }
+                    return { notification, status: "Assigned to me", color: "#0EC1B0", icon: assign, group: ["Assigned to me"] }
             }
-            return { status: "Assigned", color: "#0EC1B0", icon: assign }
+            return { notification, status: "Assigned", color: "#0EC1B0", icon: assign, group: ["Assigned"] }
         }
 
         else if (task.reopenedAt !== null) {
             if (amIApplicant(task)) {
-                return { status: "Applied", color: "#FFB600", icon: applied }
+                return { notification, status: "Applied", color: "#FFB600", icon: applied, group: ["Applied"] }
             } else {
                 if (amIRejected(task))
-                    return { status: "Rejected", color: "#E23B53", icon: rejected }
-                return { status: "Open", color: "#4BA1DB", icon: openSvg }
+                    return { notification, status: "Rejected", color: "#E23B53", icon: rejected, group: ["Rejected"] }
+                return { notification, status: "Open", color: "#4BA1DB", icon: openSvg, 
+                    group: amICreator(task) &&  submissionCount(task) > 0 ? ['Open', 'Submitted'] : ['Open']
+                }
             }
         }
 
         else if (task.taskStatus === 'approved') {
-            return { status: "Approved", color: "#27C46E", icon: approved }
+            return { notification, status: "Approved", color: "#27C46E", icon: approved, group: ["Approved"] }
         }
 
         else if (task.taskStatus === 'paid') {
-            return { status: "Paid", color: "#74D415", icon: paid }
+            return { notification, status: "Paid", color: "#74D415", icon: paid, group: ["Paid"] }
         }
 
         else if (task.taskStatus === 'rejected') {
-            return { status: "Rejected", color: "#E23B53", icon: rejected }
+            return { notification, status: "Rejected", color: "#E23B53", icon: rejected, group: ["Rejected"] }
         } else {
             return {}
         }
