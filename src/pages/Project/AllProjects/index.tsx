@@ -25,7 +25,7 @@ import { createAccountAction } from "store/actions/session";
 import { useWeb3Auth } from "context/web3Auth";
 import ProjectCard from "components/ProjectCard";
 import moment from "moment";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -89,8 +89,10 @@ const useStyles = makeStyles((theme: any) => ({
 
 export default () => {
     const classes = useStyles();
+    const location = useLocation();
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
+    const [initialCheck, setInitialCheck] = useState(false)
     const { account } = useWeb3Auth()
     const { DAO } = useDAO();
     const { user } = useAppSelector((store: any) => store?.session)
@@ -102,6 +104,7 @@ export default () => {
             dispatch(createAccountAction({}))
         }
     }, [user])
+
 
     const notificationCount = (project: any) => {
         let count = [];
@@ -130,6 +133,23 @@ export default () => {
         }
         return []
     }, [DAO?.url, user])
+
+    useEffect(() => {
+        if (!initialCheck) {
+            setInitialCheck(true);
+            let activeTab = 0
+            if (myProjects.length > 0) 
+                activeTab = 0
+            else 
+                activeTab = 1
+
+            if(location?.state?.active)
+                setTab(location?.state?.active)
+            else
+                setTab(activeTab)
+            setInitialCheck(false)
+        }
+    }, [myProjects, initialCheck, location?.state?.active]);
 
     const otherProjects = useMemo(() => {
         if (DAO?.url && user) {

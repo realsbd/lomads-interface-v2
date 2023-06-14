@@ -19,7 +19,7 @@ import AppliedSvg from 'assets/svg/applied.svg'
 import RejectedSvg from 'assets/svg/rejected.svg'
 import ApprovedSvg from 'assets/svg/approved.svg'
 import PaidSvg from 'assets/svg/paid.svg'
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import CreateTaskModal from "modals/Tasks/CreateTaskModal";
 
 const useStyles = makeStyles((theme: any) => ({
@@ -112,6 +112,7 @@ const MANAGE_TASK_STATUS: any = [
 export default () => {
     const classes = useStyles();
     const navigate = useNavigate()
+    const location = useLocation()
     const { DAO } = useDAO();
     const { transformTask } = useTask()
     const [openCreateTask, setOpenCreateTask] = useState(false);
@@ -119,6 +120,12 @@ export default () => {
     const [tab, setTab] = useState(0);
     const [initialLoad, setInitialLoad] = useState(true);
     const { parsedTasks } = useTasks(_get(DAO, 'tasks', []))
+
+    // useEffect(() => {
+    //     console.log("location?.state?.active", location?.state?.active)
+    //     if(location?.state?.active)
+    //         setTab(location?.state?.active)
+    // }, [location?.state?.active])
 
     const myTasks = useMemo(() => {
         let arr: any = parsedTasks['myTask']
@@ -167,10 +174,13 @@ export default () => {
                         activeTab = 3
                 }
             }
-            setTab(activeTab)
+            if(location?.state?.active)
+                setTab(location?.state?.active)
+            else
+                setTab(activeTab)
             setInitialLoad(false)
         }
-    }, [parsedTasks, initialLoad])
+    }, [parsedTasks, initialLoad, location?.state?.active])
 
     const applicationCount = useMemo(() => {
         let sum = 0;

@@ -230,7 +230,7 @@ export default ({ onlyProjects }: any) => {
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
-                    <IconButton onClick={() => navigate(`/${DAO.url}/tasks`)} sx={{ marginRight: '20px' }}>
+                    <IconButton onClick={() => navigate(`/${DAO.url}/tasks`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
                         <img src={expandIcon} alt="archive-icon" />
                     </IconButton>
                     <IconButton sx={{ marginRight: '20px' }}>
@@ -262,7 +262,7 @@ export default ({ onlyProjects }: any) => {
                                     <Box
                                         key={index}
                                         className={classes.showAllCard}
-                                        onClick={() => { navigate(`/${DAO.url}/tasks`) }}
+                                        onClick={() => { navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }}
                                     >
                                         <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
                                     </Box>
@@ -293,7 +293,7 @@ export default ({ onlyProjects }: any) => {
                                     <Box
                                         key={index}
                                         className={classes.showAllCard}
-                                        onClick={() => { navigate(`/${DAO.url}/tasks`) }}
+                                        onClick={() => { navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }}
                                     >
                                         <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
                                     </Box>
@@ -324,7 +324,7 @@ export default ({ onlyProjects }: any) => {
                                     <Box
                                         key={index}
                                         className={classes.showAllCard}
-                                        onClick={() => { navigate(`/${DAO.url}/tasks`) }}
+                                        onClick={() => { navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }}
                                     >
                                         <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
                                     </Box>
@@ -355,7 +355,7 @@ export default ({ onlyProjects }: any) => {
                                     <Box
                                         key={index}
                                         className={classes.showAllCard}
-                                        onClick={() => { navigate(`/${DAO.url}/tasks`) }}
+                                        onClick={() => { navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }}
                                     >
                                         <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
                                     </Box>
