@@ -18,7 +18,7 @@ export default ({ name, wallet, hideDetails, ...props }: any) => {
     };
 
     return (
-        <Box style={{ display: 'flex', width: '100%', position: 'relative' }}>
+        <Box style={{ display: 'flex', width: '100%', position: 'relative', zIndex: '99999' }}>
             <Avatar
                 key={`${name}-${wallet}`}
                 size={32}

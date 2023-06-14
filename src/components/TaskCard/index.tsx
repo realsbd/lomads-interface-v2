@@ -20,7 +20,8 @@ const useStyles = makeStyles((theme: any) => ({
         marginBottom: '15px !important',
         borderRadius: '5px !important',
         display: 'flex !important',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        zIndex: '999 !important'
     },
     taskContent: {
         width: '100%',

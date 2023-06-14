@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { Box, Typography, Chip } from "@mui/material";
 import { makeStyles } from '@mui/styles';
@@ -70,6 +70,10 @@ export default ({ list }: MembersProps) => {
 
     const [showAddMember, setShowAddMember] = useState(false);
     const [showEditMember, setShowEditMember] = useState(false);
+
+    const eligibleMembers = useMemo(() => {
+        return _sortBy(_uniqBy(list, (m: any) => m.member.wallet.toLowerCase()), (m: any) => _get(m, 'member.name', '').toLowerCase(), 'asc').filter((m: any) => m.deletedAt === null)
+    }, [DAO]);
 
     const NameAndAvatar = (props: any) => {
         const [show, setShow] = useState(false);
@@ -168,7 +172,7 @@ export default ({ list }: MembersProps) => {
                 <Typography sx={{ fontSize: '22px', fontWeight: '400', color: '#76808D' }}>Members</Typography>
                 <Box display={"flex"} alignItems={"center"}>
                     <img src={membersGroup} alt="membersGroup" />
-                    <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{list.length} {list.length > 1 ? 'members' : 'member'}</Typography>
+                    <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{eligibleMembers?.length} {eligibleMembers?.length > 1 ? 'members' : 'member'}</Typography>
                     <Box sx={{ cursor: 'pointer', margin: '0 20px' }} onClick={() => setShowEditMember(true)}>
                         <img src={editSvg} alt="edit-svg" style={{ height: '40px', width: '40px' }} />
                     </Box>
@@ -190,7 +194,7 @@ export default ({ list }: MembersProps) => {
                 </Box>
 
                 <Box sx={{ width: '100%', maxHeight: '220px', overflow: 'auto' }}>
-                    {_sortBy(_uniqBy(list, (m: any) => m.member.wallet.toLowerCase()), (m: any) => _get(m, 'member.name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
+                    {eligibleMembers?.map((result: any, index: any) => {
                         return (
                             <NameAndAvatar
                                 index={index}
