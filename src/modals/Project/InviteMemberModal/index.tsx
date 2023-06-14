@@ -102,7 +102,7 @@ export default ({ open, closeModal }: Props) => {
                 <Typography className={classes.modalTitle}>Invite members</Typography>
                 <Box sx={{ width: '100%', maxHeight: 300, overflow: 'hidden', overflowY: 'auto' }}>
                     {
-                        _get(DAO, 'members', []).map((item: any, index: number) => handleUsers(item, index))
+                        _get(DAO, 'members', []).filter((m: any) => m.deletedAt === null).map((item: any, index: number) => handleUsers(item, index))
                     }
                 </Box>
                 <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%', marginTop: '20px' }}>
