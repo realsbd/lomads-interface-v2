@@ -141,7 +141,6 @@ export default () => {
         } else if (loginType === WALLET_ADAPTERS.OPENLOGIN) {
             token = await login(WALLET_ADAPTERS.OPENLOGIN, provider);
         }
-        console.log(token)
         if (token) {
             dispatch(createAccountAction({ token }))
         }

@@ -5,9 +5,9 @@ import * as actionTypes from 'store/actionTypes';
 
 export function getInitialState() {
   return {
-    selectedChainId: 5,
-    web3AuthNetwork: "testnet",
-    chain: "goerli",
+    selectedChainId: 137,
+    web3AuthNetwork: "cyan",
+    chain: "polygon",
     token: null,
     user: null
   };

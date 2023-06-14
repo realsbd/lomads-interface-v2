@@ -94,7 +94,7 @@ const useStyles = makeStyles((theme: any) => ({
 export default ({ children, options = true, ...props }: any) => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
-	const { chainId, account, provider, switchChain } = useWeb3Auth()
+	const { chainId, account, provider, switchChain, logout } = useWeb3Auth()
 	//@ts-ignore
 	const { user } = useAppSelector(store => store?.session);
 
@@ -132,6 +132,8 @@ export default ({ children, options = true, ...props }: any) => {
 		dispatch(setTokenAction(null))
 		dispatch(setUserAction(null))
 		dispatch(logoutAction())
+		try { await logout() } catch (e) { console.log(e) }
+		window.location.reload()
 	};
 
 	// const swtBalance = useMemo(() => {

@@ -30,10 +30,10 @@ const appReducer: any = combineReducers({
 });
 
 const rootReducer = (state: any, action: any) => {
-  if (action.type === actionTypes.LOGOUT_ACTION) {
-    storage.removeItem('persist:root')
-    return appReducer(undefined, action)
-  }
+  // if (action.type === actionTypes.LOGOUT_ACTION) {
+  //   storage.removeItem('persist:root')
+  //   return appReducer(undefined, action)
+  // }
   return appReducer(state, action)
 }
 
