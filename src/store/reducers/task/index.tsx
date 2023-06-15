@@ -96,7 +96,9 @@ const TaskReducer = (state: any = getInitialState(), action: any) =>
                 draft.rejectTaskSubmissionLoading = payload;
                 break;
             }
-
+			case actionTypes.LOGOUT_ACTION: {
+				draft = getInitialState()
+			}
         }
     });
 

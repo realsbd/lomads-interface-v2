@@ -75,6 +75,7 @@ const useRole = (DAO: any, account: string | undefined, safeAddress: string | un
         let role = _get(_find(DAO.members, m => m.member.wallet.toLowerCase() === account?.toLowerCase()), 'role', '')
         if(safeAddress){
             let safe = loadSafe(safeAddress)
+            console.log("isSafeOwner", safe)
             isSafeOwner = _find(_get(safe, 'owners'), (m: any) => m.wallet.toLowerCase() === account.toLowerCase());
         }
         return { 

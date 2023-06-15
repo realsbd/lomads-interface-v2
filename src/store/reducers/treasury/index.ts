@@ -84,6 +84,9 @@ const TreasuryReducer = (state: any = getInitialState(), action: any) =>
           })
           break;
         }
+        case actionTypes.LOGOUT_ACTION: {
+          draft = getInitialState()
+        }
     }
   });
 

@@ -9,7 +9,7 @@ import Web3Token from 'web3-token';
 // import { NetworkSwitch } from "@web3auth/ui";
 import { createContext, FunctionComponent, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { CHAIN_CONFIG, CHAIN_CONFIG_TYPE } from "constants/chainConfig";
-import { WEB3AUTH_NETWORK, WEB3AUTH_NETWORK_TYPE } from "constants/chains";
+import { SupportedChainId, WEB3AUTH_NETWORK, WEB3AUTH_NETWORK_TYPE } from "constants/chains";
 import { MetamaskAdapter } from "@web3auth/metamask-adapter";
 import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 import { useAppSelector } from "helpers/useAppSelector";
@@ -85,9 +85,10 @@ const handleNetworkChanged = async (chainId: any) => {
 
 useEffect(() => {
   if(window?.ethereum) {
-      console.log("+_get(window?.ethereum, 'networkVersion', 5)", +_get(window?.ethereum, 'networkVersion', 5))
-      const chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', 5)]
-      dispatch(setNetworkConfig({ selectedChainId: +_get(window?.ethereum, 'networkVersion', 5), chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+      let chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', SupportedChainId.POLYGON)]
+      if(!chainInfo)
+        chainInfo = CHAIN_INFO[SupportedChainId.POLYGON]
+      dispatch(setNetworkConfig({ selectedChainId: +_get(window?.ethereum, 'networkVersion', SupportedChainId.POLYGON), chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
   }
 }, [])
 

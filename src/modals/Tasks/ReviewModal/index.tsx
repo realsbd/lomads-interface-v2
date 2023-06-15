@@ -181,6 +181,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
         const safeAddress = Task?.compensation?.safeAddress || _get(DAO, 'safes[0].safeAddress', null)
         const safe = loadSafe(safeAddress);
         if(!safeAddress) return;
+
         try {
 
             if(_get(Task, 'compensation.currency', 'SWEAT') !== "SWEAT") {
@@ -190,7 +191,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                 }
             }
             setApproveLoading(true)
-            const method = _get(Task, 'compensation.currency', 'SWEAT') === "SWEAT" ? createOffChainSafeTransaction : createSafeTransaction
+            const method = !isSafeOwner || _get(Task, 'compensation.currency', 'SWEAT') === "SWEAT" ? createOffChainSafeTransaction : createSafeTransaction
 
             let m = _get(activeSubmission, 'member.name', '') === '' ? _get(activeSubmission, 'member.wallet', '') : _get(activeSubmission, 'member.name', '')
 
@@ -200,7 +201,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                 tokenAddress: _get(Task, 'compensation.currency', 'SWEAT'),
                 send: [{ recipient: activeSubmission.member.wallet, amount: newCompensation, label: `${m} | ${_get(Task, 'name', '')}` || undefined, tag, taskId: Task?._id }],
                 daoId: _get(DAO, '_id', null),
-                isSafeOwner: _find(safe.owners, (owner:any) => owner?.wallet === account) !== null
+                isSafeOwner: Boolean(isSafeOwner)
             })
 
             const payload = {

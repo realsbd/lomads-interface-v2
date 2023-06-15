@@ -93,6 +93,9 @@ const DAOReducer = (state: any = getInitialState(), action: any) =>
 				draft.storeGithubIssuesLoading = payload;
 				break;
 			}
+			case actionTypes.LOGOUT_ACTION: {
+				draft = getInitialState()
+			}
 		}
 	});
 

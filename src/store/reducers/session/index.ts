@@ -36,6 +36,9 @@ const SessionReducer = (state: any = getInitialState(), action: any) =>
         draft.user = null;
         break;
       }
+      case actionTypes.LOGOUT_ACTION: {
+				draft = getInitialState()
+			}
     }
   });
 

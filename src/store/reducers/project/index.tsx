@@ -84,7 +84,9 @@ const ProjectReducer = (state: any = getInitialState(), action: any) =>
                 draft.updateProjectViewLoading = payload;
                 break;
             }
-
+            case actionTypes.LOGOUT_ACTION: {
+				draft = getInitialState()
+			}
         }
     });
 

@@ -37,6 +37,13 @@ export const SafeTokensProvider = ({ children }: any) => {
         return 0
     }
 
+    const getToken = useCallback((tokenAddr: string, safeAddress: string) => {
+        if(safeTokens && safeAddress) {
+            return _find(_get(safeTokens, safeAddress, []),  st => _get(st, 'tokenAddress', '0x') === tokenAddr)
+        }
+        return null
+    }, [safeTokens])
+
     const getTokens = async (chain: SupportedChainId, safeAddress: String) => {
         return axios.get(`${GNOSIS_SAFE_BASE_URLS[chain]}/api/v1/safes/${safeAddress}/balances/usd/`, { withCredentials: false })
             .then(async (res: any) => {
@@ -97,7 +104,8 @@ export const SafeTokensProvider = ({ children }: any) => {
 
     const contextProvider = {
         safeTokens,
-        tokenBalance
+        tokenBalance,
+        getToken
     };
     return <SafeTokensContext.Provider value={contextProvider}>{children}</SafeTokensContext.Provider>;
 }

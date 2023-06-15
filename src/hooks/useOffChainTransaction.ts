@@ -5,6 +5,7 @@ import { useWeb3Auth } from "context/web3Auth";
 import { CreateTreasuryTransactionAction, updateTreasuryTransactionAction } from "store/actions/treasury";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { nanoid } from "nanoid";
+import { useSafeTokens } from "context/safeTokens";
 
 export type CreateSafeTransaction = {
     safeAddress: string,
@@ -19,6 +20,7 @@ export default () => {
 
     const dispatch = useAppDispatch()
     const { account } = useWeb3Auth()
+    const { getToken } = useSafeTokens()
 
 	const createSafeTransaction = ({ 
         safeAddress,
@@ -28,6 +30,7 @@ export default () => {
         daoId,
         isSafeOwner
      }: CreateSafeTransaction) => {
+        const token = getToken(tokenAddress, safeAddress)
         try {
             const nonce = moment().unix();
             let payload = {}
@@ -43,8 +46,8 @@ export default () => {
                     executionDate: null,
                     submissionDate: moment().utc().toDate(),
                     token: {
-                        symbol: 'SWEAT',
-                        tokenAddress: 'SWEAT',
+                        symbol: token ? token?.token?.symbol : 'SWEAT',
+                        tokenAddress: tokenAddress,
                     },
                     confirmations: isSafeOwner ? [{
                         owner: account,
@@ -80,8 +83,8 @@ export default () => {
                     executionDate: null,
                     submissionDate: moment().utc().toDate(),
                     token: {
-                        symbol: 'SWEAT',
-                        tokenAddress: 'SWEAT',
+                        symbol: token ? token?.token?.symbol : 'SWEAT',
+                        tokenAddress: tokenAddress,
                     },
                     confirmations: isSafeOwner ? [{
                         owner: account,
@@ -101,7 +104,8 @@ export default () => {
                 rawTx: payload,
                 metadata: send.reduce((a, v) => ({ ...a, [v.recipient]: { label: v.label, tag: v.tag }}), {}) 
             }
-            dispatch(CreateTreasuryTransactionAction(params))
+            console.log(params)
+            //dispatch(CreateTreasuryTransactionAction(params))
         } catch(e) {
             throw e
         }
