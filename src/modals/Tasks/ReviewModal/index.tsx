@@ -166,7 +166,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
     const [rejectionNote, setRejectionNote] = useState('');
     const [rejectionNoteError, setRejectionNoteError] = useState('');
 
-    const { isSafeOwner } = useRole(DAO, account, Task?.compensation?.safeAddress || _get(DAO, 'safes[0].safeAddress', null));
+    const { isSafeOwner } = useRole(DAO, account, Task?.compensation?.safeAddress || _get(DAO, 'safes[0].address', null));
     const { loadSafe } = useSafe();
     const { createSafeTransaction } = useGnosisSafeTransaction();
     const { createSafeTransaction: createOffChainSafeTransaction } = useOffChainTransaction();
