@@ -146,11 +146,11 @@ useEffect(() => {
     async function init() {
       try {
         setIsLoading(true);
-        const clientId = _get(WEB3AUTH_NETWORK, `${web3AuthNetwork}.clientId`)
+        const clientId = _get(WEB3AUTH_NETWORK, `cyan.clientId`)
         console.log("chain, web3AuthNetwork", chain, web3AuthNetwork)
         const web3AuthInstance = new Web3AuthNoModal({
-          web3AuthNetwork,
-          chainConfig: _get(CHAIN_CONFIG, chain, 'goerli'),
+          web3AuthNetwork: 'cyan',
+          chainConfig: _get(CHAIN_CONFIG, chain, 'polygon'),
           enableLogging: true,
           clientId: clientId || '',
         });

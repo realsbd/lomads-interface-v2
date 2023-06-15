@@ -201,7 +201,7 @@ export default ({ open, closeModal }: Props) => {
                                     }
                                     <Box display={"flex"} alignItems={"center"}>
                                         {
-                                            item.member.wallet.toLowerCase() === account.toLowerCase()
+                                            item.member?.wallet?.toLowerCase() === account?.toLowerCase()
                                                 ?
                                                 <Box display={"flex"} alignItems={"center"} sx={{ width: '200px' }}>
                                                     <Avatar
@@ -226,7 +226,7 @@ export default ({ open, closeModal }: Props) => {
                                                 <Box display={"flex"} alignItems={"center"} sx={{ width: '200px' }}>
                                                     <AvatarComponent
                                                         name={item?.member?.name}
-                                                        hideDetails={item.member.wallet.toLowerCase() === account.toLowerCase()}
+                                                        hideDetails={item.member?.wallet?.toLowerCase() === account?.toLowerCase()}
                                                         wallet={item?.member?.wallet}
                                                     />
                                                 </Box>
@@ -235,7 +235,7 @@ export default ({ open, closeModal }: Props) => {
                                     <Box sx={{ width: '180px' }}>
                                         <MuiSelect
                                             selected={item.role}
-                                            options={item.member.wallet.toLowerCase() === account.toLowerCase() ? Object.keys(_get(DAO, 'terminologies.roles', DEFAULT_ROLES)).map((item: any) => { return { label: _get(transformRole(item), 'label'), value: item } }) : eligibleRoles}
+                                            options={item.member?.wallet?.toLowerCase() === account?.toLowerCase() ? Object.keys(_get(DAO, 'terminologies.roles', DEFAULT_ROLES)).map((item: any) => { return { label: _get(transformRole(item), 'label'), value: item } }) : eligibleRoles}
                                             setSelectedValue={(value) => handleChangeRoles(item._id, value)}
                                             disabled={!amIAdmin || item.role === "role1"}
                                         />

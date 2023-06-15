@@ -96,7 +96,7 @@ export default (rawTasks: Array<any>) => {
                 ( 
                     tsk.contributionType === 'open' && tsk.isSingleContributor && !isOthersApproved(tsk) ||
                     tsk.contributionType === 'open' && !tsk.isSingleContributor && canApply(tsk) || 
-                    _find(tsk.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())
+                    _find(tsk.members, m => m.member?.wallet?.toLowerCase() === account?.toLowerCase())
                 ))
             }), (mt: any) => moment(mt.updatedAt).unix(), 'desc');
             let drafts = rawTasks.filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && (task.creator === user._id || task.provider === 'Github' || task.provider === 'Trello'))

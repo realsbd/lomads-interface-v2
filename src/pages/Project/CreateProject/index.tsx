@@ -217,7 +217,7 @@ export default () => {
         const memberList = DAO?.members;
         if (memberList.length > 0 && selectedMembers.length === 0) {
             for (let i = 0; i < memberList.length; i++) {
-                if (memberList[i].member.wallet.toLowerCase() === account.toLowerCase()) {
+                if (memberList[i]?.member?.wallet?.toLowerCase() === account?.toLowerCase()) {
                     let memberOb: any = {};
                     memberOb.name = memberList[i].member.name;
                     memberOb.address = memberList[i].member.wallet;

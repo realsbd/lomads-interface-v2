@@ -149,7 +149,7 @@ export default () => {
     return (
         <>
             <Grid container className={classes.root}>
-                <Container maxWidth="lg">
+                <Container style={{ position: 'absolute', top: 0 }} maxWidth="lg">
                     <Box sx={{ mt: 3 }} display="flex" flexDirection="row" alignItems="center" style={{ float: 'right' }}>
                         <Link rel="noopener noreferrer" target="_blank" href="https://lomads.medium.com/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor:'pointer' }}>BLOG</Link>
                         <Link rel="noopener noreferrer" target="_blank" href="https://lomads-1.gitbook.io/lomads/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor:'pointer' }}>DOCS</Link>
