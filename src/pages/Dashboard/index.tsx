@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { useDAO } from "context/dao";
-import React from "react"
+import React, { useState } from "react"
 import { makeStyles } from '@mui/styles';
 import axiosHttp from 'api'
 import { useNavigate, useParams } from "react-router-dom"
@@ -20,6 +20,7 @@ import moment from "moment";
 import { beautifyHexToken } from "utils";
 import { CHAIN_INFO } from "constants/chainInfo";
 import { SupportedChainId } from "constants/chains";
+import ProfileModal from "modals/Profile/ProfileModal";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -38,6 +39,7 @@ export default () => {
     const { myRole, can } = useRole(DAO, account, undefined)
     // @ts-ignore
     const { setProjectLoading, Project } = useAppSelector(store => store.project);
+    const [openProfile, setOpenProfile] = useState(!false);
 
     // const send = async () => {
     //     try {
@@ -63,6 +65,13 @@ export default () => {
 
     return (
         <Grid container>
+            <Grid item sm={12}>
+                <ProfileModal
+                    open={openProfile}
+                    closeModal={() => setOpenProfile(false)}
+                />
+                <Button onClick={() => setOpenProfile(true)}>Open Profile</Button>
+            </Grid>
             <Grid item sm={12}>
                 <Links />
             </Grid>
