@@ -22,6 +22,7 @@ import axios from 'axios';
 import { ethers } from 'ethers';
 import { SUPPORTED_ASSETS, SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chains';
 import axiosHttp from 'api';
+import { CHAIN_INFO } from "constants/chainInfo";
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const useStyles = makeStyles((theme: any) => ({
@@ -146,9 +147,10 @@ export default ({ open, closeModal }: Props) => {
                                     nftData.map((asset: any) => {
                                         return (
                                             <Box sx={{ width: 250, height: 150, overflow: 'hidden', borderRadius: '5px', marginBottom: '10px', marginRight: '10px', position: 'relative' }}>
+                                                <img style={{ height: 25, width: 25, position: 'absolute', top: 15, right: 15, zIndex: 2 }} src={CHAIN_INFO[asset.chainId].logoUrl} />
                                                 <Box
                                                     display={"flex"} alignItems={"flex-end"} justifyContent={"flex-end"}
-                                                    sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, background: 'rgba(0, 0, 0, 0.5)', padding: '15px' }}>
+                                                    sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, background: 'rgba(0, 0, 0, 0.5)', padding: '15px', zIndex: 1 }}>
                                                     <Box display={"flex"} alignItems={"center"}>
                                                         <img src={diamondIcon} alt="diamondIcon" style={{ width: 10, height: 10, marginRight: 5 }} />
                                                         <Typography sx={{ fontSize: 14, color: '#FFF', fontWeight: 700 }}>{asset.name}</Typography>
