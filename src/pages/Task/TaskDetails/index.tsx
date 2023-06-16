@@ -94,7 +94,9 @@ const useStyles = makeStyles((theme: any) => ({
         background: '#FFF',
         borderRadius: '5px',
         padding: '30px 28px !important',
-        marginRight: '0.2rem'
+        marginRight: '0.2rem',
+        overflow: 'hidden',
+        overflowY: 'auto'
     },
     detailsContainer: {
         width: '70%',
@@ -718,7 +720,7 @@ export default () => {
                         <Typography sx={{ fontSize: 16, color: '#76808D' }}>Description</Typography>
                         <Typography
                             dangerouslySetInnerHTML={{ __html: _get(Task, 'description', '') }}
-                            sx={{ fontSize: '14px', color: '#1B2B41' }}></Typography>
+                            sx={{ paddingTop: '16px', fontSize: '14px', color: '#1B2B41' }}></Typography>
                     </Box>
                     <Box className={classes.detailsContainer} display="flex" flexWrap={"wrap"} alignItems="center" justifyContent={"center"}>
                         {renderBody(Task?.visual?.renderBody)}
