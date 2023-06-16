@@ -18,6 +18,11 @@ import { useWeb3Auth } from 'context/web3Auth';
 import Avatar from "boring-avatars";
 import diamondIcon from 'assets/svg/Rectangle 543.svg'
 import hkLogo from 'assets/svg/income.svg'
+import axios from 'axios';
+import { ethers } from 'ethers';
+import { SUPPORTED_ASSETS, SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chains';
+import axiosHttp from 'api';
+const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -57,20 +62,42 @@ export default ({ open, closeModal }: Props) => {
     const classes = useStyles();
     const dispatch = useAppDispatch();
     const { DAO } = useDAO();
-    const { account } = useWeb3Auth();
+    const { account, provider, chainId, openWallet, switchChain, web3Auth } = useWeb3Auth();
     // @ts-ignore
     const { user } = useAppSelector(store => store?.session);
+    console.log("user : ", user)
 
     const [name, setName] = useState<string>('');
     const [errorName, setErrorName] = useState('');
 
-    const [chain, setChain] = useState('');
+    const [chain, setChain] = useState('Polygon');
+    const [nftData, setNftData] = useState<any>({})
+
+    useEffect(() => {
+        if (account && provider && chainId)
+            computeBalance([SupportedChainId.GOERLI, SupportedChainId.POLYGON, SupportedChainId.MAINNET]);
+    }, [account, provider, chainId])
 
     useEffect(() => {
         if (user) {
             setName(user.name)
         }
     }, [user]);
+
+    const computeBalance = async (chain: any[]) => {
+        let res = await Promise.all(chain.map(async (item) =>
+            axios.get(`https://nft.api.infura.io/networks/${item}/accounts/${account}/assets/nfts`,
+                //@ts-ignore
+                { auth: { username: process.env.REACT_APP_INFURA_KEY, password: process.env.REACT_APP_INFURA_SECRET } })
+        ))
+        let ans = res.reduce((a, b) => a.concat(b?.data?.assets), [])
+        let cAddress = ans.map((item: any) => toChecksumAddress(item.contract));
+        const { data } = await axiosHttp.post(`contract/check`, { contracts: cAddress })
+        console.log("arr : ", data);
+        if (data) {
+            setNftData(data);
+        }
+    }
 
     return (
         <Drawer
@@ -111,68 +138,32 @@ export default ({ open, closeModal }: Props) => {
                         />
                     </Box>
 
-                    <Box sx={{ width: '100%', marginBottom: '35px' }} display={"flex"} flexDirection={"column"}>
-                        <Typography sx={{ fontWeight: 700, color: '#76808D', marginBottom: '5px' }}>My SBTS</Typography>
-                        <Box sx={{ width: '100%' }} display={"flex"} flexWrap={"wrap"}>
-                            <Box sx={{ width: 250, height: 150, overflow: 'hidden', borderRadius: '5px', marginBottom: '10px', marginRight: '10px', position: 'relative' }}>
-                                <Box
-                                    display={"flex"} alignItems={"flex-end"} justifyContent={"flex-end"}
-                                    sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, background: 'rgba(118, 128, 141, 0.5)', padding: '15px' }}>
-                                    <Box display={"flex"} alignItems={"center"}>
-                                        <img src={diamondIcon} alt="diamondIcon" style={{ width: 10, height: 10, marginRight: 5 }} />
-                                        <Typography sx={{ fontSize: 14, color: '#FFF', fontWeight: 700 }}>Name of SBT</Typography>
-                                    </Box>
-                                </Box>
-                                <img style={{ width: '100%', height: '100%' }} src="https://www.zicasso.com/static/5d94eddebd84649d25f26624b545d879/6d821/5d94eddebd84649d25f26624b545d879.jpg" />
-                            </Box>
-                            <Box sx={{ width: 250, height: 150, overflow: 'hidden', borderRadius: '5px', marginBottom: '10px', marginRight: '10px', position: 'relative' }}>
-                                <Box
-                                    display={"flex"} alignItems={"flex-end"} justifyContent={"flex-end"}
-                                    sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, background: 'rgba(118, 128, 141, 0.5)', padding: '15px' }}>
-                                    <Box display={"flex"} alignItems={"center"}>
-                                        <img src={diamondIcon} alt="diamondIcon" style={{ width: 10, height: 10, marginRight: 5 }} />
-                                        <Typography sx={{ fontSize: 14, color: '#FFF', fontWeight: 700 }}>Name of SBT</Typography>
-                                    </Box>
-                                </Box>
-                                <img style={{ width: '100%', height: '100%' }} src="https://www.zicasso.com/static/5d94eddebd84649d25f26624b545d879/6d821/5d94eddebd84649d25f26624b545d879.jpg" />
-                            </Box>
-                            <Box sx={{ width: 250, height: 150, overflow: 'hidden', borderRadius: '5px', marginBottom: '10px', marginRight: '10px', position: 'relative' }}>
-                                <Box
-                                    display={"flex"} alignItems={"flex-end"} justifyContent={"flex-end"}
-                                    sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, background: 'rgba(118, 128, 141, 0.5)', padding: '15px' }}>
-                                    <Box display={"flex"} alignItems={"center"}>
-                                        <img src={diamondIcon} alt="diamondIcon" style={{ width: 10, height: 10, marginRight: 5 }} />
-                                        <Typography sx={{ fontSize: 14, color: '#FFF', fontWeight: 700 }}>Name of SBT</Typography>
-                                    </Box>
-                                </Box>
-                                <img style={{ width: '100%', height: '100%' }} src="https://www.zicasso.com/static/5d94eddebd84649d25f26624b545d879/6d821/5d94eddebd84649d25f26624b545d879.jpg" />
-                            </Box>
-                            <Box sx={{ width: 250, height: 150, overflow: 'hidden', borderRadius: '5px', marginBottom: '10px', marginRight: '10px', position: 'relative' }}>
-                                <Box
-                                    display={"flex"} alignItems={"flex-end"} justifyContent={"flex-end"}
-                                    sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, background: 'rgba(118, 128, 141, 0.5)', padding: '15px' }}>
-                                    <Box display={"flex"} alignItems={"center"}>
-                                        <img src={diamondIcon} alt="diamondIcon" style={{ width: 10, height: 10, marginRight: 5 }} />
-                                        <Typography sx={{ fontSize: 14, color: '#FFF', fontWeight: 700 }}>Name of SBT</Typography>
-                                    </Box>
-                                </Box>
-                                <img style={{ width: '100%', height: '100%' }} src="https://www.zicasso.com/static/5d94eddebd84649d25f26624b545d879/6d821/5d94eddebd84649d25f26624b545d879.jpg" />
-                            </Box>
-                            <Box sx={{ width: 250, height: 150, overflow: 'hidden', borderRadius: '5px', marginBottom: '10px', marginRight: '10px', position: 'relative' }}>
-                                <Box
-                                    display={"flex"} alignItems={"flex-end"} justifyContent={"flex-end"}
-                                    sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, background: 'rgba(118, 128, 141, 0.5)', padding: '15px' }}>
-                                    <Box display={"flex"} alignItems={"center"}>
-                                        <img src={diamondIcon} alt="diamondIcon" style={{ width: 10, height: 10, marginRight: 5 }} />
-                                        <Typography sx={{ fontSize: 14, color: '#FFF', fontWeight: 700 }}>Name of SBT</Typography>
-                                    </Box>
-                                </Box>
-                                <img style={{ width: '100%', height: '100%' }} src="https://www.zicasso.com/static/5d94eddebd84649d25f26624b545d879/6d821/5d94eddebd84649d25f26624b545d879.jpg" />
+                    {
+                        nftData && nftData.length > 0 && <Box sx={{ width: '100%', marginBottom: '35px' }} display={"flex"} flexDirection={"column"}>
+                            <Typography sx={{ fontWeight: 700, color: '#76808D', marginBottom: '5px' }}>My SBTS</Typography>
+                            <Box sx={{ width: '100%' }} display={"flex"} flexWrap={"wrap"}>
+                                {
+                                    nftData.map((asset: any) => {
+                                        return (
+                                            <Box sx={{ width: 250, height: 150, overflow: 'hidden', borderRadius: '5px', marginBottom: '10px', marginRight: '10px', position: 'relative' }}>
+                                                <Box
+                                                    display={"flex"} alignItems={"flex-end"} justifyContent={"flex-end"}
+                                                    sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, background: 'rgba(0, 0, 0, 0.5)', padding: '15px' }}>
+                                                    <Box display={"flex"} alignItems={"center"}>
+                                                        <img src={diamondIcon} alt="diamondIcon" style={{ width: 10, height: 10, marginRight: 5 }} />
+                                                        <Typography sx={{ fontSize: 14, color: '#FFF', fontWeight: 700 }}>{asset.name}</Typography>
+                                                    </Box>
+                                                </Box>
+                                                <img style={{ width: '100%', height: '100%', objectFit: 'cover' }} src={asset.image} />
+                                            </Box>
+                                        )
+                                    })
+                                }
                             </Box>
                         </Box>
-                    </Box>
+                    }
 
-                    <Box sx={{ width: '100%' }} display={"flex"} flexDirection={"column"}>
+                    {/* <Box sx={{ width: '100%' }} display={"flex"} flexDirection={"column"}>
                         <Box sx={{ width: '100%', marginBottom: '20px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                             <Box sx={{ width: '50%' }} display={"flex"} alignItems={"center"}>
                                 <Typography sx={{ marginRight: '30px', fontSize: 16, fontWeight: 700, color: '#76808D' }}>My Earnings</Typography>
@@ -224,7 +215,23 @@ export default ({ open, closeModal }: Props) => {
                             </Box>
                         </Box>
 
-                    </Box>
+                        <Box sx={{ width: '100%' }} display={"flex"} flexDirection={"column"}>
+                            
+                            <Box sx={{ width: '100%' }} display={"flex"} alignItems={"center"}>
+                                <Box sx={{ width: '70%' }} display={"flex"} alignItems={"center"}>
+                                    <Typography sx={{ marginRight: '20px', color: '#76808D', fontWeight: 700, fontSize: '14px' }}>120 ETH /</Typography>
+                                    <Box display={"flex"} flexDirection={"column"}>
+                                        <Typography sx={{ color: '#76808D', fontWeight: 700, }}>Invoice | UI Improvements</Typography>
+                                        <Typography sx={{ color: '#76808D', }}>from Name of Organisation</Typography>
+                                    </Box>
+                                </Box>
+                                <Box sx={{ width: '30%' }} display={"flex"} justifyContent={"flex-end"} alignItems={"center"}>
+                                    <Typography sx={{ color: '#76808D', opacity: '0.6', fontWeight: 700, fontSize: '14px', textTransform: 'uppercase' }}>Awaiting Payment</Typography>
+                                </Box>
+                            </Box>
+                        </Box>
+
+                    </Box> */}
 
                 </Box>
             </Box>
