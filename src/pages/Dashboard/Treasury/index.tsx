@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { find as _find, orderBy as _orderBy, get as _get } from 'lodash'
 import { IconButton as MuiIconButton } from "@mui/material";
 import clsx from "clsx";
-import { Grid, Box, Typography, Divider, Skeleton, TableContainer, Table, TableBody, Stack } from "@mui/material"
+import { Grid, Box, Typography, Tabs, Tab, Divider, Skeleton, TableContainer, Table, TableBody, Stack } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import { useDAO } from "context/dao";
 import { useParams } from "react-router-dom";
@@ -18,6 +18,8 @@ import Button from "components/Button";
 import palette from "theme/palette";
 import SendToken from "../SendToken";
 import IconButton from "components/IconButton";
+import AddIcon from '@mui/icons-material/Add';
+import RecurringPayment from "./RecurringPayment";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -31,6 +33,7 @@ const useStyles = makeStyles((theme: any) => ({
         display: "flex",
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: "space-between",
         padding: 16
     },
     stack: {
@@ -46,6 +49,17 @@ const useStyles = makeStyles((theme: any) => ({
         backgroundColor: `#FFF`,
         flexDirection: 'row',
         alignItems: 'center',
+        borderRadius: 5,
+        padding: "0 20px"
+    },
+    reccurHeader: {
+        display: 'flex',
+        height: 72,
+        width: '100%',
+        backgroundColor: `#FFF`,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: "space-between",
         borderRadius: 5,
         padding: "0 20px"
     },
@@ -89,6 +103,8 @@ export default () => {
     const { daoURL } = useParams()
     const { safeTokens } = useSafeTokens()
     const [showSendToken, setShowSendToken] = useState(false);
+    const [showRecurringPayment, setShowRecurringPayment] = useState(false);
+    const [activeTab, setActiveTab] = useState(0);
 
     //@ts-ignore
     const { treasury } = useAppSelector(store => store.treasury)
@@ -138,6 +154,13 @@ export default () => {
         return _get(txn, `[0].rawTx.nonce`, 0)
     }, [treasury])
 
+    function a11yProps(index: number) {
+        return {
+            id: `simple-tab-${index}`,
+            'aria-controls': `simple-tabpanel-${index}`,
+        };
+    }
+
     const handleSyncSafe = () => 
         dispatch(syncSafeAction({ safes: DAO?.safes?.map((safe:any) => safe?.address) }))
     
@@ -148,20 +171,25 @@ export default () => {
                 { (!DAO || !treasury)  ? 
                 <Skeleton sx={{ borderRadius: 1 }}  variant="rectangular" height={72} animation="wave" /> :
                 <Box className={classes.header}>
-                    <Box className={classes.tabs}>
-                        <Box className={classes.tab}>
-                            <Typography className={clsx([classes.tabItem, classes.tabItemActive])}>Treasury
-                            {/* <MuiIconButton size="small" onClick={() => handleSyncSafe()}><SyncIcon/></MuiIconButton> */}
-                            </Typography>
-                        </Box>
-                        {/* <Box className={classes.verDivider} />
-                        <Box className={classes.tab}>
-                            <Typography className={classes.tabItem}>Recurring payments</Typography>
-                        </Box> */}
+                    <Tabs
+                        value={activeTab}
+                        onChange={(e: any, val: any) => setActiveTab(val)}
+                        aria-label="basic tabs example"
+                        TabIndicatorProps={{ hidden: true }}
+                        sx={{
+                            '& button': { color: 'rgba(118, 128, 141,0.5)', marginRight: '10px', textTransform: 'capitalize', fontSize: '22px', fontWeight: '400' },
+                            '& button.Mui-selected': { color: 'rgba(118, 128, 141,1)' },
+                        }}
+                    >
+                        <Tab label="Treasury" {...a11yProps(0)} />
+                        {/* <Tab label="Recurring payments" {...a11yProps(1)} /> */}
+                    </Tabs>
+                    <Box>
+                        { activeTab == 0 && <Button onClick={() => setShowSendToken(true)} sx={{ color: palette?.primary?.main }} size="small" variant="contained" color="secondary">SEND TOKEN</Button> }
                     </Box>
-                    <Button onClick={() => setShowSendToken(true)} sx={{ color: palette?.primary?.main }} size="small" variant="contained" color="secondary">SEND TOKEN</Button>
                 </Box> }
             </Grid>
+            { activeTab == 0 ?
             <Grid mt={0.5} item sm={12}>
                 { (!DAO || !treasury)  ? 
                 <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={72} animation="wave" /> :
@@ -182,7 +210,17 @@ export default () => {
                     </Box>
                 </Box>
                 }
-            </Grid>
+            </Grid> : null }
+            { activeTab == 1 ?
+            <Grid mt={0.5} item sm={12}>
+                <Box className={classes.reccurHeader}>
+                    <Box></Box>
+                    <Box>
+                        <Button onClick={() => setShowRecurringPayment(true)} color="secondary" variant="contained" startIcon={<AddIcon color="primary" />} size="small" ><Typography color="primary">NEW RECURRING PAYMENT</Typography></Button>
+                    </Box>
+                </Box>
+            </Grid> : null }
+            { activeTab == 0 &&
             <Grid mt={0.5} mb={1} item sm={12}>
                 { (!DAO || !treasury || !safeTokens)  ? 
                    <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={500} animation="wave" /> :
@@ -202,7 +240,9 @@ export default () => {
                     </Box>
                 }
             </Grid>
+            }
             <SendToken open={showSendToken} onClose={() => setShowSendToken(false)} />
+            <RecurringPayment open={showRecurringPayment} onClose={() => setShowRecurringPayment(false)} />
         </Grid>
     )
 }

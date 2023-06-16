@@ -1,7 +1,10 @@
 import axiosHttp from 'api';
 
-export const createAccountService = (token: string) => {
-    return axiosHttp.post(`auth/create-account`, {}, { headers: { Authorization: token } })
+export const createAccountService = (payload: any) => {
+    return axiosHttp.post(`auth/create-account`, {
+        name: payload?.userInfo?.name,
+        email: payload?.userInfo?.email
+    }, { headers: { Authorization: payload.token } })
 }
 
 export const updateAccountService = (payload: any) => {

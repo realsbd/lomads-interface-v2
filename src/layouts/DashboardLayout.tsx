@@ -28,6 +28,7 @@ import { useWeb3Auth } from 'context/web3Auth';
 import { useDAO } from 'context/dao';
 import Skeleton from '@mui/material/Skeleton';
 import Footer from 'components/Footer';
+import theme from 'theme';
 
 
 const drawerWidth: number = 116;
@@ -334,7 +335,7 @@ export default ({ children }: any) => {
             }
             <Box onClick={() => navigate('/organisation/create')}  className={classes.stripItem}>
                 <Box className={classes.invertedBox} sx={{ backgroundColor: 'transparent' }}>
-                  <Typography className={classes.create}>+</Typography>
+                  <Typography className={classes.create} style={{ color: theme.palette.primary.main }}>+</Typography>
                 </Box>
                 <Typography className={classes.daoText}>CREATE</Typography>
               </Box> 

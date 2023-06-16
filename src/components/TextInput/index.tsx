@@ -23,7 +23,7 @@ export default ({ labelChip, fullWidth, label, date, ...props }: any) => {
     return (
         <FormControl fullWidth={fullWidth}>
             <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
-                { label && <FormLabel error={props.error} component="legend">{label}</FormLabel> }
+                { label && <FormLabel style={{ marginBottom: "10px" }} error={props.error} component="legend">{label}</FormLabel> }
                 {labelChip}
             </Box>
             {   date ?

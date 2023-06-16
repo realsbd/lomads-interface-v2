@@ -81,7 +81,7 @@ export default () => {
     const handleClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
 
-    const { provider, login, account, chainId, logout } = useWeb3Auth();
+    const { provider, login, account, chainId, logout, web3Auth } = useWeb3Auth();
 
     console.log("provider", provider)
 
@@ -117,6 +117,7 @@ export default () => {
     }, [selectedChainId])
 
     useEffect(() => {
+        console.log("TOKEN , USER, ACC", token , user , account)
         if (token && user && account) {
             if (from)
                 navigate(from)
@@ -132,6 +133,25 @@ export default () => {
         setCurrentChain(chain)
     }, 1000)
 
+    // useEffect(() => {
+    //     if (account && token && web3Auth) {
+    //         if(web3Auth?.connectedAdapterName === "openlogin") {
+    //             web3Auth?.getUserInfo()
+    //             .then((res:any) => {
+    //                 console.log("userInfo", res)
+    //                 setUserInfo(res)
+    //                 setState((prev: any) => {
+    //                     return {
+    //                         ...prev,
+    //                         name: _get(res, 'name', null),
+    //                         email: _get(res, 'email', null),
+    //                     }
+    //                 })
+    //             })
+    //         }
+    //     }
+    // }, [account, token, web3Auth])
+
     const handleLogin = async (loginType = WALLET_ADAPTERS.METAMASK, provider: undefined | string = undefined) => {
         dispatch(logoutAction())
         await logout()
@@ -142,7 +162,10 @@ export default () => {
             token = await login(WALLET_ADAPTERS.OPENLOGIN, provider);
         }
         if (token) {
-            dispatch(createAccountAction({ token }))
+            let userInfo = null;
+            if(web3Auth?.connectedAdapterName === "openlogin")
+                userInfo = await web3Auth?.getUserInfo()
+            dispatch(createAccountAction({ token, userInfo }))
         }
     }
 

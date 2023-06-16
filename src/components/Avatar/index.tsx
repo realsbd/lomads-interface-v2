@@ -23,12 +23,12 @@ export default ({ name, wallet, hideDetails, ...props }: any) => {
         <Box style={{ display: 'flex', width: '100%', position: 'relative' }}>
             <Avatar
                 key={`${name}-${wallet}`}
-                size={32}
+                size={props?.small ? 24 : 32}
                 name={wallet}
                 variant="marble"
                 colors={["#E67C40", "#EDCD27", "#8ECC3E", "#2AB87C", "#188C8C"]}
             />
-            {name && <Box style={{ height: 32, width: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', left: 0, top: 0 }} >
+            {name && <Box style={{ height: props?.small ? 24 : 32, width: props?.small ? 24 : 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', left: 0, top: 0 }} >
                 <Typography sx={{ color: '#FFF', fontWeight: 500 }}>{getInitials(name)}</Typography>
             </Box>}
             {

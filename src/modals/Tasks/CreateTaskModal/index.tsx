@@ -31,6 +31,7 @@ import { createTaskAction, draftTaskAction } from "store/actions/task";
 import useSafe from "hooks/useSafe";
 import theme from "theme";
 import moment from "moment";
+import { createAccountAction } from "store/actions/session";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -179,6 +180,13 @@ export default ({ open, closeModal, selectedProject }: Props) => {
         }
     }, [selectedProject, open])
 
+    useEffect(() => {
+        if(DAO?.url)
+            setSafeAddress(_get(DAO, 'safes[0].address'))
+            if(user)
+                setReviewer(user?._id) 
+    }, [DAO?.url, user])
+
     const [errorName, setErrorName] = useState('');
     const [errorDesc, setErrorDesc] = useState('');
     const [errorDchannel, setErrorDchannel] = useState('');
@@ -213,18 +221,18 @@ export default ({ open, closeModal, selectedProject }: Props) => {
         }
     }, [createTaskLoading, draftTaskLoading]);
 
-    // useEffect(() => {
-    //     if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
-    //         dispatch(getCurrentUser({}))
-    //     }
-    // }, [account, chainId, user])
-
-    useEffect(() => { if (user) setReviewer(user?._id) }, [user])
+    useEffect(() => { 
+        if (user) 
+            setReviewer(user?._id) 
+        else
+            dispatch(createAccountAction({}))
+        },[user])
 
     const eligibleContributors = useMemo(() => {
         return _get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id && m.deletedAt === null)
             .map((item: any) => { return { label: { name: item.member.name, wallet: item.member.wallet }, value: item.member._id } });
     }, [DAO, selectedUser, reviewer]);
+
 
     const eligibleReviewers = useMemo(() => {
         return _get(DAO, 'members', []).filter((m: any) => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && (m.role === 'role1' || m.role === 'role2') && m.deletedAt === null)

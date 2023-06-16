@@ -10,8 +10,8 @@ import { createAccountService, updateAccountService } from 'store/services/sessi
 function* createAccountSaga(action: any) {
 	try {
 		yield put({ type: actionTypes.CREATE_ACCOUNT_LOADING, payload: true })
-		const { data } = yield call(createAccountService, action.payload.token)
-		console.log('json, response', data)
+		const { data } = yield call(createAccountService, action.payload)
+		console.log('json, response',action.payload.token, data)
 		yield put({ type: actionTypes.CREATE_ACCOUNT_LOADING, payload: false })
 		yield put({ type: actionTypes.SET_TOKEN_ACTION, payload: action.payload })
 		yield put({ type: actionTypes.SET_USER_ACTION, payload: data })

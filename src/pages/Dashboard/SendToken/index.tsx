@@ -67,7 +67,7 @@ export default ({ open, onClose }: any) => {
     const classes = useStyles()
     const { account, chainId: currentChainId } = useWeb3Auth()
     const { DAO } = useDAO()
-    const { safeTokens } = useSafeTokens()
+    const { safeTokens, getToken } = useSafeTokens()
     const { loadSafe } = useSafe()
     const { createSafeTransaction } = useGnosisSafeTransaction();
     const { createSafeTransaction: createOffChainSafeTransaction } = useOffChainTransaction();
@@ -78,10 +78,11 @@ export default ({ open, onClose }: any) => {
     const [tab, setTab] = useState(1)
 
     useEffect(() => {
-        if(DAO?.url && open){
+        if(DAO && DAO?.url){
             setTab(1)
             setState((prev:any) => { return { ...prev, 
                 safeAddress: _get(DAO, 'safes[0].address', null),
+                token: _get(safeTokens, `${_get(DAO, 'safes[0].address', null)}[0].tokenAddress`, process.env.REACT_APP_NATIVE_TOKEN_ADDRESS),
                 members: DAO?.members?.map((member:any) => { return { name: member?.member?.name, address: member?.member?.wallet, selected: false } })
             } })
         }

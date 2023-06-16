@@ -233,9 +233,9 @@ export default ({ onlyProjects }: any) => {
                     <IconButton onClick={() => navigate(`/${DAO.url}/tasks`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
                         <img src={expandIcon} alt="archive-icon" />
                     </IconButton>
-                    <IconButton sx={{ marginRight: '20px' }}>
+                    {/* <IconButton sx={{ marginRight: '20px' }}>
                         <img src={archiveIcon} alt="archiveIcon" />
-                    </IconButton>
+                    </IconButton> */}
                     <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn} onClick={() => setOpenCreateTask(true)}>
                         <AddIcon sx={{ fontSize: 18 }} /> CREATE
                     </Button>
