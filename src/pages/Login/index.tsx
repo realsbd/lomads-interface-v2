@@ -1,7 +1,7 @@
 import React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { throttle as _throttle, debounce as _debounce, get as _get, find as _find } from 'lodash'
-import { Container, Grid, Typography, Box, Paper, Menu } from "@mui/material"
+import { Container, Grid, Typography, Box, Paper, Menu, Link } from "@mui/material"
 import MenuItem from '@mui/material/MenuItem';
 import { makeStyles } from '@mui/styles';
 import CHEERS from 'assets/svg/cheers.svg'
@@ -149,6 +149,12 @@ export default () => {
     return (
         <>
             <Grid container className={classes.root}>
+                <Container style={{ position: 'absolute', top: 0 }} maxWidth="lg">
+                    <Box sx={{ mt: 3 }} display="flex" flexDirection="row" alignItems="center" style={{ float: 'right' }}>
+                        <Link rel="noopener noreferrer" target="_blank" href="https://lomads.medium.com/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor:'pointer' }}>BLOG</Link>
+                        <Link rel="noopener noreferrer" target="_blank" href="https://lomads-1.gitbook.io/lomads/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor:'pointer' }}>DOCS</Link>
+                    </Box>
+                </Container>
                 <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
                     <Box zIndex={0} position="absolute" bottom={0}>
                         <img src={CHEERS} style={{ marginBottom: '-5px' }} />

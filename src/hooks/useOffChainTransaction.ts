@@ -105,7 +105,7 @@ export default () => {
                 metadata: send.reduce((a, v) => ({ ...a, [v.recipient]: { label: v.label, tag: v.tag }}), {}) 
             }
             console.log(params)
-            //dispatch(CreateTreasuryTransactionAction(params))
+            dispatch(CreateTreasuryTransactionAction(params))
         } catch(e) {
             throw e
         }

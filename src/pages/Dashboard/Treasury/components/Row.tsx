@@ -86,7 +86,7 @@ export default ({ transaction, executableNonce }: any) => {
                         <Recipient safeAddress={transaction?.safeAddress} credit={tx?.isCredit} recipient={tx?.to} />
                         <Tag transaction={transaction} recipient={tx?.to} />
                         <Sign transaction={tx} index={_i} />
-                        <Action amount={tx?.formattedValue} onPostExecution={handlePostExecution} token={tx?.symbol} executableNonce={executableNonce} safeAddress={transaction?.safeAddress} transaction={tx} txnCount={txn.length} chainId={loadSafe(transaction?.safeAddress)?.chainId} index={_i} />
+                        <Action txnGroup={txn} amount={tx?.formattedValue} onPostExecution={handlePostExecution} token={tx?.symbol} tokenAddress={tx?.tokenAddress} executableNonce={executableNonce} safeAddress={transaction?.safeAddress} transaction={tx} txnCount={txn.length} chainId={loadSafe(transaction?.safeAddress)?.chainId} index={_i} />
                     </TableRow>
                 ))
             }

@@ -315,11 +315,13 @@ export default ({ children }: any) => {
           {
               DAOList && DAOList.map((dao: any) => {
                 const daoName = _get(dao, 'name', '') ? _get(dao, 'name', '').split(" ") : '';
-				const daoImage = _get(dao, 'image', '');
+				        const daoImage = _get(dao, 'image', '');
                 return (
                 <Box onClick={() => { 
-                        resetDAO(); 
-                        setTimeout(() => navigate(`/${dao?.url}`), 100)
+                        if(DAO?.url !== dao?.url) {
+                          resetDAO(); 
+                          setTimeout(() => navigate(`/${dao?.url}`), 100)
+                        }
                     }} className={classes.stripItem}>
                     <Box className={classes.invertedBox}>
                     { daoImage ? <img className={classes.image} src={daoImage} /> :

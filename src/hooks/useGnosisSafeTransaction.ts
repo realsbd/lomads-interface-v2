@@ -19,7 +19,9 @@ export type CreateSafeTransaction = {
     safeAddress: string,
     chainId: number,
     tokenAddress: string,
-    send: Array<any>
+    send: Array<any>,
+    offChainTxHash?: string | null | undefined,
+    reject?: boolean | null | undefined,
 }
 
 export type ConfirmTransaction = {
@@ -32,6 +34,7 @@ export type RejectTransaction = {
     safeAddress: string,
     chainId: number,
     _nonce: number
+    sign?: string | undefined
 }
 
 export type ExecuteTransaction = {
@@ -95,16 +98,20 @@ export default () => {
         safeAddress,
         chainId,
         tokenAddress,
-        send
+        send,
+        offChainTxHash = undefined,
+        reject = false
     }: CreateSafeTransaction) => {
         try {
+            console.log(safeAddress, tokenAddress)
             let signature: any = null;
             const safeToken = _find(_get(safeTokens, safeAddress, []), t => _get(t, 'tokenAddress', null) === tokenAddress)
+            if (!safeToken) throw 'Something went wrong'
             let total = send.reduce((pv: any, cv: any) => pv + (+cv.amount), 0);
             if (total == 0) throw 'Cannot send 0'
             const balance = tokenBalance(tokenAddress, safeAddress);
             if (balance < total)
-                throw `Low token balance. Available balance ${balance} ${safeToken?.token?.symbol}`
+                throw `Low token balance. Available balance in safe ${beautifyHexToken(safeAddress)} is ${balance} ${safeToken?.token?.symbol}`
             let safeTransactionData = null;
             const safeSDK = await ImportSafe(provider, safeAddress);
             if (tokenAddress === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {
@@ -127,14 +134,26 @@ export default () => {
             await (await safeService(provider, `${chainId}`))
                 .proposeTransaction({ safeAddress, safeTransactionData: safeTransaction.data, safeTxHash, senderAddress, senderSignature: signature.data })
             console.log("transaction has been proposed");
-            await (await safeService(provider, `${chainId}`)).confirmTransaction(safeTxHash, signature.data)
-            const tx = await (await safeService(provider, `${chainId}`)).getTransaction(safeTxHash)
-            const payload = {
-                safeAddress,
-                rawTx: tx,
-                metadata: send.reduce((a, v) => ({ ...a, [v.recipient]: { label: v.label, tag: v.tag, sweatConversion: v.sweatConversion ? v.sweatConversion : undefined, taskId: v?.taskId || undefined }}), {}) 
+            
+            console.log("REJECT==TXN", reject)
+
+            if(!reject)
+                await (await safeService(provider, `${chainId}`)).confirmTransaction(safeTxHash, signature.data)
+
+            let tx: any = await (await safeService(provider, `${chainId}`)).getTransaction(safeTxHash)
+
+            if(!offChainTxHash) {
+                const payload = {
+                    safeAddress,
+                    rawTx: tx,
+                    metadata: send.reduce((a, v) => ({ ...a, [v.recipient]: { label: v.label, tag: v.tag, sweatConversion: v.sweatConversion ? v.sweatConversion : undefined, taskId: v?.taskId || undefined }}), {}) 
+                }
+                dispatch(CreateTreasuryTransactionAction(payload))
+            } else {
+                const payload = { offChainTxHash, safeAddress, rawTx: tx }
+                dispatch(updateTreasuryTransactionAction(payload))
             }
-            dispatch(CreateTreasuryTransactionAction(payload))
+            tx = { ...tx, mySign: signature }
             return tx
         } catch (e) {
             console.log(e)
@@ -157,12 +176,14 @@ export default () => {
         }
     }
 
-    const rejectTransaction = async ({ safeAddress, chainId, _nonce } : RejectTransaction) => {
+    const rejectTransaction = async ({ safeAddress, chainId, _nonce, sign} : RejectTransaction) => {
         try {
             const safeSDK = await ImportSafe(provider, safeAddress);
             const transactionObj: any = await safeSDK.createRejectionTransaction(_nonce)
             const safeTxHash = await safeSDK.getTransactionHash(transactionObj);
-            const signature = await safeSDK.signTransactionHash(safeTxHash);
+            let signature: any = sign;
+            if(!signature)
+                signature = await safeSDK.signTransactionHash(safeTxHash);
             const senderAddress = account as string;
             await (await safeService(provider, `${chainId}`))
                 .proposeTransaction({ safeAddress, safeTransactionData: transactionObj.data, safeTxHash, senderAddress, senderSignature: signature.data, })

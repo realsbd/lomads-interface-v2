@@ -24,7 +24,8 @@ export default (props: any) => {
 	
 	if ((authenticated === null) && props.private) {
 		return <FullScreenLoader />
-	} else if ((authenticated === false) && props.private) {
+	} 
+	else if ((authenticated === false) && props.private) {
 		if (window.location.pathname !== '/')
 			window.location.href = `/login?from=${window.location.pathname}`
 		else

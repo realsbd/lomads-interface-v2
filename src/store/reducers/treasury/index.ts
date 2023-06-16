@@ -68,6 +68,11 @@ const TreasuryReducer = (state: any = getInitialState(), action: any) =>
                   ...txn.rawTx, 
                     rejectedTxn: payload.rawTx
                   } }
+              } else if (txn.safeAddress === payload.safeAddress && txn._id === payload?._id) {
+                return { ...txn, rawTx: { 
+                  ...payload.rawTx, 
+                    rejectedTxn: txn?.rawTx?.rejectedTxn || undefined  
+                  } }
               }
               return txn
             })

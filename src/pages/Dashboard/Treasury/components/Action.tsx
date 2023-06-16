@@ -25,11 +25,11 @@ const useStyles = makeStyles((theme: any) => ({
     }
   }));
 
-export default ({ safeAddress, transaction, txnCount, chainId, index, executableNonce,  amount, token, onPostExecution }: any) => {
+export default ({ txnGroup, safeAddress, tokenAddress, transaction, txnCount, chainId, index, executableNonce,  amount, token, onPostExecution }: any) => {
     const classes = useStyles()
-    const { chainId: currentChainId } = useWeb3Auth()
+    const { account, chainId: currentChainId } = useWeb3Auth()
     const { loadSafe } = useSafe()
-    const { confirmTransaction, rejectTransaction, executeTransaction } = useGnosisSafeTransaction()
+    const { confirmTransaction, rejectTransaction, executeTransaction, createSafeTransaction } = useGnosisSafeTransaction()
     const { confirmTransaction: offChainConfirmTransaction, rejectTransaction: offChainRejectTransaction, executeTransaction: offChainExecuteTransaction } = useOffChainTransaction()
 
     const isMultiTxn = useMemo(() => txnCount > 1, [transaction, txnCount])
@@ -39,43 +39,102 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
     const [executeTxLoading, setExecuteTxLoading] = useState(false)
     const [rejectTxLoading, setRejectTxLoading] = useState(false)
 
-    const handleConfirmTransaction = async () => {
-        const safe = loadSafe(safeAddress)
-        if((+safe?.chainId !== +currentChainId) && token !== 'SWEAT') {
-            toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId}/>)
-        } else {
-            try {
-                setConfirmLoading(true)
-                const payload = { safeAddress, chainId, safeTxnHash: transaction?.safeTxHash  }
-                if(transaction?.offChain)
-                    await offChainConfirmTransaction(payload)
-                else
-                    await confirmTransaction(payload)
-                setConfirmLoading(false)
-            } catch(e) {
-                console.log(e)
-                setConfirmLoading(false)
+    const isSafeOwner = useMemo(() => {
+        if(safeAddress && account) {
+            const safe = loadSafe(safeAddress)
+            return Boolean(_find(safe?.owners, (ownr:any) => ownr?.wallet?.toLowerCase() === account.toLowerCase()))
+        }
+        return false
+    }, [safeAddress, account])
+
+    const canPerformAction = useMemo(() => {
+        return (token === 'SWEAT' || isSafeOwner)
+    }, [isSafeOwner, token])
+
+    const moveTxnToOnChain = async (reject: boolean = false) => {
+        try {
+            let payload = {
+                safeAddress,
+                chainId,
+                tokenAddress,
+                send: txnGroup.map((tx:any) => { return { recipient: tx?.to, amount: +tx?.formattedValue } }),
+                offChainTxHash: transaction?.safeTxHash,
+                reject
             }
+            return createSafeTransaction(payload)
+        } catch (e) {
+            console.log(e) 
+            return null
+        }
+    }
+
+    const handleConfirmTransaction = async () => {
+        try {
+            console.log(transaction?.safeTxHash)
+            const safe = loadSafe(safeAddress)
+            if((+safe?.chainId !== +currentChainId) && token !== 'SWEAT') {
+                toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId}/>)
+            } else {
+                setConfirmLoading(true)
+                if(transaction?.offChain && token !== 'SWEAT') {
+                   const onChainTx = await moveTxnToOnChain()
+                   if(!onChainTx) throw 'Unable to move txn to onchain'
+                } else {
+                    try {
+                        setConfirmLoading(true)
+                        const payload = { safeAddress, chainId, safeTxnHash: transaction?.safeTxHash  }
+                        if(transaction?.offChain && token === 'SWEAT')
+                            await offChainConfirmTransaction(payload)
+                        else
+                            await confirmTransaction(payload)
+                        setConfirmLoading(false)
+                    } catch(e) {
+                        console.log(e)
+                        setConfirmLoading(false)
+                    }
+                }
+            }
+        } catch(e) {
+            setConfirmLoading(false)
+            console.log(e)
+            if(typeof e === 'string')
+                toast.error(e)
+            else
+                toast.error(_get(e, 'message', 'Something went wrong'))
         }
     }
 
     const handleRejectTransaction = async () => {
-        const safe = loadSafe(safeAddress)
-        if((+safe?.chainId !== +currentChainId) && token !== 'SWEAT') {
-            toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId}/>)
-        } else {
-            try {
-                setRejectLoading(true)
-                const payload: RejectTransaction = { safeAddress, chainId, _nonce: transaction?.nonce }
-                if(transaction?.offChain)
-                    await offChainRejectTransaction({ ...payload, safeTxnHash: transaction?.rejectionSafeTxHash })
-                else 
-                    await rejectTransaction(payload)
-                setRejectLoading(false)
-            } catch(e) {
-                console.log(e)
-                setRejectLoading(false)
+        try {
+            const safe = loadSafe(safeAddress)
+            if((+safe?.chainId !== +currentChainId) && token !== 'SWEAT') {
+                toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId}/>)
+            } else {
+                try {
+                    setRejectLoading(true)
+                    let payload: RejectTransaction = { safeAddress, chainId, _nonce: transaction?.nonce }
+                    if(transaction?.offChain && token !== 'SWEAT') {
+                        const onChainTx = await moveTxnToOnChain(true)
+                        if(!onChainTx) throw 'Unable to move txn to onchain'
+                        payload = { ...payload, _nonce: onChainTx?.nonce, sign: onChainTx?.mySign }
+                    }
+                    if(transaction?.offChain && token === 'SWEAT')
+                        await offChainRejectTransaction({ ...payload, safeTxnHash: transaction?.rejectionSafeTxHash })
+                    else 
+                        await rejectTransaction(payload)
+                    setRejectLoading(false)
+                } catch(e) {
+                    console.log(e)
+                    setRejectLoading(false)
+                }
             }
+        } catch(e) {
+            setRejectLoading(false)
+            console.log(e)
+            if(typeof e === 'string')
+                toast.error(e)
+            else
+                toast.error(_get(e, 'message', 'Something went wrong'))
         }
     }
 
@@ -114,24 +173,24 @@ export default ({ safeAddress, transaction, txnCount, chainId, index, executable
                                 transaction?.canExecuteTxn ? 
                                 <Tooltip title={!transaction.offChain && (transaction.nonce !== executableNonce) ? `Transaction from safe ${beautifyHexToken(safeAddress)} with nonce ${executableNonce} needs to be executed first` : `Execute nonce ${transaction?.nonce}`} placement="top-start">
                                     <span>
-                                        <Button loading={executeTxLoading} disabled={executeTxLoading || (!transaction.offChain && (transaction.nonce !== executableNonce))} onClick={() => handleExecuteTransaction(transaction?.safeTxHash)} sx={{ height: 30, padding: 0, minWidth: 120, width: 120, fontSize: 14 }} size="small" variant="contained" color="primary">Execute</Button>
+                                        <Button loading={executeTxLoading} disabled={!canPerformAction || executeTxLoading || (!transaction.offChain && (transaction.nonce !== executableNonce))} onClick={() => handleExecuteTransaction(transaction?.safeTxHash)} sx={{ height: 30, padding: 0, minWidth: 120, width: 120, fontSize: 14 }} size="small" variant="contained" color="primary">Execute</Button>
                                     </span>
                                 </Tooltip>
                                  : 
                                 transaction?.canRejectTxn ? 
                                 <Tooltip title={!transaction.offChain && (transaction.nonce !== executableNonce) ? `Transaction from safe ${beautifyHexToken(safeAddress)} with nonce ${executableNonce} needs to be executed first` : `Execute nonce ${transaction?.nonce}`} placement="top-start">
                                     <span>
-                                        <Button loading={executeTxLoading}  disabled={executeTxLoading || (!transaction.offChain && (transaction.nonce !== executableNonce))}  onClick={() => handleExecuteTransaction(transaction?.rejectionSafeTxHash)} sx={{ height: 30, padding: 0, minWidth: 120, width: 120, fontSize: 14 }} size="small" variant="contained" color="primary">Reject</Button> 
+                                        <Button loading={executeTxLoading}  disabled={!canPerformAction || executeTxLoading || (!transaction.offChain && (transaction.nonce !== executableNonce))}  onClick={() => handleExecuteTransaction(transaction?.rejectionSafeTxHash)} sx={{ height: 30, padding: 0, minWidth: 120, width: 120, fontSize: 14 }} size="small" variant="contained" color="primary">Reject</Button> 
                                     </span>
                                  </Tooltip>
                                 : null
                             }
                         </Box> : 
                         <Box display="flex" flexDirection="row" alignItems="center" justifyContent="flex-end">
-                            <Button onClick={() => handleRejectTransaction()} style={{ padding: 0, minWidth: 30, maxWidth: 30, width: 30, height: 30 }} color="primary" variant="outlined" disabled={transaction?.hasMyRejection || rejectLoading} size="small">
+                            <Button onClick={() => handleRejectTransaction()} style={{ padding: 0, minWidth: 30, maxWidth: 30, width: 30, height: 30 }} color="primary" variant="outlined" disabled={!canPerformAction || transaction?.hasMyRejection || rejectLoading} size="small">
                                 { rejectLoading ? <LeapFrog size={10} color="#C94B32" /> : <CloseIcon style={{ fontSize: 16 }} /> }
                             </Button>
-                            <Button onClick={() => handleConfirmTransaction()} sx={{ ml: 1 }} color="primary" variant="contained" style={{ padding: 0, minWidth: 30, maxWidth: 30, width: 30, height: 30 }} disabled={transaction?.hasMyConfirmation || confirmLoading} size="small">
+                            <Button onClick={() => handleConfirmTransaction()} sx={{ ml: 1 }} color="primary" variant="contained" style={{ padding: 0, minWidth: 30, maxWidth: 30, width: 30, height: 30 }} disabled={!canPerformAction || transaction?.hasMyConfirmation || confirmLoading} size="small">
                                 { confirmLoading ? <LeapFrog size={10} color="#C94B32" /> : <CheckIcon style={{ fontSize: 16 }} /> }
                             </Button>
                         </Box>

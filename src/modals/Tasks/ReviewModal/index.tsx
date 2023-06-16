@@ -166,7 +166,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
     const [rejectionNote, setRejectionNote] = useState('');
     const [rejectionNoteError, setRejectionNoteError] = useState('');
 
-    const { isSafeOwner } = useRole(DAO, account, Task?.compensation?.safeAddress || _get(DAO, 'safes[0].safeAddress', null));
+    const { isSafeOwner } = useRole(DAO, account, Task?.compensation?.safeAddress || _get(DAO, 'safes[0].address', null));
     const { loadSafe } = useSafe();
     const { createSafeTransaction } = useGnosisSafeTransaction();
     const { createSafeTransaction: createOffChainSafeTransaction } = useOffChainTransaction();
@@ -178,8 +178,9 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
     }, [Task])
 
     const handleApproveTask = async () => {
-        const safeAddress = Task?.compensation?.safeAddress || _get(DAO, 'safes[0].safeAddress', null)
+        const safeAddress = Task?.compensation?.safeAddress || _get(DAO, 'safes[0].address', null)
         const safe = loadSafe(safeAddress);
+        console.log("safeAddress", safeAddress)
         if(!safeAddress) return;
 
         try {
@@ -199,7 +200,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                 chainId: safe?.chainId,
                 safeAddress: safeAddress,
                 tokenAddress: _get(Task, 'compensation.currency', 'SWEAT'),
-                send: [{ recipient: activeSubmission.member.wallet, amount: newCompensation, label: `${m} | ${_get(Task, 'name', '')}` || undefined, tag, taskId: Task?._id }],
+                send: [{ recipient: activeSubmission.member.wallet, amount: newCompensation, label: `${beautifyHexToken(m)} | ${_get(Task, 'name', '')}` || undefined, tag, taskId: Task?._id }],
                 daoId: _get(DAO, '_id', null),
                 isSafeOwner: Boolean(isSafeOwner)
             })
