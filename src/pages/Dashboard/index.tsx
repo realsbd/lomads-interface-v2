@@ -39,7 +39,7 @@ export default () => {
     const { myRole, can } = useRole(DAO, account, undefined)
     // @ts-ignore
     const { setProjectLoading, Project } = useAppSelector(store => store.project);
-    const [openProfile, setOpenProfile] = useState(!false);
+
 
     // const send = async () => {
     //     try {
@@ -65,13 +65,6 @@ export default () => {
 
     return (
         <Grid container>
-            <Grid item sm={12}>
-                <ProfileModal
-                    open={openProfile}
-                    closeModal={() => setOpenProfile(false)}
-                />
-                <Button onClick={() => setOpenProfile(true)}>Open Profile</Button>
-            </Grid>
             <Grid item sm={12}>
                 <Links />
             </Grid>
