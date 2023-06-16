@@ -20,6 +20,7 @@ import useRole from 'hooks/useRole';
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { useSafeTokens } from 'context/safeTokens';
 import Avatar from 'components/Avatar';
+import ProfileModal from 'modals/Profile/ProfileModal';
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -108,6 +109,8 @@ export default ({ children, options = true, ...props }: any) => {
 	const open = Boolean(anchorEl);
 	const handleClick = (event: any) => setAnchorEl(event.currentTarget);
 	const handleClose = () => setAnchorEl(null);
+
+	const [openProfile, setOpenProfile] = useState(false);
 
 	useEffect(() => {
 		if (account) {
@@ -208,15 +211,18 @@ export default ({ children, options = true, ...props }: any) => {
 
 	return (
 		<Box display="flex" position="relative">
-			<Box id="account-options" {...props}
-				onClick={handleClick} className={classes.root}>
-				<Box sx={{ pl: 2 }} display="flex" flexDirection="row" alignItems="center" flexGrow={1}>
+			<ProfileModal
+				open={openProfile}
+				closeModal={() => setOpenProfile(false)}
+			/>
+			<Box id="account-options" {...props} className={classes.root}>
+				<Box sx={{ pl: 2 }} display="flex" flexDirection="row" alignItems="center" flexGrow={1} onClick={() => setOpenProfile(true)}>
 					<Avatar
 						name={user?.name}
 						wallet={account}
 					/>
 				</Box>
-				<Box sx={{ p: 2 }} className={classes.dropdown}>
+				<Box sx={{ p: 2 }} className={classes.dropdown} onClick={handleClick}>
 					<IconButton disabled>
 						<ExpandMoreIcon />
 					</IconButton>

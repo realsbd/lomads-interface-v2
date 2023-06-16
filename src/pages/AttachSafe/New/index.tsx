@@ -425,30 +425,30 @@ const useStyles = makeStyles((theme: any) => ({
 export default () => {
 	const classes = useStyles()
 	const location = useLocation();
-    //@ts-ignore
-    const { user } = useAppSelector(store => store.session)
+	//@ts-ignore
+	const { user } = useAppSelector(store => store.session)
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { daoURL } = useParams()
 	const { DAO } = useDAO();
-    const { getENSAddress, getENSName } = useENS();
+	const { getENSAddress, getENSName } = useENS();
 	const { provider, account, chainId } = useWeb3Auth();
-    const [polygonGasEstimate, setPolygonGasEstimate] = useState<any>();
-    const [errors, setErrors] = useState<any>({})
-    const [memberPlaceholder, setMemberPlaceholder] = useState<any>({})
-    const [validSafeDetails, setValidSafeDetails] = useState<boolean>(false);
-    const [state, setState] = useState<any>({})
-    const [isLoading, setisLoading] = useState<boolean>(false)
+	const [polygonGasEstimate, setPolygonGasEstimate] = useState<any>();
+	const [errors, setErrors] = useState<any>({})
+	const [memberPlaceholder, setMemberPlaceholder] = useState<any>({})
+	const [validSafeDetails, setValidSafeDetails] = useState<boolean>(false);
+	const [state, setState] = useState<any>({})
+	const [isLoading, setisLoading] = useState<boolean>(false)
 
-    useEffect(() => {
-        setState((prev: any) => {
-            return {
-                ...prev, 
-                members: [{ name: user?.name || '', address: user?.wallet || account }],
-                threshold: 1
-            }
-        })
-    }, [])
+	useEffect(() => {
+		setState((prev: any) => {
+			return {
+				...prev,
+				members: [{ name: user?.name || '', address: user?.wallet || account }],
+				threshold: 1
+			}
+		})
+	}, [])
 
 	useEffect(() => {
 		if (chainId && +chainId === SupportedChainId.POLYGON) {
@@ -457,19 +457,19 @@ export default () => {
 		}
 	}, [chainId])
 
-    const handleValidSafeDetails = () => {
+	const handleValidSafeDetails = () => {
 		let terrors: any = {};
 		if (!state.safeName || state.safeName === '') {
 			terrors.safeName = " * Multi-sig Wallet Name is required";
 		}
 		if (_.isEmpty(terrors)) {
-            setValidSafeDetails(true)
+			setValidSafeDetails(true)
 		} else {
 			setErrors(terrors);
 		}
-    }
+	}
 
-    const addMember = (_ownerName: string, _ownerAddress: string, _ownerRole: string) => {
+	const addMember = (_ownerName: string, _ownerAddress: string, _ownerRole: string) => {
 		return new Promise(async (resolve, reject) => {
 			let member = { name: _ownerName, address: _ownerAddress, role: _ownerRole };
 			if (_ownerAddress.slice(-4) === ".eth") {
@@ -496,19 +496,19 @@ export default () => {
 			}
 			if (isRightAddress(member.address)) {
 				const newMembers = [...state?.members, member];
-                setState((prev: any) => { return { ...prev, members: newMembers } })
-                setMemberPlaceholder({ name: '', address: '' })
+				setState((prev: any) => { return { ...prev, members: newMembers } })
+				setMemberPlaceholder({ name: '', address: '' })
 			}
 			resolve(true);
 		})
 	};
 
-    const handleAddNewMember = ({ address, name }: any) => {
-        let terrors: any = {};
+	const handleAddNewMember = ({ address, name }: any) => {
+		let terrors: any = {};
 		if (!isAddressValid(address)) {
 			terrors.ownerAddress = " * address is not correct.";
 		}
-		if (_find(state?.members, (member:any) => member.address === address)) {
+		if (_find(state?.members, (member: any) => member.address === address)) {
 			terrors.ownerAddress = " * address already exists.";
 		}
 		if (_isEmpty(terrors)) {
@@ -517,7 +517,7 @@ export default () => {
 		else {
 			setErrors(terrors);
 		}
-    }
+	}
 
 
 	const waitFor = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -544,7 +544,7 @@ export default () => {
 		return retryWithBackoff(0);
 	}
 
-    const hasNewSafe = async (currentSafes: any) => {
+	const hasNewSafe = async (currentSafes: any) => {
 		try {
 			const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
 			if (latestSafes.length > currentSafes.length)
@@ -556,43 +556,43 @@ export default () => {
 		}
 	}
 
-    const runAfterCreation = async (addr: string, owners: any) => {
+	const runAfterCreation = async (addr: string, owners: any) => {
 		console.log("runAfterCreation", "safe addr", addr)
 		if (!addr) return;
 		const value = state?.members?.reduce((final: any, current: any) => {
-            let object = final.find(
-                (item: any) => item.address === current.address
-            );
-            if (object) {
-                return final;
-            }
-            return final.concat([current]);
-        }, []);
-        const params = {
-            members: value.map((m: any) => {
-                return {
-                    ...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
-                }
-            }),
-            safe: {
-                name: state?.safeName,
-                address: addr,
-                owners: owners,
-				threshold: state?.threshold, 
-                chainId: state?.selectedChainId
-            }
-        }
-        axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
-        .then(res => {
-			if(location?.state?.createFlow)
-            	window.location.href = `/${daoURL}/welcome`
-			else
-				window.location.href = `/${daoURL}/settings`
-        })
+			let object = final.find(
+				(item: any) => item.address === current.address
+			);
+			if (object) {
+				return final;
+			}
+			return final.concat([current]);
+		}, []);
+		const params = {
+			members: value.map((m: any) => {
+				return {
+					...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
+				}
+			}),
+			safe: {
+				name: state?.safeName,
+				address: addr,
+				owners: owners,
+				threshold: state?.threshold,
+				chainId: state?.selectedChainId
+			}
+		}
+		axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
+			.then(res => {
+				if (location?.state?.createFlow)
+					window.location.href = `/${daoURL}/welcome`
+				else
+					window.location.href = `/${daoURL}/settings`
+			})
 		setisLoading(false);
 	}
 
-    const checkNewSafe = async (currentSafes: any, owners: any) => {
+	const checkNewSafe = async (currentSafes: any, owners: any) => {
 		const latestSafes = await retry(
 			() => hasNewSafe(currentSafes),
 			() => { console.log('retry called...') },
@@ -610,30 +610,30 @@ export default () => {
 		}
 	}
 
-    const deployNewSafe = async () => {
-		if(!chainId) return;
-		if(+state?.selectedChainId !== +chainId) {
-            toast.custom(t => <SwitchChain t={t} nextChainId={+state?.selectedChainId}/>)
-        } else {
+	const deployNewSafe = async () => {
+		if (!chainId) return;
+		if (+state?.selectedChainId !== +chainId) {
+			toast.custom(t => <SwitchChain t={t} nextChainId={+state?.selectedChainId} />)
+		} else {
 			try {
-                setisLoading(true);
+				setisLoading(true);
 				const safeOwner = provider?.getSigner(0);
 				const ethAdapter = new EthersAdapter({
 					ethers,
 					signerOrProvider: safeOwner as any,
 				});
-				const safeFactory = await SafeFactory.create({ethAdapter});
+				const safeFactory = await SafeFactory.create({ ethAdapter });
 				const owners: any = state?.members?.map((result: any) => result.address);
 				const threshold: number = state?.threshold;
 				const safeAccountConfig: SafeAccountConfig = { owners, threshold };
-		
+
 				let currentSafes: Array<string> = []
 				if (chainId === SupportedChainId.POLYGON)
 					currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
 				await safeFactory
 					.deploySafe({ safeAccountConfig })
 					.then(async (tx) => {
-                        console.log("txn txn", tx)
+						console.log("txn txn", tx)
 						const value = state?.members?.reduce((final: any, current: any) => {
 							let object = final.find(
 								(item: any) => item.address === current.address
@@ -643,28 +643,28 @@ export default () => {
 							}
 							return final.concat([current]);
 						}, []);
-                        const params = {
-                            members: value.map((m: any) => {
-                                return {
-                                    ...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
-                                }
-                            }),
-                            safe: {
-                                name: state?.safeName,
-                                address: tx.getAddress(),
-                                owners: owners,
-								threshold: state?.threshold, 
-                                chainId: state?.selectedChainId
-                            }
-                        }
-                        axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
-                        .then(res => {
-                            setisLoading(false);
-							if(location?.state?.createFlow)
-								window.location.href = `/${daoURL}/welcome`
-							else
-								window.location.href = `/${daoURL}/settings`
-                        })
+						const params = {
+							members: value.map((m: any) => {
+								return {
+									...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
+								}
+							}),
+							safe: {
+								name: state?.safeName,
+								address: tx.getAddress(),
+								owners: owners,
+								threshold: state?.threshold,
+								chainId: state?.selectedChainId
+							}
+						}
+						axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
+							.then(res => {
+								setisLoading(false);
+								if (location?.state?.createFlow)
+									window.location.href = `/${daoURL}/welcome`
+								else
+									window.location.href = `/${daoURL}/settings`
+							})
 					})
 					.catch(async (err) => {
 						console.log("An error occured while creating safe", err);
@@ -681,9 +681,9 @@ export default () => {
 		}
 	};
 
-    const deployNewSafeDelayed = useCallback(_debounce(deployNewSafe, 1000), [deployNewSafe])
+	const deployNewSafeDelayed = useCallback(_debounce(deployNewSafe, 1000), [deployNewSafe])
 
-    const SelectThreshold = () => {
+	const SelectThreshold = () => {
 		return (
 			<>
 				<Box className={classes.bottomLine} />
@@ -694,12 +694,12 @@ export default () => {
 						</Typography>
 					</Box>
 					<Box className={classes.selectionArea}>
-						<Box style={{ width: 109}}>
+						<Box style={{ width: 109 }}>
 							<Select
 								selected={state?.threshold}
 								options={state?.members?.map((item: any, index: number) => ({ label: index + 1, value: index + 1 }))}
 								setSelectedValue={(value) => {
-                                    setState((prev: any) => { return { ...prev, threshold: +value } })
+									setState((prev: any) => { return { ...prev, threshold: +value } })
 								}}
 							/>
 						</Box>
@@ -724,7 +724,14 @@ export default () => {
 		);
 	};
 
-    const InviteMembersBlock = () => {
+	const deleteMember = (_address: any) => {
+
+		let deleteMember = [...state.members];
+		deleteMember = deleteMember.filter((item) => item.address !== _address);
+		setState((prev: any) => { return { ...prev, members: deleteMember } })
+	};
+
+	const InviteMembersBlock = () => {
 		return (
 			<>
 				<Box className={classes.bottomLine} />
@@ -745,24 +752,24 @@ export default () => {
 								<TextInput
 									sx={{ height: 50, width: 144 }}
 									placeholder="Name"
-                                    value={memberPlaceholder.name}
-									onChange={(e: any) => setMemberPlaceholder((prev:any) => { return { ...prev, name: e.target.value } })}
+									value={memberPlaceholder.name}
+									onChange={(e: any) => setMemberPlaceholder((prev: any) => { return { ...prev, name: e.target.value } })}
 								/>
 							</Box>
 							<Box sx={{ marginRight: '10px' }}>
 								<TextInput
 									sx={{ height: 50, width: 251 }}
 									placeholder="ENS Domain and Wallet Address"
-                                    value={memberPlaceholder.address}
-									onChange={(e: any) => setMemberPlaceholder((prev:any) => { return { ...prev, address: e.target.value } })}
+									value={memberPlaceholder.address}
+									onChange={(e: any) => setMemberPlaceholder((prev: any) => { return { ...prev, address: e.target.value } })}
 									error={!!errors.ownerAddress}
 									helperText={errors.ownerAddress}
 								/>
 							</Box>
 							<Box>
 								<IconButton onClick={() => handleAddNewMember(memberPlaceholder)} sx={{ width: 50, height: 50 }}>
-                                    <img src={memberPlaceholder?.name && memberPlaceholder?.address ? plusIcon : GreyAddIcon} alt={"add plus"} />
-                                </IconButton>
+									<img src={memberPlaceholder?.name && memberPlaceholder?.address ? plusIcon : GreyAddIcon} alt={"add plus"} />
+								</IconButton>
 							</Box>
 						</Box>
 					</Box>
@@ -773,7 +780,7 @@ export default () => {
 									return (
 										<Box key={index} className={classes.owner}>
 											<Box className={classes.avatarPlusName}>
-												<Avatar name={result.name} wallet={result.address}/>
+												<Avatar name={result.name} wallet={result.address} />
 												{/* <img src={daoMember2} alt={result.address} />
 												<Typography variant="body1" className={classes.nameText}>{result.name}</Typography> */}
 											</Box>
@@ -790,7 +797,7 @@ export default () => {
 													<IconButton
 														className={classes.deleteButton}
 														onClick={() => {
-															//deleteMember(result.address);
+															deleteMember(result.address);
 														}}
 													>
 														<img src={closeOrange} alt="close-svg" />
@@ -814,50 +821,50 @@ export default () => {
 		<Container>
 			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
-					{ !DAO ? 
-					  <Skeleton variant="text" sx={{ mb: 2 }} className={classes.headerText} width={400} /> :
-					  <Box className={classes.headerText}>{ !location?.state?.createFlow  ? '' : '2/2'} Organisation Multi-sig Wallet</Box> 
+					{!DAO ?
+						<Skeleton variant="text" sx={{ mb: 2 }} className={classes.headerText} width={400} /> :
+						<Box className={classes.headerText}>{!location?.state?.createFlow ? '' : '2/2'} Organisation Multi-sig Wallet</Box>
 					}
 					<Box className={classes.buttonArea}>
 						<Box>
-							{ !DAO ? 
-							<Skeleton variant="rounded" width={228} height={50} /> :
-							<Button
-								sx={{
-									color: "#C94B32",
-									backgroundColor: "#FFFFFF",
-									fontWeight: 400,
-									minWidth: 'max-content',
-									width: 228,
-									boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
-								}}
-								variant='contained'>
-								CREATE
-							</Button>
+							{!DAO ?
+								<Skeleton variant="rounded" width={228} height={50} /> :
+								<Button
+									sx={{
+										color: "#C94B32",
+										backgroundColor: "#FFFFFF",
+										fontWeight: 400,
+										minWidth: 'max-content',
+										width: 228,
+										boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
+									}}
+									variant='contained'>
+									CREATE
+								</Button>
 							}
 						</Box>
 						<Box className={classes.centerText}>or</Box>
 						<Box>
-							{ !DAO ? <Skeleton variant="rounded" width={228} height={50} /> :
+							{!DAO ? <Skeleton variant="rounded" width={228} height={50} /> :
 								<Button
-								sx={{
-									backgroundColor: "#FFFFFF",
-									minWidth: 'max-content',
-									fontWeight: 400,
-									opacity: 0.6,
-									color: 'rgba(201, 75, 50, 0.6)',
-									width: 228
-								}}
-								onClick={() => {
-									navigate(`/${daoURL}/attach-safe/existing`, location?.state?.createFlow ? { state: { createFlow: true } } : {})
-								}}
-								variant='contained'>
-								ADD EXISTING
-							</Button> }
+									sx={{
+										backgroundColor: "#FFFFFF",
+										minWidth: 'max-content',
+										fontWeight: 400,
+										opacity: 0.6,
+										color: 'rgba(201, 75, 50, 0.6)',
+										width: 228
+									}}
+									onClick={() => {
+										navigate(`/${daoURL}/attach-safe/existing`, location?.state?.createFlow ? { state: { createFlow: true } } : {})
+									}}
+									variant='contained'>
+									ADD EXISTING
+								</Button>}
 						</Box>
 					</Box>
 					<Box className={classes.bottomLine} />
-					{ !DAO ? <Skeleton variant="rectangular" height={200} className={classes.centerCardSkeleton} /> : 
+					{!DAO ? <Skeleton variant="rectangular" height={200} className={classes.centerCardSkeleton} /> :
 						<Box className={classes.centerCard}>
 							<Box className={classes.inputFieldTitle}>Select Chain</Box>
 							<Select
@@ -874,11 +881,11 @@ export default () => {
 								placeholder="Pied Piper"
 								onChange={(e: any) => { setState((prev: any) => { return { ...prev, safeName: e.target.value } }) }}
 							/>
-						</Box> }
-                    { !validSafeDetails ? 
-                        !DAO ? <Skeleton width={184} height={50} variant="rounded"/> : <Button onClick={() => handleValidSafeDetails()} variant='contained'>CONTINUE</Button> : 
-                        InviteMembersBlock()
-                    }
+						</Box>}
+					{!validSafeDetails ?
+						!DAO ? <Skeleton width={184} height={50} variant="rounded" /> : <Button onClick={() => handleValidSafeDetails()} variant='contained'>CONTINUE</Button> :
+						InviteMembersBlock()
+					}
 				</Box>
 			</Grid>
 		</Container>
