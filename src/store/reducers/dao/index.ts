@@ -16,6 +16,7 @@ export function getInitialState() {
 		updateDaoMembersLoading: null,
 		syncTrelloDataLoading: null,
 		storeGithubIssuesLoading: null,
+		deSyncGithubLoading: null,
 	};
 }
 
@@ -91,6 +92,10 @@ const DAOReducer = (state: any = getInitialState(), action: any) =>
 			}
 			case actionTypes.STORE_GITHUB_ISSUES_LOADING: {
 				draft.storeGithubIssuesLoading = payload;
+				break;
+			}
+			case actionTypes.DESYNC_GITHUB_LOADING: {
+				draft.deSyncGithubLoading = payload;
 				break;
 			}
 			case actionTypes.LOGOUT_ACTION: {
