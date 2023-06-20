@@ -713,7 +713,7 @@ export default () => {
 				</Typography>
 				<Box className={classes.safeFooter}>
 					You’re about to create a new safe and will have to confirm a
-					transaction with your curentry connected wallet.
+					transaction with your curently connected wallet.
 					<Typography variant="body1" className={classes.boldText}>
 						{chainId && +chainId === SupportedChainId.POLYGON && polygonGasEstimate ? `The creation will cost approximately ${polygonGasEstimate?.standard?.maxFee} GWei.` : `The creation will cost approximately 0.01256 GOR.`}
 					</Typography>

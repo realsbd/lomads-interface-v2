@@ -112,7 +112,7 @@ export default () => {
             const balance = tokenBalance(tokenAddress, safeAddress);
             if (balance < total)
                 throw `Low token balance. Available balance in safe ${beautifyHexToken(safeAddress)} is ${balance} ${safeToken?.token?.symbol}`
-            let safeTransactionData = null;
+            let safeTransactionData: any = null;
             const safeSDK = await ImportSafe(provider, safeAddress);
             if (tokenAddress === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {
                 if(send.length === 1)
@@ -128,6 +128,7 @@ export default () => {
                 safeTransactionData,
                 options,
             });
+            await new Promise(resolve => setTimeout(resolve, 2000))
             const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
             signature = await safeSDK.signTransactionHash(safeTxHash);
             const senderAddress = account as string;
@@ -214,7 +215,7 @@ export default () => {
         try {
             const safeSDK = await ImportSafe(provider, safeAddress);
             const txn = await (await safeService(provider, `${chainId}`)).getTransaction(safeTxnHash)
-            const safeTransactionData: SafeTransactionData = {
+            const safeTransactionData: any = {
                 to: txn.to,
                 value: txn.value,
                 data: txn?.data ? txn?.data : "0x",
@@ -268,7 +269,7 @@ export default () => {
 
             const currentNonce = await (await safeService(provider, `${chainId}`)).getNextNonce(safeAddress);
 
-            const options: SafeTransactionOptionalProps = { nonce: currentNonce };
+            const options: any = { nonce: currentNonce };
 
             const newOwnerTxnData: SafeTransactionDataPartial[] = await Promise.all(
                 newOwners.map(async (owner: string) => {

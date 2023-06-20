@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { get as _get, find as _find } from 'lodash';
+import { get as _get, find as _find, uniq as _uniq } from 'lodash';
 import axios from "axios";
 import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from 'constants/chains';
 import { CHAIN_INFO } from "constants/chainInfo";
@@ -96,7 +96,7 @@ export const SafeTokensProvider = ({ children }: any) => {
                         owners = owners.concat(element['owners'])
                     }
                     setSafeTokens(tokens)
-                    await axiosHttp.patch(`dao/${DAO.url}/sync-safe-owners`, owners)
+                    await axiosHttp.patch(`dao/${DAO.url}/sync-safe-owners`, _uniq(owners))
                 })
                 .catch(e => console.log(e))
         }

@@ -6,7 +6,10 @@ import * as actionTypes from 'store/actionTypes';
 export function getInitialState() {
   return {
     treasuryLoading: null,
-    treasury: null
+    treasury: null,
+    recurringPayments: null,
+    recurringPaymentsLoading: null,
+    createRecurringPaymentsLoading: null
   };
 }
 
@@ -87,6 +90,23 @@ const TreasuryReducer = (state: any = getInitialState(), action: any) =>
             }
             return txn
           })
+          break;
+        }
+        case actionTypes.SET_RECURRING_PAYMENTS: {
+          draft.recurringPayments = payload
+          draft.recurringPaymentsLoading = null
+          break;
+        }
+        case actionTypes.LOAD_RECURRING_PAYMENTS_LOADING: {
+          draft.recurringPaymentsLoading = payload
+          break;
+        }
+        case actionTypes.CREATE_RECURRING_PAYMENT_LOADING: {
+          draft.createRecurringPaymentsLoading = payload
+          break;
+        }
+        case actionTypes.CREATE_RECURRING_PAYMENT_SUCCESS: {
+          draft.recurringPayments = [ ...draft?.recurringPayments, payload ]
           break;
         }
         case actionTypes.LOGOUT_ACTION: {

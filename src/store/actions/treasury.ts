@@ -34,3 +34,17 @@ export const syncSafeAction = (payload: any) => {
         payload
     } 
 }
+
+export const loadRecurringPaymentsAction = (payload: any) => {
+    return {
+        type: actionTypes.LOAD_RECURRING_PAYMENTS_ACTION,
+        payload
+    }
+}
+
+export const createRecurringPaymentAction  = (payload: any) => {
+    return {
+        type: actionTypes.CREATE_RECURRING_PAYMENT_ACTION,
+        payload
+    }
+}

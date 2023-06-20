@@ -18,7 +18,6 @@ import useEncryptDecrypt from "hooks/useEncryptDecrypt";
 import { updateCurrentUser } from "store/actions/session";
 import { useParams } from "react-router-dom";
 import { updateProjectLinkAction } from "store/actions/project";
-import SwitchChain from "components/SwitchChain";
 import { toast } from "react-hot-toast";
 import { LeapFrog } from "@uiball/loaders";
 const { toChecksumAddress } = require('ethereum-checksum-address')
@@ -152,8 +151,6 @@ export default ({ link, key }: ProjectLinkCardProps) => {
     const unlock = useCallback(async (link: any, update = true) => {
         //if (unlockLoading) return;
         setUnlockLoading(link?.id)
-        if(chainId !== +DAO?.sbt?.chainId) 
-            return toast.custom(t => <SwitchChain t={t} nextChainId={+DAO?.sbt?.chainId}/>)
         console.log(_uniqBy(Project?.members, '_id'))
         let memberExists = _find(_uniqBy(Project?.members, '_id'), (member:any) => member?.wallet?.toLowerCase() === account?.toLowerCase())
         console.log("memberExists", memberExists)

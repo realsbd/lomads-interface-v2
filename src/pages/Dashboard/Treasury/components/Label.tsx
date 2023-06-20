@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { updateTxLabelAction } from "store/actions/treasury";
 
-export default ({ transaction, recipient }: any) => {
+export default ({ transaction, recipient, defaultLabel }: any) => {
     console.log("transaction", transaction, recipient)
     const textfieldRef = useRef<any>()
     const dispatch = useAppDispatch()
@@ -43,7 +43,7 @@ export default ({ transaction, recipient }: any) => {
     return (
         <TableCell>
             <Box>
-                { !label || editable ? 
+                { (!defaultLabel && !label) || editable ? 
                     <TextInput 
                         ref={textfieldRef}
                         autoFocus={editable}
@@ -61,7 +61,7 @@ export default ({ transaction, recipient }: any) => {
                             }
                         }}
                     /> : 
-                    <Typography onClick={() => setEditable(true)}>{ label }</Typography> 
+                    <Typography onClick={() => transaction ? setEditable(true) : undefined}>{ defaultLabel ? defaultLabel : label }</Typography> 
                 }
             </Box>
         </TableCell>

@@ -334,8 +334,8 @@ export default ({ children }: any) => {
             })
           }
           <Box onClick={() => navigate('/organisation/create')} className={classes.stripItem}>
-            <Box className={classes.invertedBox} sx={{ backgroundColor: 'transparent' }}>
-              <Typography className={classes.create}>+</Typography>
+            <Box className={classes.invertedBox} sx={{ backgroundColor: palette.primary.main }}>
+              <Typography className={classes.create} style={{ color: '#FFF' }}>+</Typography>
             </Box>
             <Typography className={classes.daoText}>CREATE</Typography>
           </Box>
