@@ -14,6 +14,7 @@ import {
 import { Image } from "@chakra-ui/react";
 import CloseSVG from 'assets/svg/close-new.svg'
 import Integrations from "assets/svg/Integrations.svg"
+import bin from 'assets/svg/bin.svg'
 import GreyIconHelp from "assets/svg/GreyIconHelp.svg"
 import Integrationtrello from "assets/svg/Integrationtrello.svg"
 import Integrationgithub from "assets/svg/Integrationgithub.svg"
@@ -33,16 +34,17 @@ import useInterval from "hooks/useInterval";
 import usePopupWindow from 'hooks/usePopupWindow';
 import axios from 'axios';
 import IconButton from 'components/IconButton';
-import { setDAOAction, storeGithubIssuesAction, syncTrelloDataAction } from 'store/actions/dao';
+import { deSyncGithubAction, setDAOAction, storeGithubIssuesAction, syncTrelloDataAction } from 'store/actions/dao';
 import { useDAO } from "context/dao";
 
 const useStyles = makeStyles((theme: any) => ({
     card: {
         height: '60px !important',
+        width: '100% !important',
         display: 'flex !important',
         alignItems: 'center !important',
         justifyContent: 'space-between !important',
-        marginBottom: '20px !important',
+        // marginBottom: '20px !important',
         boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1) !important',
         borderRadius: '5px !important',
         padding: '0 15px !important'
@@ -50,11 +52,12 @@ const useStyles = makeStyles((theme: any) => ({
     cardDisabled: {
         background: '#d4e5d2 !important',
         opacity: 0.7,
+        width: '100% !important',
         height: '60px !important',
         display: 'flex !important',
         alignItems: 'center !important',
         justifyContent: 'space-between !important',
-        marginBottom: '20px !important',
+        // marginBottom: '20px !important',
         borderRadius: '5px !important',
         boxShadow: 'none !important',
         padding: '0 15px !important'
@@ -96,7 +99,7 @@ const IntegrationModal = ({ open, onClose }:
     const [expandDiscord, setExpandDiscord] = useState(false)
     const [expandGitHub, setExpandGitHub] = useState(false)
     const [isGitHubConnected, setGitHubConnected] = useState(false)
-    const [gitHubLoading, setGitHubLoading] = useState(false)
+    const [gitHubLoading, setGitHubLoading] = useState(false);
     const [gitHubAccessToken, setGitHubAccessToken] = useState(false)
     const [selectedGitHubLink, setSelectedGitHubLink] = useState({ id: null, url: '', full_name: '', name: '' })
     const [gitHubOrganizationList, setGitHubOrganizationList] = useState([])
@@ -123,6 +126,8 @@ const IntegrationModal = ({ open, onClose }:
     const prevActiveAddBotPopup = usePrevious(activeAddBotPopup)
     const prevIsAuthenticatingDiscord = usePrevious(isAuthenticatingDiscord)
 
+    const [reAuthGithub, setReAuthGithub] = useState(false);
+
     useEffect(() => {
         if (syncTrelloDataLoading === false) {
             setBoardsLoading(false);
@@ -130,8 +135,14 @@ const IntegrationModal = ({ open, onClose }:
     }, [syncTrelloDataLoading]);
 
     useEffect(() => {
-        if (((prevAuth == undefined && authorization) || (prevAuth && authorization && prevAuth !== authorization)) && hasClickedAuth) {
+        if (((prevAuth == undefined && authorization) || (prevAuth && authorization && prevAuth !== authorization)) && hasClickedAuth && !reAuthGithub) {
             authorizeGitHub()
+        }
+    }, [prevAuth, authorization, hasClickedAuth])
+
+    useEffect(() => {
+        if (((prevAuth == undefined && authorization) || (prevAuth && authorization && prevAuth !== authorization)) && hasClickedAuth && reAuthGithub) {
+            reAuthorizeGitHub()
         }
     }, [prevAuth, authorization, hasClickedAuth])
 
@@ -216,7 +227,6 @@ const IntegrationModal = ({ open, onClose }:
         }
 
     }
-
     const generateGitHubAccessToken = (response: any) => {
         setGitHubLoading(true);
         console.log(response.code, '...github response.code...')
@@ -245,6 +255,44 @@ const IntegrationModal = ({ open, onClose }:
                 setGitHubLoading(false);
             })
     }
+
+    const reAuthorizeGitHub = () => {
+        console.log("reauthorise")
+        setHasClickedAuth(true);
+        try {
+            if (!authorization)
+                return onOpen()
+            setHasClickedAuth(false);
+            reGenerateGitHubAccessToken({ code: authorization })
+        }
+        catch (e) {
+            console.log(e)
+        }
+
+    }
+
+    const reGenerateGitHubAccessToken = (response: any) => {
+        axiosHttp.get(`utility/getGithubAccessToken?code=${response.code}`)
+            .then((res) => {
+                if (res.data) {
+                    dispatch(deSyncGithubAction({
+                        payload:
+                        {
+                            repoInfo: selectedGitHubLink.full_name,
+                            daoId: _get(DAO, '_id', null),
+                            webhookId: _get(DAO, `github.${selectedGitHubLink.full_name}`, '').webhookId,
+                            token: res.data.access_token
+                        }
+                    }))
+                }
+                onResetAuth();
+            })
+            .catch((e) => {
+                onResetAuth();
+            })
+    }
+
+
 
     const getGitHubRepos = (token: any) => {
         const AuthStr = 'Bearer '.concat(token);
@@ -289,6 +337,33 @@ const IntegrationModal = ({ open, onClose }:
                     setGitHubLoading(false);
                 }
             })
+    }
+
+    const deSyncGithub = (item: any) => {
+        setSelectedGitHubLink(item)
+        axiosHttp.post(`utility/requiresGitAuthentication`, {
+            repoInfo: item.full_name,
+        })
+            .then((res) => {
+                // regenerate auth token
+                if (res.data.requires) {
+                    setReAuthGithub(true);
+                    reAuthorizeGitHub();
+                }
+                else {
+                    dispatch(deSyncGithubAction({
+                        payload:
+                        {
+                            repoInfo: item.full_name,
+                            daoId: _get(DAO, '_id', null),
+                        }
+                    }))
+                }
+            })
+            .catch((err) => {
+                console.log("error : ", err);
+            })
+
     }
 
     const getDiscordServers = useCallback(async () => {
@@ -577,29 +652,37 @@ const IntegrationModal = ({ open, onClose }:
             return <>
                 {gitHubOrganizationList.length ? gitHubOrganizationList.map((item: any) => {
                     return (
-                        <Card className={isGitHubItemConnected(item) ? classes.cardDisabled : classes.card}>
-                            <CardContent>
-                                <Typography sx={{ fontSize: 14 }}>
-                                    {item.name}
-                                </Typography>
-                            </CardContent>
-                            {
-                                isGitHubItemConnected(item)
-                                    ?
-                                    <Image
-                                        src={checkmark}
-                                    />
-                                    :
-                                    <Radio
-                                        checked={selectedGitHubLink.id === item.id}
-                                        onChange={(e) => handleGitHubSwitch(e, item)}
-                                        value={item.id}
-                                        name="radio-buttons"
-                                        inputProps={{ 'aria-label': 'A' }}
-                                        disabled={isGitHubItemConnected(item) || !!gitHubLoading}
-                                    />
-                            }
-                        </Card>
+                        <Box sx={{ width: '100%', marginBottom: '20px' }} display={"flex"} alignItems={"center"}>
+                            <Card className={isGitHubItemConnected(item) ? classes.cardDisabled : classes.card}>
+                                <CardContent>
+                                    <Typography sx={{ fontSize: 14 }}>
+                                        {item.name}
+                                    </Typography>
+                                </CardContent>
+                                {
+                                    isGitHubItemConnected(item)
+                                        ?
+                                        <Image
+                                            src={checkmark}
+                                        />
+                                        :
+                                        <Radio
+                                            checked={selectedGitHubLink.id === item.id}
+                                            onChange={(e) => handleGitHubSwitch(e, item)}
+                                            value={item.id}
+                                            name="radio-buttons"
+                                            inputProps={{ 'aria-label': 'A' }}
+                                            disabled={isGitHubItemConnected(item) || !!gitHubLoading}
+                                        />
+                                }
+                            </Card>
+                            {/* {
+                                isGitHubItemConnected(item) &&
+                                <Box sx={{ cursor: 'pointer', marginLeft: '10px' }} onClick={() => deSyncGithub(item)}>
+                                    <img src={bin} alt="bin" />
+                                </Box>
+                            } */}
+                        </Box>
                     );
                 }) : null}
                 <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -666,6 +749,8 @@ const IntegrationModal = ({ open, onClose }:
 
         return null
     }
+
+    console.log("Selected : ", selectedGitHubLink)
 
     return (
         <Box sx={{ pb: 8, pt: 6 }} style={{ position: 'relative' }}>

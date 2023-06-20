@@ -95,3 +95,10 @@ export const storeGithubIssuesAction = (payload: any) => {
         payload
     }
 }
+
+export const deSyncGithubAction = (payload: any) => {
+    return {
+        type: actionTypes.DESYNC_GITHUB_ACTION,
+        payload
+    }
+}

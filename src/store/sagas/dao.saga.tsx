@@ -5,7 +5,7 @@ import {
 } from 'redux-saga/effects';
 import * as actionTypes from 'store/actionTypes';
 import { get as _get } from 'lodash';
-import { loadDAOListService, loadDAOService, updateDAOService, addDAOMemberService, addSingleMemberService, addMultiMemberService, editDaoMemberService, updateDaoMembersService, syncTrelloDataService, storeGithubIssuesService } from 'store/services/dao';
+import { loadDAOListService, loadDAOService, updateDAOService, addDAOMemberService, addSingleMemberService, addMultiMemberService, editDaoMemberService, updateDaoMembersService, syncTrelloDataService, storeGithubIssuesService, deSyncGithubService } from 'store/services/dao';
 
 function* loadDAOListSaga() {
 	try {
@@ -138,6 +138,19 @@ function* storeGithubIssuesSaga(action: any) {
 	}
 }
 
+function* deSyncGithubSaga(action: any) {
+	try {
+		yield put({ type: actionTypes.DESYNC_GITHUB_LOADING, payload: true })
+		const { data } = yield call(deSyncGithubService, action.payload)
+		yield put({ type: actionTypes.SET_DAO_ACTION, payload: data.dao })
+		yield put({ type: actionTypes.DESYNC_GITHUB_LOADING, payload: false })
+		yield call(() => new Promise(resolve => setTimeout(resolve, 200)))
+		yield put({ type: actionTypes.DESYNC_GITHUB_LOADING, payload: null })
+	} catch (e) {
+		yield put({ type: actionTypes.DESYNC_GITHUB_LOADING, payload: null })
+	}
+}
+
 export default function* daoSaga() {
 	yield takeLatest(actionTypes.LOAD_DAOLIST_ACTION, loadDAOListSaga)
 	yield takeLatest(actionTypes.LOAD_DAO_ACTION, loadDAOSaga)
@@ -149,4 +162,5 @@ export default function* daoSaga() {
 	yield takeLatest(actionTypes.UPDATE_DAO_MEMBERS_ACTION, updateDaoMembersSaga)
 	yield takeLatest(actionTypes.SYNC_TRELLO_DATA_ACTION, syncTrelloDataSaga)
 	yield takeLatest(actionTypes.STORE_GITHUB_ISSUES_ACTION, storeGithubIssuesSaga)
+	yield takeLatest(actionTypes.DESYNC_GITHUB_ACTION, deSyncGithubSaga)
 }

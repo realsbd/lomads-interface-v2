@@ -38,3 +38,7 @@ export const syncTrelloDataService = (params: any) => {
 export const storeGithubIssuesService = (params: any) => {
     return axiosHttp.post(`utility/store-issues`, params.payload)
 }
+
+export const deSyncGithubService = (params: any) => {
+    return axiosHttp.post(`utility/desync-github`, params.payload)
+}
