@@ -12,9 +12,11 @@ import Tag from "./Tag"
 import Sign from "./Sign"
 import Action from "./Action"
 import useSafe from "hooks/useSafe"
+import { useAppDispatch } from "helpers/useAppDispatch"
+import { loadRecurringPaymentsAction } from "store/actions/treasury"
 
 export default ({ transaction, executableNonce }: any) => {
-
+    const dispatch = useAppDispatch()
     const { DAO } = useDAO();
     const { loadSafe } = useSafe()
 
@@ -24,13 +26,13 @@ export default ({ transaction, executableNonce }: any) => {
         return undefined
     }, [DAO?.url])
 
-    const { transformTx } = useGnosisTxnTransform(transaction?.safeAddress);
+    const { transformTx } = useGnosisTxnTransform();
 
     const txn = useMemo(() => {
-        return transformTx(transaction?.rawTx, [])
+        return transformTx(transaction?.rawTx, [], transaction?.safeAddress)
     }, [transaction])
 
-    const handlePostExecution = async () => {
+    const handlePostExecution = async (reject: boolean) => {
         let actionList: any = [];
         for (let index = 0; index < txn.length; index++) {
             const tx = txn[index];
@@ -42,7 +44,7 @@ export default ({ transaction, executableNonce }: any) => {
                 actions = { 
                     ...actions, 
                     "RESET_SWEAT": { user: tx?.to, daoId: DAO?._id, }, 
-                    "UPDATE_EARNING": { user: tx?.to, daoId: DAO?._id, symbol: tx?.symbol, value: +tx?.formattedValue, currency: tx?.tokenAddress || 'SWEAT' } 
+                    "UPDATE_EARNING": { user: tx?.to, daoId: DAO?._id, symbol: tx?.symbol, value: +tx?.formattedValue, currency: tx?.tokenAddress || 'SWEAT' }, 
                 }
             } else if(metadata?.taskId) {
                 // close task && update payment for user
@@ -50,6 +52,12 @@ export default ({ transaction, executableNonce }: any) => {
                     ...actions, 
                     "TASK_PAID": { taskId: metadata?.taskId, user: tx?.to }, 
                     "UPDATE_EARNING": { user: tx?.to, daoId: DAO?._id, symbol: tx?.symbol, value: +tx?.formattedValue, currency: tx?.tokenAddress || 'SWEAT' } 
+                }
+            } else if (metadata?.recurringPaymentAmount) {
+                // update recurring payment status
+                actions = { 
+                    ...actions, 
+                    "RECURRING_PAYMENT": { safeTxHash: transaction?.rawTx?.safeTxHash, reject }
                 }
             } else {
                 // update user earnings
@@ -64,6 +72,8 @@ export default ({ transaction, executableNonce }: any) => {
               await axiosHttp.post(`gnosis-safe/${transaction?.rawTx?.safeTxHash}/executed`, actionList)  
               .then(res => {
                 console.log(res.data)
+                const safes = DAO?.safes.map((safe: any) => safe?.address)
+                dispatch(loadRecurringPaymentsAction({ safes }))
               })
         }
     }
