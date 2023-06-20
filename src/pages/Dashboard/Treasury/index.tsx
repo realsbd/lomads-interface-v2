@@ -291,7 +291,7 @@ export default () => {
                         { activeTab == 0 &&
                         <Box display="flex" flexDirection="row" alignItems="center">
                             <Button onClick={() => setShowSendToken(true)} sx={{ color: palette?.primary?.main }} size="small" variant="contained" color="secondary">SEND TOKEN</Button> 
-                            <IconButton onClick={() => handleDownloadCsv()}>
+                            <IconButton sx={{ ml: 2 }} onClick={() => handleDownloadCsv()}>
                                 { !csvLoading ? <img src={exportBtn}/> : <LeapFrog size={20} color="#C94B32" /> }
                             </IconButton>
                         </Box>

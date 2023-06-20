@@ -71,7 +71,7 @@ export default ({ safeAddress, recipient, credit, token }: any) => {
                                     }
                                 </>
                                 :
-                                <img width={18} height={18} src={CHAIN_INFO[safe?.chainId]?.logoUrl} alt="seek-logo" />
+                                <img style={{ minWidth: 18, minHeight: 18 }} width={18} height={18} src={CHAIN_INFO[safe?.chainId]?.logoUrl} alt="seek-logo" />
                         }
                     </Box>
                     <Box sx={{ ml: 1 }}>
@@ -96,7 +96,7 @@ export default ({ safeAddress, recipient, credit, token }: any) => {
                     </Box> :
                     <Box display="flex" flexDirection="row" alignItems="center">
                         <Box className={classes.ChainLogo}>
-                            <img width={18} height={18} src={CHAIN_INFO[safe?.chainId]?.logoUrl} alt="seek-logo" />
+                            <img style={{ minWidth: 18, minHeight: 18 }} width={18} height={18} src={CHAIN_INFO[safe?.chainId]?.logoUrl} alt="seek-logo" />
                         </Box>
                         {/* <Avatar sx={{ width: 32, height: 32 }} src={CHAIN_INFO[safe?.chainId]?.logoUrl} /> */}
                         <Box sx={{ ml: 1 }}>
