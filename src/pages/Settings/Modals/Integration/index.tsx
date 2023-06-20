@@ -34,7 +34,7 @@ import useInterval from "hooks/useInterval";
 import usePopupWindow from 'hooks/usePopupWindow';
 import axios from 'axios';
 import IconButton from 'components/IconButton';
-import { deSyncGithubAction, setDAOAction, storeGithubIssuesAction, syncTrelloDataAction } from 'store/actions/dao';
+import { deSyncDiscordAction, deSyncGithubAction, deSyncTrelloAction, setDAOAction, storeGithubIssuesAction, syncTrelloDataAction } from 'store/actions/dao';
 import { useDAO } from "context/dao";
 
 const useStyles = makeStyles((theme: any) => ({
@@ -292,8 +292,6 @@ const IntegrationModal = ({ open, onClose }:
             })
     }
 
-
-
     const getGitHubRepos = (token: any) => {
         const AuthStr = 'Bearer '.concat(token);
         axios.get(`https://api.github.com/user/repos`, { headers: { Authorization: AuthStr } })
@@ -302,6 +300,7 @@ const IntegrationModal = ({ open, onClose }:
                 console.log(res.data, "....res.data github list");
                 if (res.data) {
                     const filteredOwnerGithubList = res.data.filter((item: any) => item.permissions.admin)
+                    console.log("filtered list : ", filteredOwnerGithubList);
                     setGitHubOrganizationList(filteredOwnerGithubList)
                     setGitHubLoading(false);
                 }
@@ -364,6 +363,32 @@ const IntegrationModal = ({ open, onClose }:
                 console.log("error : ", err);
             })
 
+    }
+
+    const deSyncDiscord = (item: any) => {
+        dispatch(deSyncDiscordAction({
+            payload:
+            {
+                channelId: item,
+                daoId: _get(DAO, '_id', null),
+            }
+        }))
+    }
+
+    const deSyncTrello = (item: any) => {
+
+        if (_get(DAO, `trello.${item}`, null)) {
+            var trelloToken = localStorage.getItem("trello_token");
+            dispatch(deSyncTrelloAction({
+                payload:
+                {
+                    daoId: _get(DAO, '_id', null),
+                    trelloId: item,
+                    trelloData: _get(DAO, `trello.${item}`, null),
+                    token: trelloToken
+                }
+            }))
+        }
     }
 
     const getDiscordServers = useCallback(async () => {
@@ -472,6 +497,7 @@ const IntegrationModal = ({ open, onClose }:
         setExpandGitHub(!expandGitHub)
 
     }
+
     const getAllBoards = () => {
         // check if webhook already exists
         const trelloOb = _get(DAO, 'trello', null);
@@ -574,6 +600,7 @@ const IntegrationModal = ({ open, onClose }:
         }
         return null
     }
+
     const expandList = (item: any) => {
         return (item.name === 'Trello' && expandTrello)
             || (item.name === 'GitHub' && expandGitHub)
@@ -604,34 +631,43 @@ const IntegrationModal = ({ open, onClose }:
         }
         return false
     }
+
     const IntegrationOrganizationList = (item: any) => {
         if (item.name === 'Trello' && expandTrello && isTrelloConnected) {
             return <>
-                {organizations.length ? organizations.map((item: any) => {
+                {organizations.length ? organizations.map((item: any, index: number) => {
                     return (
-                        <Card className={_get(DAO, `trello.${item.id}`, null) ? classes.cardDisabled : classes.card}>
-                            <CardContent>
-                                <Typography sx={{ fontSize: 14 }}>
-                                    {item.displayName}
-                                </Typography>
-                            </CardContent>
+                        <Box sx={{ width: '100%', marginBottom: '20px' }} display={"flex"} alignItems={"center"} key={index}>
+                            <Card className={_get(DAO, `trello.${item.id}`, null) ? classes.cardDisabled : classes.card}>
+                                <CardContent>
+                                    <Typography sx={{ fontSize: 14 }}>
+                                        {item.displayName}
+                                    </Typography>
+                                </CardContent>
+                                {
+                                    _get(DAO, `trello.${item.id}`, null)
+                                        ?
+                                        <Image
+                                            src={checkmark}
+                                        />
+                                        :
+                                        <Radio
+                                            checked={selectedValue === item.id}
+                                            onChange={(e) => setSelectedValue(e.target.value)}
+                                            value={item.id}
+                                            name="radio-buttons"
+                                            inputProps={{ 'aria-label': 'A' }}
+                                            disabled={_get(DAO, `trello.${item.id}`, null) ? true : false}
+                                        />
+                                }
+                            </Card>
                             {
-                                _get(DAO, `trello.${item.id}`, null)
-                                    ?
-                                    <Image
-                                        src={checkmark}
-                                    />
-                                    :
-                                    <Radio
-                                        checked={selectedValue === item.id}
-                                        onChange={(e) => setSelectedValue(e.target.value)}
-                                        value={item.id}
-                                        name="radio-buttons"
-                                        inputProps={{ 'aria-label': 'A' }}
-                                        disabled={_get(DAO, `trello.${item.id}`, null) ? true : false}
-                                    />
+                                _get(DAO, `trello.${item.id}`, null) &&
+                                <Box sx={{ cursor: 'pointer', marginLeft: '10px' }} onClick={() => deSyncTrello(item.id)}>
+                                    <img src={bin} alt="bin" />
+                                </Box>
                             }
-                        </Card>
+                        </Box>
                     );
                 }) : null}
                 <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -650,9 +686,9 @@ const IntegrationModal = ({ open, onClose }:
 
         if (item.name === 'GitHub' && expandGitHub && isGitHubConnected && gitHubOrganizationList.length) {
             return <>
-                {gitHubOrganizationList.length ? gitHubOrganizationList.map((item: any) => {
+                {gitHubOrganizationList.length ? gitHubOrganizationList.map((item: any, index: number) => {
                     return (
-                        <Box sx={{ width: '100%', marginBottom: '20px' }} display={"flex"} alignItems={"center"}>
+                        <Box sx={{ width: '100%', marginBottom: '20px' }} display={"flex"} alignItems={"center"} key={index}>
                             <Card className={isGitHubItemConnected(item) ? classes.cardDisabled : classes.card}>
                                 <CardContent>
                                     <Typography sx={{ fontSize: 14 }}>
@@ -676,12 +712,12 @@ const IntegrationModal = ({ open, onClose }:
                                         />
                                 }
                             </Card>
-                            {/* {
+                            {
                                 isGitHubItemConnected(item) &&
                                 <Box sx={{ cursor: 'pointer', marginLeft: '10px' }} onClick={() => deSyncGithub(item)}>
                                     <img src={bin} alt="bin" />
                                 </Box>
-                            } */}
+                            }
                         </Box>
                     );
                 }) : null}
@@ -703,31 +739,40 @@ const IntegrationModal = ({ open, onClose }:
                 {
                     serverData.length
                         ?
-                        serverData.map((item: any) => {
+                        serverData.map((item: any, index: number) => {
+                            console.log("discord item : ", item)
                             return (
-                                <Card className={_get(DAO, `discord.${item.id}`, null) ? classes.cardDisabled : classes.card}>
-                                    <CardContent>
-                                        <Typography sx={{ fontSize: 14 }}>
-                                            {item.name}
-                                        </Typography>
-                                    </CardContent>
+                                <Box sx={{ width: '100%', marginBottom: '20px' }} display={"flex"} alignItems={"center"} key={index}>
+                                    <Card className={_get(DAO, `discord.${item.id}`, null) ? classes.cardDisabled : classes.card}>
+                                        <CardContent>
+                                            <Typography sx={{ fontSize: 14 }}>
+                                                {item.name}
+                                            </Typography>
+                                        </CardContent>
+                                        {
+                                            _get(DAO, `discord.${item.id}`, null)
+                                                ?
+                                                <Image
+                                                    src={checkmark}
+                                                />
+                                                :
+                                                <Radio
+                                                    checked={selectedServerId === item.id}
+                                                    onChange={(e) => setSelectedServerId(e.target.value)}
+                                                    value={item.id}
+                                                    name="radio-buttons"
+                                                    inputProps={{ 'aria-label': 'A' }}
+                                                    disabled={_get(DAO, `discord.${item.id}`, null) ? true : false}
+                                                />
+                                        }
+                                    </Card>
                                     {
-                                        _get(DAO, `discord.${item.id}`, null)
-                                            ?
-                                            <Image
-                                                src={checkmark}
-                                            />
-                                            :
-                                            <Radio
-                                                checked={selectedServerId === item.id}
-                                                onChange={(e) => setSelectedServerId(e.target.value)}
-                                                value={item.id}
-                                                name="radio-buttons"
-                                                inputProps={{ 'aria-label': 'A' }}
-                                                disabled={_get(DAO, `discord.${item.id}`, null) ? true : false}
-                                            />
+                                        _get(DAO, `discord.${item.id}`, null) &&
+                                        <Box sx={{ cursor: 'pointer', marginLeft: '10px' }} onClick={() => deSyncDiscord(item.id)}>
+                                            <img src={bin} alt="bin" />
+                                        </Box>
                                     }
-                                </Card>
+                                </Box>
                             )
                         })
                         :
@@ -749,8 +794,6 @@ const IntegrationModal = ({ open, onClose }:
 
         return null
     }
-
-    console.log("Selected : ", selectedGitHubLink)
 
     return (
         <Box sx={{ pb: 8, pt: 6 }} style={{ position: 'relative' }}>

@@ -42,3 +42,11 @@ export const storeGithubIssuesService = (params: any) => {
 export const deSyncGithubService = (params: any) => {
     return axiosHttp.post(`utility/desync-github`, params.payload)
 }
+
+export const deSyncDiscordService = (params: any) => {
+    return axiosHttp.post(`utility/desync-discord`, params.payload)
+}
+
+export const deSyncTrelloService = (params: any) => {
+    return axiosHttp.post(`utility/desync-trello`, params.payload)
+}

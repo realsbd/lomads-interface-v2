@@ -17,6 +17,8 @@ export function getInitialState() {
 		syncTrelloDataLoading: null,
 		storeGithubIssuesLoading: null,
 		deSyncGithubLoading: null,
+		deSyncDiscordLoading: null,
+		deSyncTrelloLoading: null,
 	};
 }
 
@@ -96,6 +98,14 @@ const DAOReducer = (state: any = getInitialState(), action: any) =>
 			}
 			case actionTypes.DESYNC_GITHUB_LOADING: {
 				draft.deSyncGithubLoading = payload;
+				break;
+			}
+			case actionTypes.DESYNC_DISCORD_LOADING: {
+				draft.deSyncDiscordLoading = payload;
+				break;
+			}
+			case actionTypes.DESYNC_TRELLO_LOADING: {
+				draft.deSyncTrelloLoading = payload;
 				break;
 			}
 			case actionTypes.LOGOUT_ACTION: {
