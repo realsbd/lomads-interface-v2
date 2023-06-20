@@ -102,3 +102,17 @@ export const deSyncGithubAction = (payload: any) => {
         payload
     }
 }
+
+export const deSyncDiscordAction = (payload: any) => {
+    return {
+        type: actionTypes.DESYNC_DISCORD_ACTION,
+        payload
+    }
+}
+
+export const deSyncTrelloAction = (payload: any) => {
+    return {
+        type: actionTypes.DESYNC_TRELLO_ACTION,
+        payload
+    }
+}
