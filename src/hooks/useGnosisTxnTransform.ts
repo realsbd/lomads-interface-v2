@@ -8,30 +8,27 @@ import { useWeb3Auth } from 'context/web3Auth';
 import { useDAO } from 'context/dao';
 import useSafe from './useSafe';
 
-export default (safeAddress: string | undefined) => {
+export default () => {
     const { account } = useWeb3Auth()
     const { loadSafe } = useSafe()
     const { safeTokens } = useSafeTokens()
 
-    const getERC20Token = useCallback((tokenAddr: string) => {
+    const getERC20Token = useCallback((tokenAddr: string, safeAddress: string) => {
         if(safeTokens && safeAddress) {
             console.log("getERC20Token", safeTokens, safeAddress, _get(safeTokens, safeAddress, []))
             return _find(_get(safeTokens, safeAddress, []),  st => _get(st, 'tokenAddress', '0x') === tokenAddr)
         }
         return null
-    }, [safeTokens, safeAddress])
+    }, [safeTokens])
 
-    const safe = useMemo(() => {
-        if(safeAddress)
-            return loadSafe(safeAddress)
-        return null
-    }, [safeAddress])
 
-    const getNativeToken = useCallback(() => {
+
+    const getNativeToken = (safeAddress: string) => {
+        const safe = loadSafe(safeAddress)
         if(safe?.chainId)
             return { ...CHAIN_INFO[safe?.chainId]?.nativeCurrency, tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS }
         return { name: '', symbol: '', decimals: 18, tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS }
-    }, [safe?.chainId, safeAddress])
+    }
 
     const isNativeTokenSingleTransfer = (transaction: any) => {
         if(transaction?.value !== "0" && transaction?.dataDecoded === null) 
@@ -61,8 +58,9 @@ export default (safeAddress: string | undefined) => {
         return false
     }
 
-    const transformNativeTokenSingleTransfer = (transaction: any) => {
-        const nativeToken = getNativeToken();
+    const transformNativeTokenSingleTransfer = (transaction: any, safeAddress: string) => {
+        const safe = loadSafe(safeAddress)
+        const nativeToken = getNativeToken(safeAddress);
         if(!nativeToken)
             return [];
         const hasMyConfirmation = _find(transaction.confirmations, (c:any) => c.owner === account)
@@ -97,8 +95,9 @@ export default (safeAddress: string | undefined) => {
         }]
     }
 
-    const transformMultiOpeartion = (transaction: any, labels: any) => {
-        const nativeToken = getNativeToken();
+    const transformMultiOpeartion = (transaction: any, labels: any, safeAddress: string) => {
+        const safe = loadSafe(safeAddress)
+        const nativeToken = getNativeToken(safeAddress);
         if(!nativeToken)
             return [];
         const hasMyConfirmation = _find(transaction.confirmations, (c:any) => c?.owner === account)
@@ -142,7 +141,7 @@ export default (safeAddress: string | undefined) => {
                                     isCredit: false
                                 })
                             } else if (decoded.dataDecoded) {
-                                const erc20Token: any = getERC20Token(_get(decoded, 'to', '0x'));
+                                const erc20Token: any = getERC20Token(_get(decoded, 'to', '0x'), safeAddress);
                                 const parameters = _get(decoded, 'dataDecoded.parameters');
                                 const to = _get(_find(parameters, p => p.name === 'to'), 'value', '0x')
                                 const value = _get(_find(parameters, p => p.name === 'value'), 'value', 0)
@@ -178,7 +177,7 @@ export default (safeAddress: string | undefined) => {
                     }
                 } else {
                     let value = _get(_find(setAllowanceTxn?.dataDecoded?.parameters, p => p?.name === 'allowanceAmount'), 'value', '0')
-                    const allowanceToken: any = getERC20Token(_get(_find(setAllowanceTxn?.dataDecoded?.parameters, p => p?.name === 'token'), 'value', ''))
+                    const allowanceToken: any = getERC20Token(_get(_find(setAllowanceTxn?.dataDecoded?.parameters, p => p?.name === 'token'), 'value', ''), safeAddress)
                     const to = _get(_find(setAllowanceTxn?.dataDecoded?.parameters, p => p?.name === 'delegate'), 'value', 0)
                     let am = _get(_find(labels, (l:any) => l?.recipient?.toLowerCase() === to?.toLowerCase() && l.safeTxHash === transaction?.safeTxHash), "recurringPaymentAmount", null)
                     if(am)
@@ -245,8 +244,9 @@ export default (safeAddress: string | undefined) => {
         return op
     }
 
-    const transferERC20TokenSingleTransfer = (transaction: any) => {
-        const erc20Token: any = getERC20Token(_get(transaction, 'to', '0x'));
+    const transferERC20TokenSingleTransfer = (transaction: any, safeAddress: string) => {
+        const safe = loadSafe(safeAddress)
+        const erc20Token: any = getERC20Token(_get(transaction, 'to', '0x'), safeAddress);
         console.log("erc20Token", erc20Token)
         if(!erc20Token)
             return [];
@@ -287,7 +287,8 @@ export default (safeAddress: string | undefined) => {
         return op
     }
 
-    const transformOperationTxn = (transaction: any) => {
+    const transformOperationTxn = (transaction: any, safeAddress: string) => {
+        const safe = loadSafe(safeAddress)
         const hasMyConfirmation = _find(transaction.confirmations, (c:any) => c?.owner === account)
         const hasMyRejection = transaction?.rejectedTxn && _find(_get(transaction, 'rejectedTxn.confirmations', []), (c:any) => c.owner === account)
         const canExecuteTxn = _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)) === (_get(transaction, 'confirmations', [])?.length || 0)
@@ -322,8 +323,9 @@ export default (safeAddress: string | undefined) => {
         return op
     }
 
-    const transformEthTxn = (transaction: any) => {
-        const erc20Token: any = getERC20Token(_get(transaction, 'transfers[0].tokenAddress', '0x'));
+    const transformEthTxn = (transaction: any, safeAddress: string) => {
+        const safe = loadSafe(safeAddress)
+        const erc20Token: any = getERC20Token(_get(transaction, 'transfers[0].tokenAddress', '0x'), safeAddress);
         if(!erc20Token)
             return [];
         const value = _get(transaction, 'transfers[0].value', '0')
@@ -335,7 +337,7 @@ export default (safeAddress: string | undefined) => {
             nonce: _get(transaction, 'nonce', 0),
             offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
             value: value,
-            formattedValue: (+value / ( 10 ** (erc20Token?.token?.decimals || erc20Token?.token?.decimal) )),
+            formattedValue: _get(transaction, 'transfers[0].tokenInfo.decimals', null) || (erc20Token?.token?.decimals || erc20Token?.token?.decimal) > 0  ? (+value / ( 10 ** _get(transaction, 'transfers[0].tokenInfo.decimals', null) || (erc20Token?.token?.decimals || erc20Token?.token?.decimal) )) : +value,
             symbol: _get(transaction, 'transfers[0].tokenInfo.symbol', null),
             decimals: _get(transaction, 'transfers[0].tokenInfo.decimals', null),
             tokenAddress: erc20Token?.tokenAddress || transaction?.token?.tokenAddress,
@@ -355,45 +357,45 @@ export default (safeAddress: string | undefined) => {
         }]
     }
 
-    const transformTx = (transaction: any, labels: any) => {
+    const transformTx = (transaction: any, labels: any, safeAddress: string) => {
         if (transaction.txType === "ETHEREUM_TRANSACTION") {
-            const data = transformEthTxn(transaction)
+            const data = transformEthTxn(transaction, safeAddress)
             return data
         } else {
             if(isNativeTokenSingleTransfer(transaction)) {
                 if(transaction._id === "647f7e0dd77026d2ba13b350")
                     console.log("offChain", "transformNativeTokenSingleTransfer")
-                const data = transformNativeTokenSingleTransfer(transaction)
+                const data = transformNativeTokenSingleTransfer(transaction, safeAddress)
                 return data
             } else if(isTokenMultiTransfer(transaction)) {
                 if(transaction._id === "647f7e0dd77026d2ba13b350")
                     console.log("offChain", "transformMultiOpeartion", transaction)
-                const data = transformMultiOpeartion(transaction, labels)
+                const data = transformMultiOpeartion(transaction, labels, safeAddress)
                 return data
             } else if(isERC20TokenSingleTransfer(transaction)) {
                 if(transaction._id === "647f7e0dd77026d2ba13b350")
                     console.log("offChain", "transferERC20TokenSingleTransfer")
-                const data = transferERC20TokenSingleTransfer(transaction)
+                const data = transferERC20TokenSingleTransfer(transaction, safeAddress)
                 return data
             } else if(isOperationTransaction(transaction)) {
                 if(transaction._id === "647f7e0dd77026d2ba13b350")
                     console.log("offChain", "transformOperationTxn")
-                const data = transformOperationTxn(transaction)
+                const data = transformOperationTxn(transaction, safeAddress)
                 return data
             } else {
                 if(transaction._id === "647f7e0dd77026d2ba13b350")
                     console.log("offChain", "transformMultiOpeartion", transaction)
-                const data = transformMultiOpeartion(transaction, labels)
+                const data = transformMultiOpeartion(transaction, labels, safeAddress)
                 return data
             }
         }
     }
 
-    const transform = (transactions: any, labels = [], exportCSV: boolean = false) => {
+    const transform = (transactions: any, labels = [], safeAddress: string,  exportCSV: boolean = false) => {
         let output = []
         for (let index = 0; index < transactions.length; index++) {
             const transaction = transactions[index];
-            const data = transformTx(transaction, labels)
+            const data = transformTx(transaction, labels, safeAddress)
             output.push(data)
         }
         if(exportCSV) {

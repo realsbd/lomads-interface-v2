@@ -7,21 +7,20 @@ import { ethers } from "ethers";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 
 export const ImportSafe = async (provider: any, safeAddress: string) => {
-  const safeOwner = provider?.getSigner();
+  const safeOwner = provider?.getSigner(0);
+  console.log("ImportSafe", safeOwner)
   const ethAdapter = new EthersAdapter({
     ethers,
     signerOrProvider: safeOwner as any,
   });
-
-  const safeSDK: Safe = await Safe.create({
-    ethAdapter: ethAdapter,
-    safeAddress,
-  });
+  console.log("ImportSafe", ethAdapter)
+  const safeSDK: Safe = await Safe.create({ethAdapter: ethAdapter, safeAddress });
+  console.log("ImportSafe", provider, safeAddress, safeSDK)
   return safeSDK;
 };
 
 export const safeService = async (provider: any, chainId: string) => {
-  const safeOwner = provider?.getSigner();
+  const safeOwner = provider?.getSigner(0);
   const ethAdapter = new EthersAdapter({
     ethers,
     signerOrProvider: safeOwner as any,
