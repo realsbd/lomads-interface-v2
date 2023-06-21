@@ -56,6 +56,8 @@ export default ({ open, selectedMilestone, closeModal, openAssignContribution }:
 
     const classes = useStyles();
 
+    console.log("selectedMilestone : ", selectedMilestone);
+
     return (
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
@@ -72,7 +74,7 @@ export default ({ open, selectedMilestone, closeModal, openAssignContribution }:
                     <Typography className={classes.modalTitle}>{selectedMilestone?.name}</Typography>
                 </Box>
                 {
-                    selectedMilestone?.completed
+                    selectedMilestone?.complete
                         ?
                         <Box display="flex" flexDirection="column" sx={{ width: '340px', marginTop: '35px', padding: '20px', background: '#E8F4F2', borderRadius: '5px' }}>
                             <Box display="flex" alignItems='center' justifyContent="flex-end" sx={{ marginBottom: '10px' }}>
@@ -87,7 +89,7 @@ export default ({ open, selectedMilestone, closeModal, openAssignContribution }:
                                 selectedMilestone?.deliverables !== '' &&
                                 <Box>
                                     <Typography className={classes.modalText} sx={{ marginBottom: '8px' }}>Deliverables</Typography>
-                                    <Typography>{selectedMilestone?.deliverables}</Typography>
+                                    <Typography dangerouslySetInnerHTML={{ __html: selectedMilestone?.deliverables }}></Typography>
                                 </Box>
                             }
                         </Box>
@@ -99,7 +101,7 @@ export default ({ open, selectedMilestone, closeModal, openAssignContribution }:
                                 selectedMilestone?.deliverables !== '' &&
                                 <Box>
                                     <Typography className={classes.modalText} sx={{ marginBottom: '8px' }}>Deliverables</Typography>
-                                    <Typography>{selectedMilestone?.deliverables}</Typography>
+                                    <Typography dangerouslySetInnerHTML={{ __html: selectedMilestone?.deliverables }}></Typography>
                                 </Box>
                             }
                             <button onClick={() => { openAssignContribution(); closeModal() }} style={{ width: '100%', height: '50px', borderRadius: '5px', marginTop: '50px', border: 'none', backgroundColor: '#188C7C', boxShadow: '2px 1px 8px rgba(27, 43, 65, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '20px', color: '#FFF' }}>

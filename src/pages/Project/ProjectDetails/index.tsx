@@ -224,20 +224,16 @@ export default () => {
 
     const selectMilestone = (item: any, index: number) => {
         if (index === 0) {
-            if (!item.complete) {
-                let e = { ...item };
-                e.pos = index;
-                setSelectedMilestone(e);
-                setOpenMilestoneModal(true);
-            }
+            let e = { ...item };
+            e.pos = index;
+            setSelectedMilestone(e);
+            setOpenMilestoneModal(true);
         }
         else if (index > 0) {
-            if (!item.complete && Project.milestones[index - 1].complete) {
-                let e = { ...item };
-                e.pos = index;
-                setSelectedMilestone(e);
-                setOpenMilestoneModal(true);
-            }
+            let e = { ...item };
+            e.pos = index;
+            setSelectedMilestone(e);
+            setOpenMilestoneModal(true);
         }
     }
 
