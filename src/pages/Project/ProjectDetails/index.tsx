@@ -52,6 +52,7 @@ import editSvg from 'assets/svg/editToken.svg';
 import AddIcon from '@mui/icons-material/Add';
 
 import moment from "moment";
+import MilestoneDetailModal from "modals/Project/MilestoneDetailModal";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -190,6 +191,7 @@ export default () => {
     const [value, setValue] = useState<number>(0);
     const [showEdit, setShowEdit] = useState<boolean>(false);
     const [openAssignContribution, setOpenAssignContribution] = useState<boolean>(false);
+    const [openMilestoneModal, setOpenMilestoneModal] = useState<boolean>(false);
     const [openKraReview, setOpenKraReview] = useState<boolean>(false);
 
     const [selectedMilestone, setSelectedMilestone] = useState(null);
@@ -226,7 +228,7 @@ export default () => {
                 let e = { ...item };
                 e.pos = index;
                 setSelectedMilestone(e);
-                setOpenAssignContribution(true);
+                setOpenMilestoneModal(true);
             }
         }
         else if (index > 0) {
@@ -234,14 +236,9 @@ export default () => {
                 let e = { ...item };
                 e.pos = index;
                 setSelectedMilestone(e);
-                setOpenAssignContribution(true);
+                setOpenMilestoneModal(true);
             }
         }
-    }
-
-    const handleRenderRole = (item: any) => {
-        const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === item.wallet.toLowerCase());
-        return transformRole(_get(user, 'role', '')).label
     }
 
     const NameAndAvatar = (props: any) => {
@@ -344,6 +341,13 @@ export default () => {
                 <ProjectEditModal
                     open={showEdit}
                     closeModal={() => setShowEdit(false)}
+                />
+
+                <MilestoneDetailModal
+                    selectedMilestone={selectedMilestone}
+                    open={openMilestoneModal}
+                    closeModal={() => setOpenMilestoneModal(false)}
+                    openAssignContribution={() => setOpenAssignContribution(true)}
                 />
 
                 <AssignContributionModal

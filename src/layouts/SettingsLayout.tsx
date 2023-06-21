@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme: any) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    overflow : 'hidden'
+    overflow: 'hidden'
   },
   title: {
     fontWeight: '600 !important',
@@ -92,7 +92,7 @@ const useStyles = makeStyles((theme: any) => ({
   }
 }));
 
-export default ({ children } : any) => {
+export default ({ children }: any) => {
   const navigate = useNavigate()
   const classes = useStyles();
   const { daoURL } = useParams();
@@ -101,51 +101,51 @@ export default ({ children } : any) => {
   const initials = useMemo(() => {
     const daoName = _get(DAO, 'name', '').trim().split(" ");
     return daoName.length === 1
-    ? daoName[0].charAt(0)
-    : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
+      ? daoName[0].charAt(0)
+      : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
   }, [DAO])
 
   return (
-      <Box className={classes.root}>
-        <img className={classes.settingIcon} src={SettingsXL} />
-        <Grid container component="main" className={classes.content}>
-            <CssBaseline />
-            <Grid container mx={3}>
-              <Grid item sm={12}>
-                <Box className={classes.header}>
-                  <Box className={classes.plain}>
-                    { DAO ? <Box className={classes.logoContainer}>
-                    { DAO?.image ? <img className={classes.image} src={_get(DAO, 'image')} /> :
-                        DAO && <Typography variant='h6' className={classes.title}>{initials}</Typography>
-                    }
-                    </Box> :   
-                    <Box className={classes.logoContainer}>
-                        <Skeleton animation="wave" variant="rounded" height={72} width={72} />
-                    </Box> }
-                  </Box>
-                  <Box ml={4} flexGrow={1}>
-                    { DAO ?
-                      <Typography className={classes.daoName}>{ _get(DAO, 'name', '') }</Typography> :
-                      <Skeleton animation="wave" variant="rectangular" className={classes.daoName} sx={{ width: 250 }} />
-                    }
-                    {  DAO ?
-                      <Typography className={classes.settings}>Settings</Typography>: 
-                      <Skeleton animation="wave" variant="rectangular" className={classes.settings} sx={{ width: 100 }} />
-                    }
-                  </Box>
-                  <IconButton onClick={() => navigate(`/${daoURL}`)} sx={{ width: 37, height: 37, borderRadius: 1, backgroundColor: 'rgba(27, 43, 65, 0.2)' }}>
-                    <Close sx={{ color: '#FFF' }} />
-                  </IconButton>
-                </Box>
-              </Grid>
-            </Grid>
-            <Container maxWidth="lg">
-            { children }
-            </Container>
+    <Box className={classes.root}>
+      <img className={classes.settingIcon} src={SettingsXL} />
+      <Grid container component="main" className={classes.content}>
+        <CssBaseline />
+        <Grid container mx={3}>
+          <Grid item sm={12}>
+            <Box className={classes.header}>
+              <Box className={classes.plain}>
+                {DAO ? <Box className={classes.logoContainer}>
+                  {DAO?.image ? <img className={classes.image} src={_get(DAO, 'image')} /> :
+                    DAO && <Typography variant='h6' className={classes.title}>{initials}</Typography>
+                  }
+                </Box> :
+                  <Box className={classes.logoContainer}>
+                    <Skeleton animation="wave" variant="rounded" height={72} width={72} />
+                  </Box>}
+              </Box>
+              <Box ml={4} flexGrow={1}>
+                {DAO ?
+                  <Typography className={classes.daoName}>{_get(DAO, 'name', '')}</Typography> :
+                  <Skeleton animation="wave" variant="rectangular" className={classes.daoName} sx={{ width: 250 }} />
+                }
+                {DAO ?
+                  <Typography className={classes.settings}>Settings</Typography> :
+                  <Skeleton animation="wave" variant="rectangular" className={classes.settings} sx={{ width: 100 }} />
+                }
+              </Box>
+              <IconButton onClick={() => navigate(`/${daoURL}`)} sx={{ width: 37, height: 37, borderRadius: 1, backgroundColor: 'rgba(27, 43, 65, 0.2)' }}>
+                <Close sx={{ color: '#FFF' }} />
+              </IconButton>
+            </Box>
+          </Grid>
         </Grid>
         <Container maxWidth="lg">
-            <Footer theme='dark' />
+          {children}
         </Container>
-      </Box>
+      </Grid>
+      <Container maxWidth="lg">
+        <Footer theme='dark' />
+      </Container>
+    </Box>
   );
 }
