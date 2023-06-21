@@ -68,7 +68,7 @@ export default ({ open, onClose }: any) => {
     const { account, chainId: currentChainId } = useWeb3Auth()
     const { DAO } = useDAO()
     const { safeTokens, getToken } = useSafeTokens()
-    const { loadSafe, adminSafes } = useSafe()
+    const { loadSafe, adminSafes, activeSafes } = useSafe()
     const { createSafeTransaction } = useGnosisSafeTransaction();
     const { createSafeTransaction: createOffChainSafeTransaction } = useOffChainTransaction();
     const [sendTokensLoading, setSendTokensLoading] = useState(false)
@@ -144,7 +144,7 @@ export default ({ open, onClose }: any) => {
                         onChange={(e:any) =>  setState((prev:any) => { return { ...prev, safeAddress: e.target.value } })}
                     >
                         {
-                            DAO?.safes?.map((safe:any) => {
+                            activeSafes?.map((safe:any) => {
                                 return (
                                     <MenuItem disabled={!_find(adminSafes, (a:any) => a._id === safe?._id)} key={safe?.address} value={safe?.address}>{ (safe?.name || "Multi-sig wallet") +" ("+ beautifyHexToken(safe?.address) +")" }</MenuItem>
                                 )
@@ -238,7 +238,7 @@ export default ({ open, onClose }: any) => {
                             onChange={(e:any) =>  setState((prev:any) => { return { ...prev, safeAddress: e.target.value } })}
                         >
                             {
-                                DAO?.safes?.map((safe:any) => {
+                                activeSafes?.map((safe:any) => {
                                     return (
                                         <MenuItem key={safe?.address} value={safe?.address}>{ (safe?.name || "Multi-sig wallet") +" ("+ beautifyHexToken(safe?.address) +")" }</MenuItem>
                                     )

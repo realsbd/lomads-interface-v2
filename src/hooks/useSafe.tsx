@@ -14,10 +14,17 @@ export default () => {
 
     const adminSafes = useMemo(() => {
         if(DAO?.safes){
-            return DAO?.safes?.filter((safe:any) => Boolean(_find(safe?.owners, (m:any) => toChecksumAddress(m?.wallet) === toChecksumAddress(account))))
+            return DAO?.safes?.filter((safe:any) => safe?.enabled && Boolean(_find(safe?.owners, (m:any) => toChecksumAddress(m?.wallet) === toChecksumAddress(account))))
         }
         return []
     }, [DAO?.safes])
 
-    return { loadSafe, adminSafes }
+    const activeSafes = useMemo(() => {
+        if(DAO?.safes){
+            return DAO?.safes?.filter((safe:any) => safe?.enabled)
+        }
+        return []
+    }, [DAO?.safes])
+
+    return { loadSafe, adminSafes, activeSafes }
 }

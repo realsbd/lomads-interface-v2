@@ -25,9 +25,10 @@ export default () => {
 
     const getNativeToken = (safeAddress: string) => {
         const safe = loadSafe(safeAddress)
+        const token = _find(_get(safeTokens, safeAddress, []),  st => _get(st, 'tokenAddress', '0x') === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS)
         if(safe?.chainId)
             return { ...CHAIN_INFO[safe?.chainId]?.nativeCurrency, tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS }
-        return { name: '', symbol: '', decimals: 18, tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS }
+        return { name: '', fiatConversion: token?.fiatConversion,  symbol: '', decimals: 18, tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS }
     }
 
     const isNativeTokenSingleTransfer = (transaction: any) => {

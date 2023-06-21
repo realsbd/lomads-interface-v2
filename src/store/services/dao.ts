@@ -50,3 +50,7 @@ export const deSyncDiscordService = (params: any) => {
 export const deSyncTrelloService = (params: any) => {
     return axiosHttp.post(`utility/desync-trello`, params.payload)
 }
+
+export const toggleSafeService = (payload: any) => {
+    return axiosHttp.post(`dao/${payload.url}/toggle-safe-state`, payload.params)
+}

@@ -21,6 +21,7 @@ import { beautifyHexToken } from "utils";
 import { CHAIN_INFO } from "constants/chainInfo";
 import { SupportedChainId } from "constants/chains";
 import ProfileModal from "modals/Profile/ProfileModal";
+import useGnosisTxnTransform from "hooks/useGnosisTxnTransform";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -37,6 +38,7 @@ export default () => {
     console.log("DAO", DAO);
     const { account } = useWeb3Auth();
     const { myRole, can } = useRole(DAO, account, undefined)
+    const { transformTx } = useGnosisTxnTransform()
     // @ts-ignore
     const { setProjectLoading, Project } = useAppSelector(store => store.project);
 
@@ -63,6 +65,30 @@ export default () => {
     //     }
     // }
 
+    const updateTask = async () => {
+        const { data } = await axiosHttp.get(`/utility/update-safe`)
+        for (let index = 0; index < data.length; index++) {
+            const txn = data[index];
+            const transformedTxns = transformTx(txn.rawTx, [], txn?.safeAddress)
+            for (let index = 0; index < transformedTxns.length; index++) {
+                const t = transformedTxns[index];
+                await axiosHttp.post(`/gnosis-safe/update-metadata`, {
+                    txId: txn?._id,
+                    recipient: t?.to,
+                    key: "parsedTxValue",
+                    value: {
+                        value: t?.value,
+                        formattedValue: t?.formattedValue,
+                        symbol: t?.symbol,
+                        decimals: t?.decimals,
+                        tokenAddress: t?.tokenAddress
+                    }
+                })
+                await new Promise(resolve => setTimeout(resolve, 500))
+            }
+        }
+    }
+
     return (
         <Grid container>
             <Grid item sm={12}>
@@ -87,6 +113,7 @@ export default () => {
                     list={_get(DAO, 'members', [])}
                 />
             </Grid>
+            {/* <Button onClick={() => updateTask()}>Update txn</Button> */}
         </Grid>
     )
 }

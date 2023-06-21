@@ -106,7 +106,7 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
     const [members, setMembers] = useState([])
     const { createSafeTransaction } = useGnosisSafeTransaction();
     const { createSafeTransaction: createOffChainSafeTransaction } = useOffChainTransaction();
-    const { loadSafe } = useSafe()
+    const { loadSafe, activeSafes } = useSafe()
     const [tag, setTag] = useState(null)
     const [sendTokensLoading, setSendTokensLoading] = useState(false)
 
@@ -132,7 +132,7 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
                 })
             }
         }
-        const safe = loadSafe(Project?.compensation?.safeAddress || _get(DAO, 'safes[0].address'))
+        const safe = loadSafe(Project?.compensation?.safeAddress || _get(DAO, 'safes.[0].address'))
 
         if(!safe) return;
 

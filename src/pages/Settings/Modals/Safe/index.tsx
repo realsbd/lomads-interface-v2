@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react"
+import clsx from "clsx"
 import { get as _get, find as _find } from 'lodash'
 import { Drawer, Box, Grid, Typography, Stack, Avatar, List, ListItem, ListItemButton } from "@mui/material"
 import LomadsAvatar from "components/Avatar"
@@ -29,6 +30,9 @@ import { off } from "process"
 import SwitchChain from "components/SwitchChain"
 import { useWeb3Auth } from "context/web3Auth"
 import useGnosisSafeTransaction from "hooks/useGnosisSafeTransaction"
+import Switch from "components/Switch"
+import { useAppDispatch } from "helpers/useAppDispatch"
+import { toggleSafeAction } from "store/actions/dao"
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const useStyles = makeStyles((theme: any) => ({
@@ -70,6 +74,9 @@ const useStyles = makeStyles((theme: any) => ({
         backgroundColor: "#FEF6F4 !important",
         borderTop: "1px solid #D1D4D9"
     },
+    safeDisabled: {
+        backgroundColor: "#F5f5f5 !important",
+    },
     ownerTitle: {
         fontFamily: 'Inter, sans-serif',
         fontStyle: 'normal',
@@ -94,6 +101,7 @@ const useStyles = makeStyles((theme: any) => ({
 
 const SafeModal = ({ open, onClose }: any) => {
     const classes = useStyles();
+    const dispatch = useAppDispatch()
     const { chainId } = useWeb3Auth()
     const navigate = useNavigate();
     const { DAO } = useDAO();
@@ -244,6 +252,7 @@ const SafeModal = ({ open, onClose }: any) => {
                             <Stack spacing={1} direction="column">
                                 {
                                     DAO?.safes?.map((safe: any) => {
+                                        console.log("SAFESAFE", safe)
                                         return (
                                             <Accordion key={safe.address} elevation={0} onChange={() => setActive((prev: any) => {
                                                 if (prev && prev._id === safe._id) {
@@ -255,7 +264,7 @@ const SafeModal = ({ open, onClose }: any) => {
                                                     expandIcon={<ExpandMoreIcon color="primary" />}
                                                     aria-controls={`panel1bh-header-${safe?.address}`}
                                                     id={`panel1bh-header-${safe?.address}`}
-                                                    className={classes.safeItem}
+                                                    className={clsx(safe?.enabled ? [classes.safeItem] : [classes.safeItem, classes.safeDisabled])}
                                                 >
                                                     <Box display="flex" flexDirection="row" alignItems="center">
                                                         <Box className={classes.ChainLogo}>
@@ -268,10 +277,18 @@ const SafeModal = ({ open, onClose }: any) => {
                                                         </Box>
                                                     </Box>
                                                 </AccordionSummary>
-                                                <AccordionDetails key={`panel1bh-header-${safe?.address}`} className={classes.safeDetails}>
+                                                <AccordionDetails key={`panel1bh-header-${safe?.address}`} 
+                                                className={clsx(safe?.enabled ? [classes.safeDetails] : [classes.safeDetails, classes.safeDisabled])}
+                                                >
+                                                    <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
+                                                        <Typography className={classes.ownerTitle}>{ safe?.enabled ? 'Enabled' : 'Disabled' }</Typography>
+                                                        <Switch checked={safe?.enabled} onChange={() => dispatch(toggleSafeAction({ url: DAO?.url, params: { safeAddress: safe?.address } }))} />
+                                                    </Box>
                                                     <Box sx={{ mb: 1 }}>
                                                         <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                                                             <Typography className={classes.ownerTitle}>{`${active?.owners?.length} Owners`}</Typography>
+                                                            <Box>
+                        
                                                             {active && <IconButton onClick={() => {
                                                                 console.log(active?.owners)
                                                                 setDAOMemberList(DAO?.members?.map((member: any) => member?.member).map((member: any) => { return { ...member, owner: active?.owners?.map((o: any) => toChecksumAddress(o.wallet)).indexOf(toChecksumAddress(member?.wallet)) > -1 } }))
@@ -279,6 +296,7 @@ const SafeModal = ({ open, onClose }: any) => {
                                                             }}>
                                                                 <img src={EditSVG} />
                                                             </IconButton>}
+                                                            </Box>
                                                         </Box>
                                                         {active && <Box style={{ maxHeight: 250, overflow: 'hidden', overflowY: 'auto' }}>
                                                             {

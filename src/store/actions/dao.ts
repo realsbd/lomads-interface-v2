@@ -116,3 +116,10 @@ export const deSyncTrelloAction = (payload: any) => {
         payload
     }
 }
+
+export const toggleSafeAction = (payload: any) => {
+    return {
+        type: actionTypes.TOGGLE_SAFE_ACTION,
+        payload
+    }
+}

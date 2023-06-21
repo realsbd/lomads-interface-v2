@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { Box, Typography, Chip } from "@mui/material";
 import { makeStyles } from '@mui/styles';
@@ -16,6 +16,12 @@ import useTerminology from 'hooks/useTerminology';
 import editSvg from 'assets/svg/editToken.svg';
 import AddMemberModal from "modals/Members/AddMemberModal";
 import EditMemberModal from "modals/Members/EditMemberModal";
+import { useAppDispatch } from "helpers/useAppDispatch";
+import { loadRecurringPaymentsAction } from "store/actions/treasury";
+import { useAppSelector } from "helpers/useAppSelector";
+import useSafe from "hooks/useSafe";
+import { useWeb3Auth } from "context/web3Auth";
+import useRole from "hooks/useRole";
 
 const useStyles = makeStyles((theme: any) => ({
     line: {
@@ -64,9 +70,13 @@ interface MembersProps {
 
 export default ({ list }: MembersProps) => {
     const classes = useStyles();
-
+    const dispatch = useAppDispatch()
+    const { account } = useWeb3Auth()
     const { DAO } = useDAO();
+    const { myRole } = useRole(DAO, account, undefined)
     const { transformRole } = useTerminology(_get(DAO, 'terminologies'))
+
+    const { adminSafes } = useSafe()
 
     const [showAddMember, setShowAddMember] = useState(false);
     const [showEditMember, setShowEditMember] = useState(false);
@@ -74,6 +84,15 @@ export default ({ list }: MembersProps) => {
     const eligibleMembers = useMemo(() => {
         return _sortBy(_uniqBy(list, (m: any) => m.member.wallet.toLowerCase()), (m: any) => _get(m, 'member.name', '').toLowerCase(), 'asc').filter((m: any) => m.deletedAt === null)
     }, [DAO]);
+
+    useEffect(() => {
+        if(DAO?.url) {
+            if(myRole === 'role1') {
+                const safes = DAO?.safes?.map((safe:any) => safe?.address)
+                dispatch(loadRecurringPaymentsAction({ safes }))
+            }
+        }
+    }, [DAO?.url, myRole])
 
     const NameAndAvatar = (props: any) => {
         const [show, setShow] = useState(false);
@@ -101,7 +120,7 @@ export default ({ list }: MembersProps) => {
             <>
                 <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"} key={index}>
                     <Box sx={{ width: '250px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                        <Avatar name={props.name} wallet={props.address} />
+                        <Avatar recurringPayment name={props.name} wallet={props.address} />
                         <Box className={classes.lineSm}></Box>
                     </Box>
                     <Box sx={{ width: '300px' }} display={"flex"} alignItems={"center"}>
@@ -193,7 +212,7 @@ export default ({ list }: MembersProps) => {
                     </Box>
                 </Box>
 
-                <Box sx={{ width: '100%', maxHeight: '220px', overflow: 'auto' }}>
+                <Box sx={{ width: '100%', maxHeight: '220px', overflow: 'auto', paddingTop: 2 }}>
                     {eligibleMembers?.map((result: any, index: any) => {
                         return (
                             <NameAndAvatar
