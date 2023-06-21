@@ -68,7 +68,7 @@ export default ({ open, onClose }: any) => {
     const { account, chainId: currentChainId } = useWeb3Auth()
     const { DAO } = useDAO()
     const { safeTokens, getToken } = useSafeTokens()
-    const { loadSafe } = useSafe()
+    const { loadSafe, adminSafes } = useSafe()
     const { createSafeTransaction } = useGnosisSafeTransaction();
     const { createSafeTransaction: createOffChainSafeTransaction } = useOffChainTransaction();
     const [sendTokensLoading, setSendTokensLoading] = useState(false)
@@ -81,12 +81,12 @@ export default ({ open, onClose }: any) => {
         if(DAO && DAO?.url){
             setTab(1)
             setState((prev:any) => { return { ...prev, 
-                safeAddress: _get(DAO, 'safes[0].address', null),
-                token: _get(safeTokens, `${_get(DAO, 'safes[0].address', null)}[0].tokenAddress`, process.env.REACT_APP_NATIVE_TOKEN_ADDRESS),
+                safeAddress: _get(adminSafes, '[0].address', null),
+                token: _get(safeTokens, `${_get(adminSafes, '[0].address', null)}[0].tokenAddress`, process.env.REACT_APP_NATIVE_TOKEN_ADDRESS),
                 members: DAO?.members?.map((member:any) => { return { name: member?.member?.name, address: member?.member?.wallet, selected: false } })
             } })
         }
-    }, [DAO?.url, open])
+    }, [DAO?.url, open, adminSafes])
 
     const toggleMember = (member: any) => {
         setState((prev: any) => { return { ...prev, members: prev.members.map((mem:any) => { 
@@ -146,7 +146,7 @@ export default ({ open, onClose }: any) => {
                         {
                             DAO?.safes?.map((safe:any) => {
                                 return (
-                                    <MenuItem key={safe?.address} value={safe?.address}>{ (safe?.name || "Multi-sig wallet") +" ("+ beautifyHexToken(safe?.address) +")" }</MenuItem>
+                                    <MenuItem disabled={!_find(adminSafes, (a:any) => a._id === safe?._id)} key={safe?.address} value={safe?.address}>{ (safe?.name || "Multi-sig wallet") +" ("+ beautifyHexToken(safe?.address) +")" }</MenuItem>
                                 )
                             })
                         }

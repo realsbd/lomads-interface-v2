@@ -3,6 +3,12 @@ import { Typography, Box, TextField, FormControl, FormLabel, Chip } from '@mui/m
 import { makeStyles } from '@mui/styles';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
+const  MenuProps = {
+    MenuProps:{
+        PaperProps: { sx: { maxHeight: 300 } } 
+      },
+  }
+
 const useStyles = makeStyles((theme: any) => ({
     root: {
         "& .MuiFormHelperText-root": {
@@ -28,7 +34,7 @@ export default ({ labelChip, fullWidth, label, date, ...props }: any) => {
             </Box>
             {   date ?
                 <DatePicker {...props} className={classes.root} /> :
-                <TextField {...props} className={classes.root} />
+                <TextField {...props} SelectProps={MenuProps}  className={classes.root} />
             }
         </FormControl>
     )

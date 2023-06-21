@@ -48,6 +48,7 @@ export default ({ open, onClose, transaction }: any) => {
     const [createLoading, setCreateLoading] = useState(false)
     const [updateLoading, setUpdateLoading] = useState(false)
     const [stopLoading, setStopLoading] = useState(false)
+    const { adminSafes } = useSafe()
     const classes = useStyles()
     const { DAO } = useDAO();
     const { account, chainId: currentChainId } = useWeb3Auth()
@@ -104,13 +105,16 @@ export default ({ open, onClose, transaction }: any) => {
             }
         } else {
             setState((prev:any) => {
+                const safe = _get(adminSafes, '[0].address')
                 return {
+                    safeAddress: safe ? _get(adminSafes, '[0].address') : null,
+                    tokenAddress: safe ? _get(_get(safeTokens, safe?.address, []), '[0].tokenAddress', null) : null,
                     frequency: 'weekly',
                     ends: { value: "NEVER" }
                 }
             })
         }
-    }, [DAO?.url, transaction, safeTokens, ReceiversList, open])
+    }, [DAO?.url, transaction, safeTokens, ReceiversList, open, adminSafes])
 
     useEffect(() => {
         console.log("transaction, 'receiver._id', null),", state)

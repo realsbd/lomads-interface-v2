@@ -32,6 +32,7 @@ import { JsonToCsv, useJsonToCsv } from 'react-json-csv';
 import axios from "axios";
 import { GNOSIS_SAFE_BASE_URLS } from "constants/chains";
 import useGnosisTxnTransform from "hooks/useGnosisTxnTransform";
+import useSafe from "hooks/useSafe";
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const useStyles = makeStyles((theme: any) => ({
@@ -117,6 +118,7 @@ export default () => {
     const { daoURL } = useParams()
     const { account } = useWeb3Auth()
     const { safeTokens } = useSafeTokens()
+    const { adminSafes } = useSafe()
     const [showSendToken, setShowSendToken] = useState(false);
     const [showRecurringPayment, setShowRecurringPayment] = useState(false);
     const [activeTab, setActiveTab] = useState(0);
@@ -125,6 +127,7 @@ export default () => {
     const [csvLoading, setCsvLoading] = useState(false);
     const { transformTx } = useGnosisTxnTransform();
     const [downloadableData, setDownloadableData] = useState([])
+    
 
     const { treasury, recurringPayments } = useAppSelector((store: any) => store.treasury)
 
@@ -288,9 +291,9 @@ export default () => {
                         <Tab label="Recurring payments" {...a11yProps(1)} />
                     </Tabs>
                     <Box>
-                        { activeTab == 0 &&
+                        { activeTab == 0 && 
                         <Box display="flex" flexDirection="row" alignItems="center">
-                            <Button onClick={() => setShowSendToken(true)} sx={{ color: palette?.primary?.main }} size="small" variant="contained" color="secondary">SEND TOKEN</Button> 
+                            { adminSafes && adminSafes?.length > 0 && <Button onClick={() => setShowSendToken(true)} sx={{ color: palette?.primary?.main }} size="small" variant="contained" color="secondary">SEND TOKEN</Button> }
                             <IconButton sx={{ ml: 2 }} onClick={() => handleDownloadCsv()}>
                                 { !csvLoading ? <img src={exportBtn}/> : <LeapFrog size={20} color="#C94B32" /> }
                             </IconButton>
@@ -321,12 +324,12 @@ export default () => {
                 </Box>
                 }
             </Grid> : null }
-            { activeTab == 1 ?
+            { activeTab == 1 && adminSafes && adminSafes?.length > 0  ?
             <Grid mt={0.5} item sm={12}>
                 <Box className={classes.reccurHeader}>
                     <Box></Box>
                     <Box>
-                        <Button onClick={() => { setActiveTransaction(null); setShowRecurringPayment(true) }} color="secondary" variant="contained" startIcon={<AddIcon color="primary" />} size="small" ><Typography color="primary">NEW RECURRING PAYMENT</Typography></Button>
+                      { adminSafes && adminSafes?.length > 0 && <Button onClick={() => { setActiveTransaction(null); setShowRecurringPayment(true) }} color="secondary" variant="contained" startIcon={<AddIcon color="primary" />} size="small" ><Typography color="primary">NEW RECURRING PAYMENT</Typography></Button> }
                     </Box>
                 </Box>
             </Grid> : null }
@@ -336,7 +339,7 @@ export default () => {
                    <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={500} animation="wave" /> :
                     <Box className={classes.table}>
                         <TableContainer  style={{ maxHeight: 500 }} component={Box}>
-                            <Table size="small" stickyHeader aria-label="simple table">
+                            <Table size="medium" stickyHeader aria-label="simple table">
                                 <TableBody>
                                     {
                                         DAO && recurringPayments && recurringTreasuryTxns && recurringTreasuryTxns.map((txn:any) => {
