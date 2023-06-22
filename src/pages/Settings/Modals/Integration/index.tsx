@@ -90,6 +90,8 @@ const IntegrationModal = ({ open, onClose }:
     const [hasClickedAuth, setHasClickedAuth] = useState(false)
     const prevAuth = usePrevious(authorization)
     const { DAO } = useDAO();
+
+    console.log("DAO settings : ", DAO)
     const { user } = useAppSelector((store: any) => store.session);
     // @ts-ignore
     const { syncTrelloDataLoading } = useAppSelector(store => store.dao);
@@ -101,7 +103,7 @@ const IntegrationModal = ({ open, onClose }:
     const [isGitHubConnected, setGitHubConnected] = useState(false)
     const [gitHubLoading, setGitHubLoading] = useState(false);
     const [gitHubAccessToken, setGitHubAccessToken] = useState(false)
-    const [selectedGitHubLink, setSelectedGitHubLink] = useState({ id: null, url: '', full_name: '', name: '' })
+    const [selectedGitHubLink, setSelectedGitHubLink] = useState({ id: null, html_url: '', full_name: '', name: '' })
     const [gitHubOrganizationList, setGitHubOrganizationList] = useState([])
     const [isDiscordConnected, setIsDiscordConnected] = useState(false);
     const [serverData, setServerData] = useState<any[]>([]);
@@ -313,7 +315,7 @@ const IntegrationModal = ({ open, onClose }:
 
     const pullGithubIssues = () => {
         setGitHubLoading(true);
-        axiosHttp.get(`utility/get-issues?token=${gitHubAccessToken}&repoInfo=${selectedGitHubLink.full_name}&daoId=${_get(DAO, '_id', null)}`)
+        axiosHttp.get(`utility/get-issues?token=${gitHubAccessToken}&repoInfo=${selectedGitHubLink.full_name}&repoId=${selectedGitHubLink.id}&repoUrl=${selectedGitHubLink.html_url}&daoId=${_get(DAO, '_id', null)}`)
             .then((result: any) => {
                 console.log("issues : ", result.data);
                 if (result.data.message === 'error') {
@@ -330,7 +332,7 @@ const IntegrationModal = ({ open, onClose }:
                             issueList: result.data.data,
                             token: gitHubAccessToken,
                             repoInfo: selectedGitHubLink.full_name,
-                            linkOb: { title: selectedGitHubLink.name, link: selectedGitHubLink.url }
+                            linkOb: { title: selectedGitHubLink.name, link: selectedGitHubLink.html_url }
                         }
                     }));
                     setGitHubLoading(false);
@@ -608,11 +610,12 @@ const IntegrationModal = ({ open, onClose }:
     }
 
     const handleGitHubSwitch = (evt: any, item: any) => {
+        console.log("item :", item)
         if (!!evt.target.checked) {
             setSelectedGitHubLink(item)
             return
         }
-        setSelectedGitHubLink({ id: null, full_name: '', name: '', url: '' })
+        setSelectedGitHubLink({ id: null, full_name: '', name: '', html_url: '' })
     }
 
     const disableSycPullIssues = (item: any) => {
