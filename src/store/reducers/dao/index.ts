@@ -35,8 +35,17 @@ const DAOReducer = (state: any = getInitialState(), action: any) =>
 				draft.DAOListLoading = payload;
 				break;
 			}
+			case actionTypes.SET_DAO_ACTION:
 			case actionTypes.LOAD_DAO_SUCCESS: {
-				draft.DAO = payload;
+				draft.DAO = {
+					...payload,
+					safes: payload.safes.map((safe:any) => {
+						return {
+							...safe,
+							enabled: !payload?.disabledSafes ? true : (payload?.disabledSafes && payload?.disabledSafes.indexOf(safe?.address) > -1) ? false : true
+						}
+					})
+				};
 				draft.DAOLoading = false
 				break;
 			}
@@ -46,10 +55,6 @@ const DAOReducer = (state: any = getInitialState(), action: any) =>
 			}
 			case actionTypes.LOAD_DAO_LOADING: {
 				draft.DAOLoading = payload;
-				break;
-			}
-			case actionTypes.SET_DAO_ACTION: {
-				draft.DAO = payload;
 				break;
 			}
 			case actionTypes.SET_DAO_MEMBER_ACTION: {

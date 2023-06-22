@@ -14,11 +14,13 @@ import Action from "./Action"
 import useSafe from "hooks/useSafe"
 import { useAppDispatch } from "helpers/useAppDispatch"
 import { loadRecurringPaymentsAction } from "store/actions/treasury"
+import { useSafeTokens } from "context/safeTokens"
 
 export default ({ transaction, executableNonce }: any) => {
     const dispatch = useAppDispatch()
     const { DAO } = useDAO();
     const { loadSafe } = useSafe()
+    const { safeTokens } = useSafeTokens()
 
     const safeChainId = useMemo(() => {
         if (DAO?.url)
@@ -37,7 +39,8 @@ export default ({ transaction, executableNonce }: any) => {
         for (let index = 0; index < txn.length; index++) {
             const tx = txn[index];
             const metadata = _get(transaction, `metadata.${tx.to}`)
-            if (!tx.to || tx.to === "0x") return;
+            const token = _find(_get(safeTokens, transaction?.safeAddress, []), (tkn:any) => tkn?.tokenAddress === tx?.tokenAddress)
+            if (!tx.to || tx.to === "0x") break;
             let actions: any = {}
             if (metadata?.sweatConversion) {
                 // reset sweat for recipient && update user earnings
@@ -45,13 +48,15 @@ export default ({ transaction, executableNonce }: any) => {
                     ...actions, 
                     "RESET_SWEAT": { user: tx?.to, daoId: DAO?._id, }, 
                     "UPDATE_EARNING": { user: tx?.to, daoId: DAO?._id, symbol: tx?.symbol, value: +tx?.formattedValue, currency: tx?.tokenAddress || 'SWEAT' },
+                    "UPDATE_FIAT_CONVERSION": { txId: transaction?._id, recipient: tx?.to, fiatConversion: token?.fiatConversion }
                 }
             } else if (metadata?.taskId) {
                 // close task && update payment for user
                 actions = {
                     ...actions,
                     "TASK_PAID": { taskId: metadata?.taskId, user: tx?.to },
-                    "UPDATE_EARNING": { user: tx?.to, daoId: DAO?._id, symbol: tx?.symbol, value: +tx?.formattedValue, currency: tx?.tokenAddress || 'SWEAT' }
+                    "UPDATE_EARNING": { user: tx?.to, daoId: DAO?._id, symbol: tx?.symbol, value: +tx?.formattedValue, currency: tx?.tokenAddress || 'SWEAT' },
+                    "UPDATE_FIAT_CONVERSION": { txId: transaction?._id, recipient: tx?.to, fiatConversion: token?.fiatConversion }
                 }
             } else if (metadata?.recurringPaymentAmount) {
                 // update recurring payment status
@@ -63,7 +68,8 @@ export default ({ transaction, executableNonce }: any) => {
                 // update user earnings
                 actions = {
                     ...actions,
-                    "UPDATE_EARNING": { user: tx?.to, daoId: DAO?._id, symbol: tx?.symbol, value: +tx?.formattedValue, currency: tx?.tokenAddress || 'SWEAT' }
+                    "UPDATE_EARNING": { user: tx?.to, daoId: DAO?._id, symbol: tx?.symbol, value: +tx?.formattedValue, currency: tx?.tokenAddress || 'SWEAT' },
+                    "UPDATE_FIAT_CONVERSION": { txId: transaction?._id, recipient: tx?.to, fiatConversion: token?.fiatConversion }
                 }
             }
             actionList.push(actions)
@@ -91,7 +97,7 @@ export default ({ transaction, executableNonce }: any) => {
             {
                 txn.map((tx: any, _i: number) => (
                     <TableRow>
-                        <CreditDebit credit={tx?.isCredit} executed={tx?.executionDate} amount={tx?.formattedValue} token={tx?.symbol} />
+                        <CreditDebit credit={tx?.isCredit} fiatConversion={_get(transaction, `metadata.${tx?.to}.fiatConversion`, undefined)} executed={tx?.executionDate} amount={tx?.formattedValue} token={tx?.symbol} />
                         <Label transaction={transaction} recipient={tx?.to} />
                         <Recipient safeAddress={transaction?.safeAddress} credit={tx?.isCredit} recipient={tx?.to} token={tx?.symbol} />
                         <Tag transaction={transaction} recipient={tx?.to} />

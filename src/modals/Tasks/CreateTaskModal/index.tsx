@@ -141,6 +141,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     const classes = useStyles();
     const dispatch = useAppDispatch();
     const { DAO } = useDAO();
+    const { activeSafes } = useSafe()
     // @ts-ignore
     const { user } = useAppSelector(store => store.session);
     // @ts-ignore
@@ -182,7 +183,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
 
     useEffect(() => {
         if(DAO?.url)
-            setSafeAddress(_get(DAO, 'safes[0].address'))
+            setSafeAddress(_get(activeSafes, '[0].address'))
             if(user)
                 setReviewer(user?._id) 
     }, [DAO?.url, user])
@@ -712,7 +713,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                                     }}
                                 >
                                     {
-                                        DAO?.safes?.map((safe: any) => {
+                                        activeSafes?.map((safe: any) => {
                                             return (
                                                 <MenuItem key={safe?.address} value={safe?.address}>{(safe?.name || "Multi-sig wallet") + " (" + beautifyHexToken(safe?.address) + ")"}</MenuItem>
                                             )

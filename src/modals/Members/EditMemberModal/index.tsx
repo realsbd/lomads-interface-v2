@@ -211,7 +211,7 @@ export default ({ open, closeModal }: Props) => {
                                                         variant="marble"
                                                         colors={["#E67C40", "#EDCD27", "#8ECC3E", "#2AB87C", "#188C8C"]}
                                                     />
-                                                    <Box sx={{ width: '150px', marginLeft: '10px', transform: 'translateY(-5px)' }}>
+                                                    <Box sx={{ width: '150px', marginLeft: '10px' }}>
                                                         <TextInput
                                                             placeholder="Name"
                                                             fullWidth

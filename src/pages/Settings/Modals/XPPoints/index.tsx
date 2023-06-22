@@ -55,7 +55,7 @@ const XPPoints = ({ open, onClose }: any) => {
     const [activeTab, setActiveTab] = useState<number>(1)
     const [txnLoading, setTxnLoading] = useState<boolean>(false)
     const { DAO, updateDAO } = useDAO()
-    const { loadSafe } = useSafe()
+    const { loadSafe, adminSafes } = useSafe()
     const { safeTokens } = useSafeTokens()
     const { createSafeTransaction } = useGnosisSafeTransaction()
     const [enabled, setEnabled] = useState(false);
@@ -195,7 +195,7 @@ const XPPoints = ({ open, onClose }: any) => {
                             {
                                 DAO?.safes?.map((safe:any) => {
                                     return (
-                                        <MenuItem key={safe?.address} value={safe?.address}>{ (safe?.name || "Multi-sig wallet") +" ("+ beautifyHexToken(safe?.address) +")" }</MenuItem>
+                                        <MenuItem disabled={!_find(adminSafes, (s:any) => s.address === safe?.address)} key={safe?.address} value={safe?.address}>{ (safe?.name || "Multi-sig wallet") +" ("+ beautifyHexToken(safe?.address) +")" }</MenuItem>
                                     )
                                 })
                             }

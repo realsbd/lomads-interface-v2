@@ -27,6 +27,7 @@ import { beautifyHexToken } from "utils";
 import theme from "theme";
 import AmountInput from "components/AmountInput";
 import moment from "moment";
+import useSafe from "hooks/useSafe";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -112,7 +113,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     const { safeTokens } = useSafeTokens();
     const { chainId } = useWeb3Auth();
     const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
-
+    const { activeSafes } = useSafe()
     const [milestones, setMilestones] = useState<any[]>(list.length > 0 ? list : [{ name: '', amount: '0', deadline: '', deliverables: '', complete: false }]);
     const [milestoneCount, setMilestoneCount] = useState<number>(list.length > 0 ? list.length : 1);
     const [amount, setAmount] = useState(editMilestones ? _get(Project, 'compensation.amount', '') : 0);
@@ -395,7 +396,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                 {
                                     DAO?.safes?.map((safe: any) => {
                                         return (
-                                            <MenuItem key={safe?.address} value={safe?.address}>{(safe?.name || "Multi-sig wallet") + " (" + beautifyHexToken(safe?.address) + ")"}</MenuItem>
+                                            <MenuItem disabled={!safe?.enabled} key={safe?.address} value={safe?.address}>{(safe?.name || "Multi-sig wallet") + " (" + beautifyHexToken(safe?.address) + ")"}</MenuItem>
                                         )
                                     })
                                 }

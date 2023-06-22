@@ -38,6 +38,7 @@ import { Add } from "@mui/icons-material"
 import { useDAO } from "context/dao"
 import { USDC } from "constants/tokens"
 import SwitchChain from "components/SwitchChain"
+import useSafe from "hooks/useSafe"
 
 ///   0xD123b939B5022608241b08c41ece044059bE00f5
 
@@ -190,6 +191,7 @@ export default () => {
     const navigate = useNavigate();
     const { state } = useLocation();
     const { DAO } = useDAO();
+    const { activeSafes } = useSafe()
     const { user } = useAppSelector((store: any) => store.session)
     const { chainId, account, provider } = useWeb3Auth()
     const { getENSAddress, getENSName } = useENS();
@@ -238,7 +240,7 @@ export default () => {
 
     useEffect(() => {
         if(DAO)
-            setStateX((prev: any) => { return { ...prev, selectedChainId: +(_get(DAO, 'safes[0].chainId', _get(DAO, 'chainId', chainId))) } })
+            setStateX((prev: any) => { return { ...prev, selectedChainId: +(_get(DAO, 'activeSafes[0].chainId', _get(DAO, 'chainId', chainId))) } })
     }, [DAO])
 
     useEffect(() => {
@@ -255,14 +257,6 @@ export default () => {
                     decimals: _get(USDC, `[${stateX?.selectedChainId}].decimals`),
                 }
             ])
-            // if(DAO?.safes && DAO?.safes?.length > 0) {
-            //     setStateX((prev:any) => {
-            //         return {
-            //             ...prev,
-            //             treasury: prev.priced ? state?.selectedChainId === +_get(DAO, 'safes[0].chainId') ? _get(DAO, 'safes[0].address') : '' : "0x0000000000000000000000000000000000000000",
-            //         }
-            //     })
-            // }
         }
     }, [stateX?.selectedChainId])
 

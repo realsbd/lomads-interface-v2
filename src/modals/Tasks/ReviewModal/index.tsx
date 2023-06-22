@@ -158,7 +158,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
     const [currency, setCurrency] = useState<string>('');
     const [errorCurrency, setErrorCurrency] = useState<boolean>(false);
     const [errorTaskValue, setErrorTaskValue] = useState<boolean>(false);
-
+    const { activeSafes } = useSafe();
     const [tag, setTag] = useState(null)
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [rejectUser, setRejectUser] = useState<any>(null);

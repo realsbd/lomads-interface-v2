@@ -144,6 +144,7 @@ export default ({ open, closeModal, task }: Props) => {
     // @ts-ignore
     const { editTaskLoading, editDraftTaskLoading, convertDraftTaskLoading } = useAppSelector(store => store.task);
     const { safeTokens } = useSafeTokens();
+    const { activeSafes } = useSafe();
     const { account, chainId } = useWeb3Auth();
     const { transformTask, transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies', null));
 
