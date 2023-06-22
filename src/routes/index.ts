@@ -20,6 +20,7 @@ import CreatePassTokenPage from 'pages/CreatePassToken'
 import DCAuthPage from 'pages/DCAuth';
 import GithubAuthPage from 'pages/GithubAuth';
 import MintPage from 'pages/Mint';
+import MintPageV1 from 'pages/Mint/index.v1';
 import OnlyWhitelistedPage from 'pages/OnlyWhitelisted';
 import NoAccessPage from 'pages/NoAccess'
 import WelcomePage from 'pages/Welcome';
@@ -116,6 +117,13 @@ export default [
 		layout: LandingLayout,
 		private: true,
 		component: MintPage
+	},
+	{
+		path: '/:daoURL/mint/v1/:contractId',
+		exact: true,
+		layout: LandingLayout,
+		private: true,
+		component: MintPageV1
 	},
 	{
 		path: '/',

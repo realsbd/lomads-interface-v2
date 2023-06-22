@@ -83,14 +83,14 @@ const handleNetworkChanged = async (chainId: any) => {
     }
 }
 
-useEffect(() => {
-  if(window?.ethereum) {
-      let chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', SupportedChainId.POLYGON)]
-      if(!chainInfo)
-        chainInfo = CHAIN_INFO[SupportedChainId.POLYGON]
-      dispatch(setNetworkConfig({ selectedChainId: +_get(window?.ethereum, 'networkVersion', SupportedChainId.POLYGON), chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
-  }
-}, [])
+// useEffect(() => {
+//   if(window?.ethereum) {
+//       let chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', SupportedChainId.POLYGON)]
+//       if(!chainInfo)
+//         chainInfo = CHAIN_INFO[SupportedChainId.POLYGON]
+//       dispatch(setNetworkConfig({ selectedChainId: +_get(window?.ethereum, 'networkVersion', SupportedChainId.POLYGON), chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+//   }
+// }, [])
 
 useEffect(() => {
   if(window?.ethereum)

@@ -16,7 +16,7 @@ import { usePrevious } from 'hooks/usePrevious';
 import axiosHttp from 'api'
 import { ethers } from "ethers";
 import { SupportedChainId } from 'constants/chains';
-import useMintSBT from 'hooks/useMintSBT';
+import useMintSBT from 'hooks/useMintSBT.v1';
 import PT from "assets/images/drawer-icons/PT.svg";
 import { useNavigate } from 'react-router-dom';
 import { USDC } from 'constants/tokens';
@@ -110,7 +110,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
     const [networkError, setNetworkError] = useState<any>(null)
     const [contract, setContract] = useState<any>(null);
     const [updateContractLoading, setUpdateContractLoading] = useState<boolean | null>(null)
-    const { updateContract, getStats, withdraw } = useMintSBT(_get(contract, 'address', ''), _get(contract, 'version', ''))
+    const { updateContract,  withdraw } = useMintSBT(_get(contract, 'address', ''), _get(contract, 'version', ''))
     const [tokens, setTokens] = useState<any>([])
     const [state, setState] = useState<any>({
         whitelisted: false,
@@ -131,10 +131,6 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
         if(DAO) 
             setChainId(_get(DAO, 'sbt.chainId', _get(DAO, 'chainId')))
     }, [DAO])
-
-    useEffect(() => {
-        getStats().then((res:any) => console.log("MINT_PRICE", res[5]))
-    }, [open])
 
     useEffect(() => {
         if(contract) {
@@ -194,7 +190,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
         try {
             setUpdateContractLoading(true)
             if(+contract?.version >= 1 && (state?.price?.token !== prevState?.price?.token) || (state?.price?.value !== prevState?.price?.value)) {
-                await updateContract(state?.price?.value, state?.price?.token)
+                //await updateContract(state?.price?.value, state?.price?.token)
             }
             return await axiosHttp.patch(`contract/${contract?.address}`, {
                  daoId: DAO?._id,

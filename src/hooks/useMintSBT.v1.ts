@@ -9,9 +9,11 @@ import { USDC_GOERLI, USDC_POLYGON } from 'constants/tokens'
 import { useCallback, useEffect, useState } from 'react';
 import { INFURA_NETWORK_URLS } from 'constants/infura';
 import { CHAIN_INFO } from 'constants/chainInfo';
+import { useAppSelector } from 'helpers/useAppSelector';
 import { useWeb3Auth } from 'context/web3Auth';
-import { useDAO } from 'context/dao';
 import { getRpcUrls } from 'constants/rpcUrl';
+import { useDAO } from 'context/dao';
+// import { getRpcUrls } from 'utils/switchChain';
 
 export type SBTParams = {
     name: string,
@@ -22,8 +24,9 @@ export type SBTParams = {
 }
 
 const useMintSBT = (contractAddress: string | undefined, version: string | undefined = "0") => {
-    const { DAO } = useDAO();
+  console.log("useMintSBT", contractAddress, version)
     const { account, provider: currentProvider, chainId: currentChainId, provider } = useWeb3Auth();
+    const { DAO } = useDAO()
     const [chainId, setChainId] = useState(null)
     useEffect(() => {
       if(DAO)

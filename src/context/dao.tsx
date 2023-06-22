@@ -73,7 +73,10 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   
           } else {
             if (!DAO?.sbt?.whitelisted || (DAO?.sbt?.whitelisted && _find(DAO?.members, (member: any) => toChecksumAddress(member.member.wallet) === account))) {
-              navigate(`/${DAO?.url}/mint/${DAO?.sbt?.address}`)
+              if(+DAO?.sbt?.version >= 2)
+                navigate(`/${DAO?.url}/mint/${DAO?.sbt?.address}`)
+              else
+                navigate(`/${DAO?.url}/mint/v1/${DAO?.sbt?.address}`)
             } else {
               // NOT WHITELISTED
               navigate(`/${DAO?.url}/only-whitelisted`)
