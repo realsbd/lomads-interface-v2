@@ -19,7 +19,7 @@ export function useSafeTokens(): any {
 export const SafeTokensProvider = ({ children }: any) => {
     //@ts-ignore
     const { DAO } = useAppSelector(store => store?.dao)
-    const [safeTokens, setSafeTokens] = useState<any>(null);
+    const [safeTokens, setSafeTokens] = useState<any>();
 
     useEffect(() => {
         if (!DAO) {

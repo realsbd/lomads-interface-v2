@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
+import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy, groupBy as _groupBy } from 'lodash';
 import { Paper, Typography, Box, Drawer } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
@@ -23,7 +23,8 @@ import { ethers } from 'ethers';
 import { SUPPORTED_ASSETS, SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chains';
 import axiosHttp from 'api';
 import { CHAIN_INFO } from "constants/chainInfo";
-import { updateCurrentUser } from "store/actions/session";
+import { loadUserTransactionAction, updateCurrentUser } from "store/actions/session";
+import moment from "moment";
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const useStyles = makeStyles((theme: any) => ({
@@ -66,14 +67,42 @@ export default ({ open, closeModal }: Props) => {
     const { DAO } = useDAO();
     const { account, provider, chainId, openWallet, switchChain, web3Auth } = useWeb3Auth();
     // @ts-ignore
-    const { user } = useAppSelector(store => store?.session);
+    const { user, transactions } = useAppSelector(store => store?.session);
     console.log("user : ", user)
 
     const [name, setName] = useState<string>('');
     const [errorName, setErrorName] = useState('');
 
-    const [chain, setChain] = useState('Polygon');
+    const [chain, setChain] = useState<any>(137);
     const [nftData, setNftData] = useState<any>({})
+
+    useEffect(() => {
+        if(open == true) {
+            dispatch(loadUserTransactionAction(account))
+        }
+    }, [open])
+
+    const computedTxns = useMemo(() => {
+        if(transactions && chain) {
+            let txns = transactions.filter((transaction: any) => transaction?.chainId === chain && _get(transaction,`metadata.${account}.parsedTxValue.formattedValue`) && _get(transaction,`metadata.${account}.parsedTxValue.symbol`) && _get(transaction,`metadata.${account}.parsedTxValue.formattedValue`) !== "" && _get(transaction,`metadata.${account}.parsedTxValue.symbol`) !== "")
+            txns = _sortBy(txns, [(tx:any) => tx?.rawTx?.isExecuted, (tx:any) => tx?.rawTx?.executionDate], ['desc', 'desc'])
+            return txns
+        }
+        return []
+    }, [transactions, chain])
+
+    const coinCount = useMemo(() => {
+        let count: any = {}
+        if(computedTxns && chain) {
+            let txns = _groupBy(computedTxns, (txn:any) => _get(txn, `metadata.${account}.parsedTxValue.symbol`))
+            Object.keys(txns).map(token => {
+                count[token] = txns[token].reduce((a:any, b:any) =>  a + (+_get(b, `metadata.${account}.parsedTxValue.formattedValue`)), 0)
+            })
+        }
+        return count
+    }, [chain, computedTxns])
+
+    console.log("computedTxns", computedTxns)
 
     useEffect(() => {
         if (account && provider && chainId)
@@ -176,13 +205,13 @@ export default ({ open, closeModal }: Props) => {
                         </Box>
                     }
 
-                    {/* <Box sx={{ width: '100%' }} display={"flex"} flexDirection={"column"}>
+                    <Box sx={{ width: '100%' }} display={"flex"} flexDirection={"column"}>
                         <Box sx={{ width: '100%', marginBottom: '20px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                             <Box sx={{ width: '50%' }} display={"flex"} alignItems={"center"}>
                                 <Typography sx={{ marginRight: '30px', fontSize: 16, fontWeight: 700, color: '#76808D' }}>My Earnings</Typography>
                                 <Box sx={{ width: '175px' }}>
                                     <MuiSelect
-                                        options={[{ value: 'Polygon', label: 'Polygon' }, { value: 'Goerli', label: 'Goerli' }]}
+                                        options={SUPPORTED_CHAIN_IDS.map((c:any) => { return { label: CHAIN_INFO[c].label, value: c } })}
                                         selected={chain}
                                         setSelectedValue={(value) => setChain(value)}
                                     />
@@ -200,26 +229,16 @@ export default ({ open, closeModal }: Props) => {
                             display={"flex"} alignItems={"center"} justifyContent={"space-between"}
                         >
                             <Box display={"flex"} alignItems={"center"}>
-                                <Box sx={{ marginRight: '16px' }} display={"flex"} alignItems={"center"}>
-                                    <Typography sx={{ color: '#76808D', fontWeight: 700, marginRight: "5px" }}>24</Typography>
-                                    <Typography sx={{ color: '#76808D', fontWeight: 700 }}>SWEAT</Typography>
-                                </Box>
-                                <Box sx={{ marginRight: '16px' }} display={"flex"} alignItems={"center"}>
-                                    <Typography sx={{ color: '#76808D', fontWeight: 700, marginRight: "5px" }}>240</Typography>
-                                    <Typography sx={{ color: '#76808D', fontWeight: 700 }}>HK</Typography>
-                                </Box>
-                                <Box sx={{ marginRight: '16px' }} display={"flex"} alignItems={"center"}>
-                                    <Typography sx={{ color: '#76808D', fontWeight: 700, marginRight: "5px" }}>240</Typography>
-                                    <Typography sx={{ color: '#76808D', fontWeight: 700 }}>BV</Typography>
-                                </Box>
-                                <Box sx={{ marginRight: '16px' }} display={"flex"} alignItems={"center"}>
-                                    <Typography sx={{ color: '#76808D', fontWeight: 700, marginRight: "5px" }}>240</Typography>
-                                    <Typography sx={{ color: '#76808D', fontWeight: 700 }}>RHO</Typography>
-                                </Box>
-                                <Box sx={{ marginRight: '16px' }} display={"flex"} alignItems={"center"}>
-                                    <Typography sx={{ color: '#76808D', fontWeight: 700, marginRight: "5px" }}>240</Typography>
-                                    <Typography sx={{ color: '#76808D', fontWeight: 700 }}>ETH</Typography>
-                                </Box>
+                                {
+                                    Object.keys(coinCount).map((c:any) => {
+                                        return (
+                                            <Box sx={{ marginRight: '16px' }} display={"flex"} alignItems={"center"}>
+                                                <Typography sx={{ color: '#76808D', fontWeight: 700, marginRight: "5px" }}>{ parseFloat(coinCount[c]).toFixed(3) }</Typography>
+                                                <Typography sx={{ color: '#76808D', fontWeight: 700 }}>{ c }</Typography>
+                                            </Box>
+                                        )
+                                    })
+                                }
                             </Box>
                             <Box display={"flex"} alignItems={"center"}>
                                 <img src={hkLogo} alt="icon-alt" style={{ marginRight: '5px' }} />
@@ -229,22 +248,27 @@ export default ({ open, closeModal }: Props) => {
                         </Box>
 
                         <Box sx={{ width: '100%' }} display={"flex"} flexDirection={"column"}>
-                            
-                            <Box sx={{ width: '100%' }} display={"flex"} alignItems={"center"}>
-                                <Box sx={{ width: '70%' }} display={"flex"} alignItems={"center"}>
-                                    <Typography sx={{ marginRight: '20px', color: '#76808D', fontWeight: 700, fontSize: '14px' }}>120 ETH /</Typography>
-                                    <Box display={"flex"} flexDirection={"column"}>
-                                        <Typography sx={{ color: '#76808D', fontWeight: 700, }}>Invoice | UI Improvements</Typography>
-                                        <Typography sx={{ color: '#76808D', }}>from Name of Organisation</Typography>
+                            { computedTxns && computedTxns.map((transaction:any) => {
+                                return (
+                                    <Box sx={{ width: '100%', height: 50 }} display={"flex"} alignItems={"center"}>
+                                        <Box sx={{ width: '70%' }} display={"flex"} alignItems={"center"}>
+                                            <Typography sx={{ width: '20%', marginRight: '20px', color: '#76808D', fontWeight: 700, fontSize: '14px' }}>{ _get(transaction,`metadata.${account}.parsedTxValue.formattedValue`) } { _get(transaction,`metadata.${account}.parsedTxValue.symbol`)}</Typography>
+                                            <Box display={"flex"} flexDirection={"column"}>
+                                                <Typography sx={{ color: '#76808D', fontWeight: 700, }}>{ _get(transaction,`metadata.${account}.label`) }</Typography>
+                                                { <Typography sx={{ color: '#76808D', }}>{ transaction?.daoId?.name }</Typography> }
+                                            </Box>
+                                        </Box>
+                                        <Box sx={{ width: '30%' }} display={"flex"} flexDirection={"column"} alignItems={"flex-end"} justifyContent={"center"}>
+                                            <Typography sx={{ color: '#76808D', opacity: '0.6', fontWeight: 700, fontSize: '14px', textTransform: 'uppercase' }}>{ transaction?.rawTx?.isExecuted? 'Paid' : 'Awaiting Payment' }</Typography>
+                                            {  transaction?.rawTx?.isExecuted && <Typography sx={{ color: '#76808D', opacity: '0.6', fontWeight: 700, fontSize: '14px', textTransform: 'uppercase' }}>{ moment(transaction?.rawTx?.executionDate).format('MM/DD HH:mm') }</Typography> }
+                                        </Box>
                                     </Box>
-                                </Box>
-                                <Box sx={{ width: '30%' }} display={"flex"} justifyContent={"flex-end"} alignItems={"center"}>
-                                    <Typography sx={{ color: '#76808D', opacity: '0.6', fontWeight: 700, fontSize: '14px', textTransform: 'uppercase' }}>Awaiting Payment</Typography>
-                                </Box>
-                            </Box>
+                                )
+                            })
+                            }
                         </Box>
 
-                    </Box> */}
+                    </Box>
 
                 </Box>
             </Box>

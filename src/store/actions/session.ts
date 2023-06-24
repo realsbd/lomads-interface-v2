@@ -48,3 +48,10 @@ export const logoutAction = () => {
         type: actionTypes.LOGOUT_ACTION
     }
 }
+
+export const loadUserTransactionAction = (payload: any) => {
+    return {
+        type: actionTypes.LOAD_USER_TRANSACTION_ACTION,
+        payload
+    }
+}

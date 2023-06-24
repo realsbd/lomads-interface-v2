@@ -9,7 +9,9 @@ export function getInitialState() {
     web3AuthNetwork: "cyan",
     chain: "polygon",
     token: null,
-    user: null
+    user: null,
+    transactions: null,
+    userTransactionLoading: null
   };
 }
 
@@ -36,8 +38,17 @@ const SessionReducer = (state: any = getInitialState(), action: any) =>
         draft.user = null;
         break;
       }
+      case actionTypes.LOAD_USER_TRANSACTION_LOADING: {
+        draft.userTransactionLoading = payload
+        break;
+      }
+      case actionTypes.SET_USER_TRANSACTION: {
+        draft.transactions = payload
+        break;
+      }
       case actionTypes.LOGOUT_ACTION: {
 				draft = getInitialState()
+        break;
 			}
     }
   });

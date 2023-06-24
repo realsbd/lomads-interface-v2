@@ -10,3 +10,7 @@ export const createAccountService = (payload: any) => {
 export const updateAccountService = (payload: any) => {
     return axiosHttp.patch(`auth/me`, payload)
 }
+
+export const loadUserTransactionService = (payload: any) => {
+    return axiosHttp.get(`/gnosis-safe/transactions/${payload}`, payload)
+}

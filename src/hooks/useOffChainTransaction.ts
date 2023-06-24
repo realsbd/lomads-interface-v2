@@ -102,7 +102,13 @@ export default () => {
             const params = {
                 safeAddress,
                 rawTx: payload,
-                metadata: send.reduce((a, v) => ({ ...a, [v.recipient]: { label: v.label, tag: v.tag }}), {}) 
+                metadata: send.reduce((a, v) => ({ ...a, [v.recipient]: { parsedTxValue: {
+                    value: BigInt(parseFloat(v.amount) * 10 ** (token?.token?.decimals || 18)),
+                    formattedValue: v?.amount.toString(),
+                    symbol: token ? token?.token?.symbol : 'SWEAT',
+                    decimals: token ? token?.token?.decimals : 18,
+                    tokenAddress: tokenAddress
+                }, label: v.label, tag: v.tag }}), {}) 
             }
             console.log(params)
             dispatch(CreateTreasuryTransactionAction(params))

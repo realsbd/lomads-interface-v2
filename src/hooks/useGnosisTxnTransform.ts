@@ -24,11 +24,8 @@ export default () => {
 
 
     const getNativeToken = (safeAddress: string) => {
-        const safe = loadSafe(safeAddress)
-        const token = _find(_get(safeTokens, safeAddress, []),  st => _get(st, 'tokenAddress', '0x') === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS)
-        if(safe?.chainId)
-            return { ...CHAIN_INFO[safe?.chainId]?.nativeCurrency, tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS }
-        return { name: '', fiatConversion: token?.fiatConversion,  symbol: '', decimals: 18, tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS }
+        const token = _find(_get(safeTokens, safeAddress, []),  st => _get(st, 'tokenAddress', '0x') === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS || _get(st, 'tokenAddress', '0x') === '0x0000000000000000000000000000000000001010')
+        return { ...token?.token, tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS }
     }
 
     const isNativeTokenSingleTransfer = (transaction: any) => {
@@ -224,7 +221,7 @@ export default () => {
                 nonce: _get(transaction, 'nonce', "0"),
                 value: value,
                 formattedValue: value === '0x' ? '0x' : (+value / ( 10 ** (transaction?.token?.decimals || transaction?.token?.decimal || 18) )),
-                symbol: transaction?.token?.symbol,
+                symbol: transaction?.token?.symbol || nativeToken?.symbol,
                 decimals: transaction?.token?.decimals || transaction?.token?.decimal || 18,
                 tokenAddress: transaction?.token?.tokenAddress,
                 to: to,
@@ -339,7 +336,7 @@ export default () => {
             offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
             value: value,
             formattedValue: _get(transaction, 'transfers[0].tokenInfo.decimals', null) || (erc20Token?.token?.decimals || erc20Token?.token?.decimal) > 0  ? (+value / ( 10 ** _get(transaction, 'transfers[0].tokenInfo.decimals', null) || (erc20Token?.token?.decimals || erc20Token?.token?.decimal) )) : +value,
-            symbol: _get(transaction, 'transfers[0].tokenInfo.symbol', null),
+            symbol: _get(transaction, 'transfers[0].tokenInfo.symbol', null) || erc20Token?.token?.symbol,
             decimals: _get(transaction, 'transfers[0].tokenInfo.decimals', null),
             tokenAddress: erc20Token?.tokenAddress || transaction?.token?.tokenAddress,
             to: _get(transaction, 'to', "0x"),
