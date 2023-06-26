@@ -12,6 +12,8 @@ import ProjectDetailsPage from 'pages/Project/ProjectDetails';
 import TaskDetailsPage from 'pages/Task/TaskDetails';
 import AllTasksPage from 'pages/Task/AllTasks';
 import AllProjectsPage from 'pages/Project/AllProjects';
+import ArchivedProjectsPage from 'pages/Project/ArchiveProjects';
+// import ArchivedTasksPage from 'pages/Task/ArchiveTasks';
 import SettingsPage from 'pages/Settings';
 import AttachNewSafePage from 'pages/AttachSafe/New';
 import AttachExistingSafePage from 'pages/AttachSafe/Existing';
@@ -160,12 +162,33 @@ export default [
 		private: true,
 		component: AllTasksPage
 	},
+	// {
+	// 	path: '/:daoURL/archivedTasks',
+	// 	exact: true,
+	// 	layout: DefaultFullWidthLayout,
+	// 	private: true,
+	// 	component: ArchivedTasksPage
+	// },
+	// {
+	// 	path: '/:daoURL/archivedTasks/:projectId',
+	// 	exact: true,
+	// 	layout: DefaultFullWidthLayout,
+	// 	private: true,
+	// 	component: ArchivedTasksPage
+	// },
 	{
 		path: '/:daoURL/projects',
 		exact: true,
 		layout: DefaultFullWidthLayout,
 		private: true,
 		component: AllProjectsPage
+	},
+	{
+		path: '/:daoURL/archivedProjects',
+		exact: true,
+		layout: DefaultFullWidthLayout,
+		private: true,
+		component: ArchivedProjectsPage
 	},
 	{
 		path: '/:daoURL/task/:taskId',

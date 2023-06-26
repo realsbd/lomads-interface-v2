@@ -96,6 +96,8 @@ export default () => {
 `;
     const { data, loading, error } = useQuery(PROPOSALS_QUERY);
 
+    console.log("proposals : ", data);
+
     if (loading) return null;
     if (error) return null;
 
