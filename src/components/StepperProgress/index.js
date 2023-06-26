@@ -23,7 +23,7 @@ export default ({ variant, milestones }) => {
 
     return (
         <ProgressBar
-            percent={((milestones.filter((item) => item.complete === true).length) / (milestones.length)) * 100}
+            percent={(parseFloat((milestones.filter((item) => item.complete === true).length) / (milestones.length)) * 100).toFixed(2)}
             filledBackground={variant === 'primary' ? "#76808D" : "#188C7C"}
             unfilledBackground="#F0F0F0"
             height="5px"
@@ -34,7 +34,6 @@ export default ({ variant, milestones }) => {
                         display={"flex"}
                         alignItems={"center"}
                         justifyContent={"center"}
-                        className={accomplished ? `${classes.indexedStep} accomplished` : `${classes.indexedStep}`}
                     >
                     </Box>
                 )}

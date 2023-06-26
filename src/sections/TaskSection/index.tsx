@@ -20,8 +20,14 @@ import moment from 'moment';
 import { getProjectAction } from "store/actions/project";
 import useTasks from 'hooks/useTasks';
 import useTerminology from "hooks/useTerminology";
+import BootstrapTooltip from "components/BootstrapTooltip";
 
 const useStyles = makeStyles((theme: any) => ({
+    createBtn: {
+        width: '125px',
+        height: '40px',
+        color: '#C94B32 !important'
+    },
     addMemberBtn: {
         width: '125px',
         height: '40px',
@@ -30,6 +36,33 @@ const useStyles = makeStyles((theme: any) => ({
         borderRadius: '5px !important',
         fontSize: '14px !important',
         color: '#C94B32 !important'
+    },
+    helpCard: {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        borderRadius: "10px",
+        display: "flex",
+        alignItems: 'center',
+        justifyContent: "center",
+        color: "#FFFFFF",
+        backgroundColor: "#76808D",
+        zIndex: 99999,
+        width: "100% !important",
+        height: "100% !important",
+        opacity: 0.8,
+        textAlign: "center",
+        cursor: "pointer",
+        padding: "10px",
+        minHeight: 50
+    },
+    helpCardContent: {
+        position: 'absolute',
+        fontFamily: "'Inter', sans-serif",
+        fontStyle: "normal",
+        fontWeight: 400,
+        fontSize: "18px",
+        lineHeight: "22px",
     },
     showAllCard: {
         width: '315px',
@@ -90,7 +123,7 @@ function a11yProps(index: number) {
     };
 }
 
-export default ({ onlyProjects }: any) => {
+export default ({ isHelpIconOpen, onlyProjects }: any) => {
     const classes = useStyles();
     const { projectId } = useParams();
     const navigate = useNavigate();
@@ -166,7 +199,7 @@ export default ({ onlyProjects }: any) => {
 
 
     return (
-        <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
+        <Box sx={{ width: '100%', marginBottom: '20px', position: 'relative'}} display="flex" flexDirection={"column"}>
             <CreateTaskModal
                 open={openCreateTask}
                 closeModal={() => setOpenCreateTask(false)}
@@ -230,141 +263,194 @@ export default ({ onlyProjects }: any) => {
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
-                    <IconButton onClick={() => navigate(`/${DAO.url}/tasks`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
-                        <img src={expandIcon} alt="archive-icon" />
-                    </IconButton>
-                    {/* <IconButton sx={{ marginRight: '20px' }}>
-                        <img src={archiveIcon} alt="archiveIcon" />
-                    </IconButton> */}
-                    <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn} onClick={() => setOpenCreateTask(true)}>
-                        <AddIcon sx={{ fontSize: 18 }} /> CREATE
-                    </Button>
+                    <BootstrapTooltip arrow open={isHelpIconOpen}
+                        placement="top-start"
+                        title="Open">
+                        <span>
+                            <IconButton
+                            style={{
+                                ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {}),
+                            }}
+                            onClick={() => navigate(`/${DAO.url}/tasks`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
+                                <img src={expandIcon} alt="archive-icon" />
+                            </IconButton>
+                        </span>
+                    </BootstrapTooltip>
+                    <BootstrapTooltip arrow open={isHelpIconOpen}
+                        placement="bottom"
+                        title="Archives">
+                        <span>
+                            <IconButton sx={{
+                                marginRight: '20px',
+                                ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {}),
+                            }}>
+                                <img src={archiveIcon} alt="archiveIcon" />
+                            </IconButton>
+                        </span>
+                    </BootstrapTooltip>
+                    <BootstrapTooltip arrow open={isHelpIconOpen}
+                        placement="top-start"
+                        title="Create Task">
+                            <span>
+                                <Button
+                                    style={{
+                                        ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {})
+                                    }}
+                                    size="small" variant="contained" className={classes.createBtn} color="secondary" onClick={() => setOpenCreateTask(true)}>
+                                    <AddIcon sx={{ fontSize: 18 }} /> CREATE
+                                </Button>
+                            </span>
+                    </BootstrapTooltip>
                 </Box>
             </Box>
+            <Box style={{ position: "relative" }}>
+                <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
+                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                        {
+                        isHelpIconOpen && 
+                                <Box className={classes.helpCard}>
+                                    <Box className={classes.helpCardContent}>By creating tasks, you can <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track progress, deadlines, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> rewards on bounties, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> assign contributors </Typography> to each task.</Box>
+                                </Box>
+                        }
+                        {
+                            parsedTasks['myTask'] && parsedTasks['myTask'].filter((item, index) => index < 6).map((item, index) => {
+                                if (index <= 4) {
+                                    return (
+                                        <Box key={index}>
+                                            <TaskCard
+                                                task={item}
+                                                daoUrl={DAO?.url}
+                                            />
+                                        </Box>
+                                    )
+                                }
+                                else {
+                                    return (
+                                        <Box
+                                            key={index}
+                                            className={classes.showAllCard}
+                                            onClick={() => { navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }}
+                                        >
+                                            <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
+                                        </Box>
+                                    )
+                                }
+                            })
+                        }
+                    </Box>
+                </TabPanel>
 
-            {/* Tab panel for my tasks */}
-            <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
-                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
-                    {
-                        parsedTasks['myTask'] && parsedTasks['myTask'].filter((item, index) => index < 6).map((item, index) => {
-                            if (index <= 4) {
-                                return (
-                                    <Box key={index}>
-                                        <TaskCard
-                                            task={item}
-                                            daoUrl={DAO?.url}
-                                        />
-                                    </Box>
-                                )
-                            }
-                            else {
-                                return (
-                                    <Box
-                                        key={index}
-                                        className={classes.showAllCard}
-                                        onClick={() => { navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }}
-                                    >
-                                        <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
-                                    </Box>
-                                )
-                            }
-                        })
-                    }
-                </Box>
-            </TabPanel>
+                {/* Tab panel for manage tasks */}
+                <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
+                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                        {
+                        isHelpIconOpen && 
+                                <Box className={classes.helpCard}>
+                                    <Box className={classes.helpCardContent}>By creating tasks, you can <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track progress, deadlines, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> rewards on bounties, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> assign contributors </Typography> to each task.</Box>
+                                </Box>
+                        }
+                        {
+                            parsedTasks['manage'] && parsedTasks['manage'].filter((item, index) => index < 6).map((item, index) => {
+                                if (index <= 4) {
+                                    return (
+                                        <Box key={index}>
+                                            <TaskCard
+                                                task={item}
+                                                daoUrl={DAO?.url}
+                                            />
+                                        </Box>
+                                    )
+                                }
+                                else {
+                                    return (
+                                        <Box
+                                            key={index}
+                                            className={classes.showAllCard}
+                                            onClick={() => { navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }}
+                                        >
+                                            <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
+                                        </Box>
+                                    )
+                                }
+                            })
+                        }
+                    </Box>
+                </TabPanel>
 
-            {/* Tab panel for manage tasks */}
-            <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
-                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
-                    {
-                        parsedTasks['manage'] && parsedTasks['manage'].filter((item, index) => index < 6).map((item, index) => {
-                            if (index <= 4) {
-                                return (
-                                    <Box key={index}>
-                                        <TaskCard
-                                            task={item}
-                                            daoUrl={DAO?.url}
-                                        />
-                                    </Box>
-                                )
-                            }
-                            else {
-                                return (
-                                    <Box
-                                        key={index}
-                                        className={classes.showAllCard}
-                                        onClick={() => { navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }}
-                                    >
-                                        <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
-                                    </Box>
-                                )
-                            }
-                        })
-                    }
-                </Box>
-            </TabPanel>
+                {/* Tab panel for drafts tasks */}
+                <TabPanel value={value} index={2} style={{ marginTop: '0.2rem' }}>
+                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                        {
+                        isHelpIconOpen && 
+                                <Box className={classes.helpCard}>
+                                    <Box className={classes.helpCardContent}>By creating tasks, you can <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track progress, deadlines, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> rewards on bounties, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> assign contributors </Typography> to each task.</Box>
+                                </Box>
+                        }
+                        {
+                            parsedTasks['drafts'] && parsedTasks['drafts'].filter((item, index) => index < 6).map((item, index) => {
+                                if (index <= 4) {
+                                    return (
+                                        <Box key={index}>
+                                            <TaskCard
+                                                task={item}
+                                                daoUrl={DAO?.url}
+                                            />
+                                        </Box>
+                                    )
+                                }
+                                else {
+                                    return (
+                                        <Box
+                                            key={index}
+                                            className={classes.showAllCard}
+                                            onClick={() => { navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }}
+                                        >
+                                            <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
+                                        </Box>
+                                    )
+                                }
+                            })
+                        }
+                    </Box>
+                </TabPanel>
 
-            {/* Tab panel for drafts tasks */}
-            <TabPanel value={value} index={2} style={{ marginTop: '0.2rem' }}>
-                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
-                    {
-                        parsedTasks['drafts'] && parsedTasks['drafts'].filter((item, index) => index < 6).map((item, index) => {
-                            if (index <= 4) {
-                                return (
-                                    <Box key={index}>
-                                        <TaskCard
-                                            task={item}
-                                            daoUrl={DAO?.url}
-                                        />
-                                    </Box>
-                                )
-                            }
-                            else {
-                                return (
-                                    <Box
-                                        key={index}
-                                        className={classes.showAllCard}
-                                        onClick={() => { navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }}
-                                    >
-                                        <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
-                                    </Box>
-                                )
-                            }
-                        })
-                    }
-                </Box>
-            </TabPanel>
-
-            {/* Tab panel for all tasks */}
-            <TabPanel value={value} index={3} style={{ marginTop: '0.2rem' }}>
-                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
-                    {
-                        parsedTasks['allTasks'] && parsedTasks['allTasks'].filter((item, index) => index < 6).map((item, index) => {
-                            if (index <= 4) {
-                                return (
-                                    <Box key={index}>
-                                        <TaskCard
-                                            task={item}
-                                            daoUrl={DAO?.url}
-                                        />
-                                    </Box>
-                                )
-                            }
-                            else {
-                                return (
-                                    <Box
-                                        key={index}
-                                        className={classes.showAllCard}
-                                        onClick={() => { navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }}
-                                    >
-                                        <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
-                                    </Box>
-                                )
-                            }
-                        })
-                    }
-                </Box>
-            </TabPanel>
+                {/* Tab panel for all tasks */}
+                <TabPanel value={value} index={3} style={{ marginTop: '0.2rem' }}>
+                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                        {
+                        isHelpIconOpen && 
+                                <Box className={classes.helpCard}>
+                                    <Box className={classes.helpCardContent}>By creating tasks, you can <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track progress, deadlines, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> rewards on bounties, </Typography> and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> assign contributors </Typography> to each task.</Box>
+                                </Box>
+                        }
+                        {
+                            parsedTasks['allTasks'] && parsedTasks['allTasks'].filter((item, index) => index < 6).map((item, index) => {
+                                if (index <= 4) {
+                                    return (
+                                        <Box key={index}>
+                                            <TaskCard
+                                                task={item}
+                                                daoUrl={DAO?.url}
+                                            />
+                                        </Box>
+                                    )
+                                }
+                                else {
+                                    return (
+                                        <Box
+                                            key={index}
+                                            className={classes.showAllCard}
+                                            onClick={() => { navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }}
+                                        >
+                                            <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
+                                        </Box>
+                                    )
+                                }
+                            })
+                        }
+                    </Box>
+                </TabPanel>
+            </Box>
         </Box>
     )
 }

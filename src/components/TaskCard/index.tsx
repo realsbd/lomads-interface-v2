@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { Typography, Box, Card, CardContent } from "@mui/material";
+import { get as _get } from 'lodash';
+import { Typography, Box, Card, CardContent, Chip } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import submitted from 'assets/svg/submitted.svg';
@@ -10,6 +11,9 @@ import { useNavigate } from "react-router-dom";
 import useTask from "hooks/useTask";
 
 import moment from "moment";
+import { useAppDispatch } from "helpers/useAppDispatch";
+import { deleteTaskAction } from "store/actions/task";
+import { useDAO } from "context/dao";
 
 const useStyles = makeStyles((theme: any) => ({
     taskCard: {
@@ -89,7 +93,9 @@ interface CardProps {
 }
 
 export default ({ task, daoUrl }: CardProps) => {
+    const { DAO } = useDAO();
     const classes = useStyles();
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { transformTask } = useTask();
 
@@ -102,8 +108,8 @@ export default ({ task, daoUrl }: CardProps) => {
         navigate(`/${daoUrl}/task/${task._id}`, { state: { task } })
     }
 
-    if (Task?._id === "64834a13f8d25c69be221248") {
-        console.log("64834a13f8d25c69be221248", Task)
+    const handleDeleteTask = () => {
+        dispatch(deleteTaskAction({ taskId: _get(task, '_id', ''), daoUrl: _get(DAO, 'url', '') }));
     }
 
     return (
@@ -117,6 +123,10 @@ export default ({ task, daoUrl }: CardProps) => {
                 }}
                 onClick={handleCardClick}
             >
+                {Task?.isDummy ? <Chip style={{ position: 'absolute', top: 8, right: 8 }} clickable onClick={e => {
+                    e.stopPropagation();
+                    handleDeleteTask()
+                }} variant="outlined" size="small" label="Dismiss" /> : null}
                 {Task?.visual?.notification?.count ? <Box className={classes.iconContainer}>
                     <Box className={classes.iconPill}>
                         <img src={Task?.visual?.notification?.icon} />

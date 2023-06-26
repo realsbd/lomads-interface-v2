@@ -69,7 +69,7 @@ export default ({ children, dao, ...props } : any) => {
   }, [dao])
 
   return (
-      <Box { ...props }  className={props.plain ? classes.plain : classes.root}>
+      <Box { ...props } style={{ zIndex: 999999 }} className={props.plain ? classes.plain : classes.root}>
         { dao ? 
         <Box className={classes.logoContainer}>
           { dao?.image ? <img className={classes.image} src={_get(dao, 'image')} /> :

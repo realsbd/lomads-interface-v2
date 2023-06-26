@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { get as _get, find as _find } from 'lodash'
-import { Drawer, Box, Typography, Select, FormControl, InputLabel, MenuItem, List, ListItem, ListItemText, ListItemButton, ListItemIcon, Divider, TableContainer, TableBody, Table, TableRow, TableCell } from "@mui/material"
+import { Drawer, Box, Typography, Select, FormControl, InputLabel, MenuItem, List, ListItem, ListItemText, ListItemButton, ListItemIcon, Divider, TableContainer, TableBody, Table, TableRow, TableCell, FormLabel } from "@mui/material"
 import theme from "theme";
 import IconButton from "components/IconButton";
 import RecurringPaymentSvg from 'assets/svg/recurring_payment_XL.svg'
@@ -496,19 +496,20 @@ export default ({ open, onClose, transaction }: any) => {
                         >
                         </TextInput>
                     </Box>    
-                    <Box my={2}>
-                        <Typography>Ends</Typography>
+                    <Box py={2}>
+                        <FormLabel style={{ marginBottom: "10px" }} component="legend">Ends</FormLabel>
                         <TableContainer>
                             <Table>
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell  sx={{ display: 'flex', flexDirection: "row", alignItems: 'center' }}>
+                                        <TableCell sx={{ display: 'flex', flexDirection: "row", alignItems: 'center' }}>
                                             <Checkbox onChange={() => setState((prev:any) => { return {
                                                 ...prev,
                                                 ends: { ...prev?.ends, value: "NEVER", occurances: undefined, endOn: undefined }
                                             } })} checked={state?.ends?.value === 'NEVER'} />
-                                            <Typography>Never</Typography>
+                                            <Typography>When it is cancelled</Typography>
                                         </TableCell>
+                                        <TableCell></TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell  sx={{ display: 'flex', flexDirection: "row", alignItems: 'center' }}>
@@ -544,7 +545,7 @@ export default ({ open, onClose, transaction }: any) => {
                                             <Typography>After</Typography>
                                         </TableCell>
                                         <TableCell >
-                                            <AmountInput disabled={state?.ends?.value !== 'AFTER'} height={50} width={180} 
+                                            <AmountInput disabled={state?.ends?.value !== 'AFTER'} height={50} width={150} 
                                                 onChange={(e:any) => setState((prev:any) => { return {
                                                     ...prev,
                                                     ends: { ...prev?.ends, occurances: parse(e) }

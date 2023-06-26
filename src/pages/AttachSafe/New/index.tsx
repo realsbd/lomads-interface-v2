@@ -19,7 +19,7 @@ import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
 import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
 import { ethers } from "ethers";
 import { CHAIN_INFO } from 'constants/chainInfo';
-import { Box, Typography, Container, Grid, Menu, MenuItem, Skeleton } from "@mui/material"
+import { Box, Typography, Container, Grid, Menu, MenuItem, Skeleton, Chip } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import axios from "axios";
 import Avatar from "components/Avatar";
@@ -459,9 +459,9 @@ export default () => {
 
 	const handleValidSafeDetails = () => {
 		let terrors: any = {};
-		if (!state.safeName || state.safeName === '') {
-			terrors.safeName = " * Multi-sig Wallet Name is required";
-		}
+		// if (!state.safeName || state.safeName === '') {
+		// 	terrors.safeName = " * Multi-sig Wallet Name is required";
+		// }
 		if (_.isEmpty(terrors)) {
 			setValidSafeDetails(true)
 		} else {
@@ -707,6 +707,15 @@ export default () => {
 							of {state?.members?.length} owner(s)
 						</Box>
 					</Box>
+					<Box sx={{ mt: 3, width:'100%' }}>
+						<TextInput
+							fullWidth
+							label="Multi-sig Wallet Name"
+							labelChip={<Chip sx={{ mr: 1, opacity: 0.6 }} size="small" label="Optional" />}
+							placeholder="Pied Piper"
+							onChange={(e: any) => { setState((prev: any) => { return { ...prev, safeName: e.target.value } }) }}
+						/>
+					</Box>
 				</Box>
 				<Typography className={classes.safeFooter}>
 					By continuing you consent to the terms of use and privacy policy of Gnosis Safe
@@ -874,12 +883,6 @@ export default () => {
 								setSelectedValue={(value) => {
 									setState((prev: any) => { return { ...prev, selectedChainId: value } })
 								}}
-							/>
-							<Box className={classes.safeNameTitle}>Multi-sig Wallet Name</Box>
-							<TextInput
-								fullWidth
-								placeholder="Pied Piper"
-								onChange={(e: any) => { setState((prev: any) => { return { ...prev, safeName: e.target.value } }) }}
 							/>
 						</Box>}
 					{!validSafeDetails ?

@@ -123,3 +123,10 @@ export const toggleSafeAction = (payload: any) => {
         payload
     }
 }
+
+export const updateUserOnboardingCountAction = (payload: any) => {
+    return {
+        type: actionTypes.UPDATE_USER_ONBOARDING_COUNT_ACTION,
+        payload
+    } 
+}

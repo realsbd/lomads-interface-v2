@@ -547,7 +547,7 @@ export default () => {
                     </Box>
                 }
 
-                <TaskSection onlyProjects={true} />
+                <TaskSection isHelpIconOpen={false}  onlyProjects={true} />
 
                 <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
 
