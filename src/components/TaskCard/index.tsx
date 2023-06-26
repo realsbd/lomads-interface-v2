@@ -126,7 +126,7 @@ export default ({ task, daoUrl }: CardProps) => {
                 { Task?.isDummy ? <Chip style={{ position: 'absolute', top: 8, right: 8 }} clickable onClick={e => {
                     e.stopPropagation();
                     handleDeleteTask()
-                }} variant="outlined" size="small" label="Dismiss" /> : null }
+                }} size="small" sx={{ color: 'rgba(118, 128, 141, 0.5)', fontWeight: '700' }} label="Dismiss" /> : null }
                 { Task?.visual?.notification?.count ? <Box className={classes.iconContainer}>
                     <Box className={classes.iconPill}>
                         <img src={Task?.visual?.notification?.icon} />

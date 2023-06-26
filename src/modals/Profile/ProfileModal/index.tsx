@@ -91,6 +91,13 @@ export default ({ open, closeModal }: Props) => {
         return []
     }, [transactions, chain])
 
+    const fiatValue = useMemo(() => {
+        if(computedTxns) {
+            computedTxns.reduce((a: any, b: any) => a + _get(b, `metadata.${account}.fiatConversion`, 0), 0)
+        }
+        return 0
+    }, [computedTxns])
+
     const coinCount = useMemo(() => {
         let count: any = {}
         if(computedTxns && chain) {
@@ -240,17 +247,17 @@ export default ({ open, closeModal }: Props) => {
                                     })
                                 }
                             </Box>
-                            <Box display={"flex"} alignItems={"center"}>
+                            { fiatValue ? <Box display={"flex"} alignItems={"center"}>
                                 <img src={hkLogo} alt="icon-alt" style={{ marginRight: '5px' }} />
-                                <Typography sx={{ color: '#188C7C', fontWeight: 700, marginRight: '2px' }}>$83,40</Typography>
+                                <Typography sx={{ color: '#188C7C', fontWeight: 700, marginRight: '2px' }}>${fiatValue}</Typography>
                                 <Typography sx={{ color: '#76808D', fontWeight: 700 }}>total</Typography>
-                            </Box>
+                            </Box> : null }
                         </Box>
 
-                        <Box sx={{ width: '100%' }} display={"flex"} flexDirection={"column"}>
+                        <Box sx={{ width: '100%', maxHeight: 500, overflow: 'hidden', overflowY: 'auto' }} display={"flex"} flexDirection={"column"}>
                             { computedTxns && computedTxns.map((transaction:any) => {
                                 return (
-                                    <Box sx={{ width: '100%', height: 50 }} display={"flex"} alignItems={"center"}>
+                                    <Box sx={{ width: '100%', minHeight: 50 }} display={"flex"} flexDirection="row" alignItems={"center"}>
                                         <Box sx={{ width: '70%' }} display={"flex"} alignItems={"center"}>
                                             <Typography sx={{ width: '20%', marginRight: '20px', color: '#76808D', fontWeight: 700, fontSize: '14px' }}>{ _get(transaction,`metadata.${account}.parsedTxValue.formattedValue`) } { _get(transaction,`metadata.${account}.parsedTxValue.symbol`)}</Typography>
                                             <Box display={"flex"} flexDirection={"column"}>

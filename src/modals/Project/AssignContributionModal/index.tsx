@@ -116,6 +116,18 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
     }, [Project])
 
     const handleCreateTransaction = async () => {
+        if(Project.isDummy) {
+            const newArray1 = _get(Project, 'milestones', []).map((item: any, i: number) => {
+                if (i === _get(selectedMilestone, 'pos', '')) {
+                    return { ...item, complete: true };
+                } else {
+                    return item;
+                }
+            });
+            dispatch(updateMilestoneAction({ projectId: Project._id, daoUrl: DAO?.url, payload: { milestones: newArray1 } }));
+            closeModal()
+            return;
+        }
         const totalAllotedAmount = members.reduce((a: number, b: any) => a + (!(b?.percentage || 0) ? 0 : (((b?.percentage) / 100) * ((+Project?.compensation?.amount * (selectedMilestone?.amount / 100))))), 0)
         let sendArray: any = []
         let total = 0;

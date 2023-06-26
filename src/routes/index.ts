@@ -25,6 +25,7 @@ import OnlyWhitelistedPage from 'pages/OnlyWhitelisted';
 import NoAccessPage from 'pages/NoAccess'
 import WelcomePage from 'pages/Welcome';
 import DefaultFullWidthLayout from 'layouts/DefaultFullWidthLayout';
+import DashboardNoHeaderLayout from 'layouts/DashboardNoHeaderLayout';
 
 export default [
 	{
@@ -65,7 +66,7 @@ export default [
 	{
 		path: '/:daoURL/attach-safe/new',
 		exact: true,
-		layout: LandingLayout,
+		layout: DashboardNoHeaderLayout,
 		private: true,
 		component: AttachNewSafePage
 	},
@@ -86,7 +87,7 @@ export default [
 	{
 		path: '/:daoURL/attach-safe/existing',
 		exact: true,
-		layout: LandingLayout,
+		layout: DashboardNoHeaderLayout,
 		private: true,
 		component: AttachExistingSafePage
 	},

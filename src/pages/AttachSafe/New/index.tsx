@@ -30,7 +30,6 @@ import { useDAO } from "context/dao";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
-		minHeight: "100vh",
 		maxHeight: 'fit-content',
 		display: 'flex',
 		flexDirection: 'column',
@@ -105,7 +104,7 @@ const useStyles = makeStyles((theme: any) => ({
 		alignItems: 'center',
 		justifyContent: 'center',
 		height: 'fit-content',
-		padding: '19.3vh 0vh 10vh 0vh'
+		padding: '14vh 0vh 10vh 0vh'
 	},
 	addOwner: {
 		display: 'flex',
@@ -451,11 +450,11 @@ export default () => {
 	}, [])
 
 	useEffect(() => {
-		if (chainId && +chainId === SupportedChainId.POLYGON) {
-			axios.get(CHAIN_GAS_STATION[`${chainId}`].url)
+		if (state?.selectedChainId && +state?.selectedChainId === SupportedChainId.POLYGON) {
+			axios.get(CHAIN_GAS_STATION[`${state?.selectedChainId}`].url)
 				.then(res => setPolygonGasEstimate(res.data))
 		}
-	}, [chainId])
+	}, [state?.selectedChainId])
 
 	const handleValidSafeDetails = () => {
 		let terrors: any = {};
@@ -708,10 +707,14 @@ export default () => {
 						</Box>
 					</Box>
 					<Box sx={{ mt: 3, width:'100%' }}>
+						<Box display="flex" flexDirection="row" alignItems="flex-start">
+							<Typography className={classes.thresholdText} sx={{ my: 1 }}>
+								What do you want to call the multi-sig wallet?
+							</Typography>
+							<Chip sx={{ mr: 1, opacity: 0.6 }} size="small" label="Optional" />
+						</Box>
 						<TextInput
 							fullWidth
-							label="Multi-sig Wallet Name"
-							labelChip={<Chip sx={{ mr: 1, opacity: 0.6 }} size="small" label="Optional" />}
 							placeholder="Pied Piper"
 							onChange={(e: any) => { setState((prev: any) => { return { ...prev, safeName: e.target.value } }) }}
 						/>
@@ -720,14 +723,14 @@ export default () => {
 				<Typography className={classes.safeFooter}>
 					By continuing you consent to the terms of use and privacy policy of Gnosis Safe
 				</Typography>
-				<Box className={classes.safeFooter}>
+				{/* <Box className={classes.safeFooter}>
 					You’re about to create a new safe and will have to confirm a
 					transaction with your curently connected wallet.
 					<Typography variant="body1" className={classes.boldText}>
-						{chainId && +chainId === SupportedChainId.POLYGON && polygonGasEstimate ? `The creation will cost approximately ${polygonGasEstimate?.standard?.maxFee} GWei.` : `The creation will cost approximately 0.01256 GOR.`}
+						{state?.selectedChainId && +state?.selectedChainId === SupportedChainId.POLYGON && polygonGasEstimate ? `The creation will cost approximately ${polygonGasEstimate?.standard?.maxFee} GWei.` : `The creation will cost approximately 0.01256 GOR.`}
 					</Typography>
 					The exact amount will be determinated by your wallet.
-				</Box>
+				</Box> */}
 				<Button loading={isLoading} disabled={isLoading} onClick={deployNewSafeDelayed} variant='contained'>CREATE</Button>
 			</>
 		);

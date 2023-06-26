@@ -346,12 +346,18 @@ export default () => {
                 onClick={expandHelpOptions}>
                 {isHelpIconOpen
                     &&
-                    <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around',  height: 100 }}>
+                    <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around',  height: 140 }}>
                         <Button
                             variant="contained"
                             className={classes.PlayWalkThroughButton}
                             onClick={startWalkThroughAtStepOne}>
                             Play walk through
+                        </Button>
+                        <Button
+                            variant="contained"
+                            className={classes.PlayWalkThroughButton}
+                            onClick={() => window.open("https://lomads-1.gitbook.io/lomads/", '_blank')}>
+                            Documentation
                         </Button>
                         <Button
                             startIcon={<CloseIcon />}
