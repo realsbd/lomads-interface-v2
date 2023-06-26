@@ -23,6 +23,7 @@ import { CHAIN_INFO } from "constants/chainInfo";
 import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from "constants/chains";
 import ProfileModal from "modals/Profile/ProfileModal";
 import useGnosisTxnTransform from "hooks/useGnosisTxnTransform";
+import Proposals from "./Proposals";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -68,7 +69,7 @@ export default () => {
 
     const loadAllSafeTokens = async () => {
         let { data } = await axiosHttp.get(`/utility/update-safe`)
-        data = _uniqBy(data, (s:any) => s.address)
+        data = _uniqBy(data, (s: any) => s.address)
         const safes: any = {};
         for (let index = 0; index < data.length; index++) {
             const safe = data[index]
@@ -91,7 +92,7 @@ export default () => {
             try {
                 const response: any = await axios.get(`${GNOSIS_SAFE_BASE_URLS[`${safe?.chainId}`]}/api/v1/safes/${safe?.address}/balances/usd/`, { withCredentials: false })
                 let t = response?.data;
-                t = response?.data?.map((t:any) => {
+                t = response?.data?.map((t: any) => {
                     let tkn = t
                     if (!tkn.tokenAddress) {
                         return {
@@ -132,7 +133,7 @@ export default () => {
                 for (let index = 0; index < transformedTxns.length; index++) {
                     try {
                         const t = transformedTxns[index];
-                        if(t?.to && t?.to !== "0x" && t.symbol && t.symbol !== "") {
+                        if (t?.to && t?.to !== "0x" && t.symbol && t.symbol !== "") {
                             await axiosHttp.post(`/gnosis-safe/update-metadata`, {
                                 txId: txn?._id,
                                 recipient: t?.to,
@@ -171,6 +172,9 @@ export default () => {
             </Grid>
             <Grid sm={12}>
                 <TaskSection onlyProjects={false} />
+            </Grid>
+            <Grid sm={12}>
+                <Proposals />
             </Grid>
 
             {can(myRole, 'transaction.view') && <Grid mt={1} item sm={12}>

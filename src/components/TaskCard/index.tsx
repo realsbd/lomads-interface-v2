@@ -102,7 +102,7 @@ export default ({ task, daoUrl }: CardProps) => {
         navigate(`/${daoUrl}/task/${task._id}`, { state: { task } })
     }
 
-    if(Task?._id === "64834a13f8d25c69be221248") {
+    if (Task?._id === "64834a13f8d25c69be221248") {
         console.log("64834a13f8d25c69be221248", Task)
     }
 
@@ -117,12 +117,12 @@ export default ({ task, daoUrl }: CardProps) => {
                 }}
                 onClick={handleCardClick}
             >
-                { Task?.visual?.notification?.count ? <Box className={classes.iconContainer}>
+                {Task?.visual?.notification?.count ? <Box className={classes.iconContainer}>
                     <Box className={classes.iconPill}>
                         <img src={Task?.visual?.notification?.icon} />
-                        <Typography style={{ color:'#fff', fontSize: 14, fontWeight: 400 }}>+{Task?.visual?.notification?.count}</Typography>
+                        <Typography style={{ color: '#fff', fontSize: 14, fontWeight: 400 }}>+{Task?.visual?.notification?.count}</Typography>
                     </Box>
-                </Box> : null }
+                </Box> : null}
                 <CardContent className={classes.taskContent}>
                     <Typography className={classes.projectText}>{Task?.project?.name?.length > 20 ? Task?.project?.name?.substring(0, 20) + "..." : Task?.project?.name}</Typography>
                     <Typography className={classes.taskText}>{Task.name.length > 20 ? Task.name.substring(0, 20) + "..." : Task.name}</Typography>
