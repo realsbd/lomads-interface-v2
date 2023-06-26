@@ -19,6 +19,7 @@ import { useDAO } from "context/dao";
 
 import useTerminology from 'hooks/useTerminology';
 import { updateProjectMembersAction } from "store/actions/project";
+import theme from "theme";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -101,7 +102,6 @@ export default ({ open, closeModal }: Props) => {
     useEffect(() => {
         if (updateProjectMembersLoading === false) {
             closeModal();
-            // navigate(-1);
         }
     }, [updateProjectMembersLoading]);
 
@@ -177,11 +177,8 @@ export default ({ open, closeModal }: Props) => {
     const handleRenderMemberList = () => {
         return (
             <Paper elevation={0} className={classes.paperContainer} sx={{ width: 480 }}>
-                {/* <Box display={"flex"} alignItems={"center"} justifyContent={"flex-end"} sx={{ marginBottom: '22px' }}>
-                    <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn}>+ NEW MEMBER</Button>
-                </Box> */}
                 {
-                    _sortBy(_get(DAO, 'members', []), m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item: any, index: number) => {
+                    _sortBy(_get(DAO, 'members', []), m => _get(m, 'member.name', '').toLowerCase(), 'asc').filter((m) => m.deletedAt === null).map((item: any, index: number) => {
                         return (
                             <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} key={index} onClick={() => handleAddMemberDelete(item.member._id)}>
                                 <Avatar name={item.member.name} wallet={item.member.wallet} />
@@ -260,6 +257,7 @@ export default ({ open, closeModal }: Props) => {
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
             anchor={'right'}
+            sx={{ zIndex: theme.zIndex.appBar + 1 }}
             open={open}
             hideBackdrop={true}
         >

@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect } from "react";
 import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
-import { Grid, Typography, Box, Tab, Tabs, Menu, MenuItem } from "@mui/material";
+import { Grid, Typography, Box, Tab, Tabs, Menu, MenuItem, Chip } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import { IoIosArrowBack } from 'react-icons/io';
 
 import copyIcon from "assets/svg/copyIcon.svg";
+
+import Avatar from "components/Avatar";
 
 import {
     TelegramIcon,
@@ -31,6 +33,7 @@ import AssignContributionModal from "modals/Project/AssignContributionModal";
 import Button from "components/Button";
 import KraReviewModal from "modals/Project/KraReviewModal";
 import TaskSection from "sections/TaskSection";
+import InviteMemberModal from "modals/Project/InviteMemberModal";
 
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { useAppSelector } from "helpers/useAppSelector";
@@ -44,13 +47,20 @@ import { getProjectAction } from "store/actions/project";
 import FullScreenLoader from "components/FullScreenLoader";
 import MembersSection from "sections/MembersSection";
 
+import membersGroup from 'assets/svg/membersGroup.svg'
+import editSvg from 'assets/svg/editToken.svg';
+import AddIcon from '@mui/icons-material/Add';
+
+import moment from "moment";
+import MilestoneDetailModal from "modals/Project/MilestoneDetailModal";
+
 const useStyles = makeStyles((theme: any) => ({
     root: {
-        height: '100vh',
-        overflowY: 'scroll',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
+        // height: '100vh',
+        // overflowY: 'scroll',
+        // display: 'flex',
+        // flexDirection: 'column',
+        // justifyContent: 'center',
     },
     arrowContainer: {
         width: '5% !important',
@@ -65,7 +75,7 @@ const useStyles = makeStyles((theme: any) => ({
         height: '100% !important',
         borderRadius: '5px !important',
         background: '#FFF !important',
-        padding: '0 22px !important'
+        padding: '22px !important'
     },
     nameText: {
         fontSize: '30px !important',
@@ -86,6 +96,38 @@ const useStyles = makeStyles((theme: any) => ({
         background: 'rgba(118, 128, 141, 0.05) !important',
         borderRadius: '5px !important',
     },
+    addMemberBtn: {
+        width: '125px',
+        height: '40px',
+        background: '#FFFFFF !important',
+        boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), - 3px - 3px 8px rgba(201, 75, 50, 0.1) !important',
+        borderRadius: '5px !important',
+        fontSize: '14px !important',
+        color: '#C94B32 !important',
+        marginLeft: '20px !important'
+    },
+    lineSm: {
+        border: '1px solid rgba(118, 128, 141, 0.5) !important',
+        height: '19px',
+        width: '0px'
+    },
+    rolePill: {
+        height: '22px !important',
+        display: "flex !important",
+        alignItems: "center !important",
+        justifyContent: "flex-start !important",
+        margin: '0 10px 10px 0 !important'
+    },
+    roleCount: {
+        padding: '4px !important',
+        height: '22px !important',
+        minWidth: '36px !important',
+        marginBottom: '10px !important',
+        background: '#FFFFFF !important',
+        boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1) !important',
+        borderRadius: '100px !important',
+        cursor: 'pointer'
+    }
 }));
 
 interface TabPanelProps {
@@ -131,11 +173,11 @@ export default () => {
     // @ts-ignore
     const { setProjectLoading, Project } = useAppSelector(store => store.project);
     console.log("Project : ", Project);
-    console.log("setProjectLoading : ", setProjectLoading);
     const { DAO } = useDAO();
     const { provider, account, chainId } = useWeb3Auth();
     const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'));
-    const { myRole, can } = useRole(DAO, account);
+    const { myRole, can } = useRole(DAO, account, undefined)
+    const [openInviteModal, setOpenInviteModal] = useState<boolean>(false);
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -149,9 +191,15 @@ export default () => {
     const [value, setValue] = useState<number>(0);
     const [showEdit, setShowEdit] = useState<boolean>(false);
     const [openAssignContribution, setOpenAssignContribution] = useState<boolean>(false);
+    const [openMilestoneModal, setOpenMilestoneModal] = useState<boolean>(false);
     const [openKraReview, setOpenKraReview] = useState<boolean>(false);
 
     const [selectedMilestone, setSelectedMilestone] = useState(null);
+
+    // useEffect(() => {
+    //     if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
+    //         dispatch(getDao(daoURL))
+    // }, [DAO, daoURL])
 
     useEffect(() => {
         if (projectId && (!Project || (Project && Project._id !== projectId))) {
@@ -176,22 +224,105 @@ export default () => {
 
     const selectMilestone = (item: any, index: number) => {
         if (index === 0) {
-            if (!item.complete) {
-                let e = { ...item };
-                e.pos = index;
-                setSelectedMilestone(e);
-                setOpenAssignContribution(true);
-            }
+            let e = { ...item };
+            e.pos = index;
+            setSelectedMilestone(e);
+            setOpenMilestoneModal(true);
         }
         else if (index > 0) {
-            if (!item.complete && Project.milestones[index - 1].complete) {
-                let e = { ...item };
-                e.pos = index;
-                setSelectedMilestone(e);
-                setOpenAssignContribution(true);
-            }
+            let e = { ...item };
+            e.pos = index;
+            setSelectedMilestone(e);
+            setOpenMilestoneModal(true);
         }
     }
+
+    const NameAndAvatar = (props: any) => {
+        const [show, setShow] = useState(false);
+        let roles: any = [];
+        const discordOb = _get(DAO, 'discord', null);
+        const userTemp = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === props.address.toLowerCase() && m.deletedAt === null);
+        console.log("address : ", props.address);
+        console.log("user : ", userTemp);
+        const index = props.index;
+
+        if (userTemp?.discordId && discordOb) {
+            Object.keys(discordOb).forEach(function (key, _index) {
+                const discordChannel = discordOb[key];
+                let person = _find(_get(discordChannel, 'members', []), m => _get(m, 'displayName', '').toLowerCase() === userTemp?.discordId?.toLowerCase());
+                if (person) {
+                    person.roles.forEach(function (item: any) {
+                        _get(discordChannel, 'roles', []).map((i: any) => {
+                            if (i.id === item && i.name !== '@everyone') {
+                                roles.push({ name: i.name, roleColor: _get(i, 'roleColor', '#99aab5') })
+                            }
+                        })
+                    })
+                }
+            });
+        }
+
+        if (userTemp) {
+            return (
+                <>
+                    <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"} key={index}>
+                        <Box sx={{ width: '250px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                            <Avatar name={userTemp?.member.name} wallet={userTemp?.member.wallet} />
+                            <Box className={classes.lineSm}></Box>
+                        </Box>
+                        <Box sx={{ width: '300px' }} display={"flex"} alignItems={"center"}>
+                            <Box sx={{ width: '150px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                                <Typography sx={{ marginLeft: '6px', fontSize: '14px', color: '#76808D' }}>{moment.utc(props.joined).local().format('MM/DD/YYYY')}</Typography>
+                                <Box className={classes.lineSm}></Box>
+                            </Box>
+                            <Box sx={{ width: '150px', marginLeft: '10px' }}>
+                                <Typography sx={{ fontSize: '14px', fontWeight: '700', color: '#76808D' }}>
+                                    {
+                                        userTemp?.role === 'role1' ? userTemp?.creator ? `${transformRole(userTemp?.role).label} (Creator)` : transformRole(userTemp?.role).label : transformRole(userTemp?.role).label
+                                    }
+                                </Typography>
+                            </Box>
+                        </Box>
+                        <Box sx={{ width: '400px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                            {
+                                (show ? roles : roles.filter((_: any, i: any) => i < 5)).map((item: any, index: any) => {
+                                    if (show || index <= 3) {
+                                        return (
+                                            <>
+                                                <Chip
+                                                    label={item.name}
+                                                    className={classes.rolePill}
+                                                    sx={{
+                                                        '& .MuiChip-avatar': {
+                                                            height: '14px !important',
+                                                            width: '14px !important'
+                                                        }
+                                                    }}
+                                                    avatar={
+                                                        <Box style={{ backgroundColor: `${_get(item, "roleColor", '#99aab5')}`, borderRadius: '50%' }}></Box>
+                                                    }
+                                                    style={{ backgroundColor: `${_get(item, "roleColor", '#99aab5')}50` }}
+                                                />
+                                            </>
+                                        )
+                                    }
+                                    return (
+                                        <>
+                                            <Box className={classes.roleCount} onClick={() => setShow(prev => !prev)} display={"flex"} alignItems={"center"} justifyContent={"center"}>
+                                                <Typography>{show ? 'Hide' : `+${roles.length - 4}`}</Typography>
+                                            </Box>
+                                        </>
+                                    )
+                                })
+                            }
+                        </Box>
+                    </Box>
+                </>
+            );
+        }
+        else return null;
+    };
+
 
     if (!Project || setProjectLoading || (projectId && (Project && Project._id !== projectId))) {
         return (
@@ -201,14 +332,22 @@ export default () => {
 
     return (
         <Grid container className={classes.root}>
-            <Grid xs={12} item display="flex" flexDirection="column" sx={{ margin: '107px 0' }}>
+            <Grid xs={12} item display="flex" flexDirection="column">
 
                 <ProjectEditModal
                     open={showEdit}
                     closeModal={() => setShowEdit(false)}
                 />
 
+                <MilestoneDetailModal
+                    selectedMilestone={selectedMilestone}
+                    open={openMilestoneModal}
+                    closeModal={() => setOpenMilestoneModal(false)}
+                    openAssignContribution={() => setOpenAssignContribution(true)}
+                />
+
                 <AssignContributionModal
+                    selectedMilestone={selectedMilestone}
                     open={openAssignContribution}
                     closeModal={() => setOpenAssignContribution(false)}
                 />
@@ -218,8 +357,13 @@ export default () => {
                     closeModal={() => setOpenKraReview(false)}
                 />
 
+                <InviteMemberModal
+                    open={openInviteModal}
+                    closeModal={() => setOpenInviteModal(false)}
+                />
+
                 {/* Name */}
-                <Box sx={{ width: '100%', height: 74, marginBottom: '20px' }} display="flex" alignItems="center">
+                <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" alignItems="center">
                     <Box onClick={() => navigate(-1)} className={classes.arrowContainer} display="flex" alignItems="center" justifyContent={"center"}>
                         <IoIosArrowBack size={20} color="#C94B32" />
                     </Box>
@@ -366,9 +510,9 @@ export default () => {
                                 value === 1 &&
                                 <Box display={"flex"} alignItems={"center"}>
                                     <Typography sx={{ marginLeft: '14px', fontWeight: 400, color: '#76808D', marginRight: '100px' }}>Review frequency : {_get(Project, 'kra.frequency', [])}</Typography>
-                                    <IconButton sx={{ marginRight: '20px' }}>
+                                    {/* <IconButton sx={{ marginRight: '20px' }}>
                                         <img src={archiveIcon} alt="archiveIcon" />
-                                    </IconButton>
+                                    </IconButton> */}
                                     <Button size="small" variant="contained" onClick={() => setOpenKraReview(true)}>
                                         REVIEW
                                     </Button>
@@ -403,13 +547,49 @@ export default () => {
                     </Box>
                 }
 
-                <TaskSection isHelpIconOpen={false} />
+                <TaskSection isHelpIconOpen={false}  onlyProjects={true} />
 
-                <MembersSection
-                    isHelpIconOpen={false}
-                    list={_sortBy(_uniqBy(Project?.members, '_id'), m => _get(m, 'name', '').toLowerCase())}
-                    showProjects={true}
-                />
+                <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
+
+                    <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                        <Typography sx={{ fontSize: '22px', fontWeight: '400', color: '#76808D' }}>Members</Typography>
+                        <Box display={"flex"} alignItems={"center"}>
+                            <img src={membersGroup} alt="membersGroup" />
+                            <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{Project?.members.length} {Project?.members.length > 1 ? 'members' : 'member'}</Typography>
+                            <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn}
+                                onClick={() => setOpenInviteModal(true)}
+                            >
+                                <AddIcon sx={{ fontSize: 18 }} /> MEMBER
+                            </Button>
+                        </Box>
+                    </Box>
+
+                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px', borderRadius: '5px', marginTop: '0.2rem' }} display={"flex"} flexDirection={"column"}>
+
+                        <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"}>
+                            <Box sx={{ width: '250px' }}>
+                                <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5' }}>Name</Typography>
+                            </Box>
+                            <Box sx={{ width: '250px' }}>
+                                <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5', marginLeft: '22px' }}>Joined</Typography>
+                            </Box>
+                        </Box>
+
+                        <Box sx={{ width: '100%', maxHeight: '220px', overflow: 'auto' }}>
+                            {_sortBy(_uniqBy(Project?.members, (m: any) => m.wallet.toLowerCase()), (m: any) => _get(m, 'name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
+                                return (
+                                    <NameAndAvatar
+                                        index={index}
+                                        address={_get(result, 'wallet', '')}
+                                        position={index}
+                                    />
+                                );
+                            })}
+                        </Box>
+                    </Box>
+                </Box>
+
+
             </Grid>
         </Grid>
     )

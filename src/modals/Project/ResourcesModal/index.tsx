@@ -22,6 +22,10 @@ import { useDAO } from "context/dao";
 import AddDiscordLink from "components/AddDiscordLink";
 import AddNotionLink from "components/AddNotionLink";
 import Switch from "components/Switch";
+import theme from "theme";
+import { useAppSelector } from "helpers/useAppSelector";
+import { useAppDispatch } from "helpers/useAppDispatch";
+import { editProjectLinksAction } from "store/actions/project";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -66,8 +70,7 @@ const useStyles = makeStyles((theme: any) => ({
         height: 50,
         borderRadius: '5px',
         cursor: 'pointer',
-        margin: '0 !important',
-        marginTop: '10px !important'
+        margin: '0 !important'
     },
     linkArea: {
         width: '100% !important',
@@ -112,11 +115,13 @@ interface Props {
 
 export default ({ open, hideBackdrop, closeModal, list, getResources, editResources }: Props) => {
     const classes = useStyles();
+    const dispatch = useAppDispatch();
     const { DAO } = useDAO();
+    const { Project } = useAppSelector((store:any) => store.project);
     const [title, setTitle] = useState<string>('');
     const [titleError, setTitleError] = useState<string>('');
     const [link, setLink] = useState<string>('');
-    const [linkError, setLinkError] = useState<string>('');
+    const [linkError, setLinkError] = useState<any>('');
     const [roleName, setRoleName] = useState<string>('');
     const [spaceDomain, setSpaceDomain] = useState<string>('');
     const [accessControl, setAccessControl] = useState(false);
@@ -157,14 +162,14 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
     const LinkBtn = (props: any): JSX.Element => {
         if (link && link.indexOf('discord.') > -1) {
             return (
-                <Box sx={{ marginTop: '10px' }}>
+                <Box>
                     <AddDiscordLink onLinkError={(e: React.SetStateAction<string>) => setLinkError(e)} {...props} />
                 </Box>
             )
         }
         else {
             return (
-                <Box sx={{ marginTop: '10px' }}>
+                <Box>
                     <AddNotionLink {...props} />
                 </Box>
             )
@@ -200,6 +205,7 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
     }
 
     const handleAddResource = async (status: any = undefined) => {
+        setLinkError(null)
         if (title === '') {
             setTitleError('Enter title');
             return;
@@ -279,7 +285,8 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
 
     const handleSubmit = () => {
         if (editResources) {
-            // dispatch(editProjectLinks({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { resourceList } }));
+            dispatch(editProjectLinksAction({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { resourceList } }));
+            closeModal();
         }
         else {
             getResources(resourceList);
@@ -292,6 +299,7 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
             anchor={'right'}
             open={open}
+            sx={{ zIndex: theme.zIndex.appBar + 1 }}
             hideBackdrop={hideBackdrop}
         >
             <Box className={classes.modalConatiner}>
@@ -303,9 +311,9 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
                     <Typography className={classes.modalTitle}>Project Resources</Typography>
                     <Typography className={classes.modalSubtitle}>Add links for online ressources </Typography>
                 </Box>
-                <Box display="flex" flexDirection="column" sx={{ width: '80%' }}>
+                <Box display="flex"flexDirection="column" sx={{ width: '80%' }}>
                     <Typography className={classes.label}>Add links</Typography>
-                    <Box display="flex" justifyContent={"space-between"} sx={{ height: '80px' }}>
+                    <Box  display="flex" justifyContent={"space-between"} sx={{ height: '80px', mt: 1  }}>
                         <TextInput
                             sx={{ width: 145 }}
                             placeholder="Ex Portfolio"
@@ -354,7 +362,7 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
 
                     {
                         accessControl && link && link.indexOf('discord.') > -1 &&
-                        <Box style={{ width: '100%' }}>
+                        <Box sx={{ mb: 2 }} style={{ width: '100%' }}>
                             <TextInput
                                 sx={{ width: '100%' }}
                                 type="text"
@@ -367,7 +375,7 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
 
                     {
                         accessControl && link && link.indexOf('notion.') > -1 && !linkHasDomain &&
-                        <Box style={{ width: '100%' }}>
+                        <Box sx={{ mb: 2 }} style={{ width: '100%' }}>
                             <TextInput
                                 sx={{ width: '100%' }}
                                 type="text"
@@ -380,7 +388,7 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
 
                     {
                         DAO?.sbt &&
-                        <Box sx={{ width: '100%', marginTop: '10px' }} display={"flex"}>
+                        <Box sx={{ width: '100%' }} display={"flex"}>
                             {
                                 (link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('email') > -1) || (link && link.indexOf('discord.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('discord') > -1)
                                     ?
@@ -401,14 +409,14 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
                     {
                         accessControl && link && link.indexOf('notion.') > -1 &&
                         <Box
-                            style={{ fontSize: 14, marginTop: '10px', marginBottom: 16, padding: "5px 10px", backgroundColor: "#188C7C", borderRadius: 5, color: "#FFF" }}
+                            style={{ fontSize: 14, marginBottom: 16, padding: "5px 10px", backgroundColor: "#188C7C", borderRadius: 5, color: "#FFF" }}
                         >
                             Invite <span style={{ color: "#FFF", fontWeight: 'bold' }}>{process.env.REACT_APP_NOTION_ADMIN_EMAIL}</span> to be an Admin of your workspace
                         </Box>
                     }
 
                     {
-                        resourceList.length > 0 && !editResources &&
+                        resourceList.length > 0 &&
                         <Box className={classes.linkArea}>
                             {
                                 resourceList.map((item, index) => {
@@ -435,7 +443,7 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
                         </Box>
                     }
 
-                    {
+                    {/* {
                         resourceList.length > 0 && editResources &&
                         <Box display={"flex"} flexDirection={"column"} sx={{ width: '100%', marginTop: '20px' }}>
                             {
@@ -462,7 +470,7 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
                                 })
                             }
                         </Box>
-                    }
+                    } */}
 
                     <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%', marginTop: '20px' }}>
                         <Button variant="outlined" sx={{ marginRight: '20px', width: '169px' }} onClick={closeModal}>CANCEL</Button>

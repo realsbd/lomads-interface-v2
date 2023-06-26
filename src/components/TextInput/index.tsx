@@ -1,6 +1,13 @@
 import React from 'react';
 import { Typography, Box, TextField, FormControl, FormLabel, Chip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
+const  MenuProps = {
+    MenuProps:{
+        PaperProps: { sx: { maxHeight: 300 } } 
+      },
+  }
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -17,15 +24,18 @@ const useStyles = makeStyles((theme: any) => ({
     }
 }));
 
-export default ({ labelChip, fullWidth, label, ...props }: any) => {
+export default ({ labelChip, fullWidth, label, date, ...props }: any) => {
     const classes = useStyles();
     return (
         <FormControl fullWidth={fullWidth}>
             <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
-                <FormLabel error={props.error} component="legend" sx={{ marginBottom: '10px' }}>{label}</FormLabel>
+                { label && <FormLabel style={{ marginBottom: "10px" }} error={props.error} component="legend">{label}</FormLabel> }
                 {labelChip}
             </Box>
-            <TextField {...props} className={classes.root} />
+            {   date ?
+                <DatePicker {...props} className={classes.root} /> :
+                <TextField {...props} SelectProps={MenuProps}  className={classes.root} />
+            }
         </FormControl>
     )
 }

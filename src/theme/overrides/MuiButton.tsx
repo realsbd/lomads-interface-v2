@@ -42,11 +42,11 @@ export default {
                 background: palette.secondary.main
 			},
             '&:active': {
-				boxShadow: 'none',
+				boxShadow: `3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)`,
                 background: palette.secondary.main
 			},
 			'&:focus': {
-				boxShadow: 'none',
+				boxShadow: `3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)`,
 			},
             '&:disabled': {
                 background: 'rgba(27, 43, 65, 0.2)',

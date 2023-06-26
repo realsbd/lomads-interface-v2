@@ -1,4 +1,5 @@
 import axiosHttp from 'api';
+import axios from 'axios';
 import { get as _get, map as _map, filter as _filter, find as _find, orderBy as _orderBy } from 'lodash'
 import { getQueryString } from 'utils'
 
@@ -8,6 +9,22 @@ export const loadOffChainTxn = (daoId: string) => {
     .then(txn => {
         return { pTxn: txn.map((pt: any) => { return { safeAddress: pt?.safe, rawTx: pt } }) }
     })
+}
+
+export const createTreasuryTransactionService = (payload: any) => {
+    return axiosHttp.post(`/gnosis-safe`, payload)
+}
+
+export const updateTreasuryTransactionService = (payload: any) => {
+    return axiosHttp.patch(`/gnosis-safe`, payload)
+}
+
+export const updateTxLabelService = (payload: any) => {
+    return axiosHttp.patch(`/gnosis-safe/tx-label`, payload)
+}
+
+export const syncSafeService = (payload: any) => {
+    return axiosHttp.post(`/gnosis-safe/sync-safe`, payload)
 }
 
 export const loadTreasuryService = (payload: any) => {
@@ -48,6 +65,14 @@ export const loadTreasuryService = (payload: any) => {
     //     //@ts-ignore
     //     return ptx.concat(pTxn)
     // })
-    .then(ptx => _orderBy(ptx, [p => p?.rawTx?.isExecuted, p => p?.rawTx?.executionDate, p => p?.rawTx?.nonce], ['asc', 'desc','asc']))
+    .then(ptx => _orderBy(ptx, [p => p?.rawTx?.isExecuted, p => p?.rawTx?.offChain, p => p?.rawTx?.executionDate, p => p?.rawTx?.nonce], ['asc', 'asc', 'desc','asc']))
     .then(ptx => { return { data: ptx } })
+}
+
+export const loadRecurringPaymentsService = (payload: any) => {
+    return axiosHttp.get(`/recurring-payment${getQueryString(payload)}`)
+}
+
+export const createRecurringPaymentsService = (payload: any) => {
+    return axiosHttp.post(`/recurring-payment`, payload)
 }

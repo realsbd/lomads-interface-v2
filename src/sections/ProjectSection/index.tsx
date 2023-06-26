@@ -20,15 +20,12 @@ import useTerminology from 'hooks/useTerminology';
 
 import moment from 'moment';
 import BootstrapTooltip from "components/BootstrapTooltip";
+import Tooltip from '@mui/material/Tooltip';
 
 const useStyles = makeStyles((theme: any) => ({
     createBtn: {
         width: '125px',
         height: '40px',
-        background: '#FFFFFF !important',
-        boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), - 3px - 3px 8px rgba(201, 75, 50, 0.1) !important',
-        borderRadius: '5px !important',
-        fontSize: '14px !important',
         color: '#C94B32 !important'
     },
     showAllCard: {
@@ -54,7 +51,7 @@ const useStyles = makeStyles((theme: any) => ({
         justifyContent: "center",
         color: "#FFFFFF",
         backgroundColor: "#76808D",
-        zIndex: 999,
+        zIndex: 99999,
         width: "100% !important",
         height: "100% !important",
         opacity: 0.8,
@@ -118,7 +115,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
     const [myProjects, setMyProjects] = useState<any[]>([]);
     const [otherProjects, setOtherProjects] = useState<any[]>([]);
     const [initialCheck, setInitialCheck] = useState<boolean>(false);
-    const { myRole, can } = useRole(DAO, account)
+    const { myRole, can } = useRole(DAO, account, undefined)
     const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies', null))
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -136,34 +133,27 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
             const provider = Object.keys(grp)[index];
             count.push({ provider, count: grp[provider].reduce((p, c) => (p + (+_get(c, 'notification', 0))), 0) })
         }
-        return count;
+        return count.length;
     }
 
     useEffect(() => {
         if (DAO && DAO.url === daoURL) {
-            // @ts-ignore
-            let myProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.draftedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()));
-            // @ts-ignore
-            myProjects = myProjects.map(p => {
+            let myProjects = _get(DAO, 'projects', []).filter((project: any) => !project.deletedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()));
+            myProjects = myProjects.map((p: any) => {
                 let prj = { ...p, notification: 0 }
-                // @ts-ignore
                 if (notificationCount(prj) > 0)
                     prj.notification = 1
                 return prj;
             })
             setMyProjects(_orderBy(myProjects, ['notification', p => moment(p.createdAt).unix()], ['desc', 'desc']))
-
-            // @ts-ignore
-            let otherProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.draftedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()))
-            // @ts-ignore
-            otherProjects = otherProjects.map(p => {
+            let otherProjects = _get(DAO, 'projects', []).filter((project: any) => !project.deletedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()))
+            otherProjects = otherProjects.map((p: any) => {
                 let prj = { ...p, notification: 0 }
-                // @ts-ignore
                 if (notificationCount(prj) > 0)
                     prj.notification = 1
                 return prj;
             })
-            setOtherProjects(_orderBy(otherProjects, p => moment(p.createdAt).unix(), 'desc'))
+            setOtherProjects(_orderBy(myProjects.concat(otherProjects), p => moment(p.createdAt).unix(), 'desc'))
         }
     }, [DAO, value]);
 
@@ -181,18 +171,12 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
 
     return (
         <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
-            <Box
-                sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }}
-                display={"flex"}
-                alignItems={"center"}
-                justifyContent={"space-between"}>
+            <Box sx={{ width: '100%', background: '#FFF', height: '75px', padding: '0px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                 <Tabs
                     value={value}
                     onChange={handleChange}
                     aria-label="basic tabs example"
-                    TabIndicatorProps={{
-                        hidden: true
-                    }}
+                    TabIndicatorProps={{ hidden: true }}
                     sx={{
                         '& button': { color: 'rgba(118, 128, 141,0.5)', marginRight: '10px', textTransform: 'capitalize', fontSize: '22px', fontWeight: '400' },
                         '& button.Mui-selected': { color: 'rgba(118, 128, 141,1)' },
@@ -203,39 +187,43 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
-                    <BootstrapTooltip open={isHelpIconOpen}
+                    <BootstrapTooltip arrow open={isHelpIconOpen}
                         placement="top-start"
                         title="Open">
-                        <IconButton sx={{
-                            marginRight: '20px',
-                            zIndex: isHelpIconOpen ? 1500 : 0,
-                            boxShadow: isHelpIconOpen ? '0px 0px 20px rgba(181, 28, 72, 0.6)' : ''
-                        }}>
-                            <img src={expandIcon} alt="archive-icon" />
-                        </IconButton>
+                        <span>
+                            <IconButton
+                            style={{
+                                ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {}),
+                            }}
+                            onClick={() => navigate(`/${DAO.url}/projects`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
+                                <img src={expandIcon} alt="archive-icon" />
+                            </IconButton>
+                        </span>
                     </BootstrapTooltip>
-                    <BootstrapTooltip open={isHelpIconOpen}
+                    <BootstrapTooltip arrow open={isHelpIconOpen}
                         placement="bottom"
                         title="Archives">
-                        <IconButton sx={{
-                            marginRight: '20px',
-                            zIndex: isHelpIconOpen ? 1500 : 0,
-                            boxShadow: isHelpIconOpen ? '0px 0px 20px rgba(181, 28, 72, 0.6)' : ''
-                        }}>
-                            <img src={archiveIcon} alt="archiveIcon" />
-                        </IconButton>
+                        <span>
+                            <IconButton sx={{
+                                marginRight: '20px',
+                                ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {}),
+                            }}>
+                                <img src={archiveIcon} alt="archiveIcon" />
+                            </IconButton>
+                        </span>
                     </BootstrapTooltip>
-                    <BootstrapTooltip open={isHelpIconOpen}
+                    <BootstrapTooltip arrow open={isHelpIconOpen}
                         placement="top-start"
                         title="Create Workspace">
-                        <Button
-                            style={{
-                                zIndex: isHelpIconOpen ? 1500 : 0,
-                                boxShadow: isHelpIconOpen ? '0px 0px 20px rgba(181, 28, 72, 0.6)' : 'none'
-                            }}
-                            size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/createProject`)}>
-                            <AddIcon sx={{ fontSize: 18 }} /> CREATE
-                        </Button>
+                            <span>
+                                <Button
+                                    style={{
+                                        ...( isHelpIconOpen ? { zIndex: 1500, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {})
+                                    }}
+                                    size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/project/create`)}>
+                                    <AddIcon sx={{ fontSize: 18 }} /> CREATE
+                                </Button>
+                            </span>
                     </BootstrapTooltip>
                 </Box>
             </Box>
@@ -269,7 +257,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
                                     <Box
                                         key={index}
                                         className={classes.showAllCard}
-                                    // onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}
+                                        onClick={() => { navigate(`/${DAO.url}/projects`, { state: { active: value } }) }}
                                     >
                                         <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
                                     </Box>
@@ -309,7 +297,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
                                     <Box
                                         key={index}
                                         className={classes.showAllCard}
-                                    // onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}
+                                        onClick={() => { navigate(`/${DAO.url}/projects`, { state: { active: value } }) }}
                                     >
                                         <Typography sx={{ color: '#b12f15' }}>SHOW ALL</Typography>
                                     </Box>

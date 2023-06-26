@@ -12,6 +12,7 @@ import { useAppDispatch } from "helpers/useAppDispatch";
 
 
 export default ({ t, nextChainId }: any) => {
+    console.log("nextChainId", nextChainId)
     const { chainId, switchChain } = useWeb3Auth()
     const dispatch = useAppDispatch()
 
@@ -20,10 +21,14 @@ export default ({ t, nextChainId }: any) => {
     }, [chainId])
 
     const handleSwitch = useCallback(async () => {
-        toast.dismiss(t.id)
-        const chainInfo = CHAIN_INFO[nextChainId]
-        dispatch(setNetworkConfig({ selectedChainId: nextChainId, chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
-        await switchChain(chainInfo?.chainId)
+        try {
+            toast.dismiss(t.id)
+            const chainInfo = CHAIN_INFO[nextChainId]
+            dispatch(setNetworkConfig({ selectedChainId: nextChainId, chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+            await switchChain(chainInfo?.chainId)
+        } catch (e) {
+            console.log(e)
+        }
     }, [nextChainId])
 
     return (

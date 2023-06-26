@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-
-import { Paper, Typography, Box, Drawer } from "@mui/material";
+import { Paper, Typography, Box, Drawer, MenuItem } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import IconButton from 'components/IconButton';
@@ -24,6 +23,11 @@ import { useAppSelector } from "helpers/useAppSelector";
 
 import useTerminology from 'hooks/useTerminology';
 import { editProjectMilestonesAction } from "store/actions/project";
+import { beautifyHexToken } from "utils";
+import theme from "theme";
+import AmountInput from "components/AmountInput";
+import moment from "moment";
+import useSafe from "hooks/useSafe";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -40,7 +44,7 @@ const useStyles = makeStyles((theme: any) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '27px !important',
+        padding: '27px 27px 80px 27px !important',
         marginTop: '60px !important'
     },
     modalTitle: {
@@ -109,11 +113,12 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     const { safeTokens } = useSafeTokens();
     const { chainId } = useWeb3Auth();
     const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
-
+    const { activeSafes } = useSafe()
     const [milestones, setMilestones] = useState<any[]>(list.length > 0 ? list : [{ name: '', amount: '0', deadline: '', deliverables: '', complete: false }]);
     const [milestoneCount, setMilestoneCount] = useState<number>(list.length > 0 ? list.length : 1);
     const [amount, setAmount] = useState(editMilestones ? _get(Project, 'compensation.amount', '') : 0);
     const [currency, setCurrency] = useState<string>(editMilestones ? _get(Project, 'compensation.currency', '') : '');
+    const [safeAddress, setSafeAddress] = useState<string>('');
 
     const [errorNames, setErrorNames] = useState<number[]>([]);
     const [errorAmount, setErrorAmount] = useState<number[]>([]);
@@ -122,9 +127,16 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     const [errorProjectValue, setErrorProjectValue] = useState<boolean>(false);
 
     useEffect(() => {
+        if(editMilestones && Project && Project?._id) {
+            const safeAddress = Project?.compensation?.safeAddress || _get(DAO, 'safes[0].address', '')
+            setSafeAddress(safeAddress)
+            setCurrency(Project?.compensation?.currency)
+        }
+    }, [editMilestones && Project?._id])
+
+    useEffect(() => {
         if (editProjectMilestonesLoading === false) {
             closeModal();
-            // navigate(-1);
         }
     }, [editProjectMilestonesLoading]);
 
@@ -195,6 +207,10 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     }
 
     const handleChangeAmount = (e: string, index: number) => {
+        var x = document.getElementById(`amount${milestones.length - 1}`);
+        if (x) {
+            x.innerHTML = '';
+        }
         let amt: number = parseInt(e);
         if (errorAmount.includes(index)) {
             setErrorAmount(errorAmount.filter((i) => i !== index));
@@ -241,7 +257,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     }
 
     const handleChangeCompensationAmount = (e: any) => {
-        setAmount(parseFloat(e));
+        setAmount(e);
         setErrorProjectValue(false);
     }
 
@@ -263,7 +279,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
         }
         if (amount === 0) {
             setErrorProjectValue(true);
-            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency);
+            let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency);
             symbol = _get(symbol, 'token.symbol', null);
             if (!symbol)
                 symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
@@ -287,7 +303,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                 }
                 return;
             }
-            else if (ob.amount === '') {
+            else if (ob.amount === '' || ob.amount === 0) {
                 flag = -1;
                 if (!errorAmount.includes(i)) {
                     setErrorAmount([...errorAmount, i])
@@ -315,27 +331,26 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
             if (x) {
                 x.innerHTML = 'Total Project Value should be 100 %';
             }
-            for (var i = 0; i < milestones.length; i++) {
-                if (!milestones[i].complete) {
-                    var el = document.getElementById(`inputBox${i}`);
-                    if (el) {
-                        el.style.background = 'rgba(217, 83, 79, 0.75)';
-                    }
-                }
-            }
+            // for (var i = 0; i < milestones.length; i++) {
+            //     if (!milestones[i].complete) {
+            //         var el = document.getElementById(`inputBox${i}`);
+            //         if (el) {
+            //             el.style.background = 'rgba(217, 83, 79, 0.75)';
+            //         }
+            //     }
+            // }
             return;
         }
         if (flag !== -1) {
-            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
-            symbol = _get(symbol, 'token.symbol', null)
-            if (!symbol)
-                symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
+
+            let safeToken = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency);
+            let symbol = _get(safeToken, 'token.symbol', 'SWEAT');
 
             if (editMilestones) {
-                dispatch(editProjectMilestonesAction({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones, compensation: { currency, amount, symbol } } }));
+                dispatch(editProjectMilestonesAction({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones, compensation: { currency, amount, symbol, safeAddress } } }));
             }
             else {
-                getCompensation({ currency: currency, amount, symbol })
+                getCompensation({ currency: currency, amount, symbol, tokenAddress: safeToken?.tokenAddress,  safeAddress })
                 getMilestones(milestones);
                 closeModal();
             }
@@ -345,7 +360,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     return (
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
-            sx={{ zIndex: 1 }}
+            sx={{ zIndex: theme.zIndex.appBar + 1 }}
             anchor={'right'}
             open={open}
             hideBackdrop={hideBackdrop}
@@ -361,12 +376,40 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                 </Box>
                 <Box display="flex" flexDirection="column" alignItems={"center"} sx={{ width: '80%' }}>
 
+                    <Box display="flex" flexDirection="column" sx={{ width: 310, marginBottom: '25px' }}>
+                        <Box
+                            component="form"
+                            noValidate
+                            autoComplete="off"
+                        >
+                            <TextInput
+                                id="outlined-select-currency"
+                                select
+                                fullWidth
+                                label="Treasury"
+                                value={safeAddress}
+                                onChange={(e: any) => { 
+                                    setSafeAddress(e.target.value) 
+                                    handleChangeCurrency(_get(_get(safeTokens, e.target.value, []), '[0].tokenAddress'))
+                                }}
+                            >
+                                {
+                                    DAO?.safes?.map((safe: any) => {
+                                        return (
+                                            <MenuItem disabled={!safe?.enabled} key={safe?.address} value={safe?.address}>{(safe?.name || "Multi-sig wallet") + " (" + beautifyHexToken(safe?.address) + ")"}</MenuItem>
+                                        )
+                                    })
+                                }
+                            </TextInput>
+                        </Box>
+                    </Box>
+
                     <Box display="flex" flexDirection="column" sx={{ width: 310, marginBottom: '25px' }} id="currency-amt">
                         <Typography className={classes.label}>Total {transformWorkspace().label} Value</Typography>
                         <CurrencyInput
                             value={amount}
                             onChange={(value: any) => handleChangeCompensationAmount(value)}
-                            options={safeTokens}
+                            options={_get(safeTokens, safeAddress, []).map((tok: any) => { return { label: tok?.token?.symbol, value: tok?.tokenAddress } })}
                             dropDownvalue={currency}
                             onDropDownChange={(value: any) => {
                                 handleChangeCurrency(value)
@@ -410,28 +453,14 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                     </Box>
 
                                     {/* Milestone amount % */}
-                                    <Box display={"flex"} alignItems={'center'} sx={{ marginBottom: '20px' }}>
-                                        <TextInput
-                                            type="number"
-                                            InputProps={{
-                                                inputProps: {
-                                                    max: 100, min: 0, step: 1,
-                                                    onKeyDown: (event: any) => {
-                                                        event.preventDefault();
-                                                    },
-                                                }
-                                            }}
-                                            sx={{ width: 90 }}
-                                            value={item.amount}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeAmount(e.target.value, index)}
-                                            placeholder={`${100 / milestoneCount}`}
-                                            disabled={item.complete}
-                                            error={errorAmount.includes(index)}
-                                            id={errorAmount.includes(index) ? "outlined-error-helper-text" : ""}
-                                            helperText={errorAmount.includes(index) ? "Enter %" : ""}
-                                        />
-                                        <Typography sx={{ fontWeight: '700', fontSize: 16, color: '#76808D', marginLeft: '13.5px' }}>% of {transformWorkspace().label} value</Typography>
+                                    <Box display={"flex"} flexDirection={"column"} sx={{ mt: 2, marginBottom: '20px' }}>
+                                        <Box display={"flex"} alignItems={'center'}>
+                                            <AmountInput height={50} onChange={(e: any) => handleChangeAmount(e, index)} value={item.amount} />
+                                            <Typography sx={{ fontWeight: '700', fontSize: 16, color: '#76808D', marginLeft: '13.5px' }}>% of {transformWorkspace().label} value</Typography>
+                                        </Box>
+                                        <Typography id={`amount${index}`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal' }}></Typography>
                                     </Box>
+
 
                                     {/* Milestone deadline */}
                                     <Box sx={{ marginBottom: '20px' }}>
@@ -441,11 +470,12 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                                 <TextInput
                                                     sx={{ width: 172 }}
                                                     label="Due date"
-                                                    type="date"
-                                                    value={item.deadline}
-                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeDeadline(e.target.value, index)}
+                                                    date
+                                                    value={ moment(item.deadline, 'YYYY-MM-DD') || undefined}
+                                                    onChange={(e: any) => handleChangeDeadline(moment(e).format('YYYY-MM-DD'), index)}
                                                     disabled={item.complete}
                                                     error
+                                                    minDate={moment()}
                                                     id="outlined-error-helper-text"
                                                     helperText="Please enter deadline"
                                                 />
@@ -453,9 +483,10 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                                 <TextInput
                                                     sx={{ width: 172 }}
                                                     label="Due date"
-                                                    type="date"
-                                                    value={item.deadline}
-                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeDeadline(e.target.value, index)}
+                                                    date
+                                                    minDate={moment()}
+                                                    value={ moment(item.deadline, 'YYYY-MM-DD') || undefined}
+                                                    onChange={(e: any) => handleChangeDeadline(moment(e).format('YYYY-MM-DD'), index)}
                                                     disabled={item.complete}
                                                 />
                                         }
@@ -478,7 +509,15 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                         })
                     }
 
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
+
+                    <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                            <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                                <Button sx={{ mr:1 }} onClick={() => closeModal()} fullWidth variant='outlined' size="small">Cancel</Button>
+                                <Button sx={{ ml:1 }} onClick={() => handleSubmit()} disabled={editProjectMilestonesLoading} loading={editProjectMilestonesLoading} fullWidth variant='contained' size="small">{ editMilestones? 'SAVE' : 'ADD' }</Button>
+                            </Box>
+                    </Box>
+
+                    {/* <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
                         <Button variant="outlined" sx={{ marginRight: '20px', width: '169px' }} onClick={closeModal}>CANCEL</Button>
                         <Button variant="contained" onClick={handleSubmit} sx={{ width: '184px' }} loading={editProjectMilestonesLoading}>
                             {
@@ -489,7 +528,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                     'ADD'
                             }
                         </Button>
-                    </Box>
+                    </Box> */}
 
                 </Box>
             </Box>

@@ -20,9 +20,11 @@ const useStyles = makeStyles((theme: any) => ({
     },
     kraContent: {
         width: '100%',
-        hieght: '100% !important',
+        height: '100% !important',
         display: 'flex',
+        flexDirection: 'row',
         alignItems: 'center',
+        padding: "0px 16px !important"
     },
     kraText: {
         fontSize: '14px !important',

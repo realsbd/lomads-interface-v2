@@ -1,5 +1,5 @@
 import React from 'react';
-import {  get as _get } from 'lodash'
+import {  get as _get, find as _find } from 'lodash'
 import { ADAPTER_EVENTS, getChainConfig, SafeEventEmitterProvider, WALLET_ADAPTERS, WALLET_ADAPTER_TYPE } from "@web3auth/base";
 import type { LOGIN_PROVIDER_TYPE } from "@toruslabs/openlogin";
 import { ethers } from "ethers";
@@ -9,10 +9,13 @@ import Web3Token from 'web3-token';
 // import { NetworkSwitch } from "@web3auth/ui";
 import { createContext, FunctionComponent, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { CHAIN_CONFIG, CHAIN_CONFIG_TYPE } from "constants/chainConfig";
-import { WEB3AUTH_NETWORK, WEB3AUTH_NETWORK_TYPE } from "constants/chains";
+import { SupportedChainId, WEB3AUTH_NETWORK, WEB3AUTH_NETWORK_TYPE } from "constants/chains";
 import { MetamaskAdapter } from "@web3auth/metamask-adapter";
 import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 import { useAppSelector } from "helpers/useAppSelector";
+import { useAppDispatch } from 'helpers/useAppDispatch';
+import { logoutAction, setNetworkConfig, setTokenAction, setUserAction } from 'store/actions/session';
+import { CHAIN_INFO } from 'constants/chainInfo';
 
 const whiteLabel = {
   name: "Lomads",
@@ -48,8 +51,8 @@ interface IWeb3AuthProps {
 }
 
 export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }: IWeb3AuthProps) => {
-  // @ts-expect-error
-  const { web3AuthNetwork = "", chain = ""} = useAppSelector(store => store.session) 
+  const dispatch = useAppDispatch()
+  const { web3AuthNetwork = "", chain = ""} = useAppSelector((store:any) => store.session) 
   const [web3Auth, setWeb3Auth] = useState<Web3AuthNoModal | null>(null);
   const [state, setState] = useState<any>({
     w3Provider: null,
@@ -58,6 +61,58 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
   })
 
   const [isLoading, setIsLoading] = useState(false);
+
+const handleAccountsChanged = async () => {
+    try {
+      localStorage.clear()
+      sessionStorage.clear()
+      dispatch(setTokenAction(null))
+      dispatch(setUserAction(null))
+      dispatch(logoutAction())
+      await logout()
+    } catch(e) {
+      console.log(e)
+    }
+}
+
+const handleNetworkChanged = async (chainId: any) => {
+    try {
+      window.location.reload();
+    } catch(e) {
+      console.log(e)
+    }
+}
+
+// useEffect(() => {
+//   if(window?.ethereum) {
+//       let chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', SupportedChainId.POLYGON)]
+//       if(!chainInfo)
+//         chainInfo = CHAIN_INFO[SupportedChainId.POLYGON]
+//       dispatch(setNetworkConfig({ selectedChainId: +_get(window?.ethereum, 'networkVersion', SupportedChainId.POLYGON), chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+//   }
+// }, [])
+
+useEffect(() => {
+  if(window?.ethereum)
+    //@ts-ignore
+    window?.ethereum.on('accountsChanged', handleAccountsChanged);
+  return () => {
+    if(window?.ethereum)
+      //@ts-ignore
+      window?.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+  };
+  }, []);
+
+  // useEffect(() => {
+  //   if(window?.ethereum)
+  //     //@ts-ignore
+  //     window?.ethereum.on('networkChanged', handleNetworkChanged);
+  //   return () => {
+  //     if(window?.ethereum)
+  //       //@ts-ignore
+  //       window?.ethereum.removeListener('networkChanged', handleNetworkChanged);
+  //   };
+  //   }, []);
 
   useEffect(() => {
     const subscribeAuthEvents = (web3auth: Web3AuthNoModal) => {
@@ -91,11 +146,11 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
     async function init() {
       try {
         setIsLoading(true);
-        const clientId = _get(WEB3AUTH_NETWORK, `${web3AuthNetwork}.clientId`)
+        const clientId = _get(WEB3AUTH_NETWORK, `cyan.clientId`)
         console.log("chain, web3AuthNetwork", chain, web3AuthNetwork)
         const web3AuthInstance = new Web3AuthNoModal({
-          web3AuthNetwork,
-          chainConfig: _get(CHAIN_CONFIG, chain, 'goerli'),
+          web3AuthNetwork: 'cyan',
+          chainConfig: _get(CHAIN_CONFIG, chain, 'polygon'),
           enableLogging: true,
           clientId: clientId || '',
         });
@@ -142,6 +197,11 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
           setState({
             provider: provider, account: account, chainId, w3Provider: web3AuthInstance?.provider
           })
+        } else {
+          console.log("window.ethereum", window?.ethereum)
+          console.log("web3AuthInstance", "Need to login")
+          if(window?.location?.pathname.indexOf('/login') === -1)
+            window.location.href = '/login'
         }
       } catch (error) {
         console.error(error);

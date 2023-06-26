@@ -14,22 +14,36 @@ import { LeapFrog } from "@uiball/loaders";
 import { usePrevious } from 'hooks/usePrevious';
 import useInterval from "hooks/useInterval";
 import axiosHttp from 'api';
+import { Box, IconButton } from "@mui/material";
+import { Add } from "@mui/icons-material";
+import StyledIconButton from "components/StyledIconButton";
+import { makeStyles } from "@mui/styles";
 
-export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, onLinkError, ...props }) => {
 
+const useStyles = makeStyles((theme: any) => ({
+    addLinkBtn: {
+        width: 50,
+        height: 50,
+        borderRadius: '5px',
+        cursor: 'pointer',
+        margin: '0 !important'
+    }
+}));
+
+export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, onLinkError, ...props }: any) => {
+    const classes  = useStyles()
     const { provider, account, chainId } = useWeb3Auth();
-    const signerFunction = useCallback((signableMessage) => getSigner(provider, account).signMessage(signableMessage), [provider, account]);
     const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("identify guilds")
 
     const { onOpen: openAddBotPopup, windowInstance: activeAddBotPopup } = usePopupWindow()
 
     const { DAO } = useDAO();
 
-    const [server, setServer] = useState(null);
-    const [channels, setChannels] = useState(null);
-    const [poll, setPoll] = useState(null);
-    const [addLinkLoading, setAddLinkLoading] = useState(null);
-    const [hasClickedAuth, setHasClickedAuth] = useState(false)
+    const [server, setServer] = useState<any>(null);
+    const [channels, setChannels] = useState<any>(null);
+    const [poll, setPoll] = useState<any>(null);
+    const [addLinkLoading, setAddLinkLoading] = useState<any>(null);
+    const [hasClickedAuth, setHasClickedAuth] = useState<any>(false)
 
     const getDiscordServers = useCallback(async () => {
         return axios.get('https://discord.com/api/users/@me/guilds', { headers: { Authorization: authorization } })
@@ -82,7 +96,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
         }
     }, [channels, activeAddBotPopup])
 
-    const finish = result => {
+    const finish = (result:any) => {
         setChannels(null);
         setPoll(null);
         setHasClickedAuth(false)
@@ -100,7 +114,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
         }
     }
 
-    const onGuildBotAdded = async server => {
+    const onGuildBotAdded = async (server:any) => {
         let attachRoleId = undefined;
         if (roleName) {
             attachRoleId = await axiosHttp.get(`discord/guild/${server.id}/roles`)
@@ -187,7 +201,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                     setAddLinkLoading(null);
                 }
             } else {
-                finish()
+                finish(undefined)
             }
         }
     }
@@ -211,34 +225,50 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
     }
 
     return (
-        <>
-            {
-                okButton ?
-                    <SimpleLoadButton
-                        condition={addLinkLoading}
-                        disabled={addLinkLoading}
-                        title="OK"
-                        bgColor="#C94B32"
-                        className="button"
-                        fontsize={16}
-                        fontweight={400}
-                        height={40}
-                        width={129}
-                        onClick={() => handleAddResource()}
-                    />
-                    :
-                    <>
-                        {
-                            <button
-                                style={{ background: link !== '' && title !== '' && !addLinkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0.2)', width: 50, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                disabled={link === '' || title === '' || addLinkLoading}
-                                onClick={() => handleAddResource()}>
-                                {addLinkLoading ? <LeapFrog size={20} color="#FFF" /> : <AiOutlinePlus color="#FFF" size={25} />}
-                            </button>
-                        }
-                    </>
-            }
-        </>
-
+        <Box
+            className={classes.addLinkBtn}
+            sx={link !== '' && title !== '' ? { background: '#C84A32' } : { background: 'rgba(27, 43, 65, 0.2)', }}
+            display={"flex"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            onClick={() => handleAddResource()}
+        > { addLinkLoading ? <LeapFrog size={20} color="#FFF" /> :
+            <AiOutlinePlus color="#FFF" size={25} /> }
+        </Box>
     )
+
+    // return (
+    //     <>
+    //         {
+    //             okButton ?
+    //                 // <SimpleLoadButton
+    //                 //     condition={addLinkLoading}
+    //                 //     disabled={addLinkLoading}
+    //                 //     title="OK"
+    //                 //     bgColor="#C94B32"
+    //                 //     className="button"
+    //                 //     fontsize={16}
+    //                 //     fontweight={400}
+    //                 //     height={40}
+    //                 //     width={129}
+    //                 //     onClick={() => handleAddResource()}
+    //                 // />
+    //                 <StyledIconButton variant="contained">
+    //                     <Add/>
+    //                 </StyledIconButton>
+    //                 :
+    //                 <>
+    //                     {
+    //                         <button
+    //                             style={{ background: link !== '' && title !== '' && !addLinkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0.2)', width: 50, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    //                             disabled={link === '' || title === '' || addLinkLoading}
+    //                             onClick={() => handleAddResource()}>
+    //                             {addLinkLoading ? <LeapFrog size={20} color="#FFF" /> : <AiOutlinePlus color="#FFF" size={25} />}
+    //                         </button>
+    //                     }
+    //                 </>
+    //         }
+    //     </>
+
+    // )
 }

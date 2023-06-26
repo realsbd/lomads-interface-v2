@@ -185,7 +185,7 @@ export default () => {
             setCreateDAOLoading(true)
             axiosHttp.post('dao', daoPayload)
             .then((result) => {
-                navigate(`/${daoPayload?.url}/attach-safe/new?createflow=1`)
+                navigate(`/${daoPayload?.url}/attach-safe/new`, { state: { createFlow: true } })
             })
             .finally(() => setCreateDAOLoading(false))
 		} else {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { throttle as _throttle, debounce as _debounce, get as _get } from 'lodash'
-import { Container, Grid, Typography, Box, Paper, Menu } from "@mui/material"
+import { throttle as _throttle, debounce as _debounce, get as _get, find as _find } from 'lodash'
+import { Container, Grid, Typography, Box, Paper, Menu, Link } from "@mui/material"
 import MenuItem from '@mui/material/MenuItem';
 import { makeStyles } from '@mui/styles';
 import CHEERS from 'assets/svg/cheers.svg'
@@ -12,7 +12,7 @@ import APPLE from 'assets/images/apple.png'
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chains';
 import toast from 'react-hot-toast';
-import { createAccountAction, setTokenAction, setNetworkConfig, logoutAction } from 'store/actions/session';
+import { createAccountAction, setTokenAction, setNetworkConfig, logoutAction, setUserAction } from 'store/actions/session';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from "components/Button";
@@ -81,15 +81,43 @@ export default () => {
     const handleClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
 
-    const { provider, login, account, chainId, logout } = useWeb3Auth();
+    const { provider, login, account, chainId, logout, web3Auth } = useWeb3Auth();
 
     console.log("provider", provider)
+
+
+    // useEffect(() => {
+    //     if(window?.ethereum){
+    //         const chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', 5)]
+    //         dispatch(setNetworkConfig({ selectedChainId: +_get(window?.ethereum, 'networkVersion', 5), chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+    //     }
+    // }, [window?.ethereum])
+
+    // const handleOnMessage = (message: any) => {
+    //     if(message?.data?.data?.data?.method === "metamask_chainChanged" && message?.data?.data?.data?.params?.networkVersion !== "loading") {
+    //         console.log("+message?.data?.data?.data?.method?.params?.networkVersion", message?.data?.data?.data?.params?.networkVersion)
+    //         if(!isNaN(+message?.data?.data?.data?.params?.networkVersion)) {
+    //             const chainInfo = CHAIN_INFO[+message?.data?.data?.data?.params?.networkVersion]
+    //             if(chainInfo) {
+    //                 dispatch(setNetworkConfig({ selectedChainId: +message?.data?.data?.data?.params?.networkVersion, chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+    //             }
+    //         }
+    //     }
+    // }
+
+    // useEffect(() => {
+    //     window.addEventListener("message", handleOnMessage);
+    //     return () => {
+    //       window.removeEventListener("message", handleOnMessage);
+    //     };
+    //   }, []);
 
     useEffect(() => {
         setCurrentChain(selectedChainId)
     }, [selectedChainId])
 
     useEffect(() => {
+        console.log("TOKEN , USER, ACC", token , user , account)
         if (token && user && account) {
             if (from)
                 navigate(from)
@@ -105,6 +133,25 @@ export default () => {
         setCurrentChain(chain)
     }, 1000)
 
+    // useEffect(() => {
+    //     if (account && token && web3Auth) {
+    //         if(web3Auth?.connectedAdapterName === "openlogin") {
+    //             web3Auth?.getUserInfo()
+    //             .then((res:any) => {
+    //                 console.log("userInfo", res)
+    //                 setUserInfo(res)
+    //                 setState((prev: any) => {
+    //                     return {
+    //                         ...prev,
+    //                         name: _get(res, 'name', null),
+    //                         email: _get(res, 'email', null),
+    //                     }
+    //                 })
+    //             })
+    //         }
+    //     }
+    // }, [account, token, web3Auth])
+
     const handleLogin = async (loginType = WALLET_ADAPTERS.METAMASK, provider: undefined | string = undefined) => {
         dispatch(logoutAction())
         await logout()
@@ -114,15 +161,23 @@ export default () => {
         } else if (loginType === WALLET_ADAPTERS.OPENLOGIN) {
             token = await login(WALLET_ADAPTERS.OPENLOGIN, provider);
         }
-        console.log(token)
         if (token) {
-            dispatch(createAccountAction({ token }))
+            let userInfo = null;
+            if(web3Auth?.connectedAdapterName === "openlogin")
+                userInfo = await web3Auth?.getUserInfo()
+            dispatch(createAccountAction({ token, userInfo }))
         }
     }
 
     return (
         <>
             <Grid container className={classes.root}>
+                <Container style={{ position: 'absolute', top: 0 }} maxWidth="lg">
+                    <Box sx={{ mt: 3 }} display="flex" flexDirection="row" alignItems="center" style={{ float: 'right' }}>
+                        <Link rel="noopener noreferrer" target="_blank" href="https://lomads.medium.com/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor:'pointer' }}>BLOG</Link>
+                        <Link rel="noopener noreferrer" target="_blank" href="https://lomads-1.gitbook.io/lomads/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor:'pointer' }}>DOCS</Link>
+                    </Box>
+                </Container>
                 <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
                     <Box zIndex={0} position="absolute" bottom={0}>
                         <img src={CHEERS} style={{ marginBottom: '-5px' }} />
@@ -149,7 +204,7 @@ export default () => {
                                 <img style={{ width: 80, cursor: 'pointer' }} src={APPLE} />
                             </Box>
                     </Box>
-                    <Box mt={4} display="flex" flexDirection="row" alignItems="center">
+                    {/* <Box mt={4} display="flex" flexDirection="row" alignItems="center">
                         <Typography variant='body1' fontWeight="bold" mr={2}>Select Blockchain:</Typography>
                         <Button onClick={handleClick} aria-controls={open ? 'fade-menu' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined} className={classes.select} variant="contained" color="secondary" disableElevation startIcon={<img style={{ width: 18, height: 18 }} src={_get(CHAIN_INFO, `${currentChain}.logoUrl`)} />} endIcon={<KeyboardArrowDown />}>
                             {_get(CHAIN_INFO, `${currentChain}.label`)}
@@ -176,7 +231,7 @@ export default () => {
                                         <img style={{ marginRight: '8px', width: 18, height: 18 }} src={CHAIN_INFO[sc].logoUrl} />{CHAIN_INFO[sc].label}</MenuItem>)
                             }
                         </Menu>
-                    </Box>
+                    </Box> */}
                     <Box height={200}></Box>
                 </Grid>
             </Grid>

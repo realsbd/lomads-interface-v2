@@ -10,17 +10,21 @@ import { useAppDispatch } from "helpers/useAppDispatch";
 import { useAppSelector } from "helpers/useAppSelector";
 import { useNavigate } from "react-router-dom"
 import StepperProgress from "components/StepperProgress";
+import { updateProjectViewAction } from "store/actions/project";
+import { useDAO } from "context/dao";
 
 const useStyles = makeStyles((theme: any) => ({
     taskCard: {
+        position: 'relative',
         width: '315px',
         height: '110px',
-        padding: '20px !important',
+        padding: '0px !important',
         marginRight: '20px !important',
         marginBottom: '15px !important',
         borderRadius: '5px !important',
         display: 'flex !important',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        zIndex: '999 !important'
     },
     taskContent: {
         width: '100%',
@@ -71,6 +75,8 @@ export default ({ project, daoUrl, tab }: CardProps) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
+    const { DAO } = useDAO();
+
     // @ts-ignore
     const { user } = useAppSelector(store => store.session);
 
@@ -89,7 +95,7 @@ export default ({ project, daoUrl, tab }: CardProps) => {
     }, [project]);
 
     const handleCardClick = () => {
-        // dispatch(updateViewProject({ projectId: project._id, daoUrl: _get(DAO, 'url', '') }));
+        dispatch(updateProjectViewAction({ projectId: project._id, daoUrl: _get(DAO, 'url', '') }));
         navigate(`/${daoUrl}/project/${project._id}`, { state: { project } })
     }
 
@@ -99,16 +105,18 @@ export default ({ project, daoUrl, tab }: CardProps) => {
                 className={classes.taskCard}
                 sx={{
                     background: '#FFF',
+                    overflow: 'inherit',
                     boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
                 }}
                 onClick={handleCardClick}
+
             >
                 {
                     project.links.length > 0 && tab === 0
                         ?
                         <Box className={classes.iconContainer}>
                             {
-                                notifications.map((notification, index) => {
+                                notifications.map((notification: any, index: number) => {
                                     if (notification.provider.indexOf('discord') > -1 && notification.count) {
                                         return (
                                             <Box className={classes.iconPill} key={index}>
@@ -117,6 +125,7 @@ export default ({ project, daoUrl, tab }: CardProps) => {
                                             </Box>
                                         )
                                     }
+                                    return null
                                 })
                             }
                         </Box>
@@ -148,7 +157,8 @@ export default ({ project, daoUrl, tab }: CardProps) => {
                 }
 
                 <CardContent className={classes.taskContent}>
-                    <Typography className={classes.taskText}>{_get(project, 'name', '')}</Typography>
+                    <Typography className={classes.taskText}>{_get(project, 'name', '').length > 20 ? _get(project, 'name', '').substring(0, 20) + '...' : _get(project, 'name', '')}</Typography>
+
                     {
                         _get(project, 'milestones', []).length > 0 &&
                         <Box sx={{ width: '100%' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
@@ -156,7 +166,9 @@ export default ({ project, daoUrl, tab }: CardProps) => {
                                 <StepperProgress variant="primary" milestones={_get(project, 'milestones', [])} />
                             </Box>
                             <Typography sx={{ fontSize: '14px', color: '#76808D' }}>
-                                {(((_get(project, 'milestones', []).filter((item: any) => item.complete === true).length) / (_get(project, 'milestones', []).length)) * 100)}%
+                                {
+                                    (((_get(project, 'milestones', []).filter((item: any) => item.complete === true).length) / (_get(project, 'milestones', []).length)) * 100).toFixed(1)
+                                }%
                             </Typography>
                         </Box>
                     }

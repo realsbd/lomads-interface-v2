@@ -3,12 +3,15 @@ import { Box, MenuItem, FormControl } from "@mui/material";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { makeStyles } from '@mui/styles';
 import clsx from "clsx";
+import Avatar from 'components/Avatar';
 
 type propTypes = {
 	options?: any[],
-	selected?: number,
+	selected?: any,
 	selectStyle?: any,
 	errorSelect?: string,
+	disabled?: boolean,
+	type?: string,
 	setSelectedValue: (event: any) => void
 }
 
@@ -29,7 +32,9 @@ export default function MuiSelect({
 	selected,
 	selectStyle,
 	errorSelect,
-	setSelectedValue
+	setSelectedValue,
+	disabled,
+	type,
 }: propTypes) {
 	const classes = useStyles();
 	const [activeOption, setActiveOption] = useState<number | string | undefined | null>(selected ? selected : 'Select');
@@ -63,15 +68,42 @@ export default function MuiSelect({
 					onClose={() => {
 						setShowMenuItem((prev) => true);
 					}}
+					disabled={disabled}
+					MenuProps={{
+						PaperProps: {
+							sx: {
+								maxHeight: '200px'
+							},
+						},
+					}}
 				>
 					<MenuItem value="Select" style={{ display: showMenuItem ? "block" : "none" }}>Select</MenuItem>
-					{options?.map((option, index) => (
-						<MenuItem
-							value={option?.value}
-							key={index}
-						>
-							{option.label}
-						</MenuItem>))}
+					{
+						options?.map((option, index) => {
+							if (type === 'members') {
+								return (
+									<MenuItem
+										value={option?.value}
+										key={index}
+									>
+										<Avatar
+											name={option.label.name}
+											wallet={option.label.wallet}
+										/>
+									</MenuItem>
+								)
+							}
+							else {
+								return (
+									<MenuItem
+										value={option?.value}
+										key={index}
+									>
+										{option.label}
+									</MenuItem>
+								)
+							}
+						})}
 				</Select>
 				{errorSelect && <span style={{ background: '#EA6447', padding: '5px 10px', borderRadius: '0 0 5px 5px', color: '#FFF', textAlign: 'center', width: '90%', fontSize: '11px' }}>{errorSelect}</span>}
 			</Box>

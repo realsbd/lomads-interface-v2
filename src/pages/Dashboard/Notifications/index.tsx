@@ -184,8 +184,7 @@ const useStyles = makeStyles((theme: any) => ({
 export default ({ isHelpIconOpen }: { isHelpIconOpen: any }) => {
     const classes = useStyles();
 	const { daoURL } = useParams();
-    //@ts-expect-error
-    const { user, token } = useAppSelector((state) => state.session);
+    const { user, token } = useAppSelector((state:any) => state.session);
     const { DAO } = useDAO()
 	const { provider, account, chainId } = useWeb3Auth();
     const [myNotifications, setMyNotifications] = useState<Array<any> | null>(null)
@@ -205,7 +204,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: any }) => {
 	}, [account, chainId, user])
 
     useEffect(() => {
-        if(user && DAO && DAO.url === daoURL) {
+        if(DAO.url) {
             axiosHttp.get(`notification?dao=${_get(DAO, '_id', '')}&limit=20`)
             .then(res => {
                 setMyNotifications(res.data.data)
@@ -215,7 +214,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: any }) => {
                 setTimeline(res.data.data)
             })
         }
-    }, [DAO, daoURL, user])
+    }, [DAO?.url])
 
     const loadNotification = (notification: any) => {
         if(!user) return;

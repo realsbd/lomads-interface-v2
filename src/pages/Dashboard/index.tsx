@@ -1,8 +1,10 @@
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { useDAO } from "context/dao";
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect  } from "react"
+import axios from 'axios'
 import { makeStyles } from '@mui/styles';
+import axiosHttp from 'api'
 import { useNavigate, useParams } from "react-router-dom"
 import { Grid } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close'
@@ -18,6 +20,17 @@ import Treasury from "./Treasury";
 import Steps from 'constants/walkthroughsteps';
 import questionMarkDark from "assets/svg/question-mark-dark.svg";
 import questionMarkLight from "assets/svg/question-mark-light.svg";
+import { useWeb3Auth } from "context/web3Auth";
+import useRole from "hooks/useRole";
+import Button from "components/Button";
+import moment from "moment";
+import { beautifyHexToken } from "utils";
+import { CHAIN_INFO } from "constants/chainInfo";
+import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from "constants/chains";
+import ProfileModal from "modals/Profile/ProfileModal";
+import useGnosisTxnTransform from "hooks/useGnosisTxnTransform";
+import { updateUserOnboardingCountAction } from "store/actions/dao";
+import { useAppDispatch } from "helpers/useAppDispatch";
 
 type WalkThroughObjType = {
     step: number;
@@ -47,7 +60,6 @@ const useStyles = makeStyles((theme: any) => {
         color: '#C94B32 !important',
         backgroundColor: '#FFFFFF !important',
         cursor: 'pointer',
-        position: 'absolute',
         width: '198px !important',
         height: '40px !important',
         borderRadius: '5px !important',
@@ -89,15 +101,52 @@ const useStyles = makeStyles((theme: any) => {
 export default () => {
     const { daoURL } = useParams();
     const navigate = useNavigate();
-    const { DAO, DAOList } = useDAO();
+    const dispatch = useAppDispatch()
+    const { user } = useAppSelector((store:any) => store?.session)
+    const { DAO, DAOList, updateIsHelpOpen } = useDAO();
     const classes = useStyles();
+    console.log("DAO", DAO);
     const [currWalkThroughObj, setWalkThroughObj] = useState<any>(Steps('')[0]);
-    const [showWalkThrough, setShowWalkThrough] = useState<boolean>(true);
+    const [showWalkThrough, setShowWalkThrough] = useState<boolean>(false);
     const [isHelpIconOpen, setIsHelpIconOpen] = useState<boolean>(false);
     const anchorRef = useRef<any>();
     const questionMarkRef = useRef<any>();
+    const { account } = useWeb3Auth();
+    const { myRole, can } = useRole(DAO, account, undefined)
+    const { transformTx } = useGnosisTxnTransform()
     // @ts-ignore
     const { setProjectLoading, Project } = useAppSelector(store => store.project);
+
+    useEffect(() => {
+        updateIsHelpOpen(isHelpIconOpen)
+    }, [isHelpIconOpen])
+
+    useEffect(() => {
+		if (DAO && user && (!user?.onboardingViewCount || (user?.onboardingViewCount && user?.onboardingViewCount.indexOf(_get(DAO, '_id', '')) === -1 && user?.onboardingViewCount.length < 2)))
+			setShowWalkThrough(true)
+	}, [DAO, user])
+
+    // const send = async () => {
+    //     try {
+    //         await axiosHttp.post(`utility/send-alert`, { alertType: 'mint-success', to: ["kyle@reputable.health"], data: {
+    //             organizationName: "Reputable",
+    //             organizationLogo: "https://lomads-dao-development.s3.eu-west-3.amazonaws.com/SBT/XhtV_5RqsUvyid7TzP1fqj7ZQ6-getQq.png",
+    //             sbtName: `The Quantified Collective Membership  SBT #54`,
+    //             mintDate: moment().local().format('DD-MMM-YYYY'),
+    //             contractAddress:  beautifyHexToken("0xeD14Cc04f234dC7c10758Ef0A9ce6E11368572DB"),
+    //             tokenId: 54,
+    //             chain: CHAIN_INFO[SupportedChainId.POLYGON].label,
+    //             lomadsLink: `https://sbt.lomads.xyz/mint/${"0xeD14Cc04f234dC7c10758Ef0A9ce6E11368572DB"}`,
+    //             chainLogo: `https://lomads-dao-development.s3.eu-west-3.amazonaws.com/EmailAssets/${CHAIN_INFO[SupportedChainId.POLYGON].chainName}.png`,
+    //             image: "https://lomads-dao-development.s3.eu-west-3.amazonaws.com/SBT/GHzuG21YyuD6i2msMNWE_kGeRJ3JO3ZC.png",
+    //             link: `${CHAIN_INFO[SupportedChainId.POLYGON]?.explorer}token/${"0xeD14Cc04f234dC7c10758Ef0A9ce6E11368572DB"}?a=${54}`,
+    //             openSea: `${CHAIN_INFO[SupportedChainId.POLYGON]?.opensea}${"0xeD14Cc04f234dC7c10758Ef0A9ce6E11368572DB"}/${54}`,
+    //             redirectUrl: "https://www.quantifiedcollective.org/welcome"
+    //         } })
+    //     } catch (e) {
+    //         console.log(e)
+    //     }
+    // }
 
     const expandHelpOptions = () => {
         setIsHelpIconOpen(!isHelpIconOpen)
@@ -120,7 +169,7 @@ export default () => {
         anchorRef.current.scrollIntoView({
             behavior: 'smooth',
             block: 'end',
-            inline: 'end'
+            inline: 'nearest'
         });
     }
 
@@ -141,7 +190,7 @@ export default () => {
         setWalkThroughObj(nextObj)
     }
     const endWalkThrough = () => {
-        //dispatch(updateUserOnboardingCount({ payload: { daoId: _get(DAO, '_id', '') } }))
+        dispatch(updateUserOnboardingCountAction({ daoId: _get(DAO, '_id', '') }))
         setShowWalkThrough(false)
         setWalkThroughObj(Steps('')[0])
     }
@@ -162,6 +211,98 @@ export default () => {
 		return () => document.removeEventListener("click", handleClick);
 	});
 
+    const loadAllSafeTokens = async () => {
+        let { data } = await axiosHttp.get(`/utility/update-safe`)
+        data = _uniqBy(data, (s:any) => s.address)
+        const safes: any = {};
+        for (let index = 0; index < data.length; index++) {
+            const safe = data[index]
+            // console.log(safe)
+            // let chain = 5
+            // let gnosisSafe: any  = null;
+            // try {
+            //     gnosisSafe = await axios.get(`${GNOSIS_SAFE_BASE_URLS[`${chain}`]}/api/v1/safes/${safe?.address}/`, { withCredentials: false }).then(res => res.data)
+            // } catch (e) {
+            //     chain = 137
+            //     try {
+            //         gnosisSafe = await axios.get(`${GNOSIS_SAFE_BASE_URLS[`${chain}`]}/api/v1/safes/${safe?.address}/`, { withCredentials: false }).then(res => res.data)
+            //     } catch (e) {
+            //         chain = 1
+            //         gnosisSafe = await axios.get(`${GNOSIS_SAFE_BASE_URLS[`${chain}`]}/api/v1/safes/${safe?.address}/`, { withCredentials: false }).then(res => res.data)
+            //     }
+            // }
+            // console.log(safe?.address, chain)
+            // await axiosHttp.patch(`/safe/${safe?.address}`, { chainId: chain })
+            try {
+                const response: any = await axios.get(`${GNOSIS_SAFE_BASE_URLS[`${safe?.chainId}`]}/api/v1/safes/${safe?.address}/balances/usd/`, { withCredentials: false })
+                let t = response?.data;
+                t = response?.data?.map((t:any) => {
+                    let tkn = t
+                    if (!tkn.tokenAddress) {
+                        return {
+                            ...t,
+                            tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
+                            token: {
+                                symbol: CHAIN_INFO[safe?.chainId].nativeCurrency.symbol,
+                                decimal: CHAIN_INFO[safe?.chainId].nativeCurrency.decimals,
+                                decimals: CHAIN_INFO[safe?.chainId].nativeCurrency.decimals,
+                            }
+                        }
+                    }
+                    return t
+                })
+                t.push({
+                    tokenAddress: "SWEAT",
+                    token: {
+                        symbol: "SWEAT",
+                        decimal: 18,
+                        decimals: 18,
+                    }
+                })
+                safes[safe?.address] = t
+                await new Promise(resolve => setTimeout(resolve, 500))
+            } catch (e) {
+                continue;
+            }
+        }
+        console.log("ALL_SAFES", safes)
+    }
+
+    const updateTask = async () => {
+        const { data } = await axiosHttp.get(`/utility/update-safe`)
+        for (let index = 0; index < data.length; index++) {
+            const txn = data[index];
+            try {
+                const transformedTxns = await transformTx(txn.rawTx, [], txn?.safeAddress)
+                for (let index = 0; index < transformedTxns.length; index++) {
+                    try {
+                        const t = transformedTxns[index];
+                        if(t?.to && t?.to !== "0x" && t.symbol && t.symbol !== "") {
+                            await axiosHttp.post(`/gnosis-safe/update-metadata`, {
+                                txId: txn?._id,
+                                recipient: t?.to,
+                                key: "parsedTxValue",
+                                value: {
+                                    value: t?.value,
+                                    formattedValue: t?.formattedValue.toString(),
+                                    symbol: t?.symbol,
+                                    decimals: t?.decimals,
+                                    tokenAddress: t?.tokenAddress
+                                }
+                            })
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 500))
+                    } catch (e) {
+                        continue;
+                    }
+                }
+            } catch (e) {
+                continue;
+            }
+        }
+        alert("COMPLETED")
+    }
+
     return (
         <Grid container>
             <Grid item sm={12}>
@@ -173,53 +314,56 @@ export default () => {
                 <Notifications isHelpIconOpen={isHelpIconOpen} />
             </Grid>
             <Grid sm={12}
-                id="my-task" 
-                sx={{zIndex: currWalkThroughObj.step === 2 ? 1400: 0}} >
-                <TaskSection isHelpIconOpen={isHelpIconOpen}/>
-            </Grid>
-            <Grid sm={12}
                 id="my-workspace"
                 sx={{zIndex: currWalkThroughObj.step === 1 ? 1400: 0}}>
                 <ProjectSection isHelpIconOpen={isHelpIconOpen}/>
             </Grid>
-            {/* <Grid sm={12} id="members">
-                <MembersSection
-                    list={_get(DAO, 'members', [])}
-                    showProjects={false}
-                    highlightMembers={currWalkThroughObj.step === 6}
-                />
-            </Grid> */}
-            <Grid mt={1}
+            <Grid sm={12}
+                id="my-task" 
+                sx={{zIndex: currWalkThroughObj.step === 2 ? 1400: 0}} >
+                <TaskSection isHelpIconOpen={isHelpIconOpen}/>
+            </Grid>
+            {can(myRole, 'transaction.view') && <Grid mt={1}
                 id="treasury-management"
                 item sm={12} 
                 sx={{zIndex: currWalkThroughObj.step === 4 || currWalkThroughObj.step === 3 ? 1400: 0}}>
-                <Treasury isHelpIconOpen={isHelpIconOpen} />
+                <Treasury showWalkThrough={showWalkThrough} isHelpIconOpen={isHelpIconOpen} />
+            </Grid> }
+            <Grid sm={12}
+            sx={{zIndex: currWalkThroughObj.step === 5 ? 1400: 0}}
+            id="members">
+                <MembersSection
+                    list={_get(DAO, 'members', [])}
+                    showProjects={false}
+                    isHelpIconOpen={isHelpIconOpen}
+                    highlightMembers={currWalkThroughObj.step === 5}
+                />
             </Grid>
-                <Box
-                    sx={{ width: '100%', position: 'fixed', left: '33px', bottom: '44px', cursor: 'pointer', zIndex: isHelpIconOpen ? 1300: 1000}}
-                    id="question-mark"
-                    ref={questionMarkRef}
-                    onClick={expandHelpOptions}>
-                    {isHelpIconOpen
-                        &&
-                        <Stack spacing={2}>
-                            <Button
-                                variant="contained"
-                                className={classes.PlayWalkThroughButton}
-                                onClick={startWalkThroughAtStepOne}>
-                                Play walk through
-                            </Button>
-                            <Button
-                                startIcon={<CloseIcon />}
-                                className={classes.HideHelpIconButton}
-                                onClick={() => questionMarkRef.current.style.display = 'none'}
-                                variant="contained">
-                                Hide help icon
-                            </Button>
-                        </Stack>
-                    }
-                    <img src={getQuestionImage()} />
-                </Box>
+            <Box
+                sx={{ width: '100%', position: 'fixed', left: '33px', bottom: '44px', cursor: 'pointer', zIndex: isHelpIconOpen ? 1300: 1000}}
+                id="question-mark"
+                ref={questionMarkRef}
+                onClick={expandHelpOptions}>
+                {isHelpIconOpen
+                    &&
+                    <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around',  height: 100 }}>
+                        <Button
+                            variant="contained"
+                            className={classes.PlayWalkThroughButton}
+                            onClick={startWalkThroughAtStepOne}>
+                            Play walk through
+                        </Button>
+                        <Button
+                            startIcon={<CloseIcon />}
+                            className={classes.HideHelpIconButton}
+                            onClick={() => questionMarkRef.current.style.display = 'none'}
+                            variant="contained">
+                            Hide help icon
+                        </Button>
+                    </Box>
+                }
+                <img src={getQuestionImage()} />
+            </Box>
             {(showWalkThrough || isHelpIconOpen) && <Box className={classes.walkThroughOverlay}></Box>}
             {showWalkThrough
                 ?

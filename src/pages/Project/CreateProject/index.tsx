@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { find as _find, get as _get, debounce as _debounce, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 
-import { Grid, Paper, Typography, Box, Chip } from "@mui/material";
+import { Grid, Paper, Typography, Box, Chip, List, ListItem, ListItemButton } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -34,11 +34,15 @@ import { DEFAULT_ROLES } from "constants/terminology";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { createProjectAction } from "store/actions/project";
 import { useAppSelector } from "helpers/useAppSelector";
+import { useNavigate } from "react-router-dom";
+
+const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
-        height: '100vh',
-        overflowY: 'scroll',
+        // height: '100vh',
+        // overflowY: 'scroll',
+        paddingBottom: 32,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -126,7 +130,7 @@ export default () => {
     const { account } = useWeb3Auth();
     const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'));
     console.log("DAO in createProject : ", DAO);
-
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     // @ts-ignore
     const { createProjectLoading } = useAppSelector(store => store.project);
@@ -136,7 +140,7 @@ export default () => {
     const [next, setNext] = useState<boolean>(false);
 
     const [showAddMember, setShowAddMember] = useState(false);
-    const [memberList, setMemberList] = useState(DAO?.members);
+    const [memberList, setMemberList] = useState([]);
     const [selectedMembers, setSelectedMembers] = useState<any[]>([]);
     const [resourceList, setResourceList] = useState<any[]>([]);
     const [showMore, setShowMore] = useState<boolean>(false);
@@ -161,8 +165,17 @@ export default () => {
 
     useEffect(() => {
         if (DAO)
-            setMemberList(DAO.members)
+            setMemberList(_get(DAO, 'members', []).filter((m: any) => m.deletedAt === null))
     }, [DAO])
+
+    useEffect(() => {
+        if (createProjectLoading === false) {
+            setSuccess(true);
+            setTimeout(() => {
+                navigate(-1);
+            }, 2000);
+        }
+    }, [createProjectLoading])
 
     useEffect(() => {
         const rolesArr = _get(DAO, 'terminologies.roles', DEFAULT_ROLES);
@@ -204,7 +217,7 @@ export default () => {
         const memberList = DAO?.members;
         if (memberList.length > 0 && selectedMembers.length === 0) {
             for (let i = 0; i < memberList.length; i++) {
-                if (memberList[i].member.wallet.toLowerCase() === account.toLowerCase()) {
+                if (memberList[i]?.member?.wallet?.toLowerCase() === account?.toLowerCase()) {
                     let memberOb: any = {};
                     memberOb.name = memberList[i].member.name;
                     memberOb.address = memberList[i].member.wallet;
@@ -292,7 +305,9 @@ export default () => {
             let arr = [];
             for (let i = 0; i < DAO.members.length; i++) {
                 let user = DAO.members[i];
-                arr.push({ name: user.member.name, address: user.member.wallet })
+                if (user.deletedAt === null) {
+                    arr.push({ name: user.member.name, address: user.member.wallet })
+                }
             }
             project['members'] = arr;
             project['validRoles'] = [];
@@ -309,20 +324,22 @@ export default () => {
             let arr = [];
             for (let i = 0; i < DAO.members.length; i++) {
                 let user = DAO.members[i];
-                if (user.discordRoles) {
-                    let myDiscordRoles: any[] = [];
-                    Object.keys(user.discordRoles).forEach(function (key, index) {
-                        myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
-                    })
-                    let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
+                if (user.deletedAt === null) {
+                    if (user.discordRoles) {
+                        let myDiscordRoles: any[] = [];
+                        Object.keys(user.discordRoles).forEach(function (key, index) {
+                            myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
+                        })
+                        let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
 
-                    if (index > -1) {
-                        arr.push({ name: user.member.name, address: user.member.wallet })
+                        if (index > -1) {
+                            arr.push({ name: user.member.name, address: user.member.wallet })
+                        }
                     }
-                }
-                else {
-                    if (selectedRoles.includes(user.role)) {
-                        arr.push({ name: user.member.name, address: user.member.wallet })
+                    else {
+                        if (selectedRoles.includes(user.role)) {
+                            arr.push({ name: user.member.name, address: user.member.wallet })
+                        }
                     }
                 }
             }
@@ -330,6 +347,8 @@ export default () => {
             project['validRoles'] = selectedRoles;
             project['inviteType'] = 'Roles';
         }
+
+        console.log(project)
 
         dispatch(createProjectAction(project));
     }
@@ -341,20 +360,42 @@ export default () => {
                     <Typography sx={{ fontWeight: 700, fontSize: 16, color: '#76808D' }}>Invite members</Typography>
                     <Button variant="contained" color="secondary" className={classes.addMemberBtn}>ADD NEW MEMBER</Button>
                 </Box>
-                {
-                    _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item, index) => {
-                        if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
+                {/* <Box style={{ maxHeight: 300, overflow: 'hidden', overflowY: 'auto' }}>
+                    {
+                        _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item:any, index:number) => {
+                            if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
+                                return (
+                                    <>
+                                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} key={index} onClick={() => handleAddMember(item.member)}>
+                                            <Avatar name={item.member.name} wallet={item.member.wallet} />
+                                            <Checkbox />
+                                        </Box>
+                                    </>
+                                )
+                            }
+                            return null
+                        })
+                    }
+                </Box> */}
+                <List style={{ maxHeight: 300, overflow: 'hidden', overflowY: 'auto' }}>
+                    {
+                        _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').filter((member: any) => toChecksumAddress(member?.member.wallet) !== account).map((item: any, index: number) => {
+                            const labelId = `checkbox-list-label-${item.member.wallet}`;
                             return (
-                                <>
-                                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} key={index} onClick={() => handleAddMember(item.member)}>
-                                        <Avatar name={item.member.name} wallet={item.member.wallet} />
-                                        <Checkbox />
+                                <ListItem disablePadding key={item.member.wallet}>
+                                    <Box width={"100%"} display={"flex"} alignItems={"center"} justifyContent={"space-between"} onClick={() => handleAddMember(item.member)}>
+                                        <Avatar name={_get(item.member, 'name', '')} wallet={_get(item.member, 'wallet', '')} />
+                                        <Checkbox
+                                            edge="center"
+                                            tabIndex={-1}
+                                            inputProps={{ 'aria-labelledby': labelId }}
+                                        />
                                     </Box>
-                                </>
+                                </ListItem>
                             )
-                        }
-                    })
-                }
+                        })
+                    }
+                </List>
             </Paper>
         )
     }
@@ -426,7 +467,7 @@ export default () => {
     const _renderCreateProject = () => {
         return (
             <Grid container className={classes.root}>
-                <Grid xs={12} item display="flex" flexDirection="column" alignItems="center" sx={{ margin: '10vh 0' }}>
+                <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
                     <img src={createProjectSvg} alt="frame-icon" />
                     <Typography color="primary" variant="subtitle1" className={classes.heading}>Create New {transformWorkspace().label}</Typography>
                     {
@@ -564,7 +605,7 @@ export default () => {
                     editKRA={false}
                     hideBackdrop={false}
                 />
-                <Grid xs={12} item display="flex" flexDirection="column" alignItems="center" sx={{ margin: '10vh 0' }}>
+                <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
                     <img src={createProjectSvg} alt="frame-icon" />
                     <Typography color="primary" variant="subtitle1" className={classes.heading}>{transformWorkspace().label} Details</Typography>
 
@@ -713,8 +754,24 @@ export default () => {
         )
     }
 
+    const _renderSuccess = () => {
+        return (
+            <Grid container className={classes.root}>
+                <Grid xs={12} item display="flex" flexDirection="column" alignItems="center" justifyContent={"center"} sx={{ margin: '10vh 0' }}>
+                    <img src={createProjectSvg} alt="frame-icon" />
+                    <Typography color="primary" variant="subtitle1" className={classes.heading}>Success!</Typography>
+                    <Typography style={{ textAlign: 'center', fontStyle: 'italic', color: ' #76808D' }}>The new project is created. <br /> You will be redirected in a few seconds.</Typography>
+                </Grid>
+            </Grid>
+        )
+    }
+
     if (showMore) {
         return _renderAddProjectDetails();
+    }
+
+    if (success) {
+        return _renderSuccess();
     }
 
     return _renderCreateProject();

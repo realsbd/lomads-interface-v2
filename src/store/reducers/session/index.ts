@@ -5,11 +5,13 @@ import * as actionTypes from 'store/actionTypes';
 
 export function getInitialState() {
   return {
-    selectedChainId: 5,
-    web3AuthNetwork: "testnet",
-    chain: "goerli",
+    selectedChainId: 137,
+    web3AuthNetwork: "cyan",
+    chain: "polygon",
     token: null,
-    user: null
+    user: null,
+    transactions: null,
+    userTransactionLoading: null
   };
 }
 
@@ -25,17 +27,29 @@ const SessionReducer = (state: any = getInitialState(), action: any) =>
         draft.user = payload;
         break;
       }
-      case actionTypes.SET_NETWORK_CONFIG : {
+      case actionTypes.SET_NETWORK_CONFIG: {
         draft.web3AuthNetwork = payload.web3AuthNetwork;
         draft.chain = payload.chain;
         draft.selectedChainId = payload.selectedChainId;
         break;
       }
-      case actionTypes.LOGOUT_ACTION : {
-        draft.token= null;
-        draft.user=null;
+      case actionTypes.LOGOUT_ACTION: {
+        draft.token = null;
+        draft.user = null;
         break;
       }
+      case actionTypes.LOAD_USER_TRANSACTION_LOADING: {
+        draft.userTransactionLoading = payload
+        break;
+      }
+      case actionTypes.SET_USER_TRANSACTION: {
+        draft.transactions = payload
+        break;
+      }
+      case actionTypes.LOGOUT_ACTION: {
+				draft = getInitialState()
+        break;
+			}
     }
   });
 

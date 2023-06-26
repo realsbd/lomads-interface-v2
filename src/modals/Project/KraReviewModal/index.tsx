@@ -15,15 +15,16 @@ import { useDAO } from "context/dao";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { useAppSelector } from "helpers/useAppSelector";
 import { updateProjectKraAction } from "store/actions/project";
+import theme from "theme";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
-        height: '100vh',
-        overflowY: 'scroll',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
+        // height: '100vh',
+        // overflowY: 'scroll',
+        // display: 'flex',
+        // flexDirection: 'column',
+        // alignItems: 'center',
+        // justifyContent: 'center',
     },
     modalConatiner: {
         width: 575,
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme: any) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '27px !important',
+        padding: '27px 27px 90px 27px !important',
         marginTop: '60px !important'
     },
     modalTitle: {
@@ -49,6 +50,7 @@ const useStyles = makeStyles((theme: any) => ({
         marginBottom: '35px !important'
     },
     paperContainer: {
+        margin: '4px 0',
         borderRadius: 5,
         padding: '26px 22px',
         boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1) !important'
@@ -151,7 +153,7 @@ export default ({ open, closeModal }: Props) => {
     return (
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
-            sx={{ zIndex: 1 }}
+            sx={{ zIndex: theme.zIndex.appBar + 1  }}
             anchor={'right'}
             open={open}
         >
@@ -194,12 +196,17 @@ export default ({ open, closeModal }: Props) => {
                         }
 
                     </Box>
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
+                    {/* <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
                         <Button fullWidth size="small" variant="outlined" sx={{ marginRight: '20px' }} onClick={closeModal}>LATER</Button>
                         <Button fullWidth size="small" variant="contained" loading={updateProjectKraLoading} onClick={handleSubmit}>SUBMIT</Button>
-                    </Box>
+                    </Box> */}
                 </Box>
-
+                <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                        <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                            <Button disabled={updateProjectKraLoading} onClick={closeModal} sx={{ mr:1 }} fullWidth variant='outlined' size="small">LATER</Button>
+                            <Button loading={updateProjectKraLoading} disabled={updateProjectKraLoading} onClick={handleSubmit} sx={{ ml:1 }}  fullWidth variant='contained' size="small">SUBMIT</Button>
+                        </Box>
+                </Box>
             </Box>
         </Drawer>
     )

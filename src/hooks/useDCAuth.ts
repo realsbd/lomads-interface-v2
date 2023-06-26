@@ -1,10 +1,9 @@
 import { randomBytes } from "crypto"
-import useLocalStorage from "hooks/useLocalStorage";
-import capitalize from "utils/capitalize";
-import usePopupWindow from "hooks/usePopupWindow"
-import useToast from "hooks/useToast"
+import { capitalize } from "utils";
+import usePopupWindow from "../hooks/usePopupWindow"
 import { useEffect, useState } from "react"
-import { nanoid } from 'nanoid';
+import { nanoid } from "@reduxjs/toolkit";
+import useLocalStorage from "./useLocalStorage";
 
 
 const processDiscordError = (error: any): any => ({
@@ -47,7 +46,7 @@ const fetcherWithDCAuth = async (authorization: string, endpoint: string) => {
 
 const useDCAuth = (scope = "identify") => {
   //const router = useRouter()
-  const toast = useToast()
+  // const toast = useToast()
   const [csrfToken] = useLocalStorage(
     "dc_auth_csrf_token",
     nanoid(16),
@@ -107,7 +106,7 @@ const useDCAuth = (scope = "identify") => {
           case "DC_AUTH_ERROR":
             setError(data)
             const { title, description } = processDiscordError(data)
-            toast({ status: "error", title, description })
+            //   toast({ status: "error", title, description })
             break
           default:
             // Should never happen, since we are only processing events that are originating from us
@@ -148,3 +147,4 @@ const useDCAuth = (scope = "identify") => {
 
 export { fetcherWithDCAuth }
 export default useDCAuth
+

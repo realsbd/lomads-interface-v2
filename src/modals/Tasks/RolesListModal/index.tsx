@@ -10,6 +10,7 @@ import useTerminology from 'hooks/useTerminology';
 
 import Checkbox from "components/Checkbox";
 import Button from "components/Button";
+import theme from "theme";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -79,7 +80,7 @@ export default ({ open, closeModal, hideBackdrop, validRoles, handleValidRoles }
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
             anchor={'right'}
             open={open}
-            sx={{ zIndex: '1102' }}
+            sx={{ zIndex: theme.zIndex.appBar + 1  }}
             hideBackdrop={hideBackdrop}
         >
             <Box className={classes.modalConatiner}>

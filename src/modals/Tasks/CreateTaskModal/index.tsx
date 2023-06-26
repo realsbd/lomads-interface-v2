@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
-import { Typography, Box, Drawer, Chip } from "@mui/material";
+import { Typography, Box, Drawer, Chip, Menu, MenuItem } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import IconButton from 'components/IconButton';
@@ -28,6 +28,11 @@ import useTerminology from 'hooks/useTerminology';
 import { isValidUrl } from 'utils';
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { createTaskAction, draftTaskAction } from "store/actions/task";
+import useSafe from "hooks/useSafe";
+import theme from "theme";
+import moment from "moment";
+import { createAccountAction } from "store/actions/session";
+
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -44,7 +49,7 @@ const useStyles = makeStyles((theme: any) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '27px !important',
+        padding: ' 27px 27px 80px 27px !important',
         marginTop: '60px !important'
     },
     modalTitle: {
@@ -118,7 +123,11 @@ const useStyles = makeStyles((theme: any) => ({
         marginleft: '18px !important',
         cursor: 'pointer !important',
         marginLeft: '18px !important'
-    }
+    },
+    heading: {
+        fontSize: "32px !important",
+        margin: "20px 0 35px 0 !important"
+    },
 }));
 
 interface Props {
@@ -128,9 +137,11 @@ interface Props {
 }
 
 export default ({ open, closeModal, selectedProject }: Props) => {
+    console.log("Selected Project : ", selectedProject);
     const classes = useStyles();
     const dispatch = useAppDispatch();
     const { DAO } = useDAO();
+    const { activeSafes } = useSafe()
     // @ts-ignore
     const { user } = useAppSelector(store => store.session);
     // @ts-ignore
@@ -154,7 +165,28 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     const [reviewer, setReviewer] = useState(null);
     const [amount, setAmount] = useState(0);
     const [currency, setCurrency] = useState<string>('');
+    const [showSuccess, setShowSuccess] = useState(false);
 
+    const [safeAddress, setSafeAddress] = useState<string>('');
+
+    const [creationType, setCreationType] = useState('');
+
+    // const { loadSafe } = useSafe();
+
+    useEffect(() => {
+        if (open && selectedProject) {
+            setTimeout(() => {
+                setProjectId(selectedProject?._id)
+            }, 100)
+        }
+    }, [selectedProject, open])
+
+    useEffect(() => {
+        if(DAO?.url)
+            setSafeAddress(_get(activeSafes, '[0].address'))
+            if(user)
+                setReviewer(user?._id) 
+    }, [DAO?.url, user])
 
     const [errorName, setErrorName] = useState('');
     const [errorDesc, setErrorDesc] = useState('');
@@ -168,6 +200,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
 
     useEffect(() => {
         if (createTaskLoading === false || draftTaskLoading === false) {
+            setShowSuccess(true);
             setContributionType('open');
             setIsSingleContributor(false);
             setIsFilterRoles(false);
@@ -182,32 +215,38 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             setReviewer(null);
             setCurrency('');
             setAmount(0);
-            closeModal();
+            setTimeout(() => {
+                setShowSuccess(false);
+                closeModal();
+            }, 3000);
         }
     }, [createTaskLoading, draftTaskLoading]);
 
-    // useEffect(() => {
-    //     if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
-    //         dispatch(getCurrentUser({}))
-    //     }
-    // }, [account, chainId, user])
-
-    useEffect(() => { setReviewer(user._id) }, [user])
+    useEffect(() => { 
+        if (user) 
+            setReviewer(user?._id) 
+        else
+            dispatch(createAccountAction({}))
+        },[user])
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id)
-            .map((item: any) => { return { label: item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet), value: item.member._id } });
+        return _get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id && m.deletedAt === null)
+            .map((item: any) => { return { label: { name: item.member.name, wallet: item.member.wallet }, value: item.member._id } });
     }, [DAO, selectedUser, reviewer]);
 
+
     const eligibleReviewers = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: any) => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && (m.role === 'role1' || m.role === 'role2'))
-            .map((item: any) => { return { label: item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet), value: item.member._id } });
+        return _get(DAO, 'members', []).filter((m: any) => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && (m.role === 'role1' || m.role === 'role2') && m.deletedAt === null)
+            .map((item: any) => { return { label: { name: item.member.name, wallet: item.member.wallet }, value: item.member._id } });
 
     }, [DAO, reviewer, selectedUser]);
 
     const eligibleProjects = useMemo(() => {
+        if (selectedProject) {
+            return [{ label: selectedProject?.name, value: selectedProject?._id }]
+        }
         return _get(DAO, 'projects', []).filter((p: any) => _find(p.members, m => m._id === user._id)).map((item: any) => { return { label: item.name, value: item._id } })
-    }, [DAO, reviewer, selectedUser]);
+    }, [DAO, reviewer, selectedUser, selectedProject]);
 
     const getrolename = (roleId: any) => {
 
@@ -245,7 +284,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
 
 
     const handleChangeCompensationAmount = (e: any) => {
-        setAmount(parseFloat(e));
+        setAmount(e);
         setErrorTaskValue(false);
     }
 
@@ -275,14 +314,6 @@ export default ({ open, closeModal, selectedProject }: Props) => {
         else if (desc === '') {
             let e = document.getElementById('error-desc');
             setErrorDesc('Enter description');
-            if (e) {
-                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
-            }
-            return;
-        }
-        else if (dchannel === '') {
-            setErrorDchannel('Enter a link');
-            let e = document.getElementById('error-dchannel');
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             }
@@ -345,6 +376,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             return;
         }
         else {
+            setCreationType('Create');
             let tempLink, tempSub = null;
             if (dchannel && dchannel !== '') {
                 tempLink = dchannel;
@@ -358,10 +390,11 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                     tempSub = 'https://' + tempSub;
                 }
             }
-            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
-            symbol = _get(symbol, 'token.symbol', null)
-            if (!symbol)
-                symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
+
+            // const safe = loadSafe(safeAddress);
+            let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency)
+            symbol = _get(symbol, 'token.symbol', 'SWEAT')
+
             let task: any = {};
             task.daoId = DAO?._id;
             task.name = name;
@@ -369,15 +402,14 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             task.applicant = selectedUser;
             task.projectId = selectedProject ? selectedProject._id : projectId;
             task.discussionChannel = tempLink;
-            task.deadline = deadline;
+            task.deadline = moment(deadline).format('YYYY-MM-DD');
             task.submissionLink = tempSub ? tempSub : '';
-            task.compensation = { currency: currency, amount, symbol };
+            task.compensation = { currency: currency, amount, symbol, safeAddress: safeAddress };
             task.reviewer = reviewer;
             task.contributionType = contributionType;
             task.isSingleContributor = isSingleContributor;
             task.isFilterRoles = isFilterRoles;
             task.validRoles = isFilterRoles ? validRoles : [];
-            console.log("Task : ", task);
             dispatch(createTaskAction(task))
         }
     }
@@ -404,10 +436,10 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                 tempSub = 'https://' + tempSub;
             }
         }
-        let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
+        setCreationType('Draft');
+        let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency)
         symbol = _get(symbol, 'token.symbol', 'SWEAT')
-        if (!symbol)
-            symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
+
         let task: any = {};
         task.daoId = DAO?._id;
         task.name = name;
@@ -417,7 +449,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
         task.discussionChannel = tempLink;
         task.deadline = deadline;
         task.submissionLink = tempSub ? tempSub : '';
-        task.compensation = { currency: currency, amount, symbol };
+        task.compensation = { currency: currency, amount, symbol, safeAddress: safeAddress };
         task.reviewer = reviewer;
         task.contributionType = contributionType;
         task.isSingleContributor = isSingleContributor;
@@ -432,7 +464,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
             anchor={'right'}
             open={open}
-            sx={{ zIndex: '1102' }}
+            sx={{ zIndex: theme.zIndex.appBar + 1 }}
         >
             <RolesListModal
                 open={openRolesList}
@@ -441,234 +473,288 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                 validRoles={validRoles}
                 handleValidRoles={(value) => setValidRoles(value)}
             />
-
-            <Box className={classes.modalConatiner}>
-                <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={closeModal}>
-                    <img src={CloseSVG} />
-                </IconButton>
-
-                <Box display="flex" flexDirection="column" alignItems="center" className={classes.modalRow}>
-                    <img src={createTaskSvg} alt="project-resource" />
-                    <Typography className={classes.modalTitle}>Create Task</Typography>
-                </Box>
-
-                <Box className={classes.modalRow} id="error-name">
-                    <TextInput
-                        label="Name of the project"
-                        placeholder="Super project"
-                        fullWidth
-                        value={name}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setName(e.target.value); setErrorName('') }}
-                        error={errorName !== ''}
-                        id={errorName !== '' ? "outlined-error-helper-text" : ""}
-                        helperText={errorName}
-                    />
-                </Box>
-
-                <Box className={classes.modalRow} id="error-desc">
-                    <TextEditor
-                        fullWidth
-                        height={130}
-                        width={400}
-                        placeholder="Marketing BtoB"
-                        label="Short description"
-                        value={desc}
-                        onChange={(value: string) => { setDesc(value); setErrorDesc('') }}
-                        error={errorDesc !== ''}
-                        id={errorDesc !== '' ? "outlined-error-helper-text" : ""}
-                        helperText={errorDesc}
-                    />
-                </Box>
-
-                <Box className={classes.modalRow} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                    <Box sx={{ width: 218 }} id="error-dchannel">
-                        <TextInput
-                            label="Discussion channel"
-                            placeholder="Super project"
-                            fullWidth
-                            value={dchannel}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setDChannel(e.target.value); setErrorDchannel('') }}
-                            error={errorDchannel !== ''}
-                            id={errorDchannel !== '' ? "outlined-error-helper-text" : ""}
-                            helperText={errorDchannel}
-                        />
-                    </Box>
-                    <Box sx={{ width: 160 }} id="error-deadline">
-                        <TextInput
-                            label="Deadline"
-                            fullWidth
-                            value={deadline}
-                            type={"date"}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setDeadline(e.target.value); setErrorDeadline('') }}
-                            error={errorDeadline !== ''}
-                            id={errorDeadline !== '' ? "outlined-error-helper-text" : ""}
-                            helperText={errorDeadline}
-                        />
-                    </Box>
-                </Box>
-
-                <Box className={classes.modalRow} sx={{ margin: '0px !important' }}>
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
-                        <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>In project</Typography>
-                        <Box className={classes.optionalBox} display={"flex"} alignItems={"center"} justifyContent={"center"}>
-                            <Typography sx={{ color: 'rgba(118, 128, 141, 0.5)', fontWeight: '700' }}>Optional</Typography>
+            {
+                showSuccess
+                    ?
+                    <Box className={classes.modalConatiner}>
+                        <Box sx={{ width: '100%', height: '100%' }} display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                            <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={closeModal}>
+                                <img src={CloseSVG} />
+                            </IconButton>
+                            <img src={createTaskSvg} alt="frame-icon" />
+                            <Typography color="primary" variant="subtitle1" className={classes.heading}>New task {creationType === 'Create' ? 'created!' : 'drafted!'}</Typography>
+                            <Typography style={{ textAlign: 'center', fontStyle: 'italic', color: ' #76808D' }}>The new task is {creationType === 'Create' ? 'created' : 'drafted'}.<br />You will be redirected in a few seconds.</Typography>
                         </Box>
                     </Box>
-                    <Box sx={{ width: '100%' }}>
-                        <MuiSelect
-                            options={eligibleProjects}
-                            setSelectedValue={(value) => setProjectId(value)}
-                        />
-                    </Box>
-                </Box>
+                    :
+                    <Box className={classes.modalConatiner}>
+                        <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={closeModal}>
+                            <img src={CloseSVG} />
+                        </IconButton>
 
-                <Box className={classes.divider}></Box>
-
-                <Box className={classes.modalRow}>
-                    <Box sx={{ marginBottom: '10px' }}><Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Contribution</Typography></Box>
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                        <Box
-                            className={contributionType === 'assign' ? `${classes.tabBtn} active` : `${classes.tabBtn}`}
-                            sx={{ width: '204px', height: '60px' }}
-                            onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }}
-                        >
-                            <Typography sx={{ fontSize: '20px' }}>ASSIGN MEMBER</Typography>
+                        <Box display="flex" flexDirection="column" alignItems="center" className={classes.modalRow}>
+                            <img src={createTaskSvg} alt="project-resource" />
+                            <Typography className={classes.modalTitle}>Create Task</Typography>
                         </Box>
-                        <Box
-                            className={contributionType === 'open' ? `${classes.tabBtn} active` : `${classes.tabBtn}`}
-                            sx={{ width: '176px', height: '60px' }}
-                            onClick={() => { setContributionType('open'); setSelectedUser(null); }}
-                        >
-                            <Typography sx={{ fontSize: '20px' }}>OPEN</Typography>
-                        </Box>
-                    </Box>
 
-                    {
-                        contributionType === 'assign' &&
-                        <>
-                            <Box sx={{ margin: '18px 0 9px 0' }}>
-                                <Typography sx={{ fontSize: '14px', color: 'rgba(118, 128, 141, 0.5)' }}>This member will be in charge of completing this task</Typography>
-                            </Box>
-                            <Box sx={{ width: '100%' }} id="error-applicant">
-                                <MuiSelect
-                                    options={eligibleContributors}
-                                    setSelectedValue={(value) => { handleSetApplicant(value); setErrorApplicant('') }}
-                                    errorSelect={errorApplicant}
+                        <Box className={classes.modalRow} id="error-name">
+                            <TextInput
+                                label="Name of the project"
+                                placeholder="Super project"
+                                fullWidth
+                                value={name}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setName(e.target.value); setErrorName('') }}
+                                error={errorName !== ''}
+                                id={errorName !== '' ? "outlined-error-helper-text" : ""}
+                                helperText={errorName}
+                            />
+                        </Box>
+
+                        <Box className={classes.modalRow} id="error-desc">
+                            <TextEditor
+                                fullWidth
+                                height={130}
+                                width={400}
+                                placeholder="Marketing BtoB"
+                                label="Short description"
+                                value={desc}
+                                onChange={(value: string) => { setDesc(value); setErrorDesc('') }}
+                                error={errorDesc !== ''}
+                                id={errorDesc !== '' ? "outlined-error-helper-text" : ""}
+                                helperText={errorDesc}
+                            />
+                        </Box>
+
+                        <Box className={classes.modalRow} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                            <Box sx={{ width: 218 }} id="error-dchannel">
+                                <TextInput
+                                    label="Discussion channel"
+                                    placeholder="Super project"
+                                    fullWidth
+                                    value={dchannel}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setDChannel(e.target.value); setErrorDchannel('') }}
+                                    error={errorDchannel !== ''}
+                                    id={errorDchannel !== '' ? "outlined-error-helper-text" : ""}
+                                    helperText={errorDchannel}
                                 />
                             </Box>
-                        </>
-                    }
+                            <Box sx={{ width: 160 }} id="error-deadline">
+                                <TextInput
+                                    label="Deadline"
+                                    fullWidth
+                                    date
+                                    minDate={moment()}
+                                    value={deadline || undefined}
+                                    onChange={(e: any) => { setDeadline(e); setErrorDeadline('') }}
+                                    error={errorDeadline !== ''}
+                                    id={errorDeadline !== '' ? "outlined-error-helper-text" : ""}
+                                    helperText={errorDeadline}
+                                />
+                            </Box>
+                        </Box>
 
-                    {
-                        contributionType === 'open' &&
-                        <Box sx={{ width: '100%', marginTop: '18px' }} display={"flex"} flexDirection={"column"}>
-                            <Box sx={{ width: '100%', marginBottom: '20px' }} display={"flex"} alignItems={"flex-start"}>
-                                <Switch checkedSVG="checkmark" onChange={() => setIsSingleContributor(prev => !prev)} />
-                                <Box>
-                                    <Typography sx={{ fontSize: '16px', color: '#76808D', marginBottom: '6px' }}>SINGLE CONTRIBUTOR</Typography>
-                                    <Typography sx={{ fontSize: '14px', color: '#76808D', opacity: '0.5' }}>The reviewer will pick a contributor from the applicants (if unchecked, everyone can contribute)</Typography>
+                        <Box className={classes.modalRow} sx={{ margin: '0px !important' }}>
+                            <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
+                                <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>In project</Typography>
+                                <Box className={classes.optionalBox} display={"flex"} alignItems={"center"} justifyContent={"center"}>
+                                    <Typography sx={{ color: 'rgba(118, 128, 141, 0.5)', fontWeight: '700' }}>Optional</Typography>
                                 </Box>
                             </Box>
-                            <Box sx={{ width: '100%' }} display={"flex"} alignItems={"center"}>
-                                <Switch checkedSVG="checkmark" onChange={() => setIsFilterRoles(prev => !prev)} />
-                                <Box>
-                                    <Typography sx={{ fontSize: '16px', color: '#76808D', marginBottom: '6px' }}>FILTER BY ROLES (DISCORD)</Typography>
+                            <Box sx={{ width: '100%' }}>
+                                <MuiSelect
+                                    options={eligibleProjects}
+                                    selected={projectId}
+                                    setSelectedValue={(value) => setProjectId(value)}
+                                />
+                            </Box>
+                        </Box>
+
+                        <Box className={classes.divider}></Box>
+
+                        <Box className={classes.modalRow} id="error-reviewer">
+                            <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
+                                <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Reviewer</Typography>
+                            </Box>
+                            <Box sx={{ width: '100%' }}>
+                                <MuiSelect
+                                    options={eligibleReviewers}
+                                    setSelectedValue={(value) => { setReviewer(value); setErrorReviewer('') }}
+                                    errorSelect={errorReviewer}
+                                    type={"members"}
+                                />
+                            </Box>
+                        </Box>
+
+                        <Box className={classes.modalRow}>
+                            <Box sx={{ marginBottom: '10px' }}><Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Contribution</Typography></Box>
+                            <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                                <Box
+                                    className={contributionType === 'assign' ? `${classes.tabBtn} active` : `${classes.tabBtn}`}
+                                    sx={{ width: '204px', height: '50px' }}
+                                    onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }}
+                                >
+                                    <Typography sx={{ fontSize: '20px' }}>ASSIGN MEMBER</Typography>
+                                </Box>
+                                <Box
+                                    className={contributionType === 'open' ? `${classes.tabBtn} active` : `${classes.tabBtn}`}
+                                    sx={{ width: '176px', height: '50px' }}
+                                    onClick={() => { setContributionType('open'); setSelectedUser(null); }}
+                                >
+                                    <Typography sx={{ fontSize: '20px' }}>OPEN</Typography>
                                 </Box>
                             </Box>
-                        </Box>
-                    }
 
-                    {
-                        isFilterRoles && validRoles &&
-                        <Box className={classes.rolesBox} display={"flex"} justifyContent={"space-between"} alignItems={"flex-start"}>
-                            <Box display={"flex"} flexDirection={"column"}>
-                                {
-                                    validRoles.map((item, index) => {
-                                        return (
-                                            <Box display={"flex"} alignItems={"center"} sx={index === validRoles.length - 1 ? { marginBottom: '0px' } : { marginBottom: '10px' }} key={index}>
-                                                <Chip
-                                                    label={item == "role1" || item == "role2" || item == "role3" || item == "role4" ? transformRole(item).label : getrolename(item)}
-                                                    className={classes.rolePill}
-                                                    avatar={<Box sx={{ background: getroleColor(item).circle, borderRadius: '50%' }}></Box>}
-                                                    sx={{ background: getroleColor(item).pill }}
-                                                />
-                                                <Box className={classes.deleteBtn} onClick={() => handleRemoveRole(item)} display={"flex"} alignItems={"center"} justifyContent={"center"}>
-                                                    <CgClose color='#FFF' />
-                                                </Box>
-                                            </Box>
-                                        )
-                                    })
-                                }
+                            {
+                                contributionType === 'assign' &&
+                                <>
+                                    <Box sx={{ margin: '18px 0 9px 0' }}>
+                                        <Typography sx={{ fontSize: '14px', color: 'rgba(118, 128, 141, 0.5)' }}>This member will be in charge of completing this task</Typography>
+                                    </Box>
+                                    <Box sx={{ width: '100%' }} id="error-applicant">
+                                        <MuiSelect
+                                            options={eligibleContributors}
+                                            setSelectedValue={(value) => { handleSetApplicant(value); setErrorApplicant('') }}
+                                            errorSelect={errorApplicant}
+                                            type={'members'}
+                                        />
+                                    </Box>
+                                </>
+                            }
+
+                            {
+                                contributionType === 'open' &&
+                                <Box sx={{ width: '100%', marginTop: '18px' }} display={"flex"} flexDirection={"column"}>
+                                    <Box sx={{ width: '100%', marginBottom: '20px' }} display={"flex"} alignItems={"flex-start"}>
+                                        <Switch checkedSVG="checkmark" onChange={() => setIsSingleContributor(prev => !prev)} />
+                                        <Box>
+                                            <Typography sx={{ fontSize: '16px', color: '#76808D', marginBottom: '6px' }}>SINGLE CONTRIBUTOR</Typography>
+                                            <Typography sx={{ fontSize: '14px', color: '#76808D', opacity: '0.5' }}>The reviewer will pick a contributor from the applicants (if unchecked, everyone can contribute)</Typography>
+                                        </Box>
+                                    </Box>
+                                    <Box sx={{ width: '100%' }} display={"flex"} alignItems={"center"}>
+                                        <Switch checkedSVG="checkmark" onChange={() => setIsFilterRoles(prev => !prev)} />
+                                        <Box>
+                                            <Typography sx={{ fontSize: '16px', color: '#76808D', marginBottom: '6px' }}>FILTER BY ROLES (DISCORD)</Typography>
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            }
+
+                            {
+                                isFilterRoles && validRoles &&
+                                <Box className={classes.rolesBox} display={"flex"} justifyContent={"space-between"} alignItems={"flex-start"}>
+                                    <Box display={"flex"} flexDirection={"column"}>
+                                        {
+                                            validRoles.map((item, index) => {
+                                                return (
+                                                    <Box display={"flex"} alignItems={"center"} sx={index === validRoles.length - 1 ? { marginBottom: '0px' } : { marginBottom: '10px' }} key={index}>
+                                                        <Chip
+                                                            label={item == "role1" || item == "role2" || item == "role3" || item == "role4" ? transformRole(item).label : getrolename(item)}
+                                                            className={classes.rolePill}
+                                                            avatar={<Box sx={{ background: getroleColor(item).circle, borderRadius: '50%' }}></Box>}
+                                                            sx={{ background: getroleColor(item).pill }}
+                                                        />
+                                                        <Box className={classes.deleteBtn} onClick={() => handleRemoveRole(item)} display={"flex"} alignItems={"center"} justifyContent={"center"}>
+                                                            <CgClose color='#FFF' />
+                                                        </Box>
+                                                    </Box>
+                                                )
+                                            })
+                                        }
+                                    </Box>
+                                    <Button variant="contained" color="secondary" className={classes.addRoleBtn} onClick={() => setOpenRolesList(true)}>
+                                        <HiOutlinePlus size={24} color='#C94B32' />
+                                    </Button>
+                                </Box>
+                            }
+                        </Box>
+
+                        <Box className={classes.modalRow} sx={{ margin: '0px !important' }} id="error-sublink">
+                            <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
+                                <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Submission Link</Typography>
+                                <Box className={classes.optionalBox} display={"flex"} alignItems={"center"} justifyContent={"center"}>
+                                    <Typography sx={{ color: 'rgba(118, 128, 141, 0.5)', fontWeight: '700' }}>Optional</Typography>
+                                </Box>
                             </Box>
-                            <Button variant="contained" color="secondary" className={classes.addRoleBtn} onClick={() => setOpenRolesList(true)}>
-                                <HiOutlinePlus size={24} color='#C94B32' />
-                            </Button>
+                            <Box>
+                                <Typography sx={{ fontSize: '14px', color: 'rgba(118, 128, 141, 0.5)' }}>Provide a link here only if the submissions will<br />come from trusted contributors</Typography>
+                            </Box>
+                            <TextInput
+                                placeholder="Google driver folder, Notion page, Github..."
+                                fullWidth
+                                value={subLink}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setSubLink(e.target.value); setErrorSublink('') }}
+                                error={errorSublink !== ''}
+                                id={errorSublink !== '' ? "outlined-error-helper-text" : ""}
+                                helperText={errorSublink}
+                            />
                         </Box>
-                    }
-                </Box>
 
-                <Box className={classes.modalRow} sx={{ margin: '0px !important' }} id="error-sublink">
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
-                        <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Submission Link</Typography>
-                        <Box className={classes.optionalBox} display={"flex"} alignItems={"center"} justifyContent={"center"}>
-                            <Typography sx={{ color: 'rgba(118, 128, 141, 0.5)', fontWeight: '700' }}>Optional</Typography>
+                        <Box className={classes.divider}></Box>
+
+                        <Box className={classes.modalRow} id="error-reviewer">
+                            <Box
+                                component="form"
+                                // sx={{
+                                //     '& .MuiTextField-root': { m: 1, width: '350px' },
+                                // }}
+                                noValidate
+                                autoComplete="off"
+                            >
+                                <TextInput
+                                    id="outlined-select-currency"
+                                    select
+                                    fullWidth
+                                    label="Treasury"
+                                    value={safeAddress}
+                                    onChange={(e: any) => {
+                                        setSafeAddress(e.target.value)
+                                        handleChangeCurrency(_get(_get(safeTokens, e.target.value, []), '[0].tokenAddress', 'SWEAT'))
+                                    }}
+                                >
+                                    {
+                                        activeSafes?.map((safe: any) => {
+                                            return (
+                                                <MenuItem key={safe?.address} value={safe?.address}>{(safe?.name || "Multi-sig wallet") + " (" + beautifyHexToken(safe?.address) + ")"}</MenuItem>
+                                            )
+                                        })
+                                    }
+                                </TextInput>
+                            </Box>
                         </Box>
-                    </Box>
-                    <Box>
-                        <Typography sx={{ fontSize: '14px', color: 'rgba(118, 128, 141, 0.5)' }}>Provide a link here only if the submissions will<br />come from trusted contributors</Typography>
-                    </Box>
-                    <TextInput
-                        placeholder="Google driver folder, Notion page, Github..."
-                        fullWidth
-                        value={subLink}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setSubLink(e.target.value); setErrorSublink('') }}
-                        error={errorSublink !== ''}
-                        id={errorSublink !== '' ? "outlined-error-helper-text" : ""}
-                        helperText={errorSublink}
-                    />
-                </Box>
 
-                <Box className={classes.divider}></Box>
+                        <Box className={classes.modalRow} id="error-currency-amt">
+                            <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
+                                <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Compensation</Typography>
+                            </Box>
+                            <CurrencyInput
+                                value={amount}
+                                onChange={(value: any) => handleChangeCompensationAmount(value)}
+                                options={_get(safeTokens, safeAddress, []).map((token: any) => { return { label: token?.token?.symbol, value: token?.tokenAddress } })}
+                                dropDownvalue={currency}
+                                onDropDownChange={(value: any) => {
+                                    handleChangeCurrency(value)
+                                }}
+                                variant="primary"
+                                errorCurrency={errorCurrency}
+                                errorProjectValue={errorTaskValue}
+                            />
+                        </Box>
 
-                <Box className={classes.modalRow} id="error-currency-amt">
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
-                        <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Compensation</Typography>
-                    </Box>
-                    <Box sx={{ width: '100%' }}>
-                        <CurrencyInput
-                            value={amount}
-                            onChange={(value: any) => handleChangeCompensationAmount(value)}
-                            options={safeTokens}
-                            dropDownvalue={currency}
-                            onDropDownChange={(value: any) => {
-                                handleChangeCurrency(value)
-                            }}
-                            variant="primary"
-                            errorCurrency={errorCurrency}
-                            errorProjectValue={errorTaskValue}
-                        />
-                    </Box>
-                </Box>
+                        {/* <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
+                            <Button variant="outlined" sx={{ marginRight: '20px', width: '240px' }} onClick={handleDraftTask} loading={draftTaskLoading}>SAVE AS DRAFT</Button>
+                            <Button variant="contained" sx={{ width: '240px' }} onClick={handleCreateTask} loading={createTaskLoading}>CREATE</Button>
+                        </Box> */}
 
-                <Box className={classes.modalRow} id="error-reviewer">
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
-                        <Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Reviewer</Typography>
-                    </Box>
-                    <Box sx={{ width: '100%' }}>
-                        <MuiSelect
-                            options={eligibleReviewers}
-                            setSelectedValue={(value) => { setReviewer(value); setErrorReviewer('') }}
-                            errorSelect={errorReviewer}
-                        />
-                    </Box>
-                </Box>
+                        <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
+                            <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                                <Button sx={{ mr: 1 }} onClick={() => handleDraftTask()} loading={draftTaskLoading} disabled={draftTaskLoading} fullWidth variant='outlined' size="small">Save draft</Button>
+                                <Button sx={{ ml: 1 }} onClick={() => handleCreateTask()} loading={createTaskLoading} disabled={createTaskLoading} fullWidth variant='contained' size="small">Create</Button>
+                            </Box>
+                        </Box>
 
-                <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%' }}>
-                    <Button variant="outlined" sx={{ marginRight: '20px', width: '240px' }} onClick={handleDraftTask} loading={draftTaskLoading}>SAVE AS DRAFT</Button>
-                    <Button variant="contained" sx={{ width: '240px' }} onClick={handleCreateTask} loading={createTaskLoading}>CREATE</Button>
-                </Box>
-
-            </Box>
+                    </Box>
+            }
         </Drawer>
     )
 }

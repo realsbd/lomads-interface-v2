@@ -39,3 +39,19 @@ export const updateProjectMembersService = (params: any) => {
 export const inviteProjectMembersService = (params: any) => {
     return axiosHttp.patch(`project/${params.projectId}/update-member`, params.payload);
 }
+
+export const updateMilestoneService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/update-milestones?daoUrl=${params.daoUrl}`, params.payload)
+}
+
+export const updateProjectLinkService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/update-link?daoUrl=${params.daoUrl}`, params.payload)
+}
+
+export const editProjectLinkService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/edit-links?daoUrl=${params.daoUrl}`, params.payload)
+}
+
+export const updateProjectViewService = (params: any) => {
+    return axiosHttp.patch(`project/${params.projectId}/updateView?daoUrl=${params.daoUrl}`)
+}

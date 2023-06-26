@@ -7,8 +7,8 @@ const useStyles = makeStyles((theme: any) => ({
     root: {
       cursor: 'pointer',
       background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%) !important',
-      width: '37px !important',
-      height: '37px !important',
+      maxWidth: '37px !important',
+      maxHeight: '37px !important',
       borderRadius: '5px !important',
       '&:hover': {
         backgroundColor: 'linear-gradient(180deg, #fcebe6 0%, #dfe3e8 100%) !important',

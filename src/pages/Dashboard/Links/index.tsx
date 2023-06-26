@@ -9,6 +9,9 @@ import BootstrapTooltip from "components/BootstrapTooltip"
 import { useDAO } from "context/dao";
 import Skeleton from '@mui/material/Skeleton';
 import { useNavigate } from "react-router-dom";
+import useRole from "hooks/useRole";
+import { useWeb3Auth } from "context/web3Auth";
+import Organisation from "pages/Settings/Modals/Organisation";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -46,11 +49,17 @@ export default ({ highlightSettings, isHelpIconOpen }: { highlightSettings: bool
     const navigate = useNavigate()
     const classes = useStyles();
     const { DAO } = useDAO()
+    const { account } = useWeb3Auth();
+    const { myRole, can } = useRole(DAO, account, undefined)
 
     if (!DAO) {
         return (
             <Skeleton variant="rectangular" animation="wave" className={classes.root} />
         )
+    }
+
+    if (_get(DAO, 'links', []).length == 0 && !can(myRole, 'settings')) {
+        return null
     }
 
     return (
@@ -66,18 +75,21 @@ export default ({ highlightSettings, isHelpIconOpen }: { highlightSettings: bool
                     }
                 </Stack>
             </Box>
+            { can(myRole, 'settings') &&
             <BootstrapTooltip open={isHelpIconOpen} 
                     placement="left-start"
                     title="Global Settings">
-                <IconButton onClick={() => navigate(`/${DAO?.url}/settings`)}
-                    sx={{
-                        zIndex: highlightSettings ? 1400 : 0,
-                        boxShadow: highlightSettings ? '0px 0px 20px rgba(181, 28, 72, 0.6)' : 'none'
-                    }}
-                    id="global-settings">
-                    <img src={SettingsSVG} />
-                </IconButton>
-            </BootstrapTooltip>
+                 <span>
+                    <IconButton onClick={() => navigate(`/${DAO?.url}/settings`)}
+                        sx={{
+                            zIndex: highlightSettings ? 1400 : 0,
+                            boxShadow: highlightSettings ? '0px 0px 20px rgba(181, 28, 72, 0.6)' : 'none'
+                        }}
+                        id="global-settings">
+                        <img src={SettingsSVG} />
+                    </IconButton>
+                </span>
+            </BootstrapTooltip> }
         </Paper>
     )
 }

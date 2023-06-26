@@ -6,16 +6,17 @@ import * as actionTypes from 'store/actionTypes';
 export function getInitialState() {
     return {
         Project: null,
-        setProjectLoading: false,
-        createProjectLoading: false,
-        updateProjectDetailsLoading: false,
-        archiveProjectLoading: false,
-        deleteProjectLoading: false,
-        updateProjectKraLoading: false,
-        editProjectKraLoading: false,
-        editProjectMilestonesLoading: false,
-        updateProjectMembersLoading: false,
-        inviteProjectMembersLoading: false,
+        setProjectLoading: null,
+        createProjectLoading: null,
+        updateProjectDetailsLoading: null,
+        archiveProjectLoading: null,
+        deleteProjectLoading: null,
+        updateProjectKraLoading: null,
+        editProjectKraLoading: null,
+        editProjectMilestonesLoading: null,
+        updateProjectMembersLoading: null,
+        inviteProjectMembersLoading: null,
+        updateProjectViewLoading: null,
     };
 }
 
@@ -79,6 +80,13 @@ const ProjectReducer = (state: any = getInitialState(), action: any) =>
                 break;
             }
 
+            case actionTypes.UPDATE_PROJECT_VIEW_LOADING: {
+                draft.updateProjectViewLoading = payload;
+                break;
+            }
+            case actionTypes.LOGOUT_ACTION: {
+				draft = getInitialState()
+			}
         }
     });
 
