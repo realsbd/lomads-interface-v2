@@ -61,14 +61,36 @@ const useStyles = makeStyles((theme: any) => ({
         boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1) !important',
         borderRadius: '100px !important',
         cursor: 'pointer'
+    },
+    helpCard: {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        borderRadius: "10px",
+        display: "flex",
+        alignItems: 'center',
+        justifyContent: "center",
+        color: "#FFFFFF",
+        backgroundColor: "#76808D",
+        zIndex: 1401,
+        width: "100% !important",
+        height: "100% !important",
+        opacity: 0.8,
+        textAlign: "center",
+        cursor: "pointer",
+        padding: "10px",
+        minHeight: 50
+    },
+    helpCardContent: {
+        fontFamily: "'Inter', sans-serif",
+        fontStyle: "normal",
+        fontWeight: 400,
+        fontSize: "18px",
+        lineHeight: "22px",
     }
 }));
 
-interface MembersProps {
-    list: any[];
-}
-
-export default ({ list }: MembersProps) => {
+export default ({ showProjects, list, isHelpIconOpen, highlightMembers }: any) => {
     const classes = useStyles();
     const dispatch = useAppDispatch()
     const { account } = useWeb3Auth()
@@ -118,7 +140,7 @@ export default ({ list }: MembersProps) => {
 
         return (
             <>
-                <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"} key={index}>
+                <Box sx={{ width: '100%', marginBottom: '25px', zIndex: props.highlightMembers ? 1400 : 0 }} display={"flex"} alignItems={"center"} key={index} id="members">
                     <Box sx={{ width: '250px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                         <Avatar recurringPayment name={props.name} wallet={props.address} />
                         <Box className={classes.lineSm}></Box>
@@ -175,8 +197,7 @@ export default ({ list }: MembersProps) => {
     };
 
     return (
-        <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
-
+        <Box sx={{ width: '100%', marginBottom: '20px', zIndex: highlightMembers ? 1400 : 0 }} display="flex" flexDirection={"column"}>
             <AddMemberModal
                 open={showAddMember}
                 closeModal={() => setShowAddMember(false)}
@@ -201,8 +222,10 @@ export default ({ list }: MembersProps) => {
                 </Box>
             </Box>
 
-            <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px', borderRadius: '5px', marginTop: '0.2rem' }} display={"flex"} flexDirection={"column"}>
-
+            <Box sx={{ position: 'relative', width: '100%', background: '#FFF', padding: '26px 22px', borderRadius: '5px', marginTop: '0.2rem' }} display={"flex"} flexDirection={"column"}>
+                {isHelpIconOpen && <Box className={classes.helpCard} sx={{ width: '100%', height: '100%' }}>
+                    <Box className={classes.helpCardContent}>This allows you to add new members and manage details and roles of existing members.</Box>
+                </Box>}
                 <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"}>
                     <Box sx={{ width: '250px' }}>
                         <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5' }}>Name</Typography>

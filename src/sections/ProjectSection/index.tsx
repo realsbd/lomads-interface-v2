@@ -19,15 +19,13 @@ import useRole from 'hooks/useRole';
 import useTerminology from 'hooks/useTerminology';
 
 import moment from 'moment';
+import BootstrapTooltip from "components/BootstrapTooltip";
+import Tooltip from '@mui/material/Tooltip';
 
 const useStyles = makeStyles((theme: any) => ({
     createBtn: {
         width: '125px',
         height: '40px',
-        background: '#FFFFFF !important',
-        boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), - 3px - 3px 8px rgba(201, 75, 50, 0.1) !important',
-        borderRadius: '5px !important',
-        fontSize: '14px !important',
         color: '#C94B32 !important'
     },
     showAllCard: {
@@ -42,6 +40,32 @@ const useStyles = makeStyles((theme: any) => ({
         marginBottom: '15px !important',
         marginRight: '20px !important',
         position: 'relative'
+    },
+    helpCard: {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        borderRadius: "10px",
+        display: "flex",
+        alignItems: 'center',
+        justifyContent: "center",
+        color: "#FFFFFF",
+        backgroundColor: "#76808D",
+        zIndex: 99999,
+        width: "100% !important",
+        height: "100% !important",
+        opacity: 0.8,
+        textAlign: "center",
+        cursor: "pointer",
+        padding: "10px",
+        minHeight: 50
+    },
+    helpCardContent: {
+        fontFamily: "'Inter', sans-serif",
+        fontStyle: "normal",
+        fontWeight: 400,
+        fontSize: "18px",
+        lineHeight: "22px",
     }
 }));
 
@@ -80,7 +104,7 @@ function a11yProps(index: number) {
     };
 }
 
-export default () => {
+export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
     const classes = useStyles();
     const navigate = useNavigate();
     const { daoURL } = useParams();
@@ -163,21 +187,58 @@ export default () => {
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
-                    <IconButton onClick={() => navigate(`/${DAO.url}/projects`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
-                        <img src={expandIcon} alt="archive-icon" />
-                    </IconButton>
-                    {/* <IconButton sx={{ marginRight: '20px' }}>
-                        <img src={archiveIcon} alt="archiveIcon" />
-                    </IconButton> */}
-                    <Button size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/project/create`)}>
-                        <AddIcon sx={{ fontSize: 18 }} /> CREATE
-                    </Button>
+                    <BootstrapTooltip arrow open={isHelpIconOpen}
+                        placement="top-start"
+                        title="Open">
+                        <span>
+                            <IconButton
+                            style={{
+                                ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {}),
+                            }}
+                            onClick={() => navigate(`/${DAO.url}/projects`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
+                                <img src={expandIcon} alt="archive-icon" />
+                            </IconButton>
+                        </span>
+                    </BootstrapTooltip>
+                    <BootstrapTooltip arrow open={isHelpIconOpen}
+                        placement="bottom"
+                        title="Archives">
+                        <span>
+                            <IconButton sx={{
+                                marginRight: '20px',
+                                ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {}),
+                            }}>
+                                <img src={archiveIcon} alt="archiveIcon" />
+                            </IconButton>
+                        </span>
+                    </BootstrapTooltip>
+                    <BootstrapTooltip arrow open={isHelpIconOpen}
+                        placement="top-start"
+                        title="Create Workspace">
+                            <span>
+                                <Button
+                                    style={{
+                                        ...( isHelpIconOpen ? { zIndex: 1500, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {})
+                                    }}
+                                    size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/project/create`)}>
+                                    <AddIcon sx={{ fontSize: 18 }} /> CREATE
+                                </Button>
+                            </span>
+                    </BootstrapTooltip>
                 </Box>
             </Box>
 
             {/* Tab panel for my workspace */}
             <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
-                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', position: 'relative' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                {isHelpIconOpen && <Box className={classes.helpCard} sx={{ width: '100%', height: '100%' }}>
+                    <Box className={classes.helpCardContent}>Here, you can create 
+                        <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> customized workspaces </Typography>
+                         for all of your teams, 
+                        <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> manage milestones, </Typography>
+                        and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track key results.</Typography>
+                    </Box>
+                </Box>}
                     {
                         myProjects.length > 0 && myProjects.filter((item, index) => index < 6).map((item, index) => {
                             if (index <= 4) {
@@ -209,7 +270,15 @@ export default () => {
 
             {/* Tab panel for all workspace */}
             <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
-                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                <Box sx={{ width: '100%', background: '#FFF', borderRadius: '5px', padding: '26px 22px 7px 22px', position: 'relative' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                {isHelpIconOpen && <Box className={classes.helpCard} sx={{ width: '100%', height: '100%' }}>
+                    <Box className={classes.helpCardContent}>Here, you can create 
+                        <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> customized workspaces </Typography>
+                         for all of your teams, 
+                        <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> manage milestones, </Typography>
+                        and <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> track key results.</Typography>
+                    </Box>
+                </Box>}
                     {
                         otherProjects.length > 0 && otherProjects.filter((item, index) => index < 6).map((item, index) => {
                             if (index <= 4) {

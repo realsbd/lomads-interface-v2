@@ -11,7 +11,7 @@ import { useAppDispatch } from 'helpers/useAppDispatch';
 import { loadDAOAction, loadDAOListAction, resetDAOAction, updateDAOAction } from 'store/actions/dao';
 import useMintSBT from 'hooks/useMintSBT.v2';
 import { CHAIN_INFO } from 'constants/chainInfo';
-import { logoutAction, setTokenAction, setUserAction } from 'store/actions/session';
+import { createAccountAction, logoutAction, setTokenAction, setUserAction } from 'store/actions/session';
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 export const DAOContext = createContext<any>({
@@ -24,10 +24,11 @@ export function useDAO() {
 
 export const DAOProvider = ({ privateRoute = false, children }: any) => {
   const { account, provider } = useWeb3Auth();
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   //@ts-ignore
-  const { token } = useAppSelector(store => store.session);
+  const { token, user } = useAppSelector(store => store.session);
   const { daoURL } = useParams();
   //@ts-ignore
   const { DAO, DAOList } = useAppSelector(store => store?.dao)
@@ -36,6 +37,10 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
 
   const loadDAOList = async () => {
     dispatch(loadDAOListAction())
+  }
+
+  const updateIsHelpOpen = (status: boolean) => {
+    setIsHelpOpen(status)
   }
 
   const loadDAO = async (url: string) => {
@@ -52,8 +57,14 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
     if ((!daoURL || daoURL) && account && token && !DAOList){
       resetDAO()
       loadDAOList()
+      //dispatch(createAccountAction({}))
     }
   }, [account, token, DAOList, daoURL])
+
+  useEffect(() => {
+    if(user?._id)
+      dispatch(createAccountAction({ token })) 
+  }, [user?._id])
 
   useEffect(() => {
     if (DAOList && !daoURL && window.location.pathname === '/') {
@@ -113,7 +124,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }
 
   const contextProvider = {
-    DAO, DAOList, resetDAO, updateDAO, loadDAO
+    DAO, DAOList, isHelpOpen, resetDAO, updateDAO, loadDAO, updateIsHelpOpen
   };
   return <DAOContext.Provider value={contextProvider}>
     {

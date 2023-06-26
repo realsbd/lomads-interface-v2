@@ -1,12 +1,15 @@
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { useDAO } from "context/dao";
-import React, { useState } from "react"
+import React, { useState, useRef, useEffect  } from "react"
 import axios from 'axios'
 import { makeStyles } from '@mui/styles';
 import axiosHttp from 'api'
 import { useNavigate, useParams } from "react-router-dom"
 import { Grid } from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close'
+import WalkThroughPopover from 'components/WalkThroughPopover'
+import WalkThroughModal from "components/WalkThroughModal";
 import Links from "./Links";
 import Notifications from "./Notifications";
 import TaskSection from "sections/TaskSection";
@@ -14,6 +17,9 @@ import ProjectSection from "sections/ProjectSection";
 import MembersSection from "sections/MembersSection";
 import { useAppSelector } from "helpers/useAppSelector";
 import Treasury from "./Treasury";
+import Steps from 'constants/walkthroughsteps';
+import questionMarkDark from "assets/svg/question-mark-dark.svg";
+import questionMarkLight from "assets/svg/question-mark-light.svg";
 import { useWeb3Auth } from "context/web3Auth";
 import useRole from "hooks/useRole";
 import Button from "components/Button";
@@ -23,26 +29,102 @@ import { CHAIN_INFO } from "constants/chainInfo";
 import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from "constants/chains";
 import ProfileModal from "modals/Profile/ProfileModal";
 import useGnosisTxnTransform from "hooks/useGnosisTxnTransform";
+import { updateUserOnboardingCountAction } from "store/actions/dao";
+import { useAppDispatch } from "helpers/useAppDispatch";
 
+type WalkThroughObjType = {
+    step: number;
+    id: string;
+    title: string;
+    content: string;
+    buttonText: string;
+    imgPath: string;
+    placement: string;
+}
 
-const useStyles = makeStyles((theme: any) => ({
+const useStyles = makeStyles((theme: any) => {
+     console.log(theme.zIndex.appBar, '...z...')
+    return {
     root: {
         display: 'flex',
         background: `linear-gradient(169.22deg,#fdf7f7 12.19%,#efefef 92%)`,
+    },
+    helpOption: {
+        bottom: "44px",
+        position: "fixed",
+        width: "50px",
+        borderRadius: "50%",
+        cursor: "pointer !important"
+    },
+    PlayWalkThroughButton: {
+        color: '#C94B32 !important',
+        backgroundColor: '#FFFFFF !important',
+        cursor: 'pointer',
+        width: '198px !important',
+        height: '40px !important',
+        borderRadius: '5px !important',
+        padding: '0px !important',
+        fontFamily: "Inter, sans-serif",
+        fontSize: '16px !important',
+        '&:hover': {
+            backgroundColor: '#FFFFFF !important',
+        },
+    },
+    HideHelpIconButton: {
+        color: '#ffffff !important',
+        backgroundColor: '#1B2B41 !important',
+        cursor: 'pointer',
+        width: '198px !important',
+        height: '40px !important',
+        borderRadius: '5px !important',
+        padding: '0px !important',
+        fontFamily: "Inter, sans-serif",
+        fontSize: '16px !important',
+        '&:hover': {
+            backgroundColor: '#1B2B41 !important',
+        },
+    },
+    walkThroughOverlay: {
+        width: "100vw",
+        height: "100vh",
+        top: "0",
+        left: "0",
+        right: "0",
+        bottom: "0",
+        position: "fixed",
+        zIndex: theme.zIndex.appBar + 1,
+        background: '#1B2B41',
+        opacity: 0.2
     }
-}));
+}});
 
 export default () => {
     const { daoURL } = useParams();
     const navigate = useNavigate();
-    const { DAO, DAOList } = useDAO();
+    const dispatch = useAppDispatch()
+    const { user } = useAppSelector((store:any) => store?.session)
+    const { DAO, DAOList, updateIsHelpOpen } = useDAO();
+    const classes = useStyles();
     console.log("DAO", DAO);
+    const [currWalkThroughObj, setWalkThroughObj] = useState<any>(Steps('')[0]);
+    const [showWalkThrough, setShowWalkThrough] = useState<boolean>(false);
+    const [isHelpIconOpen, setIsHelpIconOpen] = useState<boolean>(false);
+    const anchorRef = useRef<any>();
+    const questionMarkRef = useRef<any>();
     const { account } = useWeb3Auth();
     const { myRole, can } = useRole(DAO, account, undefined)
     const { transformTx } = useGnosisTxnTransform()
     // @ts-ignore
     const { setProjectLoading, Project } = useAppSelector(store => store.project);
 
+    useEffect(() => {
+        updateIsHelpOpen(isHelpIconOpen)
+    }, [isHelpIconOpen])
+
+    useEffect(() => {
+		if (DAO && user && (!user?.onboardingViewCount || (user?.onboardingViewCount && user?.onboardingViewCount.indexOf(_get(DAO, '_id', '')) === -1 && user?.onboardingViewCount.length < 2)))
+			setShowWalkThrough(true)
+	}, [DAO, user])
 
     // const send = async () => {
     //     try {
@@ -65,6 +147,69 @@ export default () => {
     //         console.log(e)
     //     }
     // }
+
+    const expandHelpOptions = () => {
+        setIsHelpIconOpen(!isHelpIconOpen)
+    }
+    const startWalkThroughAtStepOne = () => {
+        setShowWalkThrough(true)
+        const workspace = Steps('')[1]
+        setWalkThroughObj(workspace)
+        setWalkThroughStyles(workspace)
+    }
+
+    const getQuestionImage = (): string => {
+        return ((showWalkThrough && currWalkThroughObj?.step === 7) || isHelpIconOpen)
+            ? questionMarkDark
+            : questionMarkLight
+    }
+
+    const setWalkThroughStyles = (nextObj: WalkThroughObjType) => {
+        anchorRef.current = document.getElementById(nextObj.id)
+        anchorRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'end',
+            inline: 'nearest'
+        });
+    }
+
+    const incrementWalkThroughSteps = () => {
+        if (currWalkThroughObj?.step === 7) {
+            endWalkThrough()
+            return
+        }
+
+        let nextStep = currWalkThroughObj?.step + 1
+        while (showWalkThrough
+            && !document.getElementById(Steps('')[nextStep]?.id)
+            && nextStep < 7) {
+            nextStep++
+        }
+        const nextObj = Steps('')[nextStep]
+        setWalkThroughStyles(nextObj)
+        setWalkThroughObj(nextObj)
+    }
+    const endWalkThrough = () => {
+        dispatch(updateUserOnboardingCountAction({ daoId: _get(DAO, '_id', '') }))
+        setShowWalkThrough(false)
+        setWalkThroughObj(Steps('')[0])
+    }
+
+
+	useEffect(() => {
+		function handleClick(event: any) {
+            const className = event.target.className
+			if (isHelpIconOpen && (className.includes('help-card')
+				|| className.includes('walkThroughOverlay')
+				|| className.includes('bold-text')
+				|| className.includes('help-card-content'))) {
+				event.preventDefault()
+				setIsHelpIconOpen(false)
+			}
+		}
+		document.addEventListener("click", handleClick);
+		return () => document.removeEventListener("click", handleClick);
+	});
 
     const loadAllSafeTokens = async () => {
         let { data } = await axiosHttp.get(`/utility/update-safe`)
@@ -161,28 +306,81 @@ export default () => {
     return (
         <Grid container>
             <Grid item sm={12}>
-                <Links />
+                <Links 
+                    highlightSettings={(currWalkThroughObj.step === 6) || isHelpIconOpen}
+                    isHelpIconOpen={isHelpIconOpen} />
             </Grid>
             <Grid mt={1} item sm={12}>
-                <Notifications isHelpIconOpen={false} />
+                <Notifications isHelpIconOpen={isHelpIconOpen} />
             </Grid>
-            <Grid sm={12}>
-                <ProjectSection />
+            <Grid sm={12}
+                id="my-workspace"
+                sx={{zIndex: currWalkThroughObj.step === 1 ? 1400: 0}}>
+                <ProjectSection isHelpIconOpen={isHelpIconOpen}/>
             </Grid>
-            <Grid sm={12}>
-                <TaskSection onlyProjects={false} />
+            <Grid sm={12}
+                id="my-task" 
+                sx={{zIndex: currWalkThroughObj.step === 2 ? 1400: 0}} >
+                <TaskSection isHelpIconOpen={isHelpIconOpen}/>
             </Grid>
-
-            {can(myRole, 'transaction.view') && <Grid mt={1} item sm={12}>
-                <Treasury />
-            </Grid>}
-
-            <Grid sm={12} sx={{ marginTop: '20px' }}>
+            {can(myRole, 'transaction.view') && <Grid mt={1}
+                id="treasury-management"
+                item sm={12} 
+                sx={{zIndex: currWalkThroughObj.step === 4 || currWalkThroughObj.step === 3 ? 1400: 0}}>
+                <Treasury showWalkThrough={showWalkThrough} isHelpIconOpen={isHelpIconOpen} />
+            </Grid> }
+            <Grid sm={12}
+            sx={{zIndex: currWalkThroughObj.step === 5 ? 1400: 0}}
+            id="members">
                 <MembersSection
                     list={_get(DAO, 'members', [])}
+                    showProjects={false}
+                    isHelpIconOpen={isHelpIconOpen}
+                    highlightMembers={currWalkThroughObj.step === 5}
                 />
             </Grid>
-            {/* <Button onClick={() => updateTask()}>Update txn</Button> */}
+            <Box
+                sx={{ width: '100%', position: 'fixed', left: '33px', bottom: '44px', cursor: 'pointer', zIndex: isHelpIconOpen ? 1300: 1000}}
+                id="question-mark"
+                ref={questionMarkRef}
+                onClick={expandHelpOptions}>
+                {isHelpIconOpen
+                    &&
+                    <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around',  height: 100 }}>
+                        <Button
+                            variant="contained"
+                            className={classes.PlayWalkThroughButton}
+                            onClick={startWalkThroughAtStepOne}>
+                            Play walk through
+                        </Button>
+                        <Button
+                            startIcon={<CloseIcon />}
+                            className={classes.HideHelpIconButton}
+                            onClick={() => questionMarkRef.current.style.display = 'none'}
+                            variant="contained">
+                            Hide help icon
+                        </Button>
+                    </Box>
+                }
+                <img src={getQuestionImage()} />
+            </Box>
+            {(showWalkThrough || isHelpIconOpen) && <Box className={classes.walkThroughOverlay}></Box>}
+            {showWalkThrough
+                ?
+                <WalkThroughModal
+                    incrementWalkThroughSteps={incrementWalkThroughSteps}
+                    showConfirmation={showWalkThrough && currWalkThroughObj?.step === 0}
+                    endWalkThrough={endWalkThrough}
+                    obj={currWalkThroughObj}
+                /> : null
+            }
+            <WalkThroughPopover
+                displayPopover={showWalkThrough && currWalkThroughObj?.step > 0}
+                obj={currWalkThroughObj}
+                incrementWalkThroughSteps={incrementWalkThroughSteps}
+                endWalkThrough={endWalkThrough}
+                anchorEl={anchorRef.current}
+            />
         </Grid>
     )
 }

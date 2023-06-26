@@ -245,7 +245,7 @@ export default ({ children }: any) => {
   const [open, setOpen] = React.useState(false);
   // @ts-ignore
   const { token, user } = useAppSelector(store => store.session)
-  const { DAO, DAOList, resetDAO } = useDAO()
+  const { DAO, DAOList, resetDAO, isHelpOpen } = useDAO()
 
   const showDrawer = () => {
     setOpen(true);

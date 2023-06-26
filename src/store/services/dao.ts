@@ -54,3 +54,7 @@ export const deSyncTrelloService = (params: any) => {
 export const toggleSafeService = (payload: any) => {
     return axiosHttp.post(`dao/${payload.url}/toggle-safe-state`, payload.params)
 }
+
+export const updateUserOnboardingCountService = (payload: any) => {
+    return axiosHttp.post(`member/update-onboarding-count`, payload)
+}

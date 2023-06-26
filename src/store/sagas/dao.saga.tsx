@@ -5,7 +5,7 @@ import {
 } from 'redux-saga/effects';
 import * as actionTypes from 'store/actionTypes';
 import { get as _get } from 'lodash';
-import { loadDAOListService, toggleSafeService, loadDAOService, updateDAOService, addDAOMemberService, addSingleMemberService, addMultiMemberService, editDaoMemberService, updateDaoMembersService, syncTrelloDataService, storeGithubIssuesService, deSyncGithubService, deSyncDiscordService, deSyncTrelloService } from 'store/services/dao';
+import { loadDAOListService, updateUserOnboardingCountService, toggleSafeService, loadDAOService, updateDAOService, addDAOMemberService, addSingleMemberService, addMultiMemberService, editDaoMemberService, updateDaoMembersService, syncTrelloDataService, storeGithubIssuesService, deSyncGithubService, deSyncDiscordService, deSyncTrelloService } from 'store/services/dao';
 
 function* loadDAOListSaga() {
 	try {
@@ -182,7 +182,16 @@ function* toggleSafeSaga(action: any) {
 		const { data } = yield call(toggleSafeService, action.payload)
 		yield put({ type: actionTypes.LOAD_DAO_SUCCESS, payload: data })
 	} catch (e) {
-		yield put({ type: actionTypes.DESYNC_TRELLO_LOADING, payload: null })
+		
+	}
+}
+
+function* updateUserOnboardingCountSaga(action: any) {
+	try {
+		const { data } = yield call(updateUserOnboardingCountService, action.payload)
+		yield put({ type: actionTypes.SET_USER_ACTION, payload: data })
+	} catch (e) {
+
 	}
 }
 
@@ -201,4 +210,5 @@ export default function* daoSaga() {
 	yield takeLatest(actionTypes.DESYNC_DISCORD_ACTION, deSyncDiscordSaga)
 	yield takeLatest(actionTypes.DESYNC_TRELLO_ACTION, deSyncTrelloSaga)
 	yield takeLatest(actionTypes.TOGGLE_SAFE_ACTION, toggleSafeSaga)
+	yield takeLatest(actionTypes.UPDATE_USER_ONBOARDING_COUNT_ACTION, updateUserOnboardingCountSaga)
 }

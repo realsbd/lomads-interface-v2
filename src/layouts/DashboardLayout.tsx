@@ -28,6 +28,7 @@ import { useWeb3Auth } from 'context/web3Auth';
 import { useDAO } from 'context/dao';
 import Skeleton from '@mui/material/Skeleton';
 import Footer from 'components/Footer';
+import BootstrapTooltip from "components/BootstrapTooltip";
 import theme from 'theme';
 
 
@@ -246,7 +247,7 @@ export default ({ children }: any) => {
   const [open, setOpen] = React.useState(false);
   // @ts-ignore
   const { token, user } = useAppSelector(store => store.session)
-  const { DAO, DAOList, resetDAO } = useDAO()
+  const { DAO, DAOList, resetDAO, isHelpOpen } = useDAO()
 
   const showDrawer = () => {
     setOpen(true);
@@ -276,7 +277,13 @@ export default ({ children }: any) => {
         >
           {
             DAO ?
-              <HeaderLogo dao={DAO} onMouseLeave={hideDrawer} onMouseEnter={showDrawer} /> :
+              <BootstrapTooltip arrow open={isHelpOpen}
+                placement="right"
+                title="All your organisations are here">
+                  <span>
+                    <HeaderLogo dao={DAO} onMouseLeave={hideDrawer} onMouseEnter={showDrawer} />
+                  </span>
+              </BootstrapTooltip> :
               <Skeleton variant="rectangular" animation="wave" width={116} height={107} sx={{ borderBottomRightRadius: 30 }} />
           }
           {DAO ?

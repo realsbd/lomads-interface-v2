@@ -107,10 +107,33 @@ const useStyles = makeStyles((theme: any) => ({
     },
     tabItemActive: {
         opacity: 0.7
+    },
+    helpCard: {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        borderRadius: "10px",
+        fontFamily: "'Inter', sans-serif",
+        fontStyle: "normal",
+        fontWeight: 400,
+        fontSize: "18px",
+        lineHeight: "22px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#FFFFFF",
+        backgroundColor: "#76808D",
+        zIndex: 999,
+        width: "100% !important",
+        height: "100%",
+        opacity: 0.8,
+        textAlign: "center",
+        cursor: "pointer",
+        padding: "10px"
     }
   }));
 
-export default () => {
+export default ({isHelpIconOpen, showWalkThrough}: any) => {
     const classes = useStyles();
     const dispatch = useAppDispatch()
     const downloadRef = useRef<any>()
@@ -302,8 +325,14 @@ export default () => {
                     </Box>
                 </Box> }
             </Grid>
+            <Grid style={{ position: "relative" }} mt={0.5} mb={1} item sm={12}>
+            {isHelpIconOpen &&
+                <Box className={classes.helpCard}>
+                    Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!
+                </Box>
+            }
             { activeTab == 0 ?
-            <Grid mt={0.5} item sm={12}>
+            <Box>
                 { (!DAO || !treasury)  ? 
                 <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={72} animation="wave" /> :
                 <Box className={classes.tokenHeader}>
@@ -323,22 +352,22 @@ export default () => {
                     </Box>
                 </Box>
                 }
-            </Grid> : null }
+            </Box> : null }
             { activeTab == 1 && adminSafes && adminSafes?.length > 0  ?
-            <Grid mt={0.5} item sm={12}>
+            <Box>
                 <Box className={classes.reccurHeader}>
                     <Box></Box>
                     <Box>
                       { adminSafes && adminSafes?.length > 0 && <Button onClick={() => { setActiveTransaction(null); setShowRecurringPayment(true) }} color="secondary" variant="contained" startIcon={<AddIcon color="primary" />} size="small" ><Typography color="primary">NEW RECURRING PAYMENT</Typography></Button> }
                     </Box>
                 </Box>
-            </Grid> : null }
+            </Box> : null }
             { activeTab == 0 &&
-            <Grid mt={0.5} mb={1} item sm={12}>
+            <Box mt={0.5}>
                 { (!DAO || !treasury || !safeTokens)  ? 
-                   <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={500} animation="wave" /> :
+                   <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={showWalkThrough? 400 : 500} animation="wave" /> :
                     <Box className={classes.table}>
-                        <TableContainer  style={{ maxHeight: 500 }} component={Box}>
+                        <TableContainer  style={{ maxHeight: showWalkThrough? 400 : 500 }} component={Box}>
                             <Table size="medium" stickyHeader aria-label="simple table">
                                 <TableBody>
                                     {
@@ -357,18 +386,19 @@ export default () => {
                         </TableContainer>
                     </Box>
                 }
-            </Grid>
+            </Box>
             }
             { activeTab == 1 &&
-            <Grid mt={0.5} mb={1} item sm={12}>
+            <Box mt={0.5}>
                 <RecurringPayment onRecurringEdit={(txn:any) => { 
                     setActiveTransaction(txn); 
                     setTimeout(() => {
                         setShowRecurringPayment(true) 
                     }, 500)
                 }} />
-            </Grid>
+            </Box>
             }
+            </Grid>
             <SendToken open={showSendToken} onClose={() => setShowSendToken(false)} />
             <CreateRecurringPayment transaction={activeTransaction} open={showRecurringPayment} onClose={() => { setActiveTransaction(null); setShowRecurringPayment(false) }} />
         </Grid>
