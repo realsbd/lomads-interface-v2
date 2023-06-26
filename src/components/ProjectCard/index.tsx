@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { get as _get, find as _find, groupBy as _groupBy, orderBy as _orderBy } from 'lodash';
-import { Typography, Box, Card, CardContent } from "@mui/material";
+import { Typography, Box, Card, CardContent, Chip } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import { BsDiscord } from 'react-icons/bs';
@@ -10,7 +10,7 @@ import { useAppDispatch } from "helpers/useAppDispatch";
 import { useAppSelector } from "helpers/useAppSelector";
 import { useNavigate } from "react-router-dom"
 import StepperProgress from "components/StepperProgress";
-import { updateProjectViewAction } from "store/actions/project";
+import { deleteProjectAction, updateProjectViewAction } from "store/actions/project";
 import { useDAO } from "context/dao";
 
 const useStyles = makeStyles((theme: any) => ({
@@ -99,6 +99,10 @@ export default ({ project, daoUrl, tab }: CardProps) => {
         navigate(`/${daoUrl}/project/${project._id}`, { state: { project } })
     }
 
+    const handleDeleteProject = () => {
+        dispatch(deleteProjectAction({ projectId: _get(project, '_id', ''), daoUrl: _get(DAO, 'url', '') }));
+    }
+
     return (
         <>
             <Card
@@ -111,6 +115,10 @@ export default ({ project, daoUrl, tab }: CardProps) => {
                 onClick={handleCardClick}
 
             >
+                { project?.isDummy ? <Chip style={{ position: 'absolute', top: 8, right: 8 }} clickable onClick={e => {
+                    e.stopPropagation();
+                    handleDeleteProject()
+                }} variant="outlined" size="small" label="Dismiss" /> : null }
                 {
                     project.links.length > 0 && tab === 0
                         ?
