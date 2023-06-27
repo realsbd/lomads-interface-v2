@@ -2,6 +2,7 @@
 import { ThemeProvider } from '@mui/material/styles';
 import React, { useState } from 'react';
 import theme from './theme';
+import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import { Provider, useSelector } from 'react-redux';
 import configureStore, { persistor } from 'store'
 import { PersistGate } from 'redux-persist/lib/integration/react';
@@ -20,37 +21,43 @@ export const store = configureStore();
 export type AppState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
+const client = new ApolloClient({
+    uri: "https://hub.snapshot.org/graphql",
+    cache: new InMemoryCache()
+});
+
 const App = () => {
     return (
         <ThemeProvider theme={theme}>
             <Provider store={store}>
-                <PersistGate persistor={persistor}>
-                    <Web3AuthProvider>
-                        <LocalizationProvider dateAdapter={AdapterMoment}>
-                            <Router basename={''}>
-                                <Routes>
-                                    {routes.map((route, index) => {
-                                        return (
-                                            <Route
-                                                element={
-                                                    <DAOProvider privateRoute={route.private}>
-                                                        <SafeTokensProvider>
-                                                            <PrivateRoute
-                                                                orRender={
-                                                                    <route.layout>
-                                                                        <route.component />
-                                                                    </route.layout>
-                                                                }
-                                                                private={route.private}
-                                                            />
-                                                        </SafeTokensProvider>
-                                                    </DAOProvider>
-                                                }
-                                                path={route.path}
-                                            />
-                                        );
-                                    })}
-                                    {/* <Route
+                <ApolloProvider client={client}>
+                    <PersistGate persistor={persistor}>
+                        <Web3AuthProvider>
+                            <LocalizationProvider dateAdapter={AdapterMoment}>
+                                <Router basename={''}>
+                                    <Routes>
+                                        {routes.map((route, index) => {
+                                            return (
+                                                <Route
+                                                    element={
+                                                        <DAOProvider privateRoute={route.private}>
+                                                            <SafeTokensProvider>
+                                                                <PrivateRoute
+                                                                    orRender={
+                                                                        <route.layout>
+                                                                            <route.component />
+                                                                        </route.layout>
+                                                                    }
+                                                                    private={route.private}
+                                                                />
+                                                            </SafeTokensProvider>
+                                                        </DAOProvider>
+                                                    }
+                                                    path={route.path}
+                                                />
+                                            );
+                                        })}
+                                        {/* <Route
                                             element={
                                                     <PrivateRoute orRender= {
                                                     <Landing>
@@ -62,12 +69,13 @@ const App = () => {
                                             key={'notfound'}
                                             path={'*'}
                                         /> */}
-                                </Routes>
-                            </Router>
-                        </LocalizationProvider>
-                    </Web3AuthProvider>
-                    <Toaster position="bottom-right" />
-                </PersistGate>
+                                    </Routes>
+                                </Router>
+                            </LocalizationProvider>
+                        </Web3AuthProvider>
+                        <Toaster position="bottom-right" />
+                    </PersistGate>
+                </ApolloProvider>
             </Provider>
         </ThemeProvider>
     );

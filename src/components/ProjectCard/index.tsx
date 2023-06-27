@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme: any) => ({
 interface CardProps {
     project: any;
     daoUrl: string,
-    tab: number
+    tab?: number
 }
 
 export default ({ project, daoUrl, tab }: CardProps) => {

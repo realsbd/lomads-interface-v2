@@ -510,9 +510,9 @@ export default () => {
                                 value === 1 &&
                                 <Box display={"flex"} alignItems={"center"}>
                                     <Typography sx={{ marginLeft: '14px', fontWeight: 400, color: '#76808D', marginRight: '100px' }}>Review frequency : {_get(Project, 'kra.frequency', [])}</Typography>
-                                    {/* <IconButton sx={{ marginRight: '20px' }}>
+                                    <IconButton sx={{ marginRight: '20px' }} onClick={() => navigate(`/${daoURL}/project/${projectId}/archivedKra`)}>
                                         <img src={archiveIcon} alt="archiveIcon" />
-                                    </IconButton> */}
+                                    </IconButton>
                                     <Button size="small" variant="contained" onClick={() => setOpenKraReview(true)}>
                                         REVIEW
                                     </Button>
@@ -547,7 +547,7 @@ export default () => {
                     </Box>
                 }
 
-                <TaskSection isHelpIconOpen={false}  onlyProjects={true} />
+                <TaskSection isHelpIconOpen={false} onlyProjects={true} />
 
                 <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
 

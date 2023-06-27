@@ -123,16 +123,16 @@ export default ({ task, daoUrl }: CardProps) => {
                 }}
                 onClick={handleCardClick}
             >
-                { Task?.isDummy ? <Chip style={{ position: 'absolute', top: 8, right: 8 }} clickable onClick={e => {
+                {Task?.isDummy ? <Chip style={{ position: 'absolute', top: 8, right: 8 }} clickable onClick={e => {
                     e.stopPropagation();
                     handleDeleteTask()
-                }} size="small" sx={{ color: 'rgba(118, 128, 141, 0.5)', fontWeight: '700' }} label="Dismiss" /> : null }
-                { Task?.visual?.notification?.count ? <Box className={classes.iconContainer}>
+                }} size="small" sx={{ color: 'rgba(118, 128, 141, 0.5)', fontWeight: '700' }} label="Dismiss" /> : null}
+                {Task?.visual?.notification?.count ? <Box className={classes.iconContainer}>
                     <Box className={classes.iconPill}>
                         <img src={Task?.visual?.notification?.icon} />
-                        <Typography style={{ color:'#fff', fontSize: 14, fontWeight: 400 }}>+{Task?.visual?.notification?.count}</Typography>
+                        <Typography style={{ color: '#fff', fontSize: 14, fontWeight: 400 }}>+{Task?.visual?.notification?.count}</Typography>
                     </Box>
-                </Box> : null }
+                </Box> : null}
                 <CardContent className={classes.taskContent}>
                     <Typography className={classes.projectText}>{Task?.project?.name?.length > 20 ? Task?.project?.name?.substring(0, 20) + "..." : Task?.project?.name}</Typography>
                     <Typography className={classes.taskText}>{Task.name.length > 20 ? Task.name.substring(0, 20) + "..." : Task.name}</Typography>
