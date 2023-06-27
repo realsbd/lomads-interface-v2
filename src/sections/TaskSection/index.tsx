@@ -263,12 +263,12 @@ export default ({ isHelpIconOpen, onlyProjects }: any) => {
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
-                    <IconButton onClick={() => navigate(`/${DAO.url}/tasks`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
+                    <IconButton onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { active: value } }) : navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }} sx={{ marginRight: '20px' }}>
                         <img src={expandIcon} alt="archive-icon" />
                     </IconButton>
                     <IconButton
                         sx={{ marginRight: '20px' }}
-                        onClick={() => { onlyProjects ? navigate(`/${DAO.url}/archiveTasks/${Project._id}`) : navigate(`/${DAO.url}/archivedTasks`) }}
+                        onClick={() => { onlyProjects ? navigate(`/${DAO.url}/archivedTasks/${Project._id}`) : navigate(`/${DAO.url}/archivedTasks`) }}
                         disabled={_get(DAO, 'tasks', []).filter((task: any) => !task.deletedAt && task.archivedAt).length > 0 ? false : true}
                     >
                         <img src={archiveIcon} alt="archiveIcon" />

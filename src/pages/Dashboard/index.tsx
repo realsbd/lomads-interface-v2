@@ -329,10 +329,6 @@ export default () => {
                 <Proposals />
             </Grid>
 
-            {can(myRole, 'transaction.view') && <Grid mt={1} item sm={12}>
-                <Treasury />
-            </Grid>}
-
             <Grid sm={12} sx={{ marginTop: '20px' }}>
                 {can(myRole, 'transaction.view') && <Grid mt={1}
                     id="treasury-management"

@@ -1,8 +1,11 @@
 import React from "react";
-import { Typography, Card, CardContent } from "@mui/material";
+import { Typography, Card, CardContent, Box, Chip } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import { useNavigate } from "react-router-dom";
+import Avatar from "boring-avatars";
+import { beautifyHexToken } from "utils";
+import moment from "moment";
 
 const useStyles = makeStyles((theme: any) => ({
     taskCard: {
@@ -74,6 +77,18 @@ const useStyles = makeStyles((theme: any) => ({
         justifyContent: 'center!important',
         marginLeft: '10px !important'
     },
+    chip: {
+        width: 'fit-content',
+        height: 25,
+        alignSelf: "flex-end",
+        padding: "4px 20px",
+        '& .MuiChip-label': {
+            fontStyle: 'normal',
+            fontWeight: 700,
+            fontSize: '14px',
+            color: '#FFF'
+        }
+    },
 }));
 
 interface CardProps {
@@ -94,10 +109,28 @@ export default ({ proposal, daoUrl }: CardProps) => {
                     background: '#FFF',
                     boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
                 }}
+                onClick={() => window.open(`https://snapshot.org/#/aave.eth/proposal/${proposal.id}`)}
             >
                 <CardContent className={classes.taskContent}>
-                    <Typography className={classes.projectText}>{proposal.space?.name?.length > 20 ? proposal.space?.name?.substring(0, 20) + "..." : proposal.space?.name}</Typography>
+                    <Box sx={{ width: '100%' }} mb={1} display="flex" alignItems={"center"} justifyContent={"space-between"}>
+                        <Box display="flex" alignItems={"center"}>
+                            <Avatar
+                                size={20}
+                                name={proposal.author}
+                                variant="marble"
+                                colors={["#E67C40", "#EDCD27", "#8ECC3E", "#2AB87C", "#188C8C"]}
+                            />
+                            <Typography sx={{ marginLeft: '5px' }}>{beautifyHexToken(proposal.author)}</Typography>
+                        </Box>
+                        <Chip
+                            className={classes.chip}
+                            sx={proposal.state === 'pending' ? { background: '#6A7280' } : proposal.state === 'closed' ? { background: '#7C3AED' } : { background: '#21B56E' }}
+                            size="small"
+                            label={proposal.state}
+                        />
+                    </Box>
                     <Typography className={classes.taskText}>{proposal.title?.length > 20 ? proposal.title?.substring(0, 20) + "..." : proposal.title.name}</Typography>
+
                 </CardContent>
             </Card>
         </>

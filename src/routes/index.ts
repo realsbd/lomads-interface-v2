@@ -9,11 +9,12 @@ import LoginPage from 'pages/Login';
 import DashboardPage from 'pages/Dashboard';
 import CreateProjectPage from 'pages/Project/CreateProject';
 import ProjectDetailsPage from 'pages/Project/ProjectDetails';
+import ProjectKRAPage from 'pages/Project/ProjectKRA';
 import TaskDetailsPage from 'pages/Task/TaskDetails';
 import AllTasksPage from 'pages/Task/AllTasks';
 import AllProjectsPage from 'pages/Project/AllProjects';
 import ArchivedProjectsPage from 'pages/Project/ArchiveProjects';
-// import ArchivedTasksPage from 'pages/Task/ArchiveTasks';
+import ArchivedTasksPage from 'pages/Task/ArchiveTasks';
 import SettingsPage from 'pages/Settings';
 import AttachNewSafePage from 'pages/AttachSafe/New';
 import AttachExistingSafePage from 'pages/AttachSafe/Existing';
@@ -157,26 +158,40 @@ export default [
 		component: ProjectDetailsPage
 	},
 	{
+		path: '/:daoURL/project/:projectId/archivedKra',
+		exact: true,
+		layout: DefaultFullWidthLayout,
+		private: true,
+		component: ProjectKRAPage
+	},
+	{
 		path: '/:daoURL/tasks',
 		exact: true,
 		layout: DefaultFullWidthLayout,
 		private: true,
 		component: AllTasksPage
 	},
-	// {
-	// 	path: '/:daoURL/archivedTasks',
-	// 	exact: true,
-	// 	layout: DefaultFullWidthLayout,
-	// 	private: true,
-	// 	component: ArchivedTasksPage
-	// },
-	// {
-	// 	path: '/:daoURL/archivedTasks/:projectId',
-	// 	exact: true,
-	// 	layout: DefaultFullWidthLayout,
-	// 	private: true,
-	// 	component: ArchivedTasksPage
-	// },
+	{
+		path: '/:daoURL/tasks/:projectId',
+		exact: true,
+		layout: DefaultFullWidthLayout,
+		private: true,
+		component: AllTasksPage
+	},
+	{
+		path: '/:daoURL/archivedTasks',
+		exact: true,
+		layout: DefaultFullWidthLayout,
+		private: true,
+		component: ArchivedTasksPage
+	},
+	{
+		path: '/:daoURL/archivedTasks/:projectId',
+		exact: true,
+		layout: DefaultFullWidthLayout,
+		private: true,
+		component: ArchivedTasksPage
+	},
 	{
 		path: '/:daoURL/projects',
 		exact: true,

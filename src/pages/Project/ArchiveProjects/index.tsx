@@ -14,21 +14,6 @@ export default () => {
     const daoName = _get(DAO, 'name', '').split(" ");
     return (
         <div className="archive-container">
-            <div className="home-btn" onClick={() => navigate(-1)}>
-                <div className="invertedBox">
-                    {
-                        _get(DAO, 'image', null)
-                            ?
-                            <img src={_get(DAO, 'image', null)} />
-                            :
-                            <div className="navbarText">
-                                {daoName.length === 1
-                                    ? daoName[0].charAt(0)
-                                    : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}
-                            </div>
-                    }
-                </div>
-            </div>
 
             <div className="archive-header">
                 <div className="archive-heading-box">
