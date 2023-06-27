@@ -67,7 +67,7 @@ export default ({ theme = "light", ...props }: any) => {
                     <Grid item sm={3}>
                         <Box display="flex" flexDirection="row" alignItems="center" justifyContent={"center"}>
                             <img src={icons.suggestion} />
-                            <Typography sx={{ color: theme == 'light' ? '#76808D' : '#FFF' }} className={classes.poweredBy}>Noticed a <span style={{ textDecoration: 'underline' }}>bug</span>? Any <span style={{ textDecoration: 'underline' }}>suggestion</span>? </Typography>
+                            <Typography sx={{ color: theme == 'light' ? '#76808D' : '#FFF' }} className={classes.poweredBy}>Noticed a <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={() => window.open('https://tally.so/r/wLZyyz', '_blank')}>bug</span>? Any <span onClick={() => window.open('https://tally.so/r/n9XgRp', '_blank')} style={{ cursor: 'pointer', textDecoration: 'underline' }}>suggestion</span>? </Typography>
                         </Box>
                     </Grid>
                     <Grid item sm={3}>
