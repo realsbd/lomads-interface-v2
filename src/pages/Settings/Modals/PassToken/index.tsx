@@ -230,6 +230,8 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                     <Box display="flex" flexDirection="column" my={6} alignItems="center">
                         <img src={MintSBTSvg} />
                         <Typography my={4} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>Pass Tokens</Typography>
+                        <Typography variant='subtitle2' sx={{ px: 2, fontSize: 16 }} textAlign="center" color="rgb(118, 128, 141)"> Launch '<span style={{ fontWeight: '700' }}>Soulbound Tokens</span> (SBTs)' with ease and streamline app permissions (eg. Discord, Notion, Github, and Snapshot). Don't worry, <span style={{ fontWeight: '700' }}>member data is always secure</span> with encryption on SBT.</Typography>
+                        {/* { contract ? <Typography variant="h6">Deployed on { CHAIN_INFO[contract?.chainId]?.label }</Typography> : null } */}
                     </Box>
                     { !contract ?
                     <Box margin="0 auto" display="flex" flexDirection="column" alignItems="center" width={380}>

@@ -69,7 +69,7 @@ export default ({ highlightSettings, isHelpIconOpen }: { highlightSettings: bool
                     {
                         _get(DAO, 'links', []).length > 0 ?
                             _get(DAO, 'links', []).map((link: any) => <LinkChip url={_get(link, 'link')} name={_get(link, 'title')} />) :
-                            <Box className={classes.empty}>
+                            <Box className={classes.empty} onClick={() => navigate(`/${DAO?.url}/settings`, { state: { openDefault: Organisation.name } })}>
                                 <Typography className={classes.emptyText} >ADD USEFUL LINKS HERE</Typography>
                             </Box>
                     }

@@ -178,13 +178,14 @@ const Organisation = ({ open, onClose }: any) => {
                     <TextInput value={process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}
                         disabled fullWidth label="Organisation’s URL" />
                 </Box>
-                <Box sx={{ mt: 3 }}>
+                {/* To be done */}
+                {/* <Box sx={{ mt: 3 }}>
                     <Typography className={classes.label}>Member visibility</Typography>
-                    <Typography className={classes.infoText}>If unlocked, everyone in the organisation will be able to see who is part of which project. Otherwise, only members part of a project sees the members they are working with.</Typography>
+                    <Typography className={classes.infoText}>If checked, all organization members can view workspace membership. If unchecked, only project members can see their collaborators.</Typography>
                     <Box my={2}>
                         <Switch />
                     </Box>
-                </Box>
+                </Box> */}
                 <Box mt={4}>
                     <FormControl fullWidth>
                         <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
