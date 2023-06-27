@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@apollo/client": "^3.7.16",
     "@biconomy/mexa": "^3.0.6",
     "@chakra-ui/react": "^2.7.0",
     "@emotion/react": "^11.10.6",
@@ -44,6 +45,7 @@
     "ethereum-checksum-address": "^0.0.8",
     "ethers": "5",
     "framer-motion": "^10.12.16",
+    "graphql": "^16.7.1",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
