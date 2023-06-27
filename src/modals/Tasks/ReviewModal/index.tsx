@@ -178,41 +178,14 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
     }, [Task])
 
     const handleApproveTask = async () => {
-        const safeAddress = Task?.compensation?.safeAddress || _get(DAO, 'safes[0].address', null)
-        const safe = loadSafe(safeAddress);
-        console.log("safeAddress", safeAddress)
-        if(!safeAddress) return;
-
-        try {
-
-            if(_get(Task, 'compensation.currency', 'SWEAT') !== "SWEAT") {
-                if(currentChainId !== safe?.chainId) {
-                    setApproveLoading(false);
-                    return toast.custom(t => <SwitchChain t={t} nextChainId={safe?.chainId}/>)
-                }
-            }
-            setApproveLoading(true)
-            const method = !isSafeOwner || _get(Task, 'compensation.currency', 'SWEAT') === "SWEAT" ? createOffChainSafeTransaction : createSafeTransaction
-
-            let m = _get(activeSubmission, 'member.name', '') === '' ? _get(activeSubmission, 'member.wallet', '') : _get(activeSubmission, 'member.name', '')
-
-            const txn: any = await method({
-                chainId: safe?.chainId,
-                safeAddress: safeAddress,
-                tokenAddress: _get(Task, 'compensation.currency', 'SWEAT'),
-                send: [{ recipient: activeSubmission.member.wallet, amount: newCompensation, label: `${beautifyHexToken(m)} | ${_get(Task, 'name', '')}` || undefined, tag, taskId: Task?._id }],
-                daoId: _get(DAO, '_id', null),
-                isSafeOwner: Boolean(isSafeOwner)
-            })
-
+        if(Task.isDummy) {
             const payload = {
                 daoUrl: _get(DAO, 'url', undefined),
                 compensationDelta: newCompensation - _get(Task, 'compensation.amount', 0),
                 offChainPayload: undefined,
-                onChainSafeTxHash: txn?.safeTxHash,
+                onChainSafeTxHash: null,
                 recipient: _get(activeSubmission, 'member._id', null)
             }
-    
             return axiosHttp.post(`task/${Task._id}/approve?daoUrl=${DAO.url}`, payload)
                 .then(async (res:any) => {
                     dispatch(setDAOAction(res.data.dao))
@@ -220,9 +193,53 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                     closeModal()
                 })
                 .finally(() => setApproveLoading(false))
-        } catch (e) {
-            setApproveLoading(false);
-            console.log(e)
+        } else {
+            const safeAddress = Task?.compensation?.safeAddress || _get(DAO, 'safes[0].address', null)
+            const safe = loadSafe(safeAddress);
+            console.log("safeAddress", safeAddress)
+            if(!safeAddress) return;
+    
+            try {
+    
+                if(_get(Task, 'compensation.currency', 'SWEAT') !== "SWEAT") {
+                    if(currentChainId !== safe?.chainId) {
+                        setApproveLoading(false);
+                        return toast.custom(t => <SwitchChain t={t} nextChainId={safe?.chainId}/>)
+                    }
+                }
+                setApproveLoading(true)
+                const method = !isSafeOwner || _get(Task, 'compensation.currency', 'SWEAT') === "SWEAT" ? createOffChainSafeTransaction : createSafeTransaction
+    
+                let m = _get(activeSubmission, 'member.name', '') === '' ? _get(activeSubmission, 'member.wallet', '') : _get(activeSubmission, 'member.name', '')
+    
+                const txn: any = await method({
+                    chainId: safe?.chainId,
+                    safeAddress: safeAddress,
+                    tokenAddress: _get(Task, 'compensation.currency', 'SWEAT'),
+                    send: [{ recipient: activeSubmission.member.wallet, amount: newCompensation, label: `${beautifyHexToken(m)} | ${_get(Task, 'name', '')}` || undefined, tag, taskId: Task?._id }],
+                    daoId: _get(DAO, '_id', null),
+                    isSafeOwner: Boolean(isSafeOwner)
+                })
+    
+                const payload = {
+                    daoUrl: _get(DAO, 'url', undefined),
+                    compensationDelta: newCompensation - _get(Task, 'compensation.amount', 0),
+                    offChainPayload: undefined,
+                    onChainSafeTxHash: txn?.safeTxHash,
+                    recipient: _get(activeSubmission, 'member._id', null)
+                }
+        
+                return axiosHttp.post(`task/${Task._id}/approve?daoUrl=${DAO.url}`, payload)
+                    .then(async (res:any) => {
+                        dispatch(setDAOAction(res.data.dao))
+                        dispatch(setTaskAction(res.data.task))
+                        closeModal()
+                    })
+                    .finally(() => setApproveLoading(false))
+            } catch (e) {
+                setApproveLoading(false);
+                console.log(e)
+            }
         }
     }
 

@@ -69,7 +69,7 @@ export default ({ open, onClose, transaction }: any) => {
     }, [createRecurringPaymentsLoading])
 
     const ReceiversList = useMemo(() => {
-        return DAO?.members?.filter((member:any) => member?.member?.wallet?.toLowerCase() !== account?.toLowerCase()).map((member:any) => member.member)
+        return DAO?.members?.map((member:any) => member.member)
     }, [DAO?.url])
 
     const eligibleSafes = useMemo(() => {
@@ -502,13 +502,13 @@ export default ({ open, onClose, transaction }: any) => {
                             <Table>
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell sx={{ display: 'flex', flexDirection: "row", alignItems: 'center' }}>
+                                        <Box sx={{ display: 'flex', flexDirection: "row", alignItems: 'center' }}>
                                             <Checkbox onChange={() => setState((prev:any) => { return {
                                                 ...prev,
                                                 ends: { ...prev?.ends, value: "NEVER", occurances: undefined, endOn: undefined }
                                             } })} checked={state?.ends?.value === 'NEVER'} />
                                             <Typography>When it is cancelled</Typography>
-                                        </TableCell>
+                                        </Box>
                                         <TableCell></TableCell>
                                     </TableRow>
                                     <TableRow>

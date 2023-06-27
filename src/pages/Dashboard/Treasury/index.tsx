@@ -15,7 +15,7 @@ import Row from "./components/Row";
 import { useSafeTokens } from "context/safeTokens";
 import { values } from "lodash";
 import moment from "moment";
-import exportBtn from 'assets/svg/exportBtn.png'
+import exportBtn from 'assets/svg/export.svg'
 import { usePrevious } from "hooks/usePrevious";
 import Button from "components/Button";
 import palette from "theme/palette";
@@ -317,9 +317,9 @@ export default ({isHelpIconOpen, showWalkThrough}: any) => {
                         { activeTab == 0 && 
                         <Box display="flex" flexDirection="row" alignItems="center">
                             { adminSafes && adminSafes?.length > 0 && <Button onClick={() => setShowSendToken(true)} sx={{ color: palette?.primary?.main }} size="small" variant="contained" color="secondary">SEND TOKEN</Button> }
-                            <IconButton sx={{ ml: 2 }} onClick={() => handleDownloadCsv()}>
+                            <Button variant="contained" color="secondary" sx={{ padding: 0, ml: 2, minWidth: 40, maxWidth: 40, maxHeight: 40 }} onClick={() => handleDownloadCsv()}>
                                 { !csvLoading ? <img src={exportBtn}/> : <LeapFrog size={20} color="#C94B32" /> }
-                            </IconButton>
+                            </Button>
                         </Box>
                         }
                     </Box>

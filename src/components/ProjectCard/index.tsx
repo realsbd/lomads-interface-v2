@@ -118,7 +118,7 @@ export default ({ project, daoUrl, tab }: CardProps) => {
                 { project?.isDummy ? <Chip style={{ position: 'absolute', top: 8, right: 8 }} clickable onClick={e => {
                     e.stopPropagation();
                     handleDeleteProject()
-                }} variant="outlined" size="small" label="Dismiss" /> : null }
+                }} sx={{ color: 'rgba(118, 128, 141, 0.5)', fontWeight: '700' }} size="small" label="Dismiss" /> : null }
                 {
                     project.links.length > 0 && tab === 0
                         ?

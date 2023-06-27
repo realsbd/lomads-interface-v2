@@ -393,6 +393,54 @@ export default () => {
                     anchorEl={anchorRef.current}
                 />
             </Grid>
+            <Box
+                sx={{ width: '100%', position: 'fixed', left: '33px', bottom: '44px', cursor: 'pointer', zIndex: isHelpIconOpen ? 1300 : 1000 }}
+                id="question-mark"
+                ref={questionMarkRef}
+                onClick={expandHelpOptions}>
+                {isHelpIconOpen
+                    &&
+                    <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', height: 140 }}>
+                        <Button
+                            variant="contained"
+                            className={classes.PlayWalkThroughButton}
+                            onClick={startWalkThroughAtStepOne}>
+                            Play walk through
+                        </Button>
+                        <Button
+                            variant="contained"
+                            className={classes.PlayWalkThroughButton}
+                            onClick={() => window.open("https://lomads-1.gitbook.io/lomads/", '_blank')}>
+                            Documentation
+                        </Button>
+                        <Button
+                            startIcon={<CloseIcon />}
+                            className={classes.HideHelpIconButton}
+                            onClick={() => questionMarkRef.current.style.display = 'none'}
+                            variant="contained">
+                            Hide help icon
+                        </Button>
+                    </Box>
+                }
+                <img src={getQuestionImage()} />
+            </Box>
+            {(showWalkThrough || isHelpIconOpen) && <Box className={classes.walkThroughOverlay}></Box>}
+            {showWalkThrough
+                ?
+                <WalkThroughModal
+                    incrementWalkThroughSteps={incrementWalkThroughSteps}
+                    showConfirmation={showWalkThrough && currWalkThroughObj?.step === 0}
+                    endWalkThrough={endWalkThrough}
+                    obj={currWalkThroughObj}
+                /> : null
+            }
+            <WalkThroughPopover
+                displayPopover={showWalkThrough && currWalkThroughObj?.step > 0}
+                obj={currWalkThroughObj}
+                incrementWalkThroughSteps={incrementWalkThroughSteps}
+                endWalkThrough={endWalkThrough}
+                anchorEl={anchorRef.current}
+            />
         </Grid>
     )
 }

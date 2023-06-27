@@ -25,7 +25,6 @@ import { useDAO } from "context/dao";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
-		minHeight: "100vh",
 		maxHeight: 'fit-content',
 		display: 'flex',
 		flexDirection: 'column',
@@ -416,7 +415,11 @@ export default () => {
                 address: selectedSafeAddress,
 				threshold: safe?.threshold,
                 owners: totalAddresses.map((a:any) => a.address),
-                chainId: state?.selectedChainId
+                chainId: state?.selectedChainId,
+				token: {
+					tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
+					symbol: CHAIN_INFO[state?.selectedChainId]?.nativeCurrency?.symbol
+				}
             }
         }
 		console.log(safe)
