@@ -578,7 +578,11 @@ export default () => {
 				address: addr,
 				owners: owners,
 				threshold: state?.threshold,
-				chainId: state?.selectedChainId
+				chainId: state?.selectedChainId,
+				token: {
+					tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
+					symbol: CHAIN_INFO[state?.selectedChainId]?.nativeCurrency?.symbol
+				}
 			}
 		}
 		axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
@@ -653,7 +657,11 @@ export default () => {
 								address: tx.getAddress(),
 								owners: owners,
 								threshold: state?.threshold,
-								chainId: state?.selectedChainId
+								chainId: state?.selectedChainId,
+								token: {
+									tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
+									symbol: CHAIN_INFO[state?.selectedChainId]?.nativeCurrency?.symbol
+								}
 							}
 						}
 						axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
