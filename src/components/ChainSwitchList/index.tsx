@@ -33,6 +33,7 @@ export default ({ chainId, onselect = () => {}, buttonClass }: { chainId: number
             <Menu
                 key="chain-switch-menu"
                 id="chain-switch-menu"
+                keepMounted
                 MenuListProps={{
                     'aria-labelledby': 'chain-switch-button',
                 }}

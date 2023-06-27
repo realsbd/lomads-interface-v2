@@ -325,9 +325,9 @@ export default () => {
                 sx={{ zIndex: currWalkThroughObj.step === 2 ? 1400 : 0 }} >
                 <TaskSection isHelpIconOpen={isHelpIconOpen} />
             </Grid>
-            <Grid sm={12}>
+            {/* <Grid sm={12}>
                 <Proposals />
-            </Grid>
+            </Grid> */}
 
             <Grid sm={12} sx={{ marginTop: '20px' }}>
                 {can(myRole, 'transaction.view') && <Grid mt={1}

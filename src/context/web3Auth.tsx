@@ -258,12 +258,13 @@ useEffect(() => {
   const switchChain = async (nextChainId: string) => {
     if (!web3Auth) {
       console.log("web3auth not initialized yet");
-      return;
+      throw "web3auth not initialized yet"
     }
     try { 
-      await web3Auth.switchChain({ chainId: nextChainId }); 
+      return await web3Auth.switchChain({ chainId: nextChainId }); 
     } catch (e) {
       console.log(e)
+      throw e
     }
   }
 

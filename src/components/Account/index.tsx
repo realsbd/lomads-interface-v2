@@ -60,10 +60,10 @@ const useStyles = makeStyles((theme: any) => ({
 		padding: "12px 42px 12px 11px",
 		borderRadius: "30px 0 0 30px",
 		backgroundColor: 'hsla(214,9%,51%,.05)',
-		//transition: '0.5s',
+		transition: '0.5s',
 		'&:hover': {
-			//transition: '0.5s',
-			//right: 200
+			transition: '0.5s',
+			right: 200
 		}
 	},
 	rolePill: {
@@ -166,9 +166,13 @@ export default ({ children, options = true, ...props }: any) => {
 	// }, [user, safeTokens, DAO])
 
 	const handleSwitch = async (nextChainId: number) => {
-		const chainInfo = CHAIN_INFO[nextChainId]
-		dispatch(setNetworkConfig({ selectedChainId: nextChainId, chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
-		await switchChain(chainInfo?.chainId)
+		try {
+			const chainInfo = CHAIN_INFO[nextChainId]
+			dispatch(setNetworkConfig({ selectedChainId: nextChainId, chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+			await switchChain(chainInfo?.chainId)
+		} catch (e) {
+			console.log(e)
+		}
 	}
 
 	const swtBalance = useMemo(() => {
@@ -232,18 +236,16 @@ export default ({ children, options = true, ...props }: any) => {
 				<Box className={classes.rolePill}>
 					<Typography style={{ fontSize: '14px', clear: 'both', display: 'inline-block', textAlign: 'center', whiteSpace: 'nowrap' }}>{displayRole}</Typography>
 				</Box>
-				<Box sx={{ mx: 1 }} display="flex" flexDirection="row" alignItems="center">
+				{/* <Box sx={{ mx: 1 }} display="flex" flexDirection="row" alignItems="center">
 					<Box display="flex" flexDirection="row" alignItems="center">
 						<img src={tokenDashboard} />
 						<Typography className={classes.tokenText}>${tokenDollarBalance}</Typography>
 					</Box>
-					{/* {_get(DAO, 'sweatPoints', false) === true && */}
 					<Box sx={{ ml: 1 }} display="flex" flexDirection="row" alignItems="center">
 						<img src={starDashboard} />
 						<Typography className={classes.tokenText}>{swtBalance}</Typography>
 					</Box>
-					{/* } */}
-				</Box>
+				</Box> */}
 				<Box sx={{ ml: 1 }}>
 					<ChainSwitchList onselect={(chain: any) => handleSwitch(chain)} chainId={chainId} />
 				</Box>
