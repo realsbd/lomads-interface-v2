@@ -170,7 +170,18 @@ export default ({ task, daoUrl }: CardProps) => {
                                         {
                                             diff <= 2
                                                 ?
-                                                <Typography className={classes.dateText} sx={{ color: '#c94B32' }}>{diff} {diff === 1 ? 'day' : 'days'}</Typography>
+                                                <>
+                                                    {
+                                                        diff === 0 ?
+                                                            <Typography className={classes.dateText} sx={{ color: '#c94B32' }}>Today</Typography>
+                                                            :
+                                                            diff < 0
+                                                                ?
+                                                                <Typography className={classes.dateText} sx={{ color: '#c94B32' }}>Deadline passed {Math.abs(diff)} {diff === -1 ? 'day ago' : 'days ago'}</Typography>
+                                                                :
+                                                                <Typography className={classes.dateText} sx={{ color: '#c94B32' }}>{diff} {diff === 1 ? 'day' : 'days'}</Typography>
+                                                    }
+                                                </>
                                                 :
                                                 <Typography className={classes.dateText} sx={{ color: '#76808D', }}>{moment(Task.deadline).fromNow()}</Typography>
                                         }

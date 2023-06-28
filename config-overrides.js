@@ -12,7 +12,8 @@ module.exports = function override(config) {
     "os": require.resolve("os-browserify"),
     "url": require.resolve("url"),
     "buffer": require.resolve("buffer"),
-    "zlib": require.resolve("browserify-zlib")
+    "zlib": require.resolve("browserify-zlib"),
+    "querystring": require.resolve("querystring-es3")
   })
   config.resolve.fallback = fallback;
 

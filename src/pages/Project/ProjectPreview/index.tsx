@@ -53,6 +53,8 @@ import AddIcon from '@mui/icons-material/Add';
 
 import moment from "moment";
 import MilestoneDetailModal from "modals/Project/MilestoneDetailModal";
+//@ts-ignore
+import { Helmet } from "react-helmet";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -331,49 +333,57 @@ export default () => {
     }
 
     return (
-        <Grid container className={classes.root}>
-            <Grid xs={12} item display="flex" flexDirection="column">
+        <>
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>{_get(Project, 'name')}</title>
+                <meta property="og:title" content={_get(Project, 'name')} />
+                <meta property="og:description" content={_get(Project, 'description')} />
+                <meta property="og:type" content="article" />
+            </Helmet>
+            <Grid container className={classes.root}>
+                <Grid xs={12} item display="flex" flexDirection="column">
 
-                <ProjectEditModal
-                    open={showEdit}
-                    closeModal={() => setShowEdit(false)}
-                />
+                    <ProjectEditModal
+                        open={showEdit}
+                        closeModal={() => setShowEdit(false)}
+                    />
 
-                <MilestoneDetailModal
-                    selectedMilestone={selectedMilestone}
-                    open={openMilestoneModal}
-                    closeModal={() => setOpenMilestoneModal(false)}
-                    openAssignContribution={() => setOpenAssignContribution(true)}
-                />
+                    <MilestoneDetailModal
+                        selectedMilestone={selectedMilestone}
+                        open={openMilestoneModal}
+                        closeModal={() => setOpenMilestoneModal(false)}
+                        openAssignContribution={() => setOpenAssignContribution(true)}
+                    />
 
-                <AssignContributionModal
-                    selectedMilestone={selectedMilestone}
-                    open={openAssignContribution}
-                    closeModal={() => setOpenAssignContribution(false)}
-                />
+                    <AssignContributionModal
+                        selectedMilestone={selectedMilestone}
+                        open={openAssignContribution}
+                        closeModal={() => setOpenAssignContribution(false)}
+                    />
 
-                <KraReviewModal
-                    open={openKraReview}
-                    closeModal={() => setOpenKraReview(false)}
-                />
+                    <KraReviewModal
+                        open={openKraReview}
+                        closeModal={() => setOpenKraReview(false)}
+                    />
 
-                <InviteMemberModal
-                    open={openInviteModal}
-                    closeModal={() => setOpenInviteModal(false)}
-                />
+                    <InviteMemberModal
+                        open={openInviteModal}
+                        closeModal={() => setOpenInviteModal(false)}
+                    />
 
-                {/* Name */}
-                <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" alignItems="center">
-                    <Box onClick={() => navigate(-1)} className={classes.arrowContainer} display="flex" alignItems="center" justifyContent={"center"}>
-                        <IoIosArrowBack size={20} color="#C94B32" />
-                    </Box>
-                    <Box className={classes.nameContainer} display="flex" alignItems="center" justifyContent={"space-between"}>
-                        <Box display="flex" alignItems="center">
-                            <img src={createProjectSvg} alt="project-icon" style={{ marginRight: '18px', width: 50, height: 40, objectFit: 'cover' }} />
-                            <Typography className={classes.nameText}>{_get(Project, 'name', '')}</Typography>
+                    {/* Name */}
+                    <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" alignItems="center">
+                        <Box onClick={() => navigate(-1)} className={classes.arrowContainer} display="flex" alignItems="center" justifyContent={"center"}>
+                            <IoIosArrowBack size={20} color="#C94B32" />
                         </Box>
-                        <Box display="flex" alignItems="center">
-                            {/* <Box
+                        <Box className={classes.nameContainer} display="flex" alignItems="center" justifyContent={"space-between"}>
+                            <Box display="flex" alignItems="center">
+                                <img src={createProjectSvg} alt="project-icon" style={{ marginRight: '18px', width: 50, height: 40, objectFit: 'cover' }} />
+                                <Typography className={classes.nameText}>{_get(Project, 'name', '')}</Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center">
+                                {/* <Box
                                 className={classes.iconContainer}
                                 display="flex"
                                 alignItems="center"
@@ -383,7 +393,7 @@ export default () => {
                             >
                                 <img src={settingIcon} alt="setting-icon" />
                             </Box> */}
-                            {/* <Box
+                                {/* <Box
                                 className={classes.iconContainer}
                                 display="flex"
                                 alignItems="center"
@@ -392,64 +402,64 @@ export default () => {
                             >
                                 <img src={shareIcon} alt="share-icon" style={{ width: 18, height: 18 }} />
                             </Box> */}
-                            <Menu
-                                anchorEl={anchorEl}
-                                open={open}
-                                onClose={handleClose}
-                            >
-                                <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                    <TwitterShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
-                                        <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <TwitterIcon size={32} />
-                                            <div style={{ marginLeft: 16 }}>Twitter</div>
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={open}
+                                    onClose={handleClose}
+                                >
+                                    <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                        <TwitterShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
+                                            <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                <TwitterIcon size={32} />
+                                                <div style={{ marginLeft: 16 }}>Twitter</div>
+                                            </div>
+                                        </TwitterShareButton>
+                                    </MenuItem>
+                                    <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                        <TelegramShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
+                                            <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                <TelegramIcon size={32} />
+                                                <div style={{ marginLeft: 16 }}>Telegram</div>
+                                            </div>
+                                        </TelegramShareButton>
+                                    </MenuItem>
+                                    <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                        <WhatsappShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
+                                            <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                <WhatsappIcon size={32} />
+                                                <div style={{ marginLeft: 16 }}>Whatsapp</div>
+                                            </div>
+                                        </WhatsappShareButton>
+                                    </MenuItem>
+                                    <MenuItem onClick={() => {
+                                        navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`)
+                                    }} style={{ marginLeft: 0, height: 40 }}>
+                                        <div style={{}}>
+                                            <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                <img style={{ marginLeft: 8 }} src={copyIcon} />
+                                                <div style={{ marginLeft: 24 }}>Copy to clipboard</div>
+                                            </div>
                                         </div>
-                                    </TwitterShareButton>
-                                </MenuItem>
-                                <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                    <TelegramShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
-                                        <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <TelegramIcon size={32} />
-                                            <div style={{ marginLeft: 16 }}>Telegram</div>
-                                        </div>
-                                    </TelegramShareButton>
-                                </MenuItem>
-                                <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                    <WhatsappShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
-                                        <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <WhatsappIcon size={32} />
-                                            <div style={{ marginLeft: 16 }}>Whatsapp</div>
-                                        </div>
-                                    </WhatsappShareButton>
-                                </MenuItem>
-                                <MenuItem onClick={() => {
-                                    navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`)
-                                }} style={{ marginLeft: 0, height: 40 }}>
-                                    <div style={{}}>
-                                        <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <img style={{ marginLeft: 8 }} src={copyIcon} />
-                                            <div style={{ marginLeft: 24 }}>Copy to clipboard</div>
-                                        </div>
-                                    </div>
-                                </MenuItem>
-                            </Menu>
+                                    </MenuItem>
+                                </Menu>
+                            </Box>
                         </Box>
                     </Box>
-                </Box>
 
-                {/* Description */}
-                <Box className={classes.descriptionContainer} display="flex" alignItems={"center"}>
-                    <Box>
-                        <Typography sx={{ fontSize: '22px', lineHeight: '25px', color: '#76808D' }}>Description</Typography>
+                    {/* Description */}
+                    <Box className={classes.descriptionContainer} display="flex" alignItems={"center"}>
+                        <Box>
+                            <Typography sx={{ fontSize: '22px', lineHeight: '25px', color: '#76808D' }}>Description</Typography>
+                        </Box>
+                        <Box sx={{ marginLeft: '50px' }}>
+                            <Typography
+                                dangerouslySetInnerHTML={{ __html: _get(Project, 'description', '') }}
+                                sx={{ fontSize: '14px', color: '#1B2B41', margin: 0 }}></Typography>
+                        </Box>
                     </Box>
-                    <Box sx={{ marginLeft: '50px' }}>
-                        <Typography
-                            dangerouslySetInnerHTML={{ __html: _get(Project, 'description', '') }}
-                            sx={{ fontSize: '14px', color: '#1B2B41', margin: 0 }}></Typography>
-                    </Box>
-                </Box>
 
-                {/* Links */}
-                {/* {
+                    {/* Links */}
+                    {/* {
                     _get(Project, 'links', []).length > 0 &&
                     <Box display={"flex"} flexWrap={"wrap"} sx={{ width: '100%', marginBottom: '20px' }}>
                         {
@@ -462,94 +472,94 @@ export default () => {
                     </Box>
                 } */}
 
-                {/* Milestones and KRA */}
-                {
-                    (_get(Project, 'milestones', []).length > 0 || _get(Project, 'kra.results', []).length > 0) &&
-                    <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
-                        <Box sx={{ width: '100%', background: '#FFF', padding: '10px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                            <Tabs
-                                value={value}
-                                onChange={handleChange}
-                                aria-label="basic tabs example"
-                                TabIndicatorProps={{
-                                    hidden: true
-                                }}
-                                sx={{
-                                    '& button': { color: 'rgba(118, 128, 141,0.5)', marginRight: '10px', textTransform: 'capitalize', fontSize: '22px', fontWeight: '400' },
-                                    '& button.Mui-selected': { color: 'rgba(118, 128, 141,1)' },
-                                }}
-                            >
-                                {
-                                    _get(Project, 'milestones', []).length > 0 && <Tab label="Milestones" {...a11yProps(0)} />
-                                }
-                                {
-                                    _get(Project, 'kra.results', []).length > 0 && <Tab label="Key results" {...a11yProps(1)} />
-                                }
-                            </Tabs>
-
-                            {
-                                value === 0 &&
-                                <Box display={"flex"} alignItems={"center"}>
-                                    <div style={{ width: '300px' }}>
-                                        <StepperProgress variant="secondary" milestones={_get(Project, 'milestones', [])} />
-                                    </div>
+                    {/* Milestones and KRA */}
+                    {
+                        (_get(Project, 'milestones', []).length > 0 || _get(Project, 'kra.results', []).length > 0) &&
+                        <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
+                            <Box sx={{ width: '100%', background: '#FFF', padding: '10px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                                <Tabs
+                                    value={value}
+                                    onChange={handleChange}
+                                    aria-label="basic tabs example"
+                                    TabIndicatorProps={{
+                                        hidden: true
+                                    }}
+                                    sx={{
+                                        '& button': { color: 'rgba(118, 128, 141,0.5)', marginRight: '10px', textTransform: 'capitalize', fontSize: '22px', fontWeight: '400' },
+                                        '& button.Mui-selected': { color: 'rgba(118, 128, 141,1)' },
+                                    }}
+                                >
                                     {
-                                        _get(Project, 'milestones', []).length > 0
-                                            ?
-                                            <Typography sx={{ marginLeft: '16px', fontWeight: 700, color: '#188C7C' }}>
-                                                {(((_get(Project, 'milestones', []).filter((item: any) => item.complete === true).length) / (_get(Project, 'milestones', []).length)) * 100).toFixed(2)}%
-                                            </Typography>
-                                            :
-                                            <Typography sx={{ marginLeft: '16px', fontWeight: 700, color: '#188C7C' }}>0%</Typography>
+                                        _get(Project, 'milestones', []).length > 0 && <Tab label="Milestones" {...a11yProps(0)} />
                                     }
+                                    {
+                                        _get(Project, 'kra.results', []).length > 0 && <Tab label="Key results" {...a11yProps(1)} />
+                                    }
+                                </Tabs>
 
-                                </Box>
-                            }
+                                {
+                                    value === 0 &&
+                                    <Box display={"flex"} alignItems={"center"}>
+                                        <div style={{ width: '300px' }}>
+                                            <StepperProgress variant="secondary" milestones={_get(Project, 'milestones', [])} />
+                                        </div>
+                                        {
+                                            _get(Project, 'milestones', []).length > 0
+                                                ?
+                                                <Typography sx={{ marginLeft: '16px', fontWeight: 700, color: '#188C7C' }}>
+                                                    {(((_get(Project, 'milestones', []).filter((item: any) => item.complete === true).length) / (_get(Project, 'milestones', []).length)) * 100).toFixed(2)}%
+                                                </Typography>
+                                                :
+                                                <Typography sx={{ marginLeft: '16px', fontWeight: 700, color: '#188C7C' }}>0%</Typography>
+                                        }
 
-                            {
-                                value === 1 &&
-                                <Box display={"flex"} alignItems={"center"}>
-                                    <Typography sx={{ marginLeft: '14px', fontWeight: 400, color: '#76808D', marginRight: '100px' }}>Review frequency : {_get(Project, 'kra.frequency', [])}</Typography>
-                                    {/* <IconButton sx={{ marginRight: '20px' }} onClick={() => navigate(`/${daoURL}/project/${projectId}/archivedKra`)}>
+                                    </Box>
+                                }
+
+                                {
+                                    value === 1 &&
+                                    <Box display={"flex"} alignItems={"center"}>
+                                        <Typography sx={{ marginLeft: '14px', fontWeight: 400, color: '#76808D', marginRight: '100px' }}>Review frequency : {_get(Project, 'kra.frequency', [])}</Typography>
+                                        {/* <IconButton sx={{ marginRight: '20px' }} onClick={() => navigate(`/${daoURL}/project/${projectId}/archivedKra`)}>
                                         <img src={archiveIcon} alt="archiveIcon" />
                                     </IconButton>
                                     <Button size="small" variant="contained" onClick={() => setOpenKraReview(true)}>
                                         REVIEW
                                     </Button> */}
+                                    </Box>
+                                }
+                            </Box>
+
+                            {/* Tab panel for milestones */}
+                            <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
+                                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                                    {
+                                        _get(Project, 'milestones', []).map((item: any, index: number) => {
+                                            return (
+                                                <MilestoneCard index={index} milestone={item} openModal={(value1: any, value2: number) => selectMilestone(value1, value2)} />
+                                            )
+                                        })
+                                    }
                                 </Box>
-                            }
+                            </TabPanel>
+                            {/* Tab panel for KRA */}
+                            <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
+                                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                                    {
+                                        _get(Project, 'kra.results', []).map((item: any, index: number) => {
+                                            return (
+                                                <KraCard result={item} index={index} />
+                                            )
+                                        })
+                                    }
+                                </Box>
+                            </TabPanel>
                         </Box>
+                    }
 
-                        {/* Tab panel for milestones */}
-                        <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
-                            <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
-                                {
-                                    _get(Project, 'milestones', []).map((item: any, index: number) => {
-                                        return (
-                                            <MilestoneCard index={index} milestone={item} openModal={(value1: any, value2: number) => selectMilestone(value1, value2)} />
-                                        )
-                                    })
-                                }
-                            </Box>
-                        </TabPanel>
-                        {/* Tab panel for KRA */}
-                        <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
-                            <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
-                                {
-                                    _get(Project, 'kra.results', []).map((item: any, index: number) => {
-                                        return (
-                                            <KraCard result={item} index={index} />
-                                        )
-                                    })
-                                }
-                            </Box>
-                        </TabPanel>
-                    </Box>
-                }
+                    <TaskSection isHelpIconOpen={false} onlyProjects={true} isPreview={true} />
 
-                <TaskSection isHelpIconOpen={false} onlyProjects={true} isPreview={true} />
-
-                {/* <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
+                    {/* <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
 
                     <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                         <Typography sx={{ fontSize: '22px', fontWeight: '400', color: '#76808D' }}>Members</Typography>
@@ -590,7 +600,8 @@ export default () => {
                 </Box> */}
 
 
+                </Grid>
             </Grid>
-        </Grid>
+        </>
     )
 }
