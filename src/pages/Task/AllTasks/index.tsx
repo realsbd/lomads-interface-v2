@@ -307,7 +307,7 @@ export default () => {
                                         </Tabs>
                                     </Box>
                                     <Box display="flex" flexDirection="row" alignItems="center">
-                                        <LomadsIconButton>
+                                        <LomadsIconButton onClick={() => { navigate(`/${DAO.url}/archivedTasks`) }}>
                                             <img src={ArchiveIcon} />
                                         </LomadsIconButton>
                                         <Button onClick={() => setOpenCreateTask(true)} sx={{ ml: 2 }} size="small" variant="contained" color="secondary">
