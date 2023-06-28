@@ -13,7 +13,7 @@ export default () => {
     const { transformTask, transformWorkspace } = useTerminology(_get(DAO, 'terminologies', null))
     const daoName = _get(DAO, 'name', '').split(" ");
     return (
-        <div className="archive-container">
+        <div className="archive-container" style={{ height: 'calc(100vh - 80px)' }}>
 
             <div className="archive-header">
                 <div className="archive-heading-box">
@@ -26,7 +26,8 @@ export default () => {
                 </div>
             </div>
 
-            <div className="archive-body">
+            <div className="archive-body" style={{ overflow: 'hidden', height: '80vh', marginTop: 80, display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', flexWrap: 'wrap', overflow: 'hidden', overflowY: 'auto' }}>
                 {
                     DAO?.projects.map((item: any, index: number) => {
                         if (item.archivedAt !== null && item.deletedAt === null) {
@@ -42,6 +43,7 @@ export default () => {
                         else return null
                     })
                 }
+                </div>
             </div>
         </div>
     )

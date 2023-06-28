@@ -46,7 +46,7 @@ export default () => {
     }
 
     return (
-        <div className="archive-container">
+        <div className="archive-container" style={{ height: 'calc(100vh - 80px)' }}>
 
             <div className="archive-header">
                 <div className="archive-heading-box">
@@ -59,48 +59,50 @@ export default () => {
                 </div>
             </div>
 
-            <div className="archive-body" style={{ display: 'flex', flexDirection: 'column' }}>
-                {
-                    _get(Project, 'kra.tracker', []).map((item: any, index: number) => {
-                        return (
-                            <div className="accordion-wrapper" key={index}>
-                                <button className="accordion" onClick={() => handleAccordion(index)}>
-                                    <h1>{moment.unix(item.start).format("MM/DD/YYYY")}</h1>
-                                    <div>
-                                        <h1>{renderAverage(item.results)}%</h1>
-                                        <IoIosArrowForward size={20} color="#76808D" id={`arrow${index}`} />
-                                    </div>
-                                </button>
-                                <div className="panel" id={`panel${index}`} style={{ display: 'none' }}>
-                                    <>
-                                        {
-                                            item.results.map((_item: any, _index: number) => {
-                                                return (
-                                                    <div className="panel-div" key={_index}>
-                                                        <h1>{_item.name}</h1>
-                                                        <div className="progress-wrapper">
-                                                            <div style={{ flex: 1, maxWidth: 250 }}>
-                                                                <RangeSlider
-                                                                    defaultValue={_item.progress}
-                                                                    showThumb={false}
-                                                                    disabled={true}
-                                                                    onChange={({ value, color }: any) => {
-                                                                        console.log("hello : ", value, color);
-                                                                    }}
-                                                                />
+            <div className="archive-body" style={{ overflow: 'hidden', height: '80vh', marginTop: 80, display: 'flex', flexDirection: 'column' }}>
+                <div style={{ overflow: 'hidden', overflowY: 'auto', height: '100%' }}>
+                    {
+                        _get(Project, 'kra.tracker', []).map((item: any, index: number) => {
+                            return (
+                                <div className="accordion-wrapper" key={index}>
+                                    <button className="accordion" onClick={() => handleAccordion(index)}>
+                                        <h1>{moment.unix(item.start).format("MM/DD/YYYY")}</h1>
+                                        <div>
+                                            <h1>{renderAverage(item.results)}%</h1>
+                                            <IoIosArrowForward size={20} color="#76808D" id={`arrow${index}`} />
+                                        </div>
+                                    </button>
+                                    <div className="panel" id={`panel${index}`} style={{ display: 'none' }}>
+                                        <>
+                                            {
+                                                item.results.map((_item: any, _index: number) => {
+                                                    return (
+                                                        <div className="panel-div" key={_index}>
+                                                            <h1>{_item.name}</h1>
+                                                            <div className="progress-wrapper">
+                                                                <div style={{ flex: 1, maxWidth: 250 }}>
+                                                                    <RangeSlider
+                                                                        defaultValue={_item.progress}
+                                                                        showThumb={false}
+                                                                        disabled={true}
+                                                                        onChange={({ value, color }: any) => {
+                                                                            console.log("hello : ", value, color);
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                                <span className="progress-text">{_item.progress}% done</span>
                                                             </div>
-                                                            <span className="progress-text">{_item.progress}% done</span>
                                                         </div>
-                                                    </div>
-                                                )
-                                            })
-                                        }
-                                    </>
+                                                    )
+                                                })
+                                            }
+                                        </>
+                                    </div>
                                 </div>
-                            </div>
-                        )
-                    })
-                }
+                            )
+                        })
+                    }
+                </div>
             </div>
         </div>
     )

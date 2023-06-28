@@ -39,7 +39,7 @@ export default () => {
     }, [DAO]);
 
     return (
-        <div className="archive-container">
+        <div className="archive-container" style={{ height: 'calc(100vh - 80px)' }}>
 
             <div className="archive-header">
                 <div className="archive-heading-box">
@@ -52,19 +52,21 @@ export default () => {
                 </div>
             </div>
 
-            <div className="archive-body">
-                {
-                    archivedTasks && archivedTasks.map((item, index) => {
-                        return (
-                            <div key={index} style={{ marginBottom: '25px' }}>
-                                <TaskCard
-                                    task={item}
-                                    daoUrl={DAO?.url}
-                                />
-                            </div>
-                        )
-                    })
-                }
+            <div className="archive-body" style={{ overflow: 'hidden', height: '80vh', marginTop: 80, display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', flexWrap: 'wrap', overflow: 'hidden', overflowY: 'auto' }}>
+                    {
+                        archivedTasks && archivedTasks.map((item, index) => {
+                            return (
+                                <div key={index} style={{ marginBottom: '25px' }}>
+                                    <TaskCard
+                                        task={item}
+                                        daoUrl={DAO?.url}
+                                    />
+                                </div>
+                            )
+                        })
+                    }
+                </div>
             </div>
 
         </div>
