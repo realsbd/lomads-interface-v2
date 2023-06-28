@@ -10,7 +10,7 @@ export default ({ credit = false, executed = false, amount, token, fiatConversio
         <TableCell>
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 {!(isNaN(amount) || !token) ? <img style={{ width: 24, height: 24 }} src={credit ? CreditSvg : executed ? DebitExecutedSvg : DebitSvg} /> : <Box sx={{ width: 24, height: 24 }}></Box>}
-                <Typography style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 14, color: '#76808d', }} sx={{ width: 50 }} ml={1}>{isNaN(amount) || !token ? '-' : `${parseFloat(amount).toFixed(3)} ${token}`} <span style={{ fontSize: 10, color: "rgb(24, 140, 124)" }}>{ fiatConversion ? `($${ (+amount * +fiatConversion).toFixed(3) })` : '' }</span></Typography>
+                <Typography style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 14, color: '#76808d', }} sx={{ width: 50 }} ml={1}>{isNaN(amount) || !token ? '-' : `${parseFloat(amount).toFixed(3)} ${token}`} <span style={{ fontWeight: 400, fontSize: 10, color: "#76808D" }}>{ fiatConversion ? `($${ (+amount * +fiatConversion).toFixed(3) })` : '' }</span></Typography>
             </Box>
         </TableCell>
     )

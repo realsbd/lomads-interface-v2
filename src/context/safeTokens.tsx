@@ -78,7 +78,7 @@ export const SafeTokensProvider = ({ children }: any) => {
                     let total = tokens.reduce((a: any, b: any) => {
                         return a + parseFloat(_get(b, 'fiatBalance', 0))
                     }, 0);
-                    axiosHttp.post(`/safe/${safeAddress}/sync`, { tokens, balance: total, threshold: safe?.threshold })
+                    axiosHttp.post(`/safe/${safeAddress}/sync`, { owners: safe?.owners, tokens, balance: total, threshold: safe?.threshold })
                 }
                 return { [`${safeAddress}`]: tokens, owners: safe?.owners }
             })
