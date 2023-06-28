@@ -52,8 +52,7 @@ import editSvg from 'assets/svg/editToken.svg';
 import AddIcon from '@mui/icons-material/Add';
 
 import moment from "moment";
-import MilestoneDetailModal from "modals/Project/MilestoneDetailModal";
-import { Helmet } from "react-helmet";
+import MilestoneDetailModal from "modals/Project/MilestoneDetailModal"
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -333,13 +332,6 @@ export default () => {
 
     return (
         <>
-            <Helmet>
-                <meta charSet="utf-8" />
-                <title>{_get(Project, 'name')}</title>
-                <meta property="og:title" content={_get(Project, 'name')} />
-                <meta property="og:description" content={_get(Project, 'description')} />
-                <meta property="og:type" content="article" />
-            </Helmet>
             <Grid container className={classes.root}>
                 <Grid xs={12} item display="flex" flexDirection="column">
 
