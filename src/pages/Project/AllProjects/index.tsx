@@ -138,12 +138,12 @@ export default () => {
         if (!initialCheck) {
             setInitialCheck(true);
             let activeTab = 0
-            if (myProjects.length > 0) 
+            if (myProjects.length > 0)
                 activeTab = 0
-            else 
+            else
                 activeTab = 1
 
-            if(location?.state?.active)
+            if (location?.state?.active)
                 setTab(location?.state?.active)
             else
                 setTab(activeTab)
@@ -197,10 +197,10 @@ export default () => {
                                         </Tabs>
                                     </Box>
                                     <Box display="flex" flexDirection="row" alignItems="center">
-                                        <LomadsIconButton>
+                                        <LomadsIconButton onClick={() => navigate(`/${DAO.url}/archivedProjects`)}>
                                             <img src={ArchiveIcon} />
                                         </LomadsIconButton>
-                                        <Button sx={{ ml: 2 }} size="small" variant="contained" color="secondary">
+                                        <Button sx={{ ml: 2 }} size="small" variant="contained" color="secondary" onClick={() => navigate(`/${DAO.url}/project/create`)}>
                                             Create
                                         </Button>
                                     </Box>

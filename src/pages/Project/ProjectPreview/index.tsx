@@ -52,7 +52,9 @@ import editSvg from 'assets/svg/editToken.svg';
 import AddIcon from '@mui/icons-material/Add';
 
 import moment from "moment";
-import MilestoneDetailModal from "modals/Project/MilestoneDetailModal"
+import MilestoneDetailModal from "modals/Project/MilestoneDetailModal";
+//@ts-ignore
+import { Helmet } from "react-helmet";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -332,6 +334,13 @@ export default () => {
 
     return (
         <>
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>{_get(Project, 'name')}</title>
+                <meta property="og:title" content={_get(Project, 'name')} />
+                <meta property="og:description" content={_get(Project, 'description')} />
+                <meta property="og:type" content="article" />
+            </Helmet>
             <Grid container className={classes.root}>
                 <Grid xs={12} item display="flex" flexDirection="column">
 
@@ -374,25 +383,25 @@ export default () => {
                                 <Typography className={classes.nameText}>{_get(Project, 'name', '')}</Typography>
                             </Box>
                             <Box display="flex" alignItems="center">
-                                <Box
-                                    className={classes.iconContainer}
-                                    display="flex"
-                                    alignItems="center"
-                                    justifyContent={"center"}
-                                    sx={{ marginRight: '12px' }}
-                                    onClick={() => { setShowEdit(true) }}
-                                >
-                                    <img src={settingIcon} alt="setting-icon" />
-                                </Box>
-                                <Box
-                                    className={classes.iconContainer}
-                                    display="flex"
-                                    alignItems="center"
-                                    justifyContent={"center"}
-                                    onClick={handleClick}
-                                >
-                                    <img src={shareIcon} alt="share-icon" style={{ width: 18, height: 18 }} />
-                                </Box>
+                                {/* <Box
+                                className={classes.iconContainer}
+                                display="flex"
+                                alignItems="center"
+                                justifyContent={"center"}
+                                sx={{ marginRight: '12px' }}
+                                onClick={() => { setShowEdit(true) }}
+                            >
+                                <img src={settingIcon} alt="setting-icon" />
+                            </Box> */}
+                                {/* <Box
+                                className={classes.iconContainer}
+                                display="flex"
+                                alignItems="center"
+                                justifyContent={"center"}
+                                onClick={handleClick}
+                            >
+                                <img src={shareIcon} alt="share-icon" style={{ width: 18, height: 18 }} />
+                            </Box> */}
                                 <Menu
                                     anchorEl={anchorEl}
                                     open={open}
@@ -450,18 +459,18 @@ export default () => {
                     </Box>
 
                     {/* Links */}
-                    {
-                        _get(Project, 'links', []).length > 0 &&
-                        <Box display={"flex"} flexWrap={"wrap"} sx={{ width: '100%', marginBottom: '20px' }}>
-                            {
-                                _get(Project, 'links', []).map((item: any, index: number) => {
-                                    return (
-                                        <ProjectLinkCard key={index} link={item} />
-                                    )
-                                })
-                            }
-                        </Box>
-                    }
+                    {/* {
+                    _get(Project, 'links', []).length > 0 &&
+                    <Box display={"flex"} flexWrap={"wrap"} sx={{ width: '100%', marginBottom: '20px' }}>
+                        {
+                            _get(Project, 'links', []).map((item: any, index: number) => {
+                                return (
+                                    <ProjectLinkCard key={index} link={item} />
+                                )
+                            })
+                        }
+                    </Box>
+                } */}
 
                     {/* Milestones and KRA */}
                     {
@@ -511,12 +520,12 @@ export default () => {
                                     value === 1 &&
                                     <Box display={"flex"} alignItems={"center"}>
                                         <Typography sx={{ marginLeft: '14px', fontWeight: 400, color: '#76808D', marginRight: '100px' }}>Review frequency : {_get(Project, 'kra.frequency', [])}</Typography>
-                                        <IconButton sx={{ marginRight: '20px' }} onClick={() => navigate(`/${daoURL}/project/${projectId}/archivedKra`)}>
-                                            <img src={archiveIcon} alt="archiveIcon" />
-                                        </IconButton>
-                                        <Button size="small" variant="contained" onClick={() => setOpenKraReview(true)}>
-                                            REVIEW
-                                        </Button>
+                                        {/* <IconButton sx={{ marginRight: '20px' }} onClick={() => navigate(`/${daoURL}/project/${projectId}/archivedKra`)}>
+                                        <img src={archiveIcon} alt="archiveIcon" />
+                                    </IconButton>
+                                    <Button size="small" variant="contained" onClick={() => setOpenKraReview(true)}>
+                                        REVIEW
+                                    </Button> */}
                                     </Box>
                                 }
                             </Box>
@@ -548,47 +557,48 @@ export default () => {
                         </Box>
                     }
 
-                    <TaskSection isHelpIconOpen={false} onlyProjects={true} />
+                    <TaskSection isHelpIconOpen={false} onlyProjects={true} isPreview={true} />
 
-                    <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
+                    {/* <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
 
-                        <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                            <Typography sx={{ fontSize: '22px', fontWeight: '400', color: '#76808D' }}>Members</Typography>
-                            <Box display={"flex"} alignItems={"center"}>
-                                <img src={membersGroup} alt="membersGroup" />
-                                <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{Project?.members.length} {Project?.members.length > 1 ? 'members' : 'member'}</Typography>
-                                <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn}
-                                    onClick={() => setOpenInviteModal(true)}
-                                >
-                                    <AddIcon sx={{ fontSize: 18 }} /> MEMBER
-                                </Button>
-                            </Box>
-                        </Box>
-
-                        <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px', borderRadius: '5px', marginTop: '0.2rem' }} display={"flex"} flexDirection={"column"}>
-
-                            <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"}>
-                                <Box sx={{ width: '250px' }}>
-                                    <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5' }}>Name</Typography>
-                                </Box>
-                                <Box sx={{ width: '250px' }}>
-                                    <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5', marginLeft: '22px' }}>Joined</Typography>
-                                </Box>
-                            </Box>
-
-                            <Box sx={{ width: '100%', maxHeight: '220px', overflow: 'auto' }}>
-                                {_sortBy(_uniqBy(Project?.members, (m: any) => m.wallet.toLowerCase()), (m: any) => _get(m, 'name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
-                                    return (
-                                        <NameAndAvatar
-                                            index={index}
-                                            address={_get(result, 'wallet', '')}
-                                            position={index}
-                                        />
-                                    );
-                                })}
-                            </Box>
+                    <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                        <Typography sx={{ fontSize: '22px', fontWeight: '400', color: '#76808D' }}>Members</Typography>
+                        <Box display={"flex"} alignItems={"center"}>
+                            <img src={membersGroup} alt="membersGroup" />
+                            <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{Project?.members.length} {Project?.members.length > 1 ? 'members' : 'member'}</Typography>
+                            <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn}
+                                onClick={() => setOpenInviteModal(true)}
+                            >
+                                <AddIcon sx={{ fontSize: 18 }} /> MEMBER
+                            </Button>
                         </Box>
                     </Box>
+
+                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px', borderRadius: '5px', marginTop: '0.2rem' }} display={"flex"} flexDirection={"column"}>
+
+                        <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"}>
+                            <Box sx={{ width: '250px' }}>
+                                <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5' }}>Name</Typography>
+                            </Box>
+                            <Box sx={{ width: '250px' }}>
+                                <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5', marginLeft: '22px' }}>Joined</Typography>
+                            </Box>
+                        </Box>
+
+                        <Box sx={{ width: '100%', maxHeight: '220px', overflow: 'auto' }}>
+                            {_sortBy(_uniqBy(Project?.members, (m: any) => m.wallet.toLowerCase()), (m: any) => _get(m, 'name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
+                                return (
+                                    <NameAndAvatar
+                                        index={index}
+                                        address={_get(result, 'wallet', '')}
+                                        position={index}
+                                    />
+                                );
+                            })}
+                        </Box>
+                    </Box>
+                </Box> */}
+
 
                 </Grid>
             </Grid>

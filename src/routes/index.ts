@@ -9,8 +9,10 @@ import LoginPage from 'pages/Login';
 import DashboardPage from 'pages/Dashboard';
 import CreateProjectPage from 'pages/Project/CreateProject';
 import ProjectDetailsPage from 'pages/Project/ProjectDetails';
+import ProjectPreviewPage from 'pages/Project/ProjectPreview';
 import ProjectKRAPage from 'pages/Project/ProjectKRA';
 import TaskDetailsPage from 'pages/Task/TaskDetails';
+import TaskPreviewPage from 'pages/Task/TaskPreview';
 import AllTasksPage from 'pages/Task/AllTasks';
 import AllProjectsPage from 'pages/Project/AllProjects';
 import ArchivedProjectsPage from 'pages/Project/ArchiveProjects';
@@ -158,6 +160,13 @@ export default [
 		component: ProjectDetailsPage
 	},
 	{
+		path: '/share/:daoURL/project/:projectId/preview',
+		exact: true,
+		layout: DefaultLayout,
+		private: true,
+		component: ProjectPreviewPage
+	},
+	{
 		path: '/:daoURL/project/:projectId/archivedKra',
 		exact: true,
 		layout: DefaultFullWidthLayout,
@@ -212,5 +221,12 @@ export default [
 		layout: DefaultLayout,
 		private: true,
 		component: TaskDetailsPage
+	},
+	{
+		path: '/share/:daoURL/task/:taskId/preview',
+		exact: true,
+		layout: DefaultLayout,
+		private: true,
+		component: TaskPreviewPage
 	},
 ];

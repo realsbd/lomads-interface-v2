@@ -123,7 +123,7 @@ function a11yProps(index: number) {
     };
 }
 
-export default ({ isHelpIconOpen, onlyProjects }: any) => {
+export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
     const classes = useStyles();
     const { projectId } = useParams();
     const navigate = useNavigate();
@@ -140,6 +140,8 @@ export default ({ isHelpIconOpen, onlyProjects }: any) => {
     const [initialLoad, setInitialLoad] = useState<boolean>(true);
 
     const [openCreateTask, setOpenCreateTask] = useState<boolean>(false);
+
+    console.log("user : ", user)
 
     useEffect(() => {
         if (projectId && (!Project || (Project && Project._id !== projectId)))
@@ -261,7 +263,8 @@ export default ({ isHelpIconOpen, onlyProjects }: any) => {
                     />
                     <Tab label={`All ${transformTask().labelPlural}`} {...a11yProps(3)} />
                 </Tabs>
-
+                {
+                 !isPreview &&
                 <Box display={"flex"} alignItems={"center"}>
                 <BootstrapTooltip arrow open={isHelpIconOpen}
                         placement="top-start"
@@ -314,7 +317,7 @@ export default ({ isHelpIconOpen, onlyProjects }: any) => {
                     <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn} onClick={() => setOpenCreateTask(true)}>
                         <AddIcon sx={{ fontSize: 18 }} /> CREATE
                     </Button> */}
-                </Box>
+                </Box> }
             </Box>
             <Box style={{ position: "relative" }}>
                 <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
@@ -327,15 +330,34 @@ export default ({ isHelpIconOpen, onlyProjects }: any) => {
                         }
                         {
                             parsedTasks['myTask'] && parsedTasks['myTask'].filter((item, index) => index < 6).map((item, index) => {
+                                let currentDate = moment();
+                                let tempDate = moment(item.deadline);
+                                let diff = tempDate.diff(currentDate, 'days');
+
                                 if (index <= 4) {
-                                    return (
-                                        <Box key={index}>
-                                            <TaskCard
-                                                task={item}
-                                                daoUrl={DAO?.url}
-                                            />
-                                        </Box>
-                                    )
+                                    if (diff > -1) {
+                                        return (
+                                            <Box key={index}>
+                                                <TaskCard
+                                                    task={item}
+                                                    daoUrl={DAO?.url}
+                                                />
+                                            </Box>
+                                        )
+                                    }
+                                    else {
+                                        if (item.creator === user._id || _find(_get(item, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted')?.member.wallet === user.wallet) {
+                                            return (
+                                                <Box key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </Box>
+                                            )
+                                        }
+                                        else return null;
+                                    }
                                 }
                                 else {
                                     return (
@@ -364,15 +386,33 @@ export default ({ isHelpIconOpen, onlyProjects }: any) => {
                         }
                         {
                             parsedTasks['manage'] && parsedTasks['manage'].filter((item, index) => index < 6).map((item, index) => {
+                                let currentDate = moment();
+                                let tempDate = moment(item.deadline);
+                                let diff = tempDate.diff(currentDate, 'days');
                                 if (index <= 4) {
-                                    return (
-                                        <Box key={index}>
-                                            <TaskCard
-                                                task={item}
-                                                daoUrl={DAO?.url}
-                                            />
-                                        </Box>
-                                    )
+                                    if (diff > -1) {
+                                        return (
+                                            <Box key={index}>
+                                                <TaskCard
+                                                    task={item}
+                                                    daoUrl={DAO?.url}
+                                                />
+                                            </Box>
+                                        )
+                                    }
+                                    else {
+                                        if (item.creator === user._id || _find(_get(item, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted')?.member.wallet === user.wallet) {
+                                            return (
+                                                <Box key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </Box>
+                                            )
+                                        }
+                                        else return null;
+                                    }
                                 }
                                 else {
                                     return (
@@ -438,15 +478,33 @@ export default ({ isHelpIconOpen, onlyProjects }: any) => {
                         }
                         {
                             parsedTasks['allTasks'] && parsedTasks['allTasks'].filter((item, index) => index < 6).map((item, index) => {
+                                let currentDate = moment();
+                                let tempDate = moment(item.deadline);
+                                let diff = tempDate.diff(currentDate, 'days');
                                 if (index <= 4) {
-                                    return (
-                                        <Box key={index}>
-                                            <TaskCard
-                                                task={item}
-                                                daoUrl={DAO?.url}
-                                            />
-                                        </Box>
-                                    )
+                                    if (diff > -1) {
+                                        return (
+                                            <Box key={index}>
+                                                <TaskCard
+                                                    task={item}
+                                                    daoUrl={DAO?.url}
+                                                />
+                                            </Box>
+                                        )
+                                    }
+                                    else {
+                                        if (item.creator === user._id || _find(_get(item, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted')?.member.wallet === user.wallet) {
+                                            return (
+                                                <Box key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </Box>
+                                            )
+                                        }
+                                        else return null;
+                                    }
                                 }
                                 else {
                                     return (
