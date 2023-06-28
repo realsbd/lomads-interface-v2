@@ -14,6 +14,7 @@ import moment from "moment";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { deleteTaskAction } from "store/actions/task";
 import { useDAO } from "context/dao";
+import { IoWarningOutline } from 'react-icons/io5'
 
 const useStyles = makeStyles((theme: any) => ({
     taskCard: {
@@ -58,7 +59,6 @@ const useStyles = makeStyles((theme: any) => ({
     dateText: {
         fontSize: '14px !important',
         fontWeight: '700 !important',
-        color: '#76808D !important',
         lineHeight: '16px !important',
         marginLeft: '5px !important'
     },
@@ -112,6 +112,13 @@ export default ({ task, daoUrl }: CardProps) => {
         dispatch(deleteTaskAction({ taskId: _get(task, '_id', ''), daoUrl: _get(DAO, 'url', '') }));
     }
 
+    const diff = useMemo(() => {
+        let currentDate = moment();
+        let tempDate = moment(Task.deadline);
+
+        return tempDate.diff(currentDate, 'days')
+    }, [Task]);
+
     return (
         <>
             <Card
@@ -151,8 +158,23 @@ export default ({ task, daoUrl }: CardProps) => {
                                 {
                                     Task.deadline &&
                                     <Box display={"flex"} alignItems={"center"}>
-                                        <img src={calendarIcon} alt="calendarIcon" />
-                                        <Typography className={classes.dateText}>{moment(Task.deadline).fromNow()}</Typography>
+                                        {
+                                            diff <= 2
+                                                ?
+                                                <IoWarningOutline size={20} color="#C94B32" />
+                                                :
+                                                <img src={calendarIcon} alt="calendarIcon" />
+                                        }
+
+
+                                        {
+                                            diff <= 2
+                                                ?
+                                                <Typography className={classes.dateText} sx={{ color: '#c94B32' }}>{diff} {diff === 1 ? 'day' : 'days'}</Typography>
+                                                :
+                                                <Typography className={classes.dateText} sx={{ color: '#76808D', }}>{moment(Task.deadline).fromNow()}</Typography>
+                                        }
+
                                     </Box>
                                 }
                             </Box>

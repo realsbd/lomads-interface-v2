@@ -123,7 +123,7 @@ function a11yProps(index: number) {
     };
 }
 
-export default ({ isHelpIconOpen, onlyProjects }: any) => {
+export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
     const classes = useStyles();
     const { projectId } = useParams();
     const navigate = useNavigate();
@@ -262,21 +262,24 @@ export default ({ isHelpIconOpen, onlyProjects }: any) => {
                     <Tab label={`All ${transformTask().labelPlural}`} {...a11yProps(3)} />
                 </Tabs>
 
-                <Box display={"flex"} alignItems={"center"}>
-                    <IconButton onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { active: value } }) : navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }} sx={{ marginRight: '20px' }}>
-                        <img src={expandIcon} alt="archive-icon" />
-                    </IconButton>
-                    <IconButton
-                        sx={{ marginRight: '20px' }}
-                        onClick={() => { onlyProjects ? navigate(`/${DAO.url}/archivedTasks/${Project._id}`) : navigate(`/${DAO.url}/archivedTasks`) }}
-                        disabled={_get(DAO, 'tasks', []).filter((task: any) => !task.deletedAt && task.archivedAt).length > 0 ? false : true}
-                    >
-                        <img src={archiveIcon} alt="archiveIcon" />
-                    </IconButton>
-                    <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn} onClick={() => setOpenCreateTask(true)}>
-                        <AddIcon sx={{ fontSize: 18 }} /> CREATE
-                    </Button>
-                </Box>
+                {
+                    !isPreview &&
+                    <Box display={"flex"} alignItems={"center"}>
+                        <IconButton onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { active: value } }) : navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }} sx={{ marginRight: '20px' }}>
+                            <img src={expandIcon} alt="archive-icon" />
+                        </IconButton>
+                        <IconButton
+                            sx={{ marginRight: '20px' }}
+                            onClick={() => { onlyProjects ? navigate(`/${DAO.url}/archivedTasks/${Project._id}`) : navigate(`/${DAO.url}/archivedTasks`) }}
+                            disabled={_get(DAO, 'tasks', []).filter((task: any) => !task.deletedAt && task.archivedAt).length > 0 ? false : true}
+                        >
+                            <img src={archiveIcon} alt="archiveIcon" />
+                        </IconButton>
+                        <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn} onClick={() => setOpenCreateTask(true)}>
+                            <AddIcon sx={{ fontSize: 18 }} /> CREATE
+                        </Button>
+                    </Box>
+                }
             </Box>
             <Box style={{ position: "relative" }}>
                 <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
