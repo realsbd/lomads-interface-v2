@@ -187,7 +187,45 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
-                    <IconButton onClick={() => navigate(`/${DAO.url}/projects`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
+                <BootstrapTooltip arrow open={isHelpIconOpen}
+                        placement="top-start"
+                        title="Open">
+                        <span>
+                            <IconButton
+                            style={{
+                                ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {}),
+                            }}
+                            onClick={() => navigate(`/${DAO.url}/projects`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
+                                <img src={expandIcon} alt="archive-icon" />
+                            </IconButton>
+                        </span>
+                    </BootstrapTooltip>
+                    <BootstrapTooltip arrow open={isHelpIconOpen}
+                        placement="bottom"
+                        title="Archives">
+                        <span>
+                            <IconButton onClick={() => navigate(`/${DAO.url}/archivedProjects`)} sx={{
+                                marginRight: '20px',
+                                ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {}),
+                            }}>
+                                <img src={archiveIcon} alt="archiveIcon" />
+                            </IconButton>
+                        </span>
+                    </BootstrapTooltip>
+                    <BootstrapTooltip arrow open={isHelpIconOpen}
+                        placement="top-start"
+                        title="Create Workspace">
+                            <span>
+                                <Button
+                                    style={{
+                                        ...( isHelpIconOpen ? { zIndex: 1500, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {})
+                                    }}
+                                    size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/project/create`)}>
+                                    <AddIcon sx={{ fontSize: 18 }} /> CREATE
+                                </Button>
+                            </span>
+                    </BootstrapTooltip>
+                    {/* <IconButton onClick={() => navigate(`/${DAO.url}/projects`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
                         <img src={expandIcon} alt="archive-icon" />
                     </IconButton>
                     <IconButton
@@ -199,7 +237,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
                     </IconButton>
                     <Button size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/project/create`)}>
                         <AddIcon sx={{ fontSize: 18 }} /> CREATE
-                    </Button>
+                    </Button> */}
                 </Box>
             </Box>
 

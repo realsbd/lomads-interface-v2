@@ -24,7 +24,7 @@ export default ({ variant, milestones }) => {
     return (
         <ProgressBar
             percent={(parseFloat((milestones.filter((item) => item.complete === true).length) / (milestones.length)) * 100).toFixed(2)}
-            filledBackground={variant === 'primary' ? "#76808D" : "#188C7C"}
+            filledBackground={"#188C7C"}
             unfilledBackground="#F0F0F0"
             height="5px"
         >

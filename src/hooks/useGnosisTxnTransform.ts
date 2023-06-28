@@ -142,7 +142,7 @@ export default () => {
                                 const erc20Token: any = getERC20Token(_get(decoded, 'to', '0x'), safeAddress);
                                 const parameters = _get(decoded, 'dataDecoded.parameters');
                                 const to = _get(_find(parameters, p => p.name === 'to'), 'value', '0x')
-                                const value = _get(_find(parameters, p => p.name === 'value'), 'value', 0)
+                                const value = _get(_find(parameters, p => p.name === 'value'), 'value', '0x')
                         
                                 op.push({
                                     txHash: _get(transaction, 'txHash', ''),
@@ -210,7 +210,7 @@ export default () => {
             }
         } else {
             const to = _get(_find(_get(transaction, 'dataDecoded.parameters'), p => p.name === 'to'), 'value', '0x')
-            const value = _get(_find(_get(transaction, 'dataDecoded.parameters'), p => p.name === 'value'), 'value', 0)
+            const value = _get(_find(_get(transaction, 'dataDecoded.parameters'), p => p.name === 'value'), 'value',  '0x')
       
             return [{
                 txHash: _get(transaction, 'txHash', ''),
@@ -254,7 +254,7 @@ export default () => {
         const canRejectTxn = transaction?.rejectedTxn && _get(transaction, 'rejectedTxn.confirmationsRequired', _get(safe, 'threshold', 0)) === (_get(transaction, 'rejectedTxn.confirmations', [])?.length || 0)
         const parameters = _get(transaction, 'dataDecoded.parameters');
         const to = _get(_find(parameters, p => p.name === 'to'), 'value', '0x')
-        const value = _get(_find(parameters, p => p.name === 'value'), 'value', 0)
+        const value = _get(_find(parameters, p => p.name === 'value'), 'value', '0x')
         let op = [];
         op.push({
             txHash: _get(transaction, 'txHash', ''),
@@ -323,10 +323,12 @@ export default () => {
 
     const transformEthTxn = (transaction: any, safeAddress: string) => {
         const safe = loadSafe(safeAddress)
-        const erc20Token: any = getERC20Token(_get(transaction, 'transfers[0].tokenAddress', '0x'), safeAddress);
+        let tokenAddress = _get(transaction, 'transfers[0].tokenAddress', null) ? _get(transaction, 'transfers[0].tokenAddress', null) : process.env.REACT_APP_NATIVE_TOKEN_ADDRESS
+        const erc20Token: any = getERC20Token(tokenAddress, safeAddress);
         if(!erc20Token)
             return [];
-        const value = _get(transaction, 'transfers[0].value', '0')
+        const decimals = _get(transaction, 'transfers[0].tokenInfo.decimals', null) ? _get(transaction, 'transfers[0].tokenInfo.decimals', null) : (erc20Token?.token?.decimals ||  erc20Token?.token?.decimal)
+        const value = _get(transaction, 'transfers[0].value', '0x')
         return [{
             txHash: _get(transaction, 'txHash', ''),
             transactionHash: _get(transaction, 'transactionHash', ''),
@@ -335,11 +337,11 @@ export default () => {
             nonce: _get(transaction, 'nonce', 0),
             offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
             value: value,
-            formattedValue: _get(transaction, 'transfers[0].tokenInfo.decimals', null) || (erc20Token?.token?.decimals || erc20Token?.token?.decimal) > 0  ? (+value / ( 10 ** _get(transaction, 'transfers[0].tokenInfo.decimals', null) || (erc20Token?.token?.decimals || erc20Token?.token?.decimal) )) : +value,
+            formattedValue: decimals > 0  ? (+value / ( 10 ** decimals  )) : +value,
             symbol: _get(transaction, 'transfers[0].tokenInfo.symbol', null) || erc20Token?.token?.symbol,
-            decimals: _get(transaction, 'transfers[0].tokenInfo.decimals', null),
+            decimals: decimals,
             tokenAddress: erc20Token?.tokenAddress || transaction?.token?.tokenAddress,
-            to: _get(transaction, 'to', "0x"),
+            to: _get(transaction, 'from', null) ? _get(transaction, 'from', null) : _get(transaction, 'to', "0x"),
             confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
             confirmations: _get(transaction, 'confirmations', [])?.length || 0,
             hasMyConfirmation: false,

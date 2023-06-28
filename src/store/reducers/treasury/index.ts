@@ -29,28 +29,34 @@ const TreasuryReducer = (state: any = getInitialState(), action: any) =>
         case actionTypes.APPEND_TREASURY_TRANSACTION: {
             let ptx: any = [ ...state.treasury, payload ];
             ptx = _map(ptx, (p: any) => {
-              let matchTx = _find(ptx, px => px.safeAddress === p.safeAddress && (px.rawTx.nonce === p.rawTx.nonce && px.rawTx.isExecuted));
-                console.log("matchTx", matchTx, p)
-                if (matchTx) {
-                    if(matchTx?.rawTx?.isExecuted)
-                        return { ...p, rawTx : matchTx?.rawTx }
-                }
-                return p
+              if(p.rawTx.nonce) {
+                  let matchTx = _find(ptx, px => px.safeAddress === p.safeAddress && (px.rawTx.nonce === p.rawTx.nonce && px.rawTx.isExecuted));
+                  console.log("matchTx", matchTx, p)
+                  if (matchTx) {
+                      if(matchTx?.rawTx?.isExecuted)
+                          return { ...p, rawTx : matchTx?.rawTx }
+                  }
+              }
+              return p
             })
             ptx = _map(ptx, (p: any) => {
-              let matchRejTx = _find(ptx, px => px.safeAddress === p.safeAddress && (px.rawTx.nonce === p.rawTx.nonce && px.rawTx.data === null && px.rawTx.value === "0"));
-                if (matchRejTx) {
-                    if(matchRejTx?.rawTx?.isExecuted) {
-                        return { ...p, rawTx : matchRejTx?.rawTx }
-                    }
-                    return { ...p, rawTx : { ...p.rawTx, rejectedTxn: matchRejTx?.rawTx }  }
-                }
-                return p
+              if(p.rawTx.nonce) {
+                  let matchRejTx = _find(ptx, px => px.safeAddress === p.safeAddress && (px.rawTx.nonce === p.rawTx.nonce && px.rawTx.data === null && px.rawTx.value === "0"));
+                  if (matchRejTx) {
+                      if(matchRejTx?.rawTx?.isExecuted) {
+                          return { ...p, rawTx : matchRejTx?.rawTx }
+                      }
+                      return { ...p, rawTx : { ...p.rawTx, rejectedTxn: matchRejTx?.rawTx }  }
+                  }
+              }
+              return p
             })
             ptx = _filter(ptx, p => {
-                let matchRejTx = _find(ptx, px => px.safeAddress === p.safeAddress && (px.rawTx.nonce === p.rawTx.nonce && px.rawTx.data === null && px.rawTx.value === "0"));
-                if (matchRejTx)
-                    return matchRejTx.rawTx.safeTxHash !== p.rawTx.safeTxHash
+              if(p.rawTx.nonce){
+                    let matchRejTx = _find(ptx, px => px.safeAddress === p.safeAddress && (px.rawTx.nonce === p.rawTx.nonce && px.rawTx.data === null && px.rawTx.value === "0"));
+                    if (matchRejTx)
+                        return matchRejTx.rawTx.safeTxHash !== p.rawTx.safeTxHash
+                }
                 return true
             })
             ptx = _filter(ptx, p => !p.rawTx.dataDecoded || (_get(p, 'rawTx.dataDecoded.method', '') === 'multiSend' || _get(p, 'rawTx.dataDecoded.method', '') === 'transfer' || _get(p, 'rawTx.dataDecoded.method', '') === 'addOwnerWithThreshold' || _get(p, 'rawTx.dataDecoded.method', '') === 'removeOwner' || _get(p, 'rawTx.dataDecoded.method', '') === 'changeThreshold'))
@@ -78,6 +84,14 @@ const TreasuryReducer = (state: any = getInitialState(), action: any) =>
                   } }
               }
               return txn
+            })
+            ptx = _filter(ptx, p => {
+              if(p.rawTx.nonce){
+                    let matchRejTx = _find(ptx, px => px.safeAddress === p.safeAddress && (px.rawTx.nonce === p.rawTx.nonce && px.rawTx.data === null && px.rawTx.value === "0"));
+                    if (matchRejTx)
+                        return matchRejTx.rawTx.safeTxHash !== p.rawTx.safeTxHash
+                }
+                return true
             })
             ptx = _orderBy(ptx, [p => p?.rawTx?.isExecuted, p => p?.rawTx?.offChain, p => p?.rawTx?.executionDate, p => p?.rawTx?.nonce], ['asc', 'asc', 'desc','asc'])
             draft.treasury = ptx

@@ -1,5 +1,5 @@
-import React from "react"
-import { Grid, Box, Typography, Paper, Chip, FormControl, FormLabel } from "@mui/material"
+import React, { useMemo } from "react"
+import { Grid, Box, Typography, Paper, Chip, FormControl, FormLabel, MenuItem } from "@mui/material"
 import clsx from "clsx"
 import { get as _get, find as _find } from 'lodash'
 import SBT_SVG from 'assets/svg/sbt.svg'
@@ -289,8 +289,13 @@ export default () => {
             err['logo'] = "Please upload image"
         
         if(stateX.priced) {
-            if (!stateX?.treasury || stateX?.treasury === '')
-                err['treasury'] = "Enter valid treasury"
+            if(stateX?.treasury !== 'other') {
+                if (!stateX?.treasury || stateX?.treasury === '')
+                    err['treasury'] = "Enter valid treasury"
+            } else {
+                if (!stateX?.treasuryOther || stateX?.treasuryOther === '')
+                    err['treasuryOther'] = "Enter valid treasury"
+            }
         }
 
         if (Object.keys(err).length > 0)
@@ -311,7 +316,7 @@ export default () => {
                     symbol: stateX?.symbol,
                     mintPrice: `${stateX?.price?.value}`,
                     mintToken: stateX?.price?.token,
-                    treasury: stateX?.treasury,
+                    treasury: stateX?.treasury && stateX?.treasury === 'other' ? stateX?.treasuryOther : stateX?.treasury,
                     whitelisted: stateX?.whitelisted ? 1 : 0,
                 }
     
@@ -327,7 +332,7 @@ export default () => {
                         admin: account,
                         version: 2,
                         master: _get(SBT_DEPLOYER_ADDRESSES, chainId, null),
-                        treasury: stateX?.treasury,
+                        treasury: stateX?.treasury && stateX?.treasury === 'other' ? stateX?.treasuryOther : stateX?.treasury,
                         mintPrice: `${stateX?.price?.value}`,
                         mintPriceToken: `${stateX?.price?.token}`,
                         whitelisted: stateX?.whitelisted,
@@ -425,6 +430,22 @@ export default () => {
             })
         }
     }
+
+    const availableSafes = useMemo(() => {
+        if(DAO?.safes) {
+            return DAO?.safes?.filter((safe:any) => safe?.chainId === stateX?.selectedChainId)
+        }
+        return []
+    }, [DAO?.safes, stateX?.selectedChainId])
+
+    useEffect(() => {
+        if(stateX.priced){
+            if(availableSafes && availableSafes.length > 0)
+                setStateX((prev: any) => { return { ...prev, treasury: availableSafes[0].address } })
+            else 
+                setStateX((prev: any) => { return { ...prev, treasury: 'other'} })
+        }
+    }, [availableSafes, stateX.priced])
 
     return (
         <Grid container className={classes.root}>
@@ -555,14 +576,28 @@ export default () => {
                                     </Box> : null
                             }
                             {stateX['priced'] &&
-                                <TextInput value={stateX?.treasury}
-                                    error={errors['treasury']}
-                                    helperText={errors['treasury']}
+                            <Box>
+                                { availableSafes && availableSafes.length > 0 ? <TextInput fullWidth label="Multi-sig Wallet" select style={{  minWidth: 200 }} value={stateX?.treasury}
+                                    onChange={(e:any) => setStateX((prev: any) => { return { ...prev, treasury: e.target.value } })}>
+                                    {
+                                        availableSafes?.map((_o:any) => {
+                                            return (
+                                                <MenuItem key={_o.address} value={_o.address}>{ `${_o?.name || 'Multi-sig wallet'}(${beautifyHexToken(_o?.address)})` }</MenuItem>
+                                            )
+                                        })
+                                    }
+                                    <MenuItem key='other' value='other'>Other</MenuItem>
+                                </TextInput> : null }
+                                { stateX?.treasury && stateX?.treasury === 'other' && <TextInput value={stateX?.treasuryOther}
+                                    error={errors['treasuryOther']}
+                                    helperText={errors['treasuryOther']}
+                                    label={availableSafes.length == 0 ? 'Multi-sig Wallet' : undefined}
                                     onChange={(e: any) => {
                                         setErrors({})
-                                        setStateX((prev: any) => { return { ...prev, treasury: e.target.value } })
+                                        setStateX((prev: any) => { return { ...prev, treasuryOther: e.target.value } })
                                     }}
-                                    placeholder="Multi-sig Wallet address" sx={{ my: 1 }} fullWidth label="Multi-sig Wallet" />
+                                    placeholder="Multi-sig Wallet address" sx={{ my: 1 }} fullWidth /> }
+                            </Box>
                             }
                             <Button sx={{ mt: 2 }} onClick={() => handleSetPreview()} fullWidth size="small" variant='contained'>Next</Button>
                         </Paper>

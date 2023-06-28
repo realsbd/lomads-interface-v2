@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme: any) => ({
         justifyContent: "center",
         color: "#FFFFFF",
         backgroundColor: "#76808D",
-        zIndex: 1401,
+        zIndex: 1200,
         width: "100% !important",
         height: "100% !important",
         opacity: 0.8,
