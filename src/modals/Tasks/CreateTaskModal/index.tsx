@@ -182,11 +182,12 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     }, [selectedProject, open])
 
     useEffect(() => {
-        if (DAO?.url)
+        if(DAO?.url && safeTokens)
             setSafeAddress(_get(activeSafes, '[0].address'))
-        if (user)
-            setReviewer(user?._id)
-    }, [DAO?.url, user])
+            handleChangeCurrency(_get(_get(safeTokens, _get(activeSafes, '[0].address'), []), '[0].tokenAddress', 'SWEAT'))
+            if(user)
+                setReviewer(user?._id) 
+    }, [DAO?.url, user, safeTokens])
 
     const [errorName, setErrorName] = useState('');
     const [errorDesc, setErrorDesc] = useState('');
@@ -222,12 +223,12 @@ export default ({ open, closeModal, selectedProject }: Props) => {
         }
     }, [createTaskLoading, draftTaskLoading]);
 
-    useEffect(() => {
-        if (user)
-            setReviewer(user?._id)
+    useEffect(() => { 
+        if (user) 
+            setReviewer(user?._id) 
         else
             dispatch(createAccountAction({}))
-    }, [user])
+        },[user])
 
     const eligibleContributors = useMemo(() => {
         return _get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id && m.deletedAt === null)
@@ -303,13 +304,13 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     }
 
     const handleCreateTask = () => {
+        console.log(safeAddress, currency)
         if (name === '') {
             setErrorName('Enter name');
             let e = document.getElementById('error-name');
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             }
-            alert("name")
             return;
         }
         else if (desc === '') {
@@ -318,7 +319,6 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             }
-            alert("desc")
             return;
         }
         else if (dchannel && !isValidUrl(dchannel)) {
@@ -327,7 +327,6 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             }
-            alert("dchannel")
             return;
         }
         else if (deadline === '') {
@@ -336,7 +335,6 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             }
-            alert("deadline")
             return;
         }
         else if (subLink && !isValidUrl(subLink)) {
@@ -345,7 +343,6 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             }
-            alert("sublink")
             return;
         }
         else if (contributionType === 'assign' && selectedUser === null) {
@@ -354,7 +351,6 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             }
-            alert("select applicant")
             return;
         }
         else if (currency === '') {
@@ -363,7 +359,6 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             }
-            alert("currency")
             return;
         }
         else if (amount === 0) {
@@ -372,7 +367,6 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             }
-            alert("amount")
             return;
         }
         else if (reviewer === null) {
@@ -381,7 +375,6 @@ export default ({ open, closeModal, selectedProject }: Props) => {
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             }
-            alert("reviewer")
             return;
         }
         else {

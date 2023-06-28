@@ -177,7 +177,7 @@ export default ({ task, daoUrl }: CardProps) => {
                                                             :
                                                             diff < 0
                                                                 ?
-                                                                <Typography className={classes.dateText} sx={{ color: '#c94B32' }}>Deadline passed {Math.abs(diff)} {diff === -1 ? 'day ago' : 'days ago'}</Typography>
+                                                                <Typography className={classes.dateText} sx={{ color: '#c94B32' }}>Deadline passed</Typography>
                                                                 :
                                                                 <Typography className={classes.dateText} sx={{ color: '#c94B32' }}>{diff} {diff === 1 ? 'day' : 'days'}</Typography>
                                                     }

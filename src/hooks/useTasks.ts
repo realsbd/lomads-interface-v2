@@ -6,6 +6,7 @@ import { useWeb3Auth } from 'context/web3Auth';
 import { useAppSelector } from 'helpers/useAppSelector';
 import { useDAO } from 'context/dao';
 import { createAccountAction } from 'store/actions/session';
+const { toChecksumAddress } = require('ethereum-checksum-address')
 
 export default (rawTasks: Array<any>) => {
     const dispatch = useAppDispatch()
@@ -71,6 +72,16 @@ export default (rawTasks: Array<any>) => {
         }
         return 0;
     };
+
+    const amIApproved = (task: any) =>
+        _find(_get(task, 'members', []), m => toChecksumAddress(_get(m, 'member.wallet', '')) === toChecksumAddress(account) && m.status === 'approved')
+
+    const isDeadlinePassed = (task:any) => {
+        if(task)
+            if(moment().isAfter(moment(task.deadline)))
+                return true
+        return false
+    }
     
     const parsedTasks = useMemo(() => {
         if(account && user) {
@@ -90,8 +101,10 @@ export default (rawTasks: Array<any>) => {
             manage = _orderBy(manage, ['notification', mt => moment(mt.updatedAt).unix()], ['desc', 'desc'])
      
             let myTask = _orderBy(_filter(tasks, tsk => {
+                console.log(tsk?.name, "isDeadlinePassed", tsk.deadline, isDeadlinePassed(tsk))
                 console.log(tsk?.name, canApply(tsk))
-                return tsk.reviewer !== user._id && 
+                return tsk.reviewer !== user._id 
+                && (!isDeadlinePassed(tsk) || amIApproved(tsk)) &&
                 (canApply(tsk) ||
                 ( 
                     tsk.contributionType === 'open' && tsk.isSingleContributor && !isOthersApproved(tsk) ||
@@ -100,7 +113,7 @@ export default (rawTasks: Array<any>) => {
                 ))
             }), (mt: any) => moment(mt.updatedAt).unix(), 'desc');
             let drafts = rawTasks.filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && (task.creator === user._id || task.provider === 'Github' || task.provider === 'Trello'))
-            let allTasks = _uniqBy([...manage, ...tasks], t => t._id)
+            let allTasks = _orderBy(_uniqBy([...manage, ...(tasks.filter(tsk => (!isDeadlinePassed(tsk) || amIApproved(tsk))))], t => t._id), t => t.createdAt, ['desc'])
             return { tasks, manage, myTask, drafts, allTasks  }
         }
         return { tasks: [], manage: [], myTask: [], drafts: [], allTasks: [] }
