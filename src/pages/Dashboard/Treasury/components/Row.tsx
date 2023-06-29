@@ -97,7 +97,7 @@ export default ({ transaction, executableNonce }: any) => {
             {
                 txn.map((tx: any, _i: number) => (
                     <TableRow>
-                        <CreditDebit credit={tx?.isCredit} fiatConversion={_get(transaction, `metadata.${tx?.to}.fiatConversion`, undefined)} executed={tx?.executionDate} amount={tx?.formattedValue} token={tx?.symbol} />
+                        <CreditDebit credit={tx?.isCredit} fiatConversion={ tx?.executionDate ? _get(transaction, `metadata.${tx?.to}.fiatConversion`, undefined) : _get(tx, 'fiatConversion', undefined)} executed={tx?.executionDate} amount={tx?.formattedValue} token={tx?.symbol} />
                         <Label transaction={transaction} recipient={tx?.to} />
                         <Recipient safeAddress={transaction?.safeAddress} credit={tx?.isCredit} recipient={tx?.to} token={tx?.symbol} />
                         <Tag transaction={transaction} recipient={tx?.to} />

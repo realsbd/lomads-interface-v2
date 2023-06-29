@@ -25,7 +25,7 @@ export default () => {
 
     const getNativeToken = (safeAddress: string) => {
         const token = _find(_get(safeTokens, safeAddress, []),  st => _get(st, 'tokenAddress', '0x') === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS || _get(st, 'tokenAddress', '0x') === '0x0000000000000000000000000000000000001010')
-        return { ...token?.token, tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS }
+        return { ...token, ...token?.token, tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS }
     }
 
     const isNativeTokenSingleTransfer = (transaction: any) => {
@@ -77,6 +77,7 @@ export default () => {
             symbol: nativeToken?.symbol,
             tokenAddress: nativeToken?.tokenAddress || transaction?.token?.tokenAddress,
             decimals: nativeToken?.decimals,
+            fiatConversion: nativeToken?.fiatConversion,
             to: _get(transaction, 'to', "0x"),
             confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
             confirmations: _get(transaction, 'confirmations', [])?.length || 0,
@@ -96,6 +97,7 @@ export default () => {
     const transformMultiOpeartion = (transaction: any, labels: any, safeAddress: string) => {
         const safe = loadSafe(safeAddress)
         const nativeToken = getNativeToken(safeAddress);
+        console.log("NATIVE_TOKEN", nativeToken)
         if(!nativeToken)
             return [];
         const hasMyConfirmation = _find(transaction.confirmations, (c:any) => c?.owner === account)
@@ -124,6 +126,7 @@ export default () => {
                                     symbol: nativeToken?.symbol,
                                     tokenAddress: nativeToken?.tokenAddress || transaction?.token?.tokenAddress,
                                     decimals: nativeToken?.decimals,
+                                    fiatConversion: nativeToken?.fiatConversion,
                                     to: _get(decoded, 'to', "0x"),
                                     confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
                                     confirmations: _get(transaction, 'confirmations', [])?.length || 0,
@@ -156,6 +159,7 @@ export default () => {
                                     symbol: erc20Token?.token?.symbol || transaction?.token?.symbol,
                                     tokenAddress: erc20Token?.tokenAddress || transaction?.token?.tokenAddress,
                                     decimals: erc20Token?.token?.decimal || erc20Token?.token?.decimals || 18,
+                                    fiatConversion: erc20Token?.fiatConversion,
                                     to: to,
                                     confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
                                     confirmations: _get(transaction, 'confirmations', [])?.length || 0,
@@ -192,6 +196,7 @@ export default () => {
                         symbol: allowanceToken?.token?.symbol,
                         tokenAddress: allowanceToken?.tokenAddress || transaction?.token?.tokenAddress,
                         decimals: (allowanceToken?.token?.decimal || allowanceToken?.token?.decimals),
+                        fiatConversion: allowanceToken?.fiatConversion,
                         to: to,
                         confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
                         confirmations: _get(transaction, 'confirmations', [])?.length || 0,
@@ -211,7 +216,7 @@ export default () => {
         } else {
             const to = _get(_find(_get(transaction, 'dataDecoded.parameters'), p => p.name === 'to'), 'value', '0x')
             const value = _get(_find(_get(transaction, 'dataDecoded.parameters'), p => p.name === 'value'), 'value',  '0x')
-      
+            const token: any = getERC20Token(transaction?.token?.tokenAddress, safeAddress)
             return [{
                 txHash: _get(transaction, 'txHash', ''),
                 transactionHash: _get(transaction, 'transactionHash', ''),
@@ -224,6 +229,7 @@ export default () => {
                 symbol: transaction?.token?.symbol || nativeToken?.symbol,
                 decimals: transaction?.token?.decimals || transaction?.token?.decimal || 18,
                 tokenAddress: transaction?.token?.tokenAddress,
+                fiatConversion: token?.fiatConversion,
                 to: to,
                 confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
                 confirmations: _get(transaction, 'confirmations', [])?.length || 0,
@@ -268,6 +274,7 @@ export default () => {
             symbol: erc20Token?.token?.symbol || transaction?.token?.symbol,
             decimals: erc20Token?.token?.decimal || erc20Token?.token?.decimals,
             tokenAddress: erc20Token?.tokenAddress || transaction?.token?.tokenAddress,
+            fiatConversion: erc20Token?.fiatConversion,
             to: to,
             confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
             confirmations: _get(transaction, 'confirmations', [])?.length || 0,
@@ -303,6 +310,7 @@ export default () => {
             formattedValue: "0",
             symbol: "",
             decimals: "",
+            fiatConversion: null,
             tokenAddress: "0x",
             to: "0x",
             confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
@@ -340,6 +348,7 @@ export default () => {
             formattedValue: decimals > 0  ? (+value / ( 10 ** decimals  )) : +value,
             symbol: _get(transaction, 'transfers[0].tokenInfo.symbol', null) || erc20Token?.token?.symbol,
             decimals: decimals,
+            fiatConversion: erc20Token?.fiatConversion,
             tokenAddress: erc20Token?.tokenAddress || transaction?.token?.tokenAddress,
             to: _get(transaction, 'from', null) ? _get(transaction, 'from', null) : _get(transaction, 'to', "0x"),
             confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),

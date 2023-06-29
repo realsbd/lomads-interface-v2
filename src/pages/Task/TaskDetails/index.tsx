@@ -615,7 +615,7 @@ export default () => {
                             {
                                 (amICreator || can(myRole, 'task.share')) && (Task.isDummy === false) &&
                                 <>
-                                    <Box
+                                    {/* <Box
                                         className={classes.iconContainer}
                                         display="flex"
                                         alignItems="center"
@@ -623,7 +623,7 @@ export default () => {
                                         onClick={handleClick}
                                     >
                                         <img src={shareIcon} alt="share-icon" style={{ width: 18, height: 18 }} />
-                                    </Box>
+                                    </Box> */}
                                     <Menu
                                         anchorEl={anchorEl}
                                         open={open}
