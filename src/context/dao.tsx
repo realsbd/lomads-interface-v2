@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { get as _get, find as _find } from 'lodash'
 import { createContext, useContext } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import axiosHttp from 'api'
 import { useWeb3Auth } from './web3Auth';
 import { useAppSelector } from 'helpers/useAppSelector';
@@ -25,6 +25,8 @@ export function useDAO() {
 export const DAOProvider = ({ privateRoute = false, children }: any) => {
   const { account, provider } = useWeb3Auth();
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const from = searchParams.get("from")
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   //@ts-ignore
@@ -48,8 +50,12 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }
   
   useEffect(() => {
-    if(!token)
-      navigate(`/login`)
+    if(!token && window.location.pathname !== '/login'){
+      if (window.location.pathname !== '/')
+        window.location.href = `/login?from=${window.location.pathname}`
+      else
+        window.location.href = `/login`
+    }
   }, [token])
 
   useEffect(() => {
@@ -68,12 +74,13 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
 
   useEffect(() => {
     if (DAOList && !daoURL && window.location.pathname === '/') {
-      if (DAOList.length > 0)
-        navigate(`/${_get(DAOList, '[0].url')}`)
+      if (DAOList.length > 0){
+          navigate(`/${_get(DAOList, '[0].url')}`)
+      }
       else
         navigate(`/organisation/create`)
     }
-  }, [DAOList])
+  }, [DAOList, from])
 
   useEffect(() => {
     if (provider && account && DAO?.url) {

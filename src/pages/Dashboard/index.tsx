@@ -329,66 +329,66 @@ export default () => {
                 <Proposals />
             </Grid> */}
 
-            <Grid sm={12} sx={{ marginTop: '20px' }}>
-                {can(myRole, 'transaction.view') && <Grid mt={1}
-                    id="treasury-management"
-                    item sm={12}
-                    sx={{ zIndex: currWalkThroughObj.step === 4 || currWalkThroughObj.step === 3 ? 1400 : 0 }}>
-                    <Treasury showWalkThrough={showWalkThrough} isHelpIconOpen={isHelpIconOpen} />
-                </Grid>}
-                <Grid sm={12}
-                    sx={{ zIndex: currWalkThroughObj.step === 5 ? 1400 : 0 }}
-                    id="members">
-                    <MembersSection
-                        list={_get(DAO, 'members', [])}
-                        showProjects={false}
-                        isHelpIconOpen={isHelpIconOpen}
-                        highlightMembers={currWalkThroughObj.step === 5}
-                    />
-                </Grid>
-                <Box
-                    sx={{ width: '100%', position: 'fixed', left: '33px', bottom: '44px', cursor: 'pointer', zIndex: isHelpIconOpen ? 1300 : 1000 }}
-                    id="question-mark"
-                    ref={questionMarkRef}
-                    onClick={expandHelpOptions}>
-                    {isHelpIconOpen
-                        &&
-                        <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', height: 100 }}>
-                            <Button
-                                variant="contained"
-                                className={classes.PlayWalkThroughButton}
-                                onClick={startWalkThroughAtStepOne}>
-                                Play walk through
-                            </Button>
-                            <Button
-                                startIcon={<CloseIcon />}
-                                className={classes.HideHelpIconButton}
-                                onClick={() => questionMarkRef.current.style.display = 'none'}
-                                variant="contained">
-                                Hide help icon
-                            </Button>
-                        </Box>
-                    }
-                    <img src={getQuestionImage()} />
-                </Box>
-                {(showWalkThrough || isHelpIconOpen) && <Box className={classes.walkThroughOverlay}></Box>}
-                {showWalkThrough
-                    ?
-                    <WalkThroughModal
-                        incrementWalkThroughSteps={incrementWalkThroughSteps}
-                        showConfirmation={showWalkThrough && currWalkThroughObj?.step === 0}
-                        endWalkThrough={endWalkThrough}
-                        obj={currWalkThroughObj}
-                    /> : null
-                }
-                <WalkThroughPopover
-                    displayPopover={showWalkThrough && currWalkThroughObj?.step > 0}
-                    obj={currWalkThroughObj}
-                    incrementWalkThroughSteps={incrementWalkThroughSteps}
-                    endWalkThrough={endWalkThrough}
-                    anchorEl={anchorRef.current}
+
+            {can(myRole, 'transaction.view') && <Grid mt={1}
+                id="treasury-management"
+                item sm={12}
+                sx={{ zIndex: currWalkThroughObj.step === 4 || currWalkThroughObj.step === 3 ? 1400 : 0 }}>
+                <Treasury showWalkThrough={showWalkThrough} isHelpIconOpen={isHelpIconOpen} />
+            </Grid>}
+            <Grid sm={12}
+                sx={{ zIndex: currWalkThroughObj.step === 5 ? 1400 : 0 }}
+                id="members">
+                <MembersSection
+                    list={_get(DAO, 'members', [])}
+                    showProjects={false}
+                    isHelpIconOpen={isHelpIconOpen}
+                    highlightMembers={currWalkThroughObj.step === 5}
                 />
             </Grid>
+            <Box
+                sx={{ width: '100%', position: 'fixed', left: '33px', bottom: '44px', cursor: 'pointer', zIndex: isHelpIconOpen ? 1300 : 1000 }}
+                id="question-mark"
+                ref={questionMarkRef}
+                onClick={expandHelpOptions}>
+                {isHelpIconOpen
+                    &&
+                    <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', height: 100 }}>
+                        <Button
+                            variant="contained"
+                            className={classes.PlayWalkThroughButton}
+                            onClick={startWalkThroughAtStepOne}>
+                            Play walk through
+                        </Button>
+                        <Button
+                            startIcon={<CloseIcon />}
+                            className={classes.HideHelpIconButton}
+                            onClick={() => questionMarkRef.current.style.display = 'none'}
+                            variant="contained">
+                            Hide help icon
+                        </Button>
+                    </Box>
+                }
+                <img src={getQuestionImage()} />
+            </Box>
+            {(showWalkThrough || isHelpIconOpen) && <Box className={classes.walkThroughOverlay}></Box>}
+            {showWalkThrough
+                ?
+                <WalkThroughModal
+                    incrementWalkThroughSteps={incrementWalkThroughSteps}
+                    showConfirmation={showWalkThrough && currWalkThroughObj?.step === 0}
+                    endWalkThrough={endWalkThrough}
+                    obj={currWalkThroughObj}
+                /> : null
+            }
+            <WalkThroughPopover
+                displayPopover={showWalkThrough && currWalkThroughObj?.step > 0}
+                obj={currWalkThroughObj}
+                incrementWalkThroughSteps={incrementWalkThroughSteps}
+                endWalkThrough={endWalkThrough}
+                anchorEl={anchorRef.current}
+            />
+
             <Box
                 sx={{ width: '100%', position: 'fixed', left: '33px', bottom: '44px', cursor: 'pointer', zIndex: isHelpIconOpen ? 1300 : 1000 }}
                 id="question-mark"
