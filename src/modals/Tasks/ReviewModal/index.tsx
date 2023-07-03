@@ -165,6 +165,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
     const [reopen, setReopen] = useState(false);
     const [rejectionNote, setRejectionNote] = useState('');
     const [rejectionNoteError, setRejectionNoteError] = useState('');
+    const [networkError, setNetworkError]= useState<any>(null);
 
     const { isSafeOwner } = useRole(DAO, account, Task?.compensation?.safeAddress || _get(DAO, 'safes[0].address', null));
     const { loadSafe } = useSafe();
@@ -238,6 +239,9 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                     .finally(() => setApproveLoading(false))
             } catch (e) {
                 setApproveLoading(false);
+                if(typeof e === 'string')
+                    setNetworkError(e)
+                setTimeout(() => setNetworkError(null), 3000)
                 console.log(e)
             }
         }
@@ -601,6 +605,9 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                         </Box>
                     </Box>
                     <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                        { networkError ? <Box sx={{ my:2 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Typography color="error">{ networkError }</Typography>
+                        </Box> : null }
                         <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
                             <Button disabled={approveLoading} onClick={() => { setRejectUser(activeSubmission?.member?._id); setShowRejectSubmission(true); }} sx={{ mr:1 }} fullWidth variant='outlined' size="small">Reject</Button>
                             <Button sx={{ ml:1 }} disabled={approveLoading} loading={approveLoading} onClick={() => handleApproveTaskAsync()} fullWidth variant='contained' size="small">Approve</Button>
