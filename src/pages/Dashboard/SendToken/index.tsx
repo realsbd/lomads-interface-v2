@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme: any) => ({
     },
     footer: {
         width: 575,
-        height: 80,
+        minHeight: 80,
         background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', 
         position: 'fixed', 
         display: 'flex',
@@ -72,6 +72,7 @@ export default ({ open, onClose }: any) => {
     const { createSafeTransaction } = useGnosisSafeTransaction();
     const { createSafeTransaction: createOffChainSafeTransaction } = useOffChainTransaction();
     const [sendTokensLoading, setSendTokensLoading] = useState(false)
+    const [networkError, setNetworkError] = useState<any>(null)
     const [state, setState] = useState<any>({
         members: []
     })
@@ -118,6 +119,9 @@ export default ({ open, onClose }: any) => {
         } catch (e) {
             setSendTokensLoading(false)
             console.log(e)
+            if(typeof e === 'string')
+                setNetworkError(e)
+            setTimeout(() => setNetworkError(null), 3000)
             return;
         }
     }
@@ -350,7 +354,12 @@ export default ({ open, onClose }: any) => {
                         <Button sx={{ mx: 1 }} onClick={() => setTab(3)} disabled={state?.members?.filter((m:any) => m.selected).length == 0} fullWidth color="primary" variant="contained" size="small">Next</Button>
                     </Box> :
                     tab === 3 ?
-                    <Button loading={sendTokensLoading} disabled={sendTokensLoading} onClick={() => handleSendTokens()} color="primary" variant="contained" size="small">Send Tokens</Button> :
+                    <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" sx={{ pb: 1 }}>
+                        { networkError ? <Box sx={{ py: 1 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                            <Typography style={{ textAlign: 'center' }} color="error">{ networkError }</Typography>
+                        </Box> : null }
+                        <Button loading={sendTokensLoading} disabled={sendTokensLoading} onClick={() => handleSendTokens()} color="primary" variant="contained" size="small">Send Tokens</Button>
+                    </Box> :
                     null
                 }
             </Box>

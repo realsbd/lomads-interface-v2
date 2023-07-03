@@ -109,6 +109,7 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
     const { loadSafe, activeSafes } = useSafe()
     const [tag, setTag] = useState(null)
     const [sendTokensLoading, setSendTokensLoading] = useState(false)
+    const [networkError, setNetworkError] = useState<any>(null)
 
     useEffect(() => {
         if (Project)
@@ -116,6 +117,7 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
     }, [Project])
 
     const handleCreateTransaction = async () => {
+        setNetworkError(null)
         if(Project.isDummy) {
             const newArray1 = _get(Project, 'milestones', []).map((item: any, i: number) => {
                 if (i === _get(selectedMilestone, 'pos', '')) {
@@ -174,8 +176,11 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
             closeModal()
             return setSendTokensLoading(false)
         } catch (e) {
-            setSendTokensLoading(false)
             console.log(e)
+            setSendTokensLoading(false)
+            if(typeof e === 'string')
+                setNetworkError(e)
+            setTimeout(() => setNetworkError(null), 3000)
             return;
         }
     }
@@ -271,6 +276,7 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
                     </Box> */}
                 </Box>
                 <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
+                    { networkError ? <Box sx={{ py: 2 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}><Typography color="error">{ networkError }</Typography></Box> : null }
                     <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
                         <Button sx={{ mr: 1 }} onClick={() => closeModal()} fullWidth variant='outlined' size="small">Cancel</Button>
                         <Button onClick={() => handleCreateTransaction()} loading={sendTokensLoading} disabled={sendTokensLoading} sx={{ ml: 1 }} fullWidth variant='contained' size="small">Save</Button>
