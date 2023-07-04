@@ -54,7 +54,7 @@ export default () => {
         const safeTransactionData: SafeTransactionDataPartial[] = [{
             to: toChecksumAddress(_get(send, '[0].recipient')),
             data: "0x",
-            value: `${BigInt(parseFloat(_get(send, '[0].amount')) * 10 ** _get(token, 'token.decimals', 18))}`,
+            value: `${BigInt((parseFloat(_get(send, '[0].amount')) * (10 ** _get(token, 'token.decimals', 18))).toFixed(0))}`,
         }]
         return safeTransactionData;
     }
@@ -62,10 +62,11 @@ export default () => {
     const createNativeMultiTxn = async (send: any, token: any) => {
         const safeTransactionData: SafeTransactionDataPartial[] =
             send.map((result: any, index: number) => {
+                console.log((parseFloat(result.amount) * (10 ** _get(token, 'token.decimals', 18))).toFixed(0))
                 return {
                     to: toChecksumAddress(result.recipient),
                     data: "0x",
-                    value: `${BigInt(parseFloat(result.amount) * 10 ** _get(token, 'token.decimals', 18))}`
+                    value: `${BigInt((parseFloat(result.amount) * (10 ** _get(token, 'token.decimals', 18))).toFixed(0))}`
                 };
             }
             )
@@ -79,7 +80,7 @@ export default () => {
                 async (result: any, index: number) => {
                     const unsignedTransaction = await token.populateTransaction.transfer(
                         toChecksumAddress(result.recipient),
-                        BigInt(parseFloat(result.amount) * 10 ** _get(safeToken, 'token.decimals', 18))
+                        BigInt((parseFloat(result.amount) * (10 ** _get(safeToken, 'token.decimals', 18))).toFixed(0))
                     );
                     console.log("unsignedTransaction", unsignedTransaction)
                     const transactionData = {
@@ -148,7 +149,7 @@ export default () => {
                     safeAddress,
                     rawTx: tx,
                     metadata: send.reduce((a, v) => ({ ...a, [v.recipient]: { parsedTxValue: {
-                        value: BigInt(parseFloat(v.amount) * 10 ** _get(safeToken, 'token.decimals', 18)).toString(),
+                        value: BigInt((parseFloat(v.amount) * 10 ** _get(safeToken, 'token.decimals', 18)).toFixed(0)).toString(),
                         formattedValue: v?.amount.toString(),
                         symbol: safeToken?.token?.symbol,
                         decimals: safeToken?.token?.decimals,

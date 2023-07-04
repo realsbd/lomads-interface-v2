@@ -130,23 +130,30 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
             closeModal()
             return;
         }
+        const safe = loadSafe(Project?.compensation?.safeAddress || _get(DAO, 'safes.[0].address'))
+        if(_get(Project, 'compensation.currency', 'SWEAT') !== "SWEAT") {
+            if(chainId !== safe?.chainId) 
+                return toast.custom(t => <SwitchChain t={t} nextChainId={safe?.chainId}/>)
+        }
         const totalAllotedAmount = members.reduce((a: number, b: any) => a + (!(b?.percentage || 0) ? 0 : (((b?.percentage) / 100) * ((+Project?.compensation?.amount * (selectedMilestone?.amount / 100))))), 0)
         let sendArray: any = []
         let total = 0;
-        for (var i = 0; i < _uniqBy(members, (t: any) => t._id).length; i++) {
-            const item = _uniqBy(members, (t: any) => t._id)[i];
+        let uMembers = _uniqBy(members, (t: any) => t._id);
+        for (var i = 0; i < uMembers.length; i++) {
+            const item = uMembers[i];
             total += item.percentage;
-            if (item.percentage > 0) {
+            if (item.percentage > 0 && item?.wallet) {
                 sendArray.push({
                     amount: ((item.percentage * totalAllotedAmount) / 100).toFixed(5),
                     name: item.name,
-                    recipient: item.wallet,
+                    recipient: item?.wallet,
                     label: `${item.name} | ${_get(Project, 'name', 'x')} | ${selectedMilestone.name}`,
                     tag
                 })
             }
         }
-        const safe = loadSafe(Project?.compensation?.safeAddress || _get(DAO, 'safes.[0].address'))
+
+        console.log("sendArray", sendArray)
 
         if (!safe) return;
 
