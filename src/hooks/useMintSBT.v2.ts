@@ -14,6 +14,7 @@ import { useWeb3Auth } from 'context/web3Auth';
 import { getRpcUrls } from 'constants/rpcUrl';
 import { SupportedChainId } from 'constants/chains';
 
+
 export type SBTParams = {
     name: string,
     tokenSymbol: string,

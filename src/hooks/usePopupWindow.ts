@@ -12,7 +12,7 @@ type WindowFeatures = Partial<{
 }>
 
 const defaultWindowFeatures = {
-  width: 600,
+  width: 900,
   height: 750,
   scrollbars: true,
 }

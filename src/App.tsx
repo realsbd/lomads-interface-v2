@@ -15,7 +15,9 @@ import PrivateRoute from 'components/PrivateRoute';
 import { Toaster } from 'react-hot-toast';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+
 export const store = configureStore();
+
 
 
 export type AppState = ReturnType<typeof store.getState>;

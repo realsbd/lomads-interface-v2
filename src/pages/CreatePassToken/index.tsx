@@ -1,5 +1,5 @@
 import React, { useMemo } from "react"
-import { Grid, Box, Typography, Paper, Chip, FormControl, FormLabel, MenuItem } from "@mui/material"
+import { Grid, Box, Typography, Paper, Chip, FormControl, FormLabel, MenuItem, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material"
 import clsx from "clsx"
 import { get as _get, find as _find } from 'lodash'
 import SBT_SVG from 'assets/svg/sbt.svg'
@@ -39,6 +39,9 @@ import { useDAO } from "context/dao"
 import { USDC } from "constants/tokens"
 import SwitchChain from "components/SwitchChain"
 import useSafe from "hooks/useSafe"
+import usePopupWindow from "hooks/usePopupWindow"
+import useStripeRedirect from "hooks/useStripeRedirect"
+import Checkbox from "components/Checkbox"
 
 ///   0xD123b939B5022608241b08c41ece044059bE00f5
 
@@ -196,10 +199,13 @@ export default () => {
     const { chainId, account, provider } = useWeb3Auth()
     const { getENSAddress, getENSName } = useENS();
 
+    const { onOpen, addedStripeAccount } = useStripeRedirect()
+
     const [deployContractLoading, setDeployContractLoading] = useState(false)
 
     const [editMode, setEditMode] = useState(true)
 
+    const [stripeAccounts, setStripeAccounts] = useState<any>(null)
 
     const [errors, setErrors] = useState<any>({})
 
@@ -240,17 +246,47 @@ export default () => {
 
     useEffect(() => {
         if(DAO)
-            setStateX((prev: any) => { return { ...prev, selectedChainId: +(_get(DAO, 'activeSafes[0].chainId', _get(DAO, 'chainId', chainId))) } })
+            setStateX((prev: any) => { return { ...prev, price: { ...prev.price, token: _get(USDC, `[${+(_get(DAO, 'activeSafes[0].chainId', _get(DAO, 'chainId', chainId)))}].address`) }, selectedChainId: +(_get(DAO, 'activeSafes[0].chainId', _get(DAO, 'chainId', chainId))) } })
     }, [DAO])
+
+    useEffect(() => {
+        if(stateX?.stripeAccount) {
+            setStateX((prev: any) => {
+                return {
+                    ...prev,
+                    contact: prev?.contact.indexOf('email') > -1 ? prev.contact : [...prev?.contact, 'email']
+                }
+            })
+        }
+    }, [stateX?.stripeAccount])
+
+    useEffect(() => {
+        if(addedStripeAccount) {
+            setStripeAccounts((prev:any) => {
+                if(prev && _find(prev, (p:any) => p._id === addedStripeAccount?._id)) {
+                    return prev?.map((acc:any) => {
+                        if(acc._id === addedStripeAccount?._id)
+                            return addedStripeAccount
+                        return acc
+                    })
+                } else {
+                    if(prev && prev.length > 0)
+                        return [...prev, addedStripeAccount]
+                    return [addedStripeAccount]
+                }
+            })
+            setStateX((prev: any) => { return { ...prev, stripeAccount: addedStripeAccount?._id } })
+        }
+    }, [addedStripeAccount])
 
     useEffect(() => {
         if(stateX?.selectedChainId) {
             setTokens([
-                {
-                    label: CHAIN_INFO[stateX?.selectedChainId]?.nativeCurrency?.symbol,
-                    value: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
-                    decimals: CHAIN_INFO[stateX?.selectedChainId]?.nativeCurrency?.decimals
-                },
+                // {
+                //     label: CHAIN_INFO[stateX?.selectedChainId]?.nativeCurrency?.symbol,
+                //     value: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
+                //     decimals: CHAIN_INFO[stateX?.selectedChainId]?.nativeCurrency?.decimals
+                // },
                 {
                     label: _get(USDC, `[${stateX?.selectedChainId}].symbol`),
                     value: _get(USDC, `[${stateX?.selectedChainId}].address`),
@@ -304,6 +340,14 @@ export default () => {
         setEditMode(false)
     }
 
+    useEffect(() => {
+        const load = async () => {
+            const { data } = await axiosHttp.get(`payment/stripe-accounts`)
+            setStripeAccounts(data)
+        }
+        load();
+    }, [])
+
     const deployContract = async () => {
         if(chainId !== stateX?.selectedChainId) {
             toast.custom(t => <SwitchChain t={t} nextChainId={stateX?.selectedChainId}/>)
@@ -331,6 +375,7 @@ export default () => {
                         address: contractAddr,
                         admin: account,
                         version: 2,
+                        stripeAccount: stateX.stripeAccount,
                         master: _get(SBT_DEPLOYER_ADDRESSES, chainId, null),
                         treasury: stateX?.treasury && stateX?.treasury === 'other' ? stateX?.treasuryOther : stateX?.treasury,
                         mintPrice: `${stateX?.price?.value}`,
@@ -429,6 +474,28 @@ export default () => {
                 }
             })
         }
+    }
+
+    const handleLinkStripeAccount = (accountId?: any) => {
+        axiosHttp.get(`payment/onboard${accountId ? '?accountId=' + accountId : ''}`)
+        .then(res => {
+            let accs = null
+            if(stripeAccounts && _find(stripeAccounts, (p:any) => p._id === res?.data?.stripeAcc?._id)) {
+                accs = stripeAccounts?.map((acc:any) => {
+                    if(acc._id === res?.data?.stripeAcc?._id)
+                        return res?.data?.stripeAcc
+                    return acc
+                })
+            } else {
+                if(stripeAccounts && stripeAccounts.length > 0)
+                    accs = [...stripeAccounts, res?.data?.stripeAcc]
+                else {
+                    accs = [res?.data?.stripeAcc]
+                }
+            }
+            setStripeAccounts(accs)
+            onOpen(res?.data?.url)
+        })
     }
 
     const availableSafes = useMemo(() => {
@@ -599,6 +666,71 @@ export default () => {
                                     placeholder="Multi-sig Wallet address" sx={{ my: 1 }} fullWidth /> }
                             </Box>
                             }
+                            {
+                              stateX['priced'] &&
+                              <Box sx={{ my: 2 }}>
+                                    <FormLabel>Stripe account</FormLabel>
+                                    <Button style={{ marginTop: 16 }} fullWidth size="small" variant="outlined" color="primary" onClick={() => handleLinkStripeAccount()}>Link new stripe account</Button> 
+                                    <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                                    { stripeAccounts.map((value: any) => {
+                                        const labelId = `checkbox-list-label-${value._id}`;
+
+                                        return (
+                                        <ListItem
+                                            key={value}
+                                            secondaryAction={
+                                                !(value?.account.details_submitted && _get(value?.account, 'capabilities.card_payments', 'inactive') === 'active' && _get(value?.account, 'capabilities.transfers', 'inactive') === 'active') ?
+                                                <Typography onClick={() => handleLinkStripeAccount(value?.account?.id)} style={{ cursor: 'pointer' }} color="primary">RESUME</Typography> : null
+                                            }
+                                            disablePadding
+                                        >
+                                            <ListItemButton onClick={() => setStateX((prev: any) => { return { ...prev, stripeAccount: value._id } })} disabled={!(value?.account.details_submitted && _get(value?.account, 'capabilities.card_payments', 'inactive') === 'active' && _get(value?.account, 'capabilities.transfers', 'inactive') === 'active')} role={undefined}  dense>
+                                            <ListItemIcon>
+                                                <Checkbox
+                                                edge="start"
+                                                checked={stateX?.stripeAccount === value._id}
+                                                tabIndex={-1}
+                                                disableRipple
+                                                inputProps={{ 'aria-labelledby': labelId }}
+                                                />
+                                            </ListItemIcon>
+                                            <ListItemText secondaryTypographyProps={{ style: { color: 'red', fontSize: 12, fontWeight: 400 } }} primaryTypographyProps={{ style: { fontSize: 14, fontWeight: 500 } }} id={labelId} secondary={!(value?.account.details_submitted && _get(value?.account, 'capabilities.card_payments', 'inactive') === 'active' && _get(value?.account, 'capabilities.transfers', 'inactive') === 'active') ? 'Onboarding pending' : ''} primary={value?.account?.business_profile?.name || value?.account?.business_profile?.url || value?.account?.id } />
+                                            </ListItemButton>
+                                        </ListItem>
+                                        );
+                                    })}
+                                    </List>
+                                    {
+                                    // <TextInput fullWidth label="Stripe account" select style={{  minWidth: 200 }} value={stateX?.treasury}
+                                    //     onChange={(e:any) => {
+                                    //         if(e.target.value === 'CREATE') {
+                                    //             handleLinkStripeAccount()
+                                    //         } else {
+                                    //             let stripeAcc = _find(stripeAccounts, (str:any) => str?._id === e.target.value)
+                                    //             if(!(stripeAcc?.account.details_submitted && _get(stripeAcc?.account, 'capabilities.card_payments', 'inactive') === 'active' && _get(stripeAcc?.account, 'capabilities.transfers', 'inactive') === 'active')) {
+                                    //                 handleLinkStripeAccount(stripeAcc?.account?.id)
+                                    //             } else {
+
+                                    //             }
+                                    //         }
+                                    //     }}>
+                                    //     {
+                                    //         stripeAccounts?.map((_o:any) => {
+                                    //             return (
+                                    //                 <MenuItem key={_o._id} value={_o._id}>
+                                    //                     <Box>
+                                    //                         <Typography>{_o._id}</Typography>
+                                    //                         <Typography>{ _o?.account.details_submitted && _get(_o?.account, 'capabilities.card_payments', 'inactive') === 'active' && _get(_o?.account, 'capabilities.transfers', 'inactive') === 'active' ? '' : 'Onboarding pending' }</Typography>
+                                    //                     </Box>
+                                    //                 </MenuItem>
+                                    //             )
+                                    //         })
+                                    //     }
+                                    //     <MenuItem key='other' value='CREATE'>Create</MenuItem>
+                                    // </TextInput>
+                                }
+                              </Box>
+                            }
                             <Button sx={{ mt: 2 }} onClick={() => handleSetPreview()} fullWidth size="small" variant='contained'>Next</Button>
                         </Paper>
                         :
@@ -638,6 +770,7 @@ export default () => {
                                     <Typography variant="body2" className={clsx(classes.socialText, { fontStyle: 'normal !important' })}>Get certain member details could be useful for the smooth functioning of your organisation</Typography>
                                     <Box my={3} mx={1}>
                                         <Switch
+                                            disabled={stateX?.stripeAccount}
                                             checked={stateX?.contact.indexOf('email') > -1}
                                             onChange={() => handleContactChange('email')}
                                             label="Email" />
