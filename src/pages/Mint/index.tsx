@@ -8,6 +8,7 @@ import { makeStyles } from '@mui/styles';
 import TextInput from 'components/TextInput';
 import Switch from "components/Switch";
 import Drawer from '@mui/material/Drawer';
+import {Elements} from '@stripe/react-stripe-js';
 import Button from "components/Button";
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CheckIcon from '@mui/icons-material/Check';
@@ -71,6 +72,12 @@ import { useTokenContract } from 'hooks/useContract'
 import ExternalPayment from 'components/ExternalPayment'
 import { useDAO } from 'context/dao'
 import { addDAOMemberAction } from 'store/actions/dao'
+import StripePayment from 'components/StripePayment'
+import {loadStripe} from '@stripe/stripe-js';
+//@ts-ignore
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+
+
 // import ExternalPayment from 'components/ExternalPayment'
 const { NFTStorage, File } = require("nft.storage")
 const client = new NFTStorage({ token: process.env.REACT_APP_NFT_STORAGE })
@@ -163,6 +170,8 @@ export default () => {
     const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("identify")
     const { encryptMessage, decryptMessage } = useEncryptDecrypt()
     const tokenContract = useTokenContract(contract?.mintPriceToken || undefined)
+
+    const [showStripePayment, setShowStripePayment] = useState<any>(null)
 
     // const [orgData, setOrgData] = useState<any>(null);
 
@@ -636,6 +645,7 @@ export default () => {
                 amount: +price?.mintPriceinUsd, 
                 treasury, network: CHAIN_INFO[chainId]?.chainName.toUpperCase(), 
                 discountCode: state?.referralCode,
+                name: state?.name,
                 email: state?.email
             }
             if(contract?.externalPaymentProvider) {
@@ -645,7 +655,11 @@ export default () => {
                     paymentLink: _get(contract, 'externalPaymentProvider.paymentLink', 'https://buy.onramper.com')
                 }
             }
-            setShowOnRamper(options)
+            if(contract?.stripeAccount) {
+                setShowStripePayment(options)
+            } else {
+                setShowOnRamper(options)
+            }
             return;
             //onOpenRamper()
             // const order: any = await initTransak({ token, amount, treasury })
@@ -686,6 +700,7 @@ export default () => {
 
     const handleCardPaymentSuccess = async (paymentRefence: any) => {
         setShowOnRamper(null);
+        setShowStripePayment(null)
         // const stats: any = await getCurrentTokenId();
         // let tokenId = parseFloat(stats.toString());
         await axiosHttp.post(`mint-payment/verify`, {
@@ -912,402 +927,409 @@ export default () => {
 
 
     return (
-        <Box>
-            <Grid container className={classes.root}>
-                <Grid item sm={12} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-                    <Box sx={{ mt:5 }} display="flex" alignItems="flex-start" justifyContent={"flex-start"} style={{ width: '100%', height: '100px' }}>
-                        <HeaderLogo sx={{ mt: 1  }} plain dao={DAO} />
-                        <Box>
-                            <Typography sx={{ marginLeft: "20px" }} className={classes.title}>{DAO ? DAO.name : ''}</Typography>
-                            <Typography sx={{ marginLeft: "20px", maxWidth: 800 }} className={classes.subtitle}>{DAO ? DAO.description : ''}</Typography>
+        <Elements stripe={stripePromise} options={{}}>
+            <Box>
+                <Grid container className={classes.root}>
+                    <Grid item sm={12} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
+                        <Box sx={{ mt:5 }} display="flex" alignItems="flex-start" justifyContent={"flex-start"} style={{ width: '100%', height: '100px' }}>
+                            <HeaderLogo sx={{ mt: 1  }} plain dao={DAO} />
+                            <Box>
+                                <Typography sx={{ marginLeft: "20px" }} className={classes.title}>{DAO ? DAO.name : ''}</Typography>
+                                <Typography sx={{ marginLeft: "20px", maxWidth: 800 }} className={classes.subtitle}>{DAO ? DAO.description : ''}</Typography>
+                            </Box>
                         </Box>
-                    </Box>
-                    <Box mt={0} style={{ width: '100%', minHeight: '568px', display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-                        <Grid container style={{ boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)', height: '100%' }}>
-                            <Grid p={2} item xs={12} sm={4} style={{ backgroundColor: '#FDEEEC', borderRadius: '5px 0 0 5px' }}>
-                                <Box style={{ borderRadius: '5px', width: '330px', height: '330px', margin: '0 auto' }}>
-                                    <img src={balance === 1 ? _get(metadata, 'image') : _get(contract, 'image')} style={{  backgroundColor: "rgba(234, 100, 71, 0.1)", objectFit: 'contain', width: '100%', height: '100%', borderRadius: 5 }} />
-                                </Box>
-
-                                <Box py={4} style={{ maxWidth: '330px', display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-                                    <Typography style={{ fontSize: 26, lineHeight: '30px', fontWeight: 700, color: "#B12F15" }}>{_get(contract, 'token')}</Typography>
-                                </Box>
-
-                                { balance === 0 ?
-                                <Box py={2} style={{ borderRadius: 5, width: '100%' }}>
-                                    <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                        <Typography style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>
-                                            Price
-                                        </Typography>
-                                        <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dashed rgba(177, 47, 21, 0.15)' }}></Box>
-                                        <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <Typography style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>${ canMintFree ?  "0.00" : parseFloat(_get(price, 'originalPriceinUsd', 0)).toFixed(2)} /</Typography>
-                                            { canMintFree ? 
-                                                 <Typography ml={2} style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{"0.00"} {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography> :
-                                                <Typography ml={2} style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{parseFloat(_get(contract, 'mintPrice', 0)).toFixed(2)} {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography>
-                                            }
-                                        </Box>
+                        <Box mt={0} style={{ width: '100%', minHeight: '568px', display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
+                            <Grid container style={{ boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)', height: '100%' }}>
+                                <Grid p={2} item xs={12} sm={4} style={{ backgroundColor: '#FDEEEC', borderRadius: '5px 0 0 5px' }}>
+                                    <Box style={{ borderRadius: '5px', width: '330px', height: '330px', margin: '0 auto' }}>
+                                        <img src={balance === 1 ? _get(metadata, 'image') : _get(contract, 'image')} style={{  backgroundColor: "rgba(234, 100, 71, 0.1)", objectFit: 'contain', width: '100%', height: '100%', borderRadius: 5 }} />
                                     </Box>
-                                    { discountMessage &&
-                                    <Box sx={{ mt: 1 }} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                        <Typography style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>
-                                            
-                                        </Typography>
-                                        <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '0px dashed rgba(177, 47, 21, 0.15)' }}></Box>
+
+                                    <Box py={4} style={{ maxWidth: '330px', display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+                                        <Typography style={{ fontSize: 26, lineHeight: '30px', fontWeight: 700, color: "#B12F15" }}>{_get(contract, 'token')}</Typography>
+                                    </Box>
+
+                                    { balance === 0 ?
+                                    <Box py={2} style={{ borderRadius: 5, width: '100%' }}>
                                         <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <Typography style={{ fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>${ canMintFree ?  "0.00" : parseFloat(_get(price, 'mintPriceinUsd', 0)).toFixed(2)} /</Typography>
-                                            { canMintFree ? 
-                                                 <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{"0.00"} {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography> :
-                                                <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{parseFloat(_get(price, 'mintPrice', 0)).toFixed(2)} {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography>
-                                            }
+                                            <Typography style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>
+                                                Price
+                                            </Typography>
+                                            <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dashed rgba(177, 47, 21, 0.15)' }}></Box>
+                                            <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                <Typography style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>${ canMintFree ?  "0.00" : parseFloat(_get(price, 'originalPriceinUsd', 0)).toFixed(2)} /</Typography>
+                                                { canMintFree ? 
+                                                    <Typography ml={2} style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{"0.00"} {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography> :
+                                                    <Typography ml={2} style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{parseFloat(_get(contract, 'mintPrice', 0)).toFixed(2)} {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography>
+                                                }
+                                            </Box>
+                                        </Box>
+                                        { discountMessage &&
+                                        <Box sx={{ mt: 1 }} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                            <Typography style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>
+                                                
+                                            </Typography>
+                                            <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '0px dashed rgba(177, 47, 21, 0.15)' }}></Box>
+                                            <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                <Typography style={{ fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>${ canMintFree ?  "0.00" : parseFloat(_get(price, 'mintPriceinUsd', 0)).toFixed(2)} /</Typography>
+                                                { canMintFree ? 
+                                                    <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{"0.00"} {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography> :
+                                                    <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{parseFloat(_get(price, 'mintPrice', 0)).toFixed(2)} {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography>
+                                                }
+                                            </Box>
+                                        </Box>
+                                        }
+                                    </Box> : 
+                                    <Box py={2} style={{ borderRadius: 5, width: '100%' }}>
+                                        <Box mt={0} mb={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                            <Typography style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>
+                                                Contract
+                                            </Typography>
+                                            <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dashed rgba(177, 47, 21, 0.15)' }}></Box>
+                                            <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                <Typography style={{ fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)", marginRight: 8 }}>{ beautifyHexToken(contract?.address) }</Typography>
+                                                <IconButton onClick={() => {
+                                                    navigator.clipboard.writeText(`${contract?.address}`);
+                                                    toast.success('Copied to clipboard')
+                                                }} style={{ marginRight: 0 }}>
+                                                    <img src={LINK_SVG} />
+                                                </IconButton>
+                                            </Box>
+                                        </Box>
+                                        <Box my={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                            <Typography style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>
+                                                Token Id
+                                            </Typography>
+                                            <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dashed rgba(177, 47, 21, 0.15)' }}></Box>
+                                            <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                <Typography style={{ fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>{ metadata?.id }</Typography>
+                                            </Box>
+                                        </Box>
+                                        <Box my={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                            <Typography style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>
+                                                Token Standard
+                                            </Typography>
+                                            <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dashed rgba(177, 47, 21, 0.15)' }}></Box>
+                                            <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                <Typography style={{ fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>ERC721</Typography>
+                                            </Box>
+                                        </Box>
+                                        <Box my={2}  style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                            <Typography style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>
+                                                Chain
+                                            </Typography>
+                                            <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dashed rgba(177, 47, 21, 0.15)' }}></Box>
+                                            <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                <Typography style={{ fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>{ CHAIN_INFO[+contract?.chainId]?.label }</Typography>
+                                            </Box>
                                         </Box>
                                     </Box>
                                     }
-                                </Box> : 
-                                 <Box py={2} style={{ borderRadius: 5, width: '100%' }}>
-                                    <Box mt={0} mb={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                        <Typography style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>
-                                            Contract
-                                        </Typography>
-                                        <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dashed rgba(177, 47, 21, 0.15)' }}></Box>
-                                        <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <Typography style={{ fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)", marginRight: 8 }}>{ beautifyHexToken(contract?.address) }</Typography>
-                                            <IconButton onClick={() => {
-                                                navigator.clipboard.writeText(`${contract?.address}`);
-                                                toast.success('Copied to clipboard')
-                                            }} style={{ marginRight: 0 }}>
-                                                <img src={LINK_SVG} />
-                                            </IconButton>
-                                        </Box>
-                                    </Box>
-                                    <Box my={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                        <Typography style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>
-                                            Token Id
-                                        </Typography>
-                                        <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dashed rgba(177, 47, 21, 0.15)' }}></Box>
-                                        <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <Typography style={{ fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>{ metadata?.id }</Typography>
-                                        </Box>
-                                    </Box>
-                                    <Box my={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                        <Typography style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>
-                                            Token Standard
-                                        </Typography>
-                                        <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dashed rgba(177, 47, 21, 0.15)' }}></Box>
-                                        <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <Typography style={{ fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>ERC721</Typography>
-                                        </Box>
-                                    </Box>
-                                    <Box my={2}  style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                        <Typography style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>
-                                            Chain
-                                        </Typography>
-                                        <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dashed rgba(177, 47, 21, 0.15)' }}></Box>
-                                        <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <Typography style={{ fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>{ CHAIN_INFO[+contract?.chainId]?.label }</Typography>
-                                        </Box>
-                                    </Box>
-                                 </Box>
-                                }
 
-                            </Grid>
-                           
-                            <Grid p={1} item xs={12} sm={8} style={{ backgroundColor: '#FFF', borderRadius: '0 5px 5px 0' }}>
-                                {                  
-                                    user && token && account ?
-                                    <> 
-                                        { balance === 0 && !isWhiteListed ?
-                                        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" style={{ height: '100%', width: '100%' }}>
-                                            {/* <Box style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#B12F15' }}></Box> */}
-                                            <Typography style={{ fontSize: '24px', fontWeight: '600', lineHeight: '33px', textAlign: 'center', marginTop: '25px', marginBottom: '15px', color: '#1B2B41' }}>Not whitelisted</Typography>
-                                            <Typography style={{ fontSize: '12px', fontWeight: '400', lineHeight: '16px', textAlign: 'center', color: 'rgba(27, 43, 65, 0.5)' }}>You are not whitelisted for this organisation</Typography>
-                                        </Box> :
-                                        <>
-                                        { balance === 1  ? 
-                                        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" style={{ height: '100%', minHeight: isMobile ? 440 : '100%', width: '100%' }}>
-                                            <Box style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#B12F15' }}></Box>
-                                            <Typography style={{ fontSize: '24px', fontWeight: '600', lineHeight: '33px', textAlign: 'center', marginTop: '25px', marginBottom: '15px', color: '#1B2B41' }}>Thank you for minting<br />your pass token. </Typography>
-                                            <Typography style={{ fontSize: '12px', fontWeight: '400', lineHeight: '16px', textAlign: 'center', color: 'rgba(27, 43, 65, 0.5)' }}>you will be soon redirected to the dashboard in ... 3s</Typography>
-                                        </Box> :
-                                        <Box display="flex" flexDirection="column" alignItems="center" style={{ marginTop: '50px' }}>
-                                            <Box>
-                                                <TextInput
-                                                    value={state["name"]}
-                                                    error={errors['name']}
-                                                    helperText={errors['name']}
-                                                    onChange={(e: any) => setState((prev: any) => { return { ...prev, name: e.target.value } })}
-                                                    placeholder="Aragron"
-                                                    sx={{ my: 1, width: isMobile ? '300px' : '400px', height: '40px' }}
-                                                    label="Name"
-                                                />
-                                            </Box>
-                                            {
-                                                contract?.contactDetail.map((item: string, index: number) => {
-                                                    if (item === 'discord') {
-                                                        return (
-                                                            <Box sx={{ marginTop: '17px' }}>
-                                                                <Box sx={{ width: isMobile ? '300px' : '400px', padding: '16px 0' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                                                                    <Box display={"flex"} alignItems={"center"}>
-                                                                        <img src={discord} alt="discord" />
-                                                                        <Typography style={{ fontSize: '16px', fontWeight: '600', color: '#1b2b41', marginLeft: '24px' }}>Discord</Typography>
-                                                                    </Box>
-                                                                    {
-                                                                        state?.discord ?
-                                                                        <Box style={{  }}>{ state?.discord }</Box> : 
-                                                                        <Button onClick={() => handleDiscord()} className={classes.createBtn}>CONNECT</Button>
-                                                                    }
-                                                                </Box>
-                                                            </Box>
-                                                        )
-                                                    }
-                                                    else {
-                                                        return (
-                                                            <Box sx={{ marginTop: '17px' }}>
-                                                                <TextInput
-                                                                    value={state[`${item}`]}
-                                                                    error={errors[`${item}`]}
-                                                                    helperText={errors[`${item}`]}
-                                                                    onChange={(e: any) => setState((prev: any) => { return { ...prev, [item]: e.target.value } })}
-                                                                    placeholder={item}
-                                                                    sx={{ my: 1, width: isMobile ? '300px' : '400px', height: '40px' }}
-                                                                    label={item[0].toUpperCase() + item.substring(1)} />
-                                                            </Box>
-                                                        )
-                                                    }
-                                                })
-                                            }
-                                            { contract?.hasDiscountCodes && 
+                                </Grid>
+                            
+                                <Grid p={1} item xs={12} sm={8} style={{ backgroundColor: '#FFF', borderRadius: '0 5px 5px 0' }}>
+                                    {                  
+                                        user && token && account ?
+                                        <> 
+                                            { balance === 0 && !isWhiteListed ?
+                                            <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" style={{ height: '100%', width: '100%' }}>
+                                                {/* <Box style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#B12F15' }}></Box> */}
+                                                <Typography style={{ fontSize: '24px', fontWeight: '600', lineHeight: '33px', textAlign: 'center', marginTop: '25px', marginBottom: '15px', color: '#1B2B41' }}>Not whitelisted</Typography>
+                                                <Typography style={{ fontSize: '12px', fontWeight: '400', lineHeight: '16px', textAlign: 'center', color: 'rgba(27, 43, 65, 0.5)' }}>You are not whitelisted for this organisation</Typography>
+                                            </Box> :
+                                            <>
+                                            { balance === 1  ? 
+                                            <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" style={{ height: '100%', minHeight: isMobile ? 440 : '100%', width: '100%' }}>
+                                                <Box style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#B12F15' }}></Box>
+                                                <Typography style={{ fontSize: '24px', fontWeight: '600', lineHeight: '33px', textAlign: 'center', marginTop: '25px', marginBottom: '15px', color: '#1B2B41' }}>Thank you for minting<br />your pass token. </Typography>
+                                                <Typography style={{ fontSize: '12px', fontWeight: '400', lineHeight: '16px', textAlign: 'center', color: 'rgba(27, 43, 65, 0.5)' }}>you will be soon redirected to the dashboard in ... 3s</Typography>
+                                            </Box> :
+                                            <Box display="flex" flexDirection="column" alignItems="center" style={{ marginTop: '50px' }}>
                                                 <Box>
-                                                <Box display="flex" flexDirection="row" alignItems="center" sx={{ marginTop: '17px', width: isMobile ? '300px' : '400px' }}>
                                                     <TextInput
-                                                        fullWidth
-                                                        disabled={discountMessage}
-                                                        value={state["referralCode"]}
-                                                        error={errors[`referralCode`]}
-                                                        helperText={errors[`referralCode`]}
-                                                        onChange={(e: any) => setState((prev: any) => { return { ...prev, referralCode: e.target.value } })}
-                                                        placeholder={""}
-                                                        sx={{ my: 1, mr: 1, height: '40px' }}
-                                                        label={"Discount code"} />
-                                                        {
-                                                            discountMessage ? 
-                                                            <Button loading={discountCheckLoading} onClick={() => {
-                                                                setState((prev: any) => { return { ...prev, referralCode: '' } })
-                                                                setDiscountMessage(null)
-                                                                setPrice((prev: any) => { return { ...prev, mintPrice: contract?.mintPrice } })
-                                                            }} sx={{ mt: 4 }} size="small" variant="outlined">Remove</Button> : 
-                                                            <Button loading={discountCheckLoading} onClick={() => handleApplyDiscount()} sx={{ mt: 4 }} size="small" variant="outlined">Apply</Button>
+                                                        value={state["name"]}
+                                                        error={errors['name']}
+                                                        helperText={errors['name']}
+                                                        onChange={(e: any) => setState((prev: any) => { return { ...prev, name: e.target.value } })}
+                                                        placeholder="Aragron"
+                                                        sx={{ my: 1, width: isMobile ? '300px' : '400px', height: '40px' }}
+                                                        label="Name"
+                                                    />
+                                                </Box>
+                                                {
+                                                    contract?.contactDetail.map((item: string, index: number) => {
+                                                        if (item === 'discord') {
+                                                            return (
+                                                                <Box sx={{ marginTop: '17px' }}>
+                                                                    <Box sx={{ width: isMobile ? '300px' : '400px', padding: '16px 0' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                                                                        <Box display={"flex"} alignItems={"center"}>
+                                                                            <img src={discord} alt="discord" />
+                                                                            <Typography style={{ fontSize: '16px', fontWeight: '600', color: '#1b2b41', marginLeft: '24px' }}>Discord</Typography>
+                                                                        </Box>
+                                                                        {
+                                                                            state?.discord ?
+                                                                            <Box style={{  }}>{ state?.discord }</Box> : 
+                                                                            <Button onClick={() => handleDiscord()} className={classes.createBtn}>CONNECT</Button>
+                                                                        }
+                                                                    </Box>
+                                                                </Box>
+                                                            )
                                                         }
-                                                </Box> 
-                                                {  discountMessage &&
-                                                    <Box mt={2} display="flex" flexDirection="row" alignItems="center">
-                                                        <CheckIcon color='success'/>
-                                                        <Typography fontSize={12} color="#188C7C">{ discountMessage }</Typography>
+                                                        else {
+                                                            return (
+                                                                <Box sx={{ marginTop: '17px' }}>
+                                                                    <TextInput
+                                                                        value={state[`${item}`]}
+                                                                        error={errors[`${item}`]}
+                                                                        helperText={errors[`${item}`]}
+                                                                        onChange={(e: any) => setState((prev: any) => { return { ...prev, [item]: e.target.value } })}
+                                                                        placeholder={item}
+                                                                        sx={{ my: 1, width: isMobile ? '300px' : '400px', height: '40px' }}
+                                                                        label={item[0].toUpperCase() + item.substring(1)} />
+                                                                </Box>
+                                                            )
+                                                        }
+                                                    })
+                                                }
+                                                { contract?.hasDiscountCodes && 
+                                                    <Box>
+                                                    <Box display="flex" flexDirection="row" alignItems="center" sx={{ marginTop: '17px', width: isMobile ? '300px' : '400px' }}>
+                                                        <TextInput
+                                                            fullWidth
+                                                            disabled={discountMessage}
+                                                            value={state["referralCode"]}
+                                                            error={errors[`referralCode`]}
+                                                            helperText={errors[`referralCode`]}
+                                                            onChange={(e: any) => setState((prev: any) => { return { ...prev, referralCode: e.target.value } })}
+                                                            placeholder={""}
+                                                            sx={{ my: 1, mr: 1, height: '40px' }}
+                                                            label={"Discount code"} />
+                                                            {
+                                                                discountMessage ? 
+                                                                <Button loading={discountCheckLoading} onClick={() => {
+                                                                    setState((prev: any) => { return { ...prev, referralCode: '' } })
+                                                                    setDiscountMessage(null)
+                                                                    setPrice((prev: any) => { return { ...prev, mintPrice: contract?.mintPrice } })
+                                                                }} sx={{ mt: 4 }} size="small" variant="outlined">Remove</Button> : 
+                                                                <Button loading={discountCheckLoading} onClick={() => handleApplyDiscount()} sx={{ mt: 4 }} size="small" variant="outlined">Apply</Button>
+                                                            }
+                                                    </Box> 
+                                                    {  discountMessage &&
+                                                        <Box mt={2} display="flex" flexDirection="row" alignItems="center">
+                                                            <CheckIcon color='success'/>
+                                                            <Typography fontSize={12} color="#188C7C">{ discountMessage }</Typography>
+                                                        </Box>
+                                                    }
                                                     </Box>
                                                 }
-                                                </Box>
-                                            }
-                                            {   mintLoading ? 
-                                                <Box sx={{ minWidth: isMobile ? '300px' : '400px', margin: '25px 0' }} flexDirection={isMobile ? "column":"row"} display={"flex"} alignItems="center" justifyContent={"center"}>
-                                                    <LeapFrog size={50} color="#C94B32" />
-                                                </Box>
-                                                :
-                                                <Box sx={{ minWidth: isMobile ? '300px' : '400px', margin: '25px 0' }} flexDirection={isMobile ? "column":"row"} display={"flex"} alignItems="center" justifyContent={"center"}>
-                                                    {/* <Button className={classes.footerBtn} style={{ border: '1px solid #C94B32' }} onClick={handlePayByCard}>PAY BY CARD</Button>
-                                                    <Button className={classes.footerBtn} sx={{ background: '#C94B32', color: '#FFF' }} onClick={handlePayByCrypto}>PAY BY CRYPTO</Button> */}
+                                                {   mintLoading ? 
+                                                    <Box sx={{ minWidth: isMobile ? '300px' : '400px', margin: '25px 0' }} flexDirection={isMobile ? "column":"row"} display={"flex"} alignItems="center" justifyContent={"center"}>
+                                                        <LeapFrog size={50} color="#C94B32" />
+                                                    </Box>
+                                                    :
+                                                    <Box sx={{ minWidth: isMobile ? '300px' : '400px', margin: '25px 0' }} flexDirection={isMobile ? "column":"row"} display={"flex"} alignItems="center" justifyContent={"center"}>
+                                                        {/* <Button className={classes.footerBtn} style={{ border: '1px solid #C94B32' }} onClick={handlePayByCard}>PAY BY CARD</Button>
+                                                        <Button className={classes.footerBtn} sx={{ background: '#C94B32', color: '#FFF' }} onClick={handlePayByCrypto}>PAY BY CRYPTO</Button> */}
 
-                                                    {balance === 0 ?
-                                                        <>
-                                                        {
-                                                        canMintFree ?
-                                                        <Button className={classes.footerBtn} sx={{ width: isMobile ? '100%' : '190px', my: isMobile ? 1 : 0 }} loading={mintLoading} disabled={mintLoading} onClick={() => {
-                                                            if (+contract?.version >= 1) {
-                                                                mintFree()
-                                                            } else {
-                                                                handleMint(undefined, undefined)
-                                                            }
-                                                        }} style={{ marginTop: 32 }} fullWidth variant="outlined" color="primary">{"MINT"}</Button>:
-                                                        <Button className={classes.footerBtn} sx={{ width: isMobile ? '100%' : '190px', my: isMobile? 1 : 0 }}  loading={mintLoading} disabled={mintLoading} onClick={() => {
-                                                            if (+contract?.version >= 1) {
-                                                                if (price?.mintPrice && price?.mintPrice !== "0") {
-                                                                    handlePayByCrypto()
-                                                                } else {
+                                                        {balance === 0 ?
+                                                            <>
+                                                            {
+                                                            canMintFree ?
+                                                            <Button className={classes.footerBtn} sx={{ width: isMobile ? '100%' : '190px', my: isMobile ? 1 : 0 }} loading={mintLoading} disabled={mintLoading} onClick={() => {
+                                                                if (+contract?.version >= 1) {
                                                                     mintFree()
+                                                                } else {
+                                                                    handleMint(undefined, undefined)
                                                                 }
-                                                            } else {
-                                                                handleMint(undefined, undefined)
+                                                            }} style={{ marginTop: 32 }} fullWidth variant="outlined" color="primary">{"MINT"}</Button>:
+                                                            <Button className={classes.footerBtn} sx={{ width: isMobile ? '100%' : '190px', my: isMobile? 1 : 0 }}  loading={mintLoading} disabled={mintLoading} onClick={() => {
+                                                                if (+contract?.version >= 1) {
+                                                                    if (price?.mintPrice && price?.mintPrice !== "0") {
+                                                                        handlePayByCrypto()
+                                                                    } else {
+                                                                        mintFree()
+                                                                    }
+                                                                } else {
+                                                                    handleMint(undefined, undefined)
+                                                                }
+                                                            }} style={{ marginTop: 32 }} fullWidth variant="outlined" color="primary">{
+                                                                    payment ? "MINT" : price?.mintPrice === "0" ? "MINT" : "PAY BY CRYPTO"}</Button>
                                                             }
-                                                        }} style={{ marginTop: 32 }} fullWidth variant="outlined" color="primary">{
-                                                                payment ? "MINT" : price?.mintPrice === "0" ? "MINT" : "PAY BY CRYPTO"}</Button>
+                                                            </> :
+                                                            <Button className={classes.footerBtn} sx={{ width: isMobile ? '100%' : '190px', my: isMobile? 1 : 0 }} loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
                                                         }
-                                                        </> :
-                                                        <Button className={classes.footerBtn} sx={{ width: isMobile ? '100%' : '190px', my: isMobile? 1 : 0 }} loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
+
+                                                    { price?.mintPrice && price?.mintPrice !== "0" &&
+                                                     !canMintFree && !payment && balance === 0 && contract && 
+                                                     (((!contract?.externalPaymentProvider || (contract?.externalPaymentProvider && contract?.externalPaymentProvider?.provider === 'on-ramper')) && +price?.mintPriceinUsd >= 30) || (contract?.externalPaymentProvider && contract?.externalPaymentProvider?.provider === 'stripe') || contract?.stripeAccount) &&
+                                                        <Button className={classes.footerBtn} sx={{ width: isMobile ? '100%' : '190px', my: isMobile? 1 : 0 }} loading={mintLoading} disabled={mintLoading} onClick={() => {
+                                                            if (valid()) {
+                                                                setShowDrawer(false)
+                                                                handlePayByCardGasless()
+                                                            }
+                                                        }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY BY CARD</Button>
                                                     }
-
-                                                { price?.mintPrice && price?.mintPrice !== "0" && (contract?.externalPaymentProvider && contract?.externalPaymentProvider?.provider === 'stripe') && !canMintFree && !payment && balance === 0 && contract && (((!contract?.externalPaymentProvider || (contract?.externalPaymentProvider && contract?.externalPaymentProvider?.provider === 'on-ramper')) && +price?.mintPriceinUsd >= 30) || (contract?.externalPaymentProvider && contract?.externalPaymentProvider?.provider === 'stripe')) &&
-                                                    <Button className={classes.footerBtn} sx={{ width: isMobile ? '100%' : '190px', my: isMobile? 1 : 0 }} loading={mintLoading} disabled={mintLoading} onClick={() => {
-                                                        if (valid()) {
-                                                            setShowDrawer(false)
-                                                            handlePayByCardGasless()
-                                                        }
-                                                    }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY BY CARD</Button>
+                                                    </Box>
                                                 }
-                                                </Box>
-                                            }
-                                            {
-                                                networkError
-                                                &&
-                                                <Typography my={2} textAlign="center" color="error" variant="body2">{networkError}</Typography>
-                                            }
-                                        </Box> }
-                                        </> }
-                                        </>
-                                    :
-                                    <Box display="flex" flex={1} flexDirection="column" alignItems="center" justifyContent={"center"} style={{ height: isMobile ? 350 : '100%' }}>
-                                       
-                                    </Box>
-                                }
+                                                {
+                                                    networkError
+                                                    &&
+                                                    <Typography my={2} textAlign="center" color="error" variant="body2">{networkError}</Typography>
+                                                }
+                                            </Box> }
+                                            </> }
+                                            </>
+                                        :
+                                        <Box display="flex" flex={1} flexDirection="column" alignItems="center" justifyContent={"center"} style={{ height: isMobile ? 350 : '100%' }}>
+                                        
+                                        </Box>
+                                    }
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </Box>
-                </Grid>
-                <Drawer
-                    PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
-                    sx={{ zIndex: 99999 }}
-                    anchor={'right'}
-                    open={showDrawer}
-                    onClose={() => setShowDrawer(false)}>
-                    <Box sx={{ width: 575, paddingBottom: '60px', borderRadius: '20px 0px 0px 20px' }}>
-                        <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={() => setShowDrawer(false)}>
-                            <img src={CloseSVG} />
-                        </IconButton>
-                        <Box display="flex" flexDirection="column" my={6} alignItems="center">
-                            <img src={MintSBTSvg} />
-                            <Typography my={4} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>{balance === 1 ? "Update details" : "Contact details"}</Typography>
                         </Box>
-                        <Box px={12}>
-                            <TextInput
-                                value={state["name"]}
-                                error={errors['name']}
-                                helperText={errors['name']}
-                                onChange={(e: any) => setState((prev: any) => { return { ...prev, name: e.target.value } })}
-                                placeholder="Aragron" sx={{ my: 1 }} fullWidth label="Name" />
-                            {/* <TextInput 
-                                value={state["referralCode"]}
-                                error={errors['referralCode']}
-                                helperText={errors['referralCode']}
-                                onChange={(e: any) => setState((prev: any) => { return { ...prev, referralCode: e.target.value } } )}
-                                placeholder="Go Gondor" sx={{ my: 1 }} fullWidth label="Invite code" /> */}
-                            <Box mt={4}>
-                                <Typography style={{ fontWeight: 700, fontSize: 16 }}>Contact details</Typography>
-                                {
-                                    contract?.contactDetail.indexOf('email') > -1 &&
-                                    <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
-                                        <img style={{ width: 36, marginRight: 12 }} src={state['email'] ? EmailGreenSVG : EmailSVG} />
-                                        <TextInput
-                                            value={state["email"]}
-                                            error={errors['email']}
-                                            helperText={errors['email']}
-                                            onChange={(e: any) => setState((prev: any) => { return { ...prev, email: e.target.value } })}
-                                            placeholder="Enter your email" sx={{ my: 1 }} fullWidth />
-                                    </Box>
-                                }
-                                {contract?.contactDetail.indexOf('discord') > -1 &&
-                                    <>
-                                        {state['discord'] ?
-                                            <>
-                                                <Box mt={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
-                                                    <img style={{ width: 36, marginRight: 12 }} src={DiscordGreenSVG} />
-                                                    <Button fullWidth endIcon={<img src={CheckSVG} />} variant="contained" color="success">
-                                                        <Typography style={{ color: "#FFF" }}>CONNECTED TO DISCORD</Typography>
-                                                    </Button>
-                                                </Box>
-                                            </> :
-                                            <>
-                                                <Box mt={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
-                                                    <img style={{ width: 36, marginRight: 12 }} src={DiscordSVG} />
-                                                    <Button onClick={() => handleDiscord()} fullWidth endIcon={<img src={ArrowRightSVG} />} variant="contained" color="secondary">
-                                                        <Typography style={{ color: palette.primary.main }}>CONNECT WITH DISCORD</Typography>
-                                                    </Button>
-                                                </Box>
-                                                {errors['discord'] && <FormHelperText style={{ marginLeft: 58, marginTop: 4, color: '#e53935' }}>{errors['discord']}</FormHelperText>}
-                                            </>}
-                                    </>
-                                }
-                                {contract?.contactDetail.indexOf('github') > -1 &&
-                                    // <>
-                                    //     <Box mt={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
-                                    //         <img style={{ width: 36, marginRight: 12 }} src={GithubSVG} />
-                                    //         <Button fullWidth endIcon={<img src={ArrowRightSVG} />} variant="contained" color="secondary">
-                                    //             <Typography style={{ color: palette.primary.main }}>CONNECT WITH GITHUB</Typography>
-                                    //         </Button>
-                                    //     </Box>
-                                    //     { errors['github'] && <FormHelperText style={{ marginLeft: 58,  marginTop: 4, color: '#e53935' }}>{ errors['github'] }</FormHelperText> }
-                                    // </>
-                                    <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
-                                        <img style={{ width: 36, marginRight: 12 }} src={state["github"] ? GithubGreenSVG : GithubSVG} />
-                                        <TextInput
-                                            value={state["github"]}
-                                            error={errors['github']}
-                                            helperText={errors['github']}
-                                            onChange={(e: any) => setState((prev: any) => { return { ...prev, github: e.target.value } })}
-                                            placeholder="Enter your github" sx={{ my: 1 }} fullWidth />
-                                    </Box>
-                                }
-                                {contract?.contactDetail.indexOf('telegram') > -1 &&
-                                    <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
-                                        <img style={{ width: 36, marginRight: 12 }} src={state["telegram"] ? TelegramGreenSVG : TelegramSVG} />
-                                        <TextInput
-                                            value={state["telegram"]}
-                                            error={errors['telegram']}
-                                            helperText={errors['telegram']}
-                                            onChange={(e: any) => setState((prev: any) => { return { ...prev, telegram: e.target.value } })}
-                                            placeholder="Enter your telegram" sx={{ my: 1 }} fullWidth />
-                                    </Box>
-                                }
+                    </Grid>
+                    <Drawer
+                        PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
+                        sx={{ zIndex: 99999 }}
+                        anchor={'right'}
+                        open={showDrawer}
+                        onClose={() => setShowDrawer(false)}>
+                        <Box sx={{ width: 575, paddingBottom: '60px', borderRadius: '20px 0px 0px 20px' }}>
+                            <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={() => setShowDrawer(false)}>
+                                <img src={CloseSVG} />
+                            </IconButton>
+                            <Box display="flex" flexDirection="column" my={6} alignItems="center">
+                                <img src={MintSBTSvg} />
+                                <Typography my={4} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>{balance === 1 ? "Update details" : "Contact details"}</Typography>
                             </Box>
-                            <Typography mt={2} variant='body1' style={{ textAlign: 'center' }}>Your contact details are encrypted using advanced public key encryption technology, ensuring that your personal information stays safe and secure.</Typography>
-                            {balance === 0 ?
-                                <>
-                                { canMintFree ? 
-                                <Button loading={mintLoading} disabled={mintLoading} onClick={() => {
-                                    if (+contract?.version >= 1) {
-                                        mintFree()
-                                    } else {
-                                        handleMint(undefined, undefined) 
+                            <Box px={12}>
+                                <TextInput
+                                    value={state["name"]}
+                                    error={errors['name']}
+                                    helperText={errors['name']}
+                                    onChange={(e: any) => setState((prev: any) => { return { ...prev, name: e.target.value } })}
+                                    placeholder="Aragron" sx={{ my: 1 }} fullWidth label="Name" />
+                                {/* <TextInput 
+                                    value={state["referralCode"]}
+                                    error={errors['referralCode']}
+                                    helperText={errors['referralCode']}
+                                    onChange={(e: any) => setState((prev: any) => { return { ...prev, referralCode: e.target.value } } )}
+                                    placeholder="Go Gondor" sx={{ my: 1 }} fullWidth label="Invite code" /> */}
+                                <Box mt={4}>
+                                    <Typography style={{ fontWeight: 700, fontSize: 16 }}>Contact details</Typography>
+                                    {
+                                        contract?.contactDetail.indexOf('email') > -1 &&
+                                        <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
+                                            <img style={{ width: 36, marginRight: 12 }} src={state['email'] ? EmailGreenSVG : EmailSVG} />
+                                            <TextInput
+                                                value={state["email"]}
+                                                error={errors['email']}
+                                                helperText={errors['email']}
+                                                onChange={(e: any) => setState((prev: any) => { return { ...prev, email: e.target.value } })}
+                                                placeholder="Enter your email" sx={{ my: 1 }} fullWidth />
+                                        </Box>
                                     }
-                                }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">{"MINT"}</Button> : 
-                                <Button loading={mintLoading} disabled={mintLoading} onClick={() => {
-                                    if (+contract?.version >= 1) {
-                                        if (price?.mintPrice && price?.mintPrice !== "0") {
-                                            handlePayByCrypto()
-                                        } else {
+                                    {contract?.contactDetail.indexOf('discord') > -1 &&
+                                        <>
+                                            {state['discord'] ?
+                                                <>
+                                                    <Box mt={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
+                                                        <img style={{ width: 36, marginRight: 12 }} src={DiscordGreenSVG} />
+                                                        <Button fullWidth endIcon={<img src={CheckSVG} />} variant="contained" color="success">
+                                                            <Typography style={{ color: "#FFF" }}>CONNECTED TO DISCORD</Typography>
+                                                        </Button>
+                                                    </Box>
+                                                </> :
+                                                <>
+                                                    <Box mt={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
+                                                        <img style={{ width: 36, marginRight: 12 }} src={DiscordSVG} />
+                                                        <Button onClick={() => handleDiscord()} fullWidth endIcon={<img src={ArrowRightSVG} />} variant="contained" color="secondary">
+                                                            <Typography style={{ color: palette.primary.main }}>CONNECT WITH DISCORD</Typography>
+                                                        </Button>
+                                                    </Box>
+                                                    {errors['discord'] && <FormHelperText style={{ marginLeft: 58, marginTop: 4, color: '#e53935' }}>{errors['discord']}</FormHelperText>}
+                                                </>}
+                                        </>
+                                    }
+                                    {contract?.contactDetail.indexOf('github') > -1 &&
+                                        // <>
+                                        //     <Box mt={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
+                                        //         <img style={{ width: 36, marginRight: 12 }} src={GithubSVG} />
+                                        //         <Button fullWidth endIcon={<img src={ArrowRightSVG} />} variant="contained" color="secondary">
+                                        //             <Typography style={{ color: palette.primary.main }}>CONNECT WITH GITHUB</Typography>
+                                        //         </Button>
+                                        //     </Box>
+                                        //     { errors['github'] && <FormHelperText style={{ marginLeft: 58,  marginTop: 4, color: '#e53935' }}>{ errors['github'] }</FormHelperText> }
+                                        // </>
+                                        <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
+                                            <img style={{ width: 36, marginRight: 12 }} src={state["github"] ? GithubGreenSVG : GithubSVG} />
+                                            <TextInput
+                                                value={state["github"]}
+                                                error={errors['github']}
+                                                helperText={errors['github']}
+                                                onChange={(e: any) => setState((prev: any) => { return { ...prev, github: e.target.value } })}
+                                                placeholder="Enter your github" sx={{ my: 1 }} fullWidth />
+                                        </Box>
+                                    }
+                                    {contract?.contactDetail.indexOf('telegram') > -1 &&
+                                        <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
+                                            <img style={{ width: 36, marginRight: 12 }} src={state["telegram"] ? TelegramGreenSVG : TelegramSVG} />
+                                            <TextInput
+                                                value={state["telegram"]}
+                                                error={errors['telegram']}
+                                                helperText={errors['telegram']}
+                                                onChange={(e: any) => setState((prev: any) => { return { ...prev, telegram: e.target.value } })}
+                                                placeholder="Enter your telegram" sx={{ my: 1 }} fullWidth />
+                                        </Box>
+                                    }
+                                </Box>
+                                <Typography mt={2} variant='body1' style={{ textAlign: 'center' }}>Your contact details are encrypted using advanced public key encryption technology, ensuring that your personal information stays safe and secure.</Typography>
+                                {balance === 0 ?
+                                    <>
+                                    { canMintFree ? 
+                                    <Button loading={mintLoading} disabled={mintLoading} onClick={() => {
+                                        if (+contract?.version >= 1) {
                                             mintFree()
+                                        } else {
+                                            handleMint(undefined, undefined) 
                                         }
-                                    } else {
-                                        handleMint(undefined, undefined) 
+                                    }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">{"MINT"}</Button> : 
+                                    <Button loading={mintLoading} disabled={mintLoading} onClick={() => {
+                                        if (+contract?.version >= 1) {
+                                            if (price?.mintPrice && price?.mintPrice !== "0") {
+                                                handlePayByCrypto()
+                                            } else {
+                                                mintFree()
+                                            }
+                                        } else {
+                                            handleMint(undefined, undefined) 
+                                        }
+                                    }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">{
+                                            payment ? "MINT" : price?.mintPrice === "0" ? "MINT" : "PAY BY CRYPTO"}</Button> 
                                     }
-                                }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">{
-                                        payment ? "MINT" : price?.mintPrice === "0" ? "MINT" : "PAY BY CRYPTO"}</Button> 
+                                    </> :
+                                    <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
                                 }
-                                </> :
-                                <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
-                            }
-                            { price?.mintPrice && price?.mintPrice !== "0" && (contract?.externalPaymentProvider && contract?.externalPaymentProvider?.provider === 'stripe') && !canMintFree && !payment && balance === 0 && contract && (((!contract?.externalPaymentProvider || (contract?.externalPaymentProvider && contract?.externalPaymentProvider?.provider === 'on-ramper')) && +price?.mintPriceinUsd >= 30) || (contract?.externalPaymentProvider && contract?.externalPaymentProvider?.provider === 'stripe')) &&
-                                <Button loading={mintLoading} disabled={mintLoading} onClick={() => {
-                                    if (valid()) {
-                                        setShowDrawer(false)
-                                        handlePayByCardGasless()
-                                    }
-                                }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY BY CARD</Button>
-                            }
+                                { price?.mintPrice && price?.mintPrice !== "0" && 
+                     
+                             !canMintFree && !payment && balance === 0 && contract && (((!contract?.externalPaymentProvider || (contract?.externalPaymentProvider && contract?.externalPaymentProvider?.provider === 'on-ramper')) && +price?.mintPriceinUsd >= 30) || (contract?.externalPaymentProvider && contract?.externalPaymentProvider?.provider === 'stripe') || contract?.stripeAccount) &&
+                                    <Button loading={mintLoading} disabled={mintLoading} onClick={() => {
+                                        if (valid()) {
+                                            setShowDrawer(false)
+                                            handlePayByCardGasless()
+                                        }
+                                    }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY BY CARD</Button>
+                                }
 
-                            {networkError && typeof networkError === 'string' && <Typography my={2} textAlign="center" color="error" variant="body2">{networkError}</Typography>}
+                                {networkError && typeof networkError === 'string' && <Typography my={2} textAlign="center" color="error" variant="body2">{networkError}</Typography>}
+                            </Box>
                         </Box>
-                    </Box>
-                </Drawer>
-            </Grid>
-            <ExternalPayment onSuccess={handleCardPaymentSuccess} open={showOnRamper} onClose={() => { setMintLoading(false); setShowOnRamper(null) }}/>
-        </Box>
+                    </Drawer>
+                </Grid>
+                <ExternalPayment onSuccess={handleCardPaymentSuccess} open={showOnRamper} onClose={() => { setMintLoading(false); setShowOnRamper(null) }}/>
+                <StripePayment onSuccess={handleCardPaymentSuccess} open={showStripePayment} onClose={() => { setMintLoading(false); setShowStripePayment(null) }} />
+            </Box>
+        </Elements>
     )
 }

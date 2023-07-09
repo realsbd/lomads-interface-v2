@@ -113,7 +113,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
       if(window.ethereum) {
         const stats = await getStats();
         const treasury = stats[5];
-        const mintToken = (stats[3] ? stats[3] : process.env.REACT_APP_MATIC_TOKEN_ADDRESS).toString()
+        const mintToken = (stats[3] ? stats[3] : process.env.REACT_APP_NATIVE_TOKEN_ADDRESS).toString()
         let mintPrice = stats[2]._hex
         if(mintToken === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {
           const params = {
@@ -152,15 +152,6 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
         try {
           const stats = await getStats();
           let tokenId = parseFloat(stats[1].toString());
-          const mintPrice = (stats[2] ? stats[2] : 0).toString()
-          const mintToken = (stats[3] ? stats[3] : process.env.REACT_APP_MATIC_TOKEN_ADDRESS).toString()
-          const isWhitelisted = stats[4] ? stats[4] : 0
-
-          // if(mintToken && (mintToken !== process.env.REACT_APP_MATIC_TOKEN_ADDRESS)) {
-          //   const txtx = await tokenContract?.approve(contractAddress, mintPrice)
-          //   await txtx?.wait()
-          // }
-
           try {
             let tx = null;
             if(+version >= 1) {

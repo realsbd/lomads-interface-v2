@@ -23,6 +23,8 @@ import AttachExistingSafePage from 'pages/AttachSafe/Existing';
 import CreateOrganisation from 'pages/CreateOrganisation';
 import CreatePassTokenPage from 'pages/CreatePassToken'
 import DCAuthPage from 'pages/DCAuth';
+import StripeOnBoardSuccessPage from 'pages/StripeOnBoardSuccess';
+import StripeOnBoardRefreshPage from 'pages/StripeOnBoardRefresh';
 import GithubAuthPage from 'pages/GithubAuth';
 import MintPage from 'pages/Mint';
 import MintPageV1 from 'pages/Mint/index.v1';
@@ -53,6 +55,20 @@ export default [
 		layout: PrimaryLayout,
 		private: false,
 		component: DCAuthPage
+	},
+	{
+		path: "/connected-account",
+		exact: true,
+		layout: PrimaryLayout,
+		private: false,
+		component: StripeOnBoardSuccessPage
+	},
+	{
+		path: "/onboard-refresh",
+		exact: true,
+		layout: PrimaryLayout,
+		private: false,
+		component: StripeOnBoardRefreshPage
 	},
 	{
 		path: "/githubauth",
