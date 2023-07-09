@@ -152,6 +152,7 @@ export default ({ open, closeModal, task }: Props) => {
     const [isSingleContributor, setIsSingleContributor] = useState(task.isSingleContributor);
     const [isFilterRoles, setIsFilterRoles] = useState(task.isFilterRoles);
     const [openRolesList, setOpenRolesList] = useState(false);
+    const [roleType, setRoleType] = useState('');
     const [validRoles, setValidRoles] = useState(task.validRoles);
     const [selectedUser, setSelectedUser] = useState<any>(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?._id || null);
     const [name, setName] = useState<string>(task.name);
@@ -568,6 +569,7 @@ export default ({ open, closeModal, task }: Props) => {
                 closeModal={() => setOpenRolesList(false)}
                 hideBackdrop={true}
                 validRoles={validRoles}
+                roleType={roleType}
                 handleValidRoles={(value) => setValidRoles(value)}
             />
             {
