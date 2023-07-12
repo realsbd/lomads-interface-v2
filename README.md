@@ -1,46 +1,115 @@
-# Getting Started with Create React App
+# Clone and run the project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The project code can be cloned and run on localhost. To successfully run the code complete the following steps:
 
-## Available Scripts
+### Step 1
+Create and complete the .env file
 
-In the project directory, you can run:
+        REACT_APP_INFURA_KEY=
+        REACT_APP_INFURA_SECRET=
+        REACT_APP_NODE_BASE_URL=
+        REACT_APP_URL=
+        REACT_APP_S3_BASE_URL=
+        REACT_APP_NATIVE_TOKEN_ADDRESS=
+        REACT_APP_NOTION_ADMIN_EMAIL=
+        REACT_APP_DISCORD_APP_ID=
+        REACT_APP_GITHUB_CLIENT_ID=
+        REACT_APP_NFT_STORAGE=
+        REACT_APP_BICONOMY_AUTH_KEY=
 
-### `yarn start`
+### Step 2
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+        yarn install
+        yarn start
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+This will run the app in the development mode. Open [http://localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits to the code.
 
-### `yarn test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# Code Structure
+<img align="right" src="images/Screenshot%202023-07-11%20at%2015.19.03.png" alt="drawing" width="300" > 
 
-### `yarn build`
+The figure shows the folder structure of the code. We will detail out some of the main folders namely:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- Assets Folder
+- Routes Folder
+- Layouts Folder
+- Components Folder
+- Pages Folder
+- Hooks Folder
+- abis Folder
+- Hooks folder
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `yarn eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Assets Folder
+it contains assets of our project i.e. images and styling files.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Routes Folder
 
-## Learn More
+This folder consists of all routes of the application. It consists of private, protected, and all types of routes. Here we can even call our sub-route.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Layouts Folder
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+it contains layouts available to the whole project like header, footer, etc. The following layouts are present:
+
+
+### Components Folder
+
+This folder is where you store reusable UI components that can be used across multiple pages or other components.
+
+### Pages Folder
+
+This folder contains individual page components that represent different views or routes of the application.
+
+### Hooks Folder
+
+The folder has every hook in the application that are used across multiple pages.
+
+### abis Folder
+
+This folder contains all the abis of the smart contract that are used in the application. These are used to call various smart contract functions
+
+### Utils Folder
+
+This folder holds utility functions or helper modules that can be used throughout the application
+
+
+# App Building Blocks
+
+The main building blocks or functionalities of the Lomads app are : 
+
+- Login
+- Projects and Tasks
+- Gnosis Safe and Transactions
+- Soul Bound Token
+- 3rd Party Tools Integration
+- Token Gating
+
+## Login
+For login and authentication **Web3auth** has been integrated. We use their sdk to allow users to login into the app using Metamask or Social Login (Gmail and Apple). The code can be found in _/src/pages/Login/index.tsx_. 
+
+Web3auth instance is used to retrieve the info about the provider, chain, account etc.
+
+        const { provider, login, account, chainId, logout, web3Auth } = useWeb3Auth();
+
+_handleLogin_ function handles the login. a token is generated at login and is sent to the backend as params for _createAccountAction_ along with userInfo. 
+
+        const handleLogin = async (loginType = WALLET_ADAPTERS.METAMASK, provider: undefined | string = undefined) => {
+                dispatch(logoutAction())
+                await logout()
+                let token = null;
+                if (loginType === WALLET_ADAPTERS.METAMASK) {
+                    token = await login(loginType);
+                } else if (loginType === WALLET_ADAPTERS.OPENLOGIN) {
+                    token = await login(WALLET_ADAPTERS.OPENLOGIN, provider);
+                }
+                if (token) {
+                    let userInfo = null;
+                    if(web3Auth?.connectedAdapterName === "openlogin")
+                        userInfo = await web3Auth?.getUserInfo()
+                    dispatch(createAccountAction({ token, userInfo }))
+                }
+            }
