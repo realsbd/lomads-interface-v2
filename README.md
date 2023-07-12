@@ -120,7 +120,7 @@ Users can create Projects and Tasks using Lomads platform. There are two folders
 |/src/pages/Projects|/src/Modals/Projects|
 |:-:|:-:|
 |The contains the code for full page views for the project component|This contains the code for side modals, popovers, etc that are used within the project|
-|![First Image](images/Screenshot%202023-07-11%20at%2015.53.39.png?h=750&w=1260)|![Second Image](images/Screenshot%202023-07-11%20at%2015.53.00.png?h=750&w=1260)|
+|![First Image](images/Screenshot%202023-07-11%20at%2015.53.39.png?h=450&w=1260)|![Second Image](images/Screenshot%202023-07-11%20at%2015.53.00.png?h=450&w=1260)|
 
 
 
@@ -289,3 +289,148 @@ The following functions are used to use the allowance module and set the allowan
 Once the allowance is approved the following function is used to create a transaction using the allowance
 
         const createAllowanceTransaction = async ({ tokenAddress, amount, to, label, delegate}: { tokenAddress: string, amount: number, to: string, label: string, delegate: string} )
+
+
+## Soul Bound Token
+
+SBT or Pass Token can be created by deploying the smart contract. 
+
+### Create SBT
+
+In the file *src/pages/CreatePassToken/index.tsx,* the following function is used to gather all the necessary info and uses the *src/pages/*useContractDeployer hook to deploy the contract
+
+        import useContractDeployer, { SBTParams } from "hooks/useContractDeployer"
+        ...
+        ...
+        ...
+        
+        const { deploy, deployLoading } = useContractDeployer(SBT_DEPLOYER_ADDRESSES[stateX?.selectedChainId])
+        ...
+        ...
+        ...
+        
+        const deployContract = async () => {
+                if(chainId !== stateX?.selectedChainId) {
+                    toast.custom(t => <SwitchChain t={t} nextChainId={stateX?.selectedChainId}/>)
+                } else {
+                    try {
+                        setDeployContractLoading(true)
+                        const params: SBTParams = {
+                            chainId: stateX?.selectedChainId,
+                            name: `${stateX?.symbol} SBT`,
+                            symbol: stateX?.symbol,
+                            mintPrice: `${stateX?.price?.value}`,
+                            mintToken: stateX?.price?.token,
+                            treasury: stateX?.treasury && stateX?.treasury === 'other' ? stateX?.treasuryOther : stateX?.treasury,
+                            whitelisted: stateX?.whitelisted ? 1 : 0,
+                        }
+            
+                        const contractAddr = await deploy(params)
+
+### Mint SBT
+
+In the file *src/pages/Mint/index.tsx,* the following function is used to gather all the necessary info and uses the *src/pages/*useMintSBT hook to mint the SBT
+
+        import useMintSBT from "hooks/useMintSBT.v2"
+        ...
+        ...
+        ...
+        
+        const { mint, getTreasury, estimateGas, checkDiscount, payByCrypto, payByCryptoEstimate, balanceOf, getCurrentTokenId } = useMintSBT(contractId, contract?.version, +contract?.chainId)
+        ...
+        ...
+        ...
+        ...
+        
+        const handleMint = async (payment: string | undefined, signature: string | undefined) => {
+                if (!valid()) return;
+                setMintLoading(true)
+                try {
+                    const msg = await encryptMessage(JSON.stringify({ email: _get(state, 'email', ''), discord: _get(state, 'discord', ''), telegram: _get(state, 'telegram', ''), github: _get(state, 'github', '') }))
+                    const stats: any = await getCurrentTokenId();
+                    let tokenId = parseFloat(stats.toString());
+                    const metadataJSON = {
+                        id: tokenId,
+                        description: `${contract?.token} SBT TOKEN`,
+                        name: `${contract?.name}#${tokenId}`,
+                        image: contract?.image,
+                        attributes: [
+                            {
+                                trait_type: "Name",
+                                value: state?.name,
+                            },
+                            {
+                                trait_type: "Wallet Address/ENS Domain",
+                                value: account,
+                            },
+                            {
+                                trait_type: "Discount Code",
+                                value: state?.referralCode
+                            },
+                            {
+        .....
+        ....
+        ....
+        ....
+        
+        const token = await mint(ipfsURL, payment, signature, tokenContract, contract?.gasless, contract?.gasConfig?.apiKey);
+
+
+## 3rd Party Tools Integrations
+
+Lomads app has integrated the following 3rd party tools using open APIs:
+
+Discord: To import Discord Roles
+
+Trello: To import boards and cards
+
+Github: To import issues
+
+The code can be found in the file src/pages/Settings/Modal/Integration/index.tsx. First step consist of authorisation. The following functions are used for the same. Check the code for more details
+
+        const handleClick = (item: any) => {
+                if (item.name === "Trello") {
+                    authorizeTrello()
+                    setExpandTrello(true)
+                }
+                else if (item.name === "GitHub") {
+                    authorizeGitHub()
+                }
+                else if (item.name === 'Discord') {
+                    handleConnectDiscord();
+                }
+            }
+
+Once the user is authenticated functions are used to pull roles, issues, boards and cards. Below is the code for Github Issues. 
+
+        const pullGithubIssues = () => {
+                setGitHubLoading(true);
+                axiosHttp.get(`utility/get-issues?token=${gitHubAccessToken}&repoInfo=${selectedGitHubLink.full_name}&repoId=${selectedGitHubLink.id}&repoUrl=${selectedGitHubLink.html_url}&daoId=${_get(DAO, '_id', null)}`)
+                    .then((result: any) => {
+                        console.log("issues : ", result.data);
+                        if (result.data.message === 'error') {
+                            console.log("Not allowed");
+                            setGitHubLoading(false);
+                            return;
+                        }
+                        else {
+                            console.log("Allowed to pull and store issues", result.data.data)
+                            dispatch(storeGithubIssuesAction({
+                                payload:
+                                {
+                                    daoId: _get(DAO, '_id', null),
+                                    issueList: result.data.data,
+                                    token: gitHubAccessToken,
+                                    repoInfo: selectedGitHubLink.full_name,
+                                    linkOb: { title: selectedGitHubLink.name, link: selectedGitHubLink.html_url }
+                                }
+                            }));
+                            setGitHubLoading(false);
+                        }
+                    })
+            }
+
+Similarly Trello boards and cards can be pulled using handleTrello function and sync discord roles using handleSyncServer function. Details can be seen in the code
+
+        const handleTrello = (selectedValue: any)
+        const handleSyncServer = async ()
