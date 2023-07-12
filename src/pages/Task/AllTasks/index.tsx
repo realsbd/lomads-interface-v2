@@ -21,6 +21,8 @@ import ApprovedSvg from 'assets/svg/approved.svg'
 import PaidSvg from 'assets/svg/paid.svg'
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CreateTaskModal from "modals/Tasks/CreateTaskModal";
+import useRole from "hooks/useRole";
+import { useWeb3Auth } from "context/web3Auth";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -113,6 +115,7 @@ export default () => {
     const classes = useStyles();
     const navigate = useNavigate()
     const location = useLocation()
+    const { account } = useWeb3Auth()
     const { DAO } = useDAO();
     const { projectId } = useParams();
     const { transformTask } = useTask()
@@ -121,6 +124,7 @@ export default () => {
     const [tab, setTab] = useState(0);
     const [initialLoad, setInitialLoad] = useState(true);
     const { parsedTasks } = useTasks(_get(DAO, 'tasks', []))
+    const { myRole, can } = useRole(DAO, account, undefined)
 
     const myTasks = useMemo(() => {
         let arr: any[] = [];
@@ -310,9 +314,11 @@ export default () => {
                                         <LomadsIconButton onClick={() => { navigate(`/${DAO.url}/archivedTasks`) }}>
                                             <img src={ArchiveIcon} />
                                         </LomadsIconButton>
+                                        {  can(myRole, 'task.create') &&
                                         <Button onClick={() => setOpenCreateTask(true)} sx={{ ml: 2 }} size="small" variant="contained" color="secondary">
                                             Create
                                         </Button>
+                                        }
                                     </Box>
                                 </Box>
                             </Container>

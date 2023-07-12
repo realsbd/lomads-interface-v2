@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { Grid, Typography, Box, Tab, Tabs, Menu, MenuItem, Chip } from "@mui/material";
 import { makeStyles } from '@mui/styles';
@@ -207,6 +207,19 @@ export default () => {
         }
     }, [projectId])
 
+    const canMyrole = useCallback((permission: any) => {
+        if (!Project) return false;
+        let creator = _get(Project, 'creator', '').toLowerCase() === account?.toLowerCase();
+        let inProject = _find(_uniqBy(Project?.members, '_id'), (m:any) => m.wallet.toLowerCase() === account?.toLowerCase())
+        let p = permission;
+        if (inProject)
+            p = `${permission}.inproject`
+        if (creator)
+            p = `${permission}.creator`
+        console.log("can(myRole, p) || can(myRole, permission)", can(myRole, p) || can(myRole, permission))
+        return (can(myRole, p) || can(myRole, permission))
+    }, [Project, myRole]);
+
     useEffect(() => {
         if (Project) {
             if (_get(Project, 'milestones', []).length > 0) {
@@ -374,7 +387,8 @@ export default () => {
                                 <Typography className={classes.nameText}>{_get(Project, 'name', '')}</Typography>
                             </Box>
                             <Box display="flex" alignItems="center">
-                                <Box
+                                { canMyrole('project.edit') &&
+                                    <Box
                                     className={classes.iconContainer}
                                     display="flex"
                                     alignItems="center"
@@ -383,8 +397,9 @@ export default () => {
                                     onClick={() => { setShowEdit(true) }}
                                 >
                                     <img src={settingIcon} alt="setting-icon" />
-                                </Box>
-                                {/* <Box
+                                </Box> }
+                                { canMyrole('project.share') && false &&
+                                <Box
                                     className={classes.iconContainer}
                                     display="flex"
                                     alignItems="center"
@@ -392,7 +407,8 @@ export default () => {
                                     onClick={handleClick}
                                 >
                                     <img src={shareIcon} alt="share-icon" style={{ width: 18, height: 18 }} />
-                                </Box> */}
+                                </Box>
+                                }
                                 <Menu
                                     anchorEl={anchorEl}
                                     open={open}
@@ -451,7 +467,7 @@ export default () => {
 
                     {/* Links */}
                     {
-                        _get(Project, 'links', []).length > 0 &&
+                        canMyrole('project.links.view') && _get(Project, 'links', []).length > 0 &&
                         <Box display={"flex"} flexWrap={"wrap"} sx={{ width: '100%', marginBottom: '20px' }}>
                             {
                                 _get(Project, 'links', []).map((item: any, index: number) => {
@@ -464,7 +480,7 @@ export default () => {
                     }
 
                     {/* Milestones and KRA */}
-                    {
+                    {canMyrole('project.milestone.view') &&
                         (_get(Project, 'milestones', []).length > 0 || _get(Project, 'kra.results', []).length > 0) &&
                         <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
                             <Box sx={{ width: '100%', background: '#FFF', padding: '10px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
@@ -514,9 +530,9 @@ export default () => {
                                         <IconButton sx={{ marginRight: '20px' }} onClick={() => navigate(`/${daoURL}/project/${projectId}/archivedKra`)}>
                                             <img src={archiveIcon} alt="archiveIcon" />
                                         </IconButton>
-                                        <Button size="small" variant="contained" onClick={() => setOpenKraReview(true)}>
+                                        { canMyrole('project.review') && <Button size="small" variant="contained" onClick={() => setOpenKraReview(true)}>
                                             REVIEW
-                                        </Button>
+                                        </Button> }
                                     </Box>
                                 }
                             </Box>
@@ -527,7 +543,7 @@ export default () => {
                                     {
                                         _get(Project, 'milestones', []).map((item: any, index: number) => {
                                             return (
-                                                <MilestoneCard index={index} milestone={item} openModal={(value1: any, value2: number) => selectMilestone(value1, value2)} />
+                                                <MilestoneCard editable={canMyrole('project.milestone.update')} index={index} milestone={item} openModal={(value1: any, value2: number) => selectMilestone(value1, value2)} />
                                             )
                                         })
                                     }
@@ -547,49 +563,52 @@ export default () => {
                             </TabPanel>
                         </Box>
                     }
+                    {
+                        canMyrole('project.task.view') &&
+                        <TaskSection isHelpIconOpen={false} onlyProjects={true} />
+                    }
 
-                    <TaskSection isHelpIconOpen={false} onlyProjects={true} />
+                    { canMyrole('members.view') &&
+                        <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
 
-                    <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
-
-                        <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                            <Typography sx={{ fontSize: '22px', fontWeight: '400', color: '#76808D' }}>Members</Typography>
-                            <Box display={"flex"} alignItems={"center"}>
-                                <img src={membersGroup} alt="membersGroup" />
-                                <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{Project?.members.length} {Project?.members.length > 1 ? 'members' : 'member'}</Typography>
-                                <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn}
-                                    onClick={() => setOpenInviteModal(true)}
-                                >
-                                    <AddIcon sx={{ fontSize: 18 }} /> MEMBER
-                                </Button>
-                            </Box>
-                        </Box>
-
-                        <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px', borderRadius: '5px', marginTop: '0.2rem' }} display={"flex"} flexDirection={"column"}>
-
-                            <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"}>
-                                <Box sx={{ width: '250px' }}>
-                                    <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5' }}>Name</Typography>
-                                </Box>
-                                <Box sx={{ width: '250px' }}>
-                                    <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5', marginLeft: '22px' }}>Joined</Typography>
+                            <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                                <Typography sx={{ fontSize: '22px', fontWeight: '400', color: '#76808D' }}>Members</Typography>
+                                <Box display={"flex"} alignItems={"center"}>
+                                    <img src={membersGroup} alt="membersGroup" />
+                                    <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{Project?.members.length} {Project?.members.length > 1 ? 'members' : 'member'}</Typography>
+                                   { canMyrole('project.member.add') && <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn}
+                                        onClick={() => setOpenInviteModal(true)}
+                                    >
+                                        <AddIcon sx={{ fontSize: 18 }} /> MEMBER
+                                    </Button> }
                                 </Box>
                             </Box>
 
-                            <Box sx={{ width: '100%', maxHeight: '220px', overflow: 'auto' }}>
-                                {_sortBy(_uniqBy(Project?.members, (m: any) => m.wallet.toLowerCase()), (m: any) => _get(m, 'name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
-                                    return (
-                                        <NameAndAvatar
-                                            index={index}
-                                            address={_get(result, 'wallet', '')}
-                                            position={index}
-                                        />
-                                    );
-                                })}
-                            </Box>
-                        </Box>
-                    </Box>
+                            <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px', borderRadius: '5px', marginTop: '0.2rem' }} display={"flex"} flexDirection={"column"}>
 
+                                <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"}>
+                                    <Box sx={{ width: '250px' }}>
+                                        <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5' }}>Name</Typography>
+                                    </Box>
+                                    <Box sx={{ width: '250px' }}>
+                                        <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5', marginLeft: '22px' }}>Joined</Typography>
+                                    </Box>
+                                </Box>
+
+                                <Box sx={{ width: '100%', maxHeight: '220px', overflow: 'auto' }}>
+                                    {_sortBy(_uniqBy(Project?.members, (m: any) => m.wallet.toLowerCase()), (m: any) => _get(m, 'name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
+                                        return (
+                                            <NameAndAvatar
+                                                index={index}
+                                                address={_get(result, 'wallet', '')}
+                                                position={index}
+                                            />
+                                        );
+                                    })}
+                                </Box>
+                            </Box>
+                        </Box> 
+                    }
                 </Grid>
             </Grid>
         </>

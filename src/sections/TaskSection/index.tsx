@@ -21,6 +21,7 @@ import { getProjectAction } from "store/actions/project";
 import useTasks from 'hooks/useTasks';
 import useTerminology from "hooks/useTerminology";
 import BootstrapTooltip from "components/BootstrapTooltip";
+import useRole from "hooks/useRole";
 
 const useStyles = makeStyles((theme: any) => ({
     createBtn: {
@@ -138,7 +139,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
     const { parsedTasks } = useTasks(onlyProjects ? _get(Project, 'tasks', []) : _get(DAO, 'tasks', []))
     const [value, setValue] = useState<number>(0);
     const [initialLoad, setInitialLoad] = useState<boolean>(true);
-
+    const { myRole, can } = useRole(DAO, account, undefined)
     const [openCreateTask, setOpenCreateTask] = useState<boolean>(false);
 
     console.log("user : ", user)
@@ -221,6 +222,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                     }}
                 >
                     <Tab label={`My ${transformTask().labelPlural}`} {...a11yProps(0)} />
+                    { can(myRole, 'task.tabs.manage') &&  <>
                     <Tab
                         label="Manage"
                         {...a11yProps(1)}
@@ -261,7 +263,8 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                                 <></>
                         }
                     />
-                    <Tab label={`All ${transformTask().labelPlural}`} {...a11yProps(3)} />
+                    </> }
+                    {  can(myRole, 'task.tabs.all') && <Tab label={`All ${transformTask().labelPlural}`} {...a11yProps(3)} /> }
                 </Tabs>
                 {
                  !isPreview &&
@@ -291,6 +294,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                             </IconButton>
                         </span>
                     </BootstrapTooltip>
+                    { can(myRole, 'task.create') &&
                     <BootstrapTooltip arrow open={isHelpIconOpen}
                         placement="top-start"
                         title="Create Task">
@@ -304,6 +308,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                                 </Button>
                             </span>
                     </BootstrapTooltip>
+                    }
                     {/* <IconButton onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { active: value } }) : navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }} sx={{ marginRight: '20px' }}>
                         <img src={expandIcon} alt="archive-icon" />
                     </IconButton>

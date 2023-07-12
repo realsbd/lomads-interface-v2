@@ -94,14 +94,14 @@ export default [
 	{
 		path: '/:daoURL/only-whitelisted',
 		exact: true,
-		layout: DefaultLayout,
+		layout: DashboardNoHeaderLayout,
 		private: false,
 		component: OnlyWhitelistedPage
 	},
 	{
 		path: '/:daoURL/no-access',
 		exact: true,
-		layout: DefaultLayout,
+		layout: DashboardNoHeaderLayout,
 		private: false,
 		component: NoAccessPage
 	},
@@ -136,14 +136,14 @@ export default [
 	{
 		path: '/:daoURL/mint/:contractId',
 		exact: true,
-		layout: LandingLayout,
+		layout: DashboardNoHeaderLayout,
 		private: true,
 		component: MintPage
 	},
 	{
 		path: '/:daoURL/mint/v1/:contractId',
 		exact: true,
-		layout: LandingLayout,
+		layout: DashboardNoHeaderLayout,
 		private: true,
 		component: MintPageV1
 	},

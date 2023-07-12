@@ -14,7 +14,7 @@ const role4: Array<string> = [
     'project.milestone.view.inproject',
     'project.task.view.inproject',
     'project.links.view.inproject',
-    'members.view'
+    'members.view',
 ];
 
 const role3: Array<string> = [
@@ -31,7 +31,8 @@ const role3: Array<string> = [
     'project.member.edit.creator', 
     'project.link.add.creator',
     'project.task.view.creator',
-    'project.links.view.creator'
+    'project.links.view.creator',
+    'task.tabs.all'
 ];
 
 const role2: Array<string> = [
@@ -39,6 +40,7 @@ const role2: Array<string> = [
     //'settings',
     //'settings.roles_permissions',
     //'settings.integration',
+    'project.tabs.all', 
     'project.edit', 
     'project.share', 
     'project.view.all', 
@@ -57,6 +59,7 @@ const role2: Array<string> = [
     'members.add', 
     'notification.view', 
     'task.create', 
+    'task.tabs.manage',
     'task.create.sweat'
 ]
 const role1: Array<string> = [...role2, 'settings', 'settings.*', 'members.delete', 'task.edit', 'task.share', 'task.delete', 'task.close'];

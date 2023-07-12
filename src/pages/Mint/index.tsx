@@ -159,6 +159,7 @@ export default () => {
     const [payment, setPayment] = useState<any>(null)
     const [discountCheckLoading, setDiscountCheckLoading] = useState<boolean | null>(null)
     const [discountMessage, setDiscountMessage] = useState<any>(null);
+    const [paymentSuccess, setPaymentSuccess] = useState<any>(false)
     const [state, setState] = useState<any>({
         name: ""
     })
@@ -540,7 +541,7 @@ export default () => {
                 const transferGas = ethers.utils.formatEther((parseFloat(gasPrice.toString()) * tokenTransferGas).toString())
                 let total = ((contract?.gasless ? 0 : +gp.gas) + (+transferGas) * 2) + (+price.mintPrice)
                 if (total > parseFloat(accBalance)) {
-                    setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network. Mint price + Estimated gas ~${total} ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol}`)
+                    setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network. Mint price + Estimated gas ~${total.toFixed(3)} ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol}`)
                     setMintLoading(false)
                     return;
                 }
@@ -620,7 +621,7 @@ export default () => {
             if (contract?.mintPriceToken === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {
                 let total = (+gp.gas * 2)
                 if (total > parseFloat(accBalance)) {
-                    setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network. Estimated gas ~${total} ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol}`)
+                    setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network. Estimated gas ~${total.toFixed(3)} ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol}`)
                     setMintLoading(false)
                     return;
                 }
@@ -699,6 +700,7 @@ export default () => {
     }
 
     const handleCardPaymentSuccess = async (paymentRefence: any) => {
+        setPaymentSuccess(true)
         setShowOnRamper(null);
         setShowStripePayment(null)
         // const stats: any = await getCurrentTokenId();
@@ -718,6 +720,7 @@ export default () => {
         .catch(e => {
             console.log(e)
             setMintLoading(false)
+            setPaymentSuccess(false)
         })
     }
 
@@ -738,7 +741,7 @@ export default () => {
                 const transferGas = ethers.utils.formatEther((parseFloat(gasPrice.toString()) * tokenTransferGas).toString())
                 let total = ((+gp.gas) + (+transferGas) * 2) + (+gp.mintPrice)
                 if (total > parseFloat(accBalance)) {
-                    setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network. Estimated gas ~${total} ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol}`)
+                    setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network. Estimated gas ~${total.toFixed(3)} ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol}`)
                     setMintLoading(false)
                     return;
                 }
@@ -931,8 +934,8 @@ export default () => {
             <Box>
                 <Grid container className={classes.root}>
                     <Grid item sm={12} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-                        <Box sx={{ mt:5 }} display="flex" alignItems="flex-start" justifyContent={"flex-start"} style={{ width: '100%', height: '100px' }}>
-                            <HeaderLogo sx={{ mt: 1  }} plain dao={DAO} />
+                        <Box display="flex" alignItems="flex-start" justifyContent={"flex-start"} style={{ width: '100%', height: '100px' }}>
+                            {/* <HeaderLogo sx={{ mt: 1  }} plain dao={DAO} /> */}
                             <Box>
                                 <Typography sx={{ marginLeft: "20px" }} className={classes.title}>{DAO ? DAO.name : ''}</Typography>
                                 <Typography sx={{ marginLeft: "20px", maxWidth: 800 }} className={classes.subtitle}>{DAO ? DAO.description : ''}</Typography>
@@ -1073,6 +1076,16 @@ export default () => {
                                                                             <Button onClick={() => handleDiscord()} className={classes.createBtn}>CONNECT</Button>
                                                                         }
                                                                     </Box>
+                                                                    { errors['discord'] && <Typography
+                                                                    style={{ 
+                                                                        fontSize: 12,
+                                                                        margin: '0 14px',
+                                                                        color: '#FFF',
+                                                                        backgroundColor: '#EA6447',
+                                                                        borderRadius: "0 0 5px 5px",
+                                                                        padding: '5px 10px'
+                                                                     }}
+                                                                    >{ errors['discord'] }</Typography> }
                                                                 </Box>
                                                             )
                                                         }
@@ -1111,8 +1124,8 @@ export default () => {
                                                                     setState((prev: any) => { return { ...prev, referralCode: '' } })
                                                                     setDiscountMessage(null)
                                                                     setPrice((prev: any) => { return { ...prev, mintPrice: contract?.mintPrice } })
-                                                                }} sx={{ mt: 4 }} size="small" variant="outlined">Remove</Button> : 
-                                                                <Button loading={discountCheckLoading} onClick={() => handleApplyDiscount()} sx={{ mt: 4 }} size="small" variant="outlined">Apply</Button>
+                                                                }} sx={{ mt: 6 }} size="small" variant="outlined">Remove</Button> : 
+                                                                <Button loading={discountCheckLoading} onClick={() => handleApplyDiscount()} sx={{ mt: 6 }} size="small" variant="outlined">Apply</Button>
                                                             }
                                                     </Box> 
                                                     {  discountMessage &&
@@ -1124,8 +1137,10 @@ export default () => {
                                                     </Box>
                                                 }
                                                 {   mintLoading ? 
-                                                    <Box sx={{ minWidth: isMobile ? '300px' : '400px', margin: '25px 0' }} flexDirection={isMobile ? "column":"row"} display={"flex"} alignItems="center" justifyContent={"center"}>
+                                                     <Box sx={{width: isMobile ? '300px' : '400px', margin: '25px 0' }} flexDirection={"column"} display={"flex"} alignItems="center" justifyContent={"center"}>
                                                         <LeapFrog size={50} color="#C94B32" />
+                                                        { paymentSuccess && <Typography style={{  lineHeight: '24px', fontFamily: `'Inter', sans-serif`, textAlign: 'center', fontSize: 16, opacity: 0.7 }}>{ `Hold on while we make your ${ contract?.token } Official! 
+                                                        This may take a few minutes. Please don’t close this page or refresh your browser` }</Typography> }
                                                     </Box>
                                                     :
                                                     <Box sx={{ minWidth: isMobile ? '300px' : '400px', margin: '25px 0' }} flexDirection={isMobile ? "column":"row"} display={"flex"} alignItems="center" justifyContent={"center"}>

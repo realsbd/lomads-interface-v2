@@ -102,7 +102,7 @@ const useContractDeployer = (deployerAddress: any) => {
         }
         catch (e:any) {
            console.log(e.message)
-           throw _get(e ,'message', 'Error during deployment')
+           throw 'Error during deployment'
         }
     }
 

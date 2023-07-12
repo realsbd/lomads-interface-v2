@@ -26,6 +26,7 @@ import { useWeb3Auth } from "context/web3Auth";
 import ProjectCard from "components/ProjectCard";
 import moment from "moment";
 import { useLocation, useNavigate } from "react-router-dom";
+import useRole from "hooks/useRole";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -98,6 +99,7 @@ export default () => {
     const { user } = useAppSelector((store: any) => store?.session)
     const { transformWorkspace, transformTask: transformTaskLabel } = useTerminology(_get(DAO, 'terminologies', null))
     const [tab, setTab] = useState(0);
+    const { myRole, can } = useRole(DAO, account, undefined)
 
     useEffect(() => {
         if (!user) {
@@ -200,9 +202,11 @@ export default () => {
                                         <LomadsIconButton onClick={() => navigate(`/${DAO.url}/archivedProjects`)}>
                                             <img src={ArchiveIcon} />
                                         </LomadsIconButton>
+                                        { can(myRole, 'project.create') &&
                                         <Button sx={{ ml: 2 }} size="small" variant="contained" color="secondary" onClick={() => navigate(`/${DAO.url}/project/create`)}>
                                             Create
                                         </Button>
+                                        }
                                     </Box>
                                 </Box>
                             </Container>
