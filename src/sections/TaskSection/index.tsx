@@ -264,47 +264,47 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                     <Tab label={`All ${transformTask().labelPlural}`} {...a11yProps(3)} />
                 </Tabs>
                 {
-                 !isPreview &&
-                <Box display={"flex"} alignItems={"center"}>
-                <BootstrapTooltip arrow open={isHelpIconOpen}
-                        placement="top-start"
-                        title="Open">
-                        <span>
-                            <IconButton
-                            style={{
-                                ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {}),
-                            }}
-                            onClick={() => navigate(`/${DAO.url}/tasks`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
-                                <img src={expandIcon} alt="archive-icon" />
-                            </IconButton>
-                        </span>
-                    </BootstrapTooltip>
-                    <BootstrapTooltip arrow open={isHelpIconOpen}
-                        placement="bottom"
-                        title="Archives">
-                        <span>
-                            <IconButton onClick={() => { onlyProjects ? navigate(`/${DAO.url}/archivedTasks/${Project._id}`) : navigate(`/${DAO.url}/archivedTasks`) }} sx={{
-                                marginRight: '20px',
-                                ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {}),
-                            }}>
-                                <img src={archiveIcon} alt="archiveIcon" />
-                            </IconButton>
-                        </span>
-                    </BootstrapTooltip>
-                    <BootstrapTooltip arrow open={isHelpIconOpen}
-                        placement="top-start"
-                        title="Create Task">
+                    !isPreview &&
+                    <Box display={"flex"} alignItems={"center"}>
+                        <BootstrapTooltip arrow open={isHelpIconOpen}
+                            placement="top-start"
+                            title="Open">
+                            <span>
+                                <IconButton
+                                    style={{
+                                        ...(isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {}),
+                                    }}
+                                    onClick={() => navigate(`/${DAO.url}/tasks`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
+                                    <img src={expandIcon} alt="archive-icon" />
+                                </IconButton>
+                            </span>
+                        </BootstrapTooltip>
+                        <BootstrapTooltip arrow open={isHelpIconOpen}
+                            placement="bottom"
+                            title="Archives">
+                            <span>
+                                <IconButton onClick={() => { onlyProjects ? navigate(`/${DAO.url}/archivedTasks/${Project._id}`) : navigate(`/${DAO.url}/archivedTasks`) }} sx={{
+                                    marginRight: '20px',
+                                    ...(isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {}),
+                                }}>
+                                    <img src={archiveIcon} alt="archiveIcon" />
+                                </IconButton>
+                            </span>
+                        </BootstrapTooltip>
+                        <BootstrapTooltip arrow open={isHelpIconOpen}
+                            placement="top-start"
+                            title="Create Task">
                             <span>
                                 <Button
                                     style={{
-                                        ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {})
+                                        ...(isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {})
                                     }}
                                     size="small" variant="contained" className={classes.createBtn} color="secondary" onClick={() => setOpenCreateTask(true)}>
                                     <AddIcon sx={{ fontSize: 18 }} /> CREATE
                                 </Button>
                             </span>
-                    </BootstrapTooltip>
-                    {/* <IconButton onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { active: value } }) : navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }} sx={{ marginRight: '20px' }}>
+                        </BootstrapTooltip>
+                        {/* <IconButton onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { active: value } }) : navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }} sx={{ marginRight: '20px' }}>
                         <img src={expandIcon} alt="archive-icon" />
                     </IconButton>
                     <IconButton
@@ -317,7 +317,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                     <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn} onClick={() => setOpenCreateTask(true)}>
                         <AddIcon sx={{ fontSize: 18 }} /> CREATE
                     </Button> */}
-                </Box> }
+                    </Box>}
             </Box>
             <Box style={{ position: "relative" }}>
                 <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>

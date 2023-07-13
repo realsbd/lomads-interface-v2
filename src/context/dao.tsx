@@ -48,9 +48,9 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   const loadDAO = async (url: string) => {
     dispatch(loadDAOAction(url))
   }
-  
+
   useEffect(() => {
-    if(!token && window.location.pathname !== '/login'){
+    if (!token && window.location.pathname !== '/login') {
       if (window.location.pathname !== '/')
         window.location.href = `/login?from=${window.location.pathname}`
       else
@@ -60,7 +60,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
 
   useEffect(() => {
     console.log("loadDAOList", account, token)
-    if ((!daoURL || daoURL) && account && token && !DAOList){
+    if ((!daoURL || daoURL) && account && token && !DAOList) {
       resetDAO()
       loadDAOList()
       //dispatch(createAccountAction({}))
@@ -68,30 +68,31 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }, [account, token, DAOList, daoURL])
 
   useEffect(() => {
-    if(user?._id)
-      dispatch(createAccountAction({ token })) 
+    if (user?._id)
+      dispatch(createAccountAction({ token }))
   }, [user?._id])
 
   useEffect(() => {
     if (DAOList && !daoURL && window.location.pathname === '/') {
-      if (DAOList.length > 0){
-          navigate(`/${_get(DAOList, '[0].url')}`)
+      if (DAOList.length > 0) {
+        navigate(`/${_get(DAOList, '[0].url')}`)
       }
       else
-        navigate(`/organisation/create`)
+        // navigate(`/organisation/create`)
+        navigate(`/starter`)
     }
   }, [DAOList, from])
 
   useEffect(() => {
     if (provider && account && DAO?.url) {
-      if(DAO?.sbt) {
+      if (DAO?.sbt) {
         balanceOf().then(res => {
           console.log("Balance of...", parseInt(res._hex, 16))
           if (parseInt(res._hex, 16) === 1) {
-  
+
           } else {
             if (!DAO?.sbt?.whitelisted || (DAO?.sbt?.whitelisted && _find(DAO?.members, (member: any) => toChecksumAddress(member.member.wallet) === account))) {
-              if(+DAO?.sbt?.version >= 2)
+              if (+DAO?.sbt?.version >= 2)
                 navigate(`/${DAO?.url}/mint/${DAO?.sbt?.address}`)
               else
                 navigate(`/${DAO?.url}/mint/v1/${DAO?.sbt?.address}`)
@@ -101,11 +102,11 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
             }
           }
         })
-        .catch(e => {
-          console.log(e)
-        })
+          .catch(e => {
+            console.log(e)
+          })
       } else {
-        if(!_find(DAO?.members, (member: any) => toChecksumAddress(member.member.wallet) === account))
+        if (!_find(DAO?.members, (member: any) => toChecksumAddress(member.member.wallet) === account))
           navigate(`/${DAO?.url}/no-access`)
       }
     }

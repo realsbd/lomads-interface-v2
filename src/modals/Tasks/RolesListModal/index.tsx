@@ -96,7 +96,7 @@ export default ({ open, closeModal, hideBackdrop, validRoles, roleType, handleVa
                             (_get(DAO, 'terminologies') ? Object.keys(_get(DAO, 'terminologies.roles', {})) : Object.keys(DEFAULT_ROLES)).map((key, index) => {
                                 return (
                                     <>
-                                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} key={index} onClick={() => handleAddRoles(key)}>
+                                        <Box display={"flex"} alignItems={"center"} key={index} onClick={() => handleAddRoles(key)}>
                                             <Chip
                                                 label={_get(transformRole(key), 'label')}
                                                 className={classes.rolePill}

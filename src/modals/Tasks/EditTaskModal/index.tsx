@@ -14,6 +14,10 @@ import { CgClose } from 'react-icons/cg'
 
 import CloseSVG from 'assets/svg/closeNew.svg'
 import createTaskSvg from 'assets/svg/task.svg';
+import AddIcon from '@mui/icons-material/Add';
+
+import { IoIosClose } from 'react-icons/io'
+import Avatar from "components/Avatar";
 
 import { useSafeTokens } from "context/safeTokens";
 import { useDAO } from "context/dao";
@@ -31,6 +35,7 @@ import { editDraftTaskAction, editTaskAction, convertDraftTaskAction } from "sto
 import useSafe from "hooks/useSafe";
 import theme from "theme";
 import moment from "moment";
+import InviteMemberModal from "../InviteMemberModal";
 
 
 const useStyles = makeStyles((theme: any) => ({
@@ -109,10 +114,21 @@ const useStyles = makeStyles((theme: any) => ({
         width: '40px !important',
     },
     rolePill: {
-        width: 200,
+        width: 107,
+        height: 22,
+        borderRadius: '100px !important',
         display: "flex !important",
         alignItems: "center !important",
-        justifyContent: "flex-start !important",
+        justifyContent: "space-between !important",
+        marginRight: '5px !important',
+        marginBottom: '5px !important',
+        padding: '0 5px !important'
+    },
+    roleAvatar: {
+        height: 14,
+        width: 14,
+        borderRadius: '50% !important',
+        marginRight: '5px !important'
     },
     deleteBtn: {
         height: '20px !important',
@@ -126,6 +142,14 @@ const useStyles = makeStyles((theme: any) => ({
     heading: {
         fontSize: "32px !important",
         margin: "20px 0 35px 0 !important"
+    },
+    createBtn: {
+        width: '125px',
+        height: '40px',
+        color: '#C94B32 !important',
+        display: 'flex !important',
+        alignItems: 'center !important',
+        justifyContent: 'space-around !important'
     },
 }));
 
@@ -178,6 +202,9 @@ export default ({ open, closeModal, task }: Props) => {
     const [errorTaskValue, setErrorTaskValue] = useState<boolean>(false);
 
     const [editType, setEditType] = useState('');
+
+    const [invitations, setInvitations] = useState(task.invitations);
+    const [openInviteMember, setOpenInviteMember] = useState(false);
 
     const getrolename = (roleId: any) => {
 
@@ -276,7 +303,13 @@ export default ({ open, closeModal, task }: Props) => {
     }
 
     const handleRemoveRole = (role: any) => {
-        setValidRoles(validRoles.filter((item: any) => item !== role))
+        let newRoles = validRoles.filter((item: any) => item !== role)
+        setValidRoles(newRoles)
+    }
+
+    const handleRemoveInvitation = (invite: any) => {
+        let newInvites = invitations.filter((item: any) => item.address !== invite.address)
+        setInvitations(newInvites)
     }
 
     const handleEditTask = () => {
@@ -320,14 +353,14 @@ export default ({ open, closeModal, task }: Props) => {
             }
             return;
         }
-        else if (contributionType === 'assign' && selectedUser === null) {
-            setErrorApplicant('Select an applicant');
-            let e = document.getElementById('error-applicant');
-            if (e) {
-                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
-            }
-            return;
-        }
+        // else if (contributionType === 'assign' && selectedUser === null) {
+        //     setErrorApplicant('Select an applicant');
+        //     let e = document.getElementById('error-applicant');
+        //     if (e) {
+        //         e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+        //     }
+        //     return;
+        // }
         else if (currency === '') {
             setErrorCurrency(true);
             let e = document.getElementById('error-currency-amt');
@@ -382,7 +415,7 @@ export default ({ open, closeModal, task }: Props) => {
                 members = []
             }
 
-            members = contributionType === 'assign' && selectedUser ? [{ member: selectedUser._id, status: 'approved' }] : members;
+            // members = contributionType === 'assign' && selectedUser ? [{ member: selectedUser._id, status: 'approved' }] : members;
 
             let taskOb: any = {};
             taskOb.name = name;
@@ -397,6 +430,7 @@ export default ({ open, closeModal, task }: Props) => {
             taskOb.isFilterRoles = isFilterRoles;
             taskOb.validRoles = isFilterRoles ? validRoles : [];
             taskOb.reviewer = reviewer;
+            task.invitations = invitations;
             taskOb.members = members;
             dispatch(editTaskAction({ payload: taskOb, daoUrl: _get(DAO, 'url', ''), taskId: task._id }))
         }
@@ -443,6 +477,7 @@ export default ({ open, closeModal, task }: Props) => {
         tsk.isSingleContributor = isSingleContributor;
         tsk.isFilterRoles = isFilterRoles;
         tsk.validRoles = validRoles;
+        task.invitations = invitations;
 
         dispatch(editDraftTaskAction({ payload: tsk, daoUrl: _get(DAO, 'url', ''), taskId: _get(task, '_id', '') }))
     }
@@ -488,14 +523,14 @@ export default ({ open, closeModal, task }: Props) => {
             }
             return;
         }
-        else if (contributionType === 'assign' && selectedUser === null) {
-            setErrorApplicant('Select an applicant');
-            let e = document.getElementById('error-applicant');
-            if (e) {
-                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
-            }
-            return;
-        }
+        // else if (contributionType === 'assign' && selectedUser === null) {
+        //     setErrorApplicant('Select an applicant');
+        //     let e = document.getElementById('error-applicant');
+        //     if (e) {
+        //         e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+        //     }
+        //     return;
+        // }
         else if (currency === '') {
             setErrorCurrency(true);
             let e = document.getElementById('error-currency-amt');
@@ -553,7 +588,20 @@ export default ({ open, closeModal, task }: Props) => {
             taskOb.isSingleContributor = isSingleContributor;
             taskOb.isFilterRoles = isFilterRoles;
             taskOb.validRoles = isFilterRoles ? validRoles : [];
+            task.invitations = invitations;
             dispatch(convertDraftTaskAction({ payload: taskOb, daoUrl: _get(DAO, 'url', ''), taskId: _get(task, '_id', '') }))
+        }
+    }
+
+    const handleChangeContributionType = () => {
+        if (contributionType === 'open') {
+            setContributionType('assign');
+            setIsFilterRoles(true);
+            setValidRoles([]);
+            setInvitations([]);
+        }
+        else {
+            setContributionType('open')
         }
     }
 
@@ -564,6 +612,14 @@ export default ({ open, closeModal, task }: Props) => {
             open={open}
             sx={{ zIndex: theme.zIndex.appBar + 1 }}
         >
+            <InviteMemberModal
+                open={openInviteMember}
+                closeModal={() => setOpenInviteMember(false)}
+                hideBackdrop={true}
+                selectedApplicants={invitations}
+                reviewer={reviewer}
+                handleInvitations={(value: any) => setInvitations(value)}
+            />
             <RolesListModal
                 open={openRolesList}
                 closeModal={() => setOpenRolesList(false)}
@@ -684,7 +740,7 @@ export default ({ open, closeModal, task }: Props) => {
                             </Box>
                         </Box>
 
-                        <Box className={classes.modalRow}>
+                        {/* <Box className={classes.modalRow}>
                             <Box sx={{ marginBottom: '10px' }}><Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Contribution</Typography></Box>
                             <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                                 <Box
@@ -766,6 +822,121 @@ export default ({ open, closeModal, task }: Props) => {
                                     </Button>
                                 </Box>
                             }
+                        </Box> */}
+
+                        <Box className={classes.modalRow}>
+                            <Box sx={{ marginBottom: '10px' }}><Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Contributors</Typography></Box>
+                            <Box sx={{ margin: '1rem 0' }} display={"flex"} alignItems={"center"}>
+                                <Box sx={{ marginRight: '11px' }}><Typography sx={{ color: contributionType === 'open' ? '#C94B32' : '#76808D' }}>OPEN FOR ALL</Typography></Box>
+                                <Box><Switch checked={contributionType === 'open' ? false : true} unidirectional={false} checkedSVG="lock" onChange={handleChangeContributionType} /></Box>
+                                <Box sx={{ marginLeft: '3px' }}><Typography sx={{ color: contributionType === 'assign' ? '#C94B32' : '#76808D' }}>FILTER BY</Typography></Box>
+                            </Box>
+
+                            {
+                                contributionType === 'assign' &&
+                                <Box sx={{ width: '100%' }}>
+                                    <Box sx={{ marginBottom: '1rem' }} display={"flex"} alignItems={"flex-start"} justifyContent={"space-between"}>
+                                        <Box display={"flex"} flexDirection={"column"}>
+                                            <Typography sx={{ color: '#76808D', fontSize: '16px', fontWeight: '700', opacity: '0.3' }}>Lomads Roles</Typography>
+                                            <Box display={"flex"} flexWrap={"wrap"} sx={{ marginTop: '5px' }}>
+
+                                                {
+                                                    validRoles && validRoles.map((item: any, index: number) => {
+                                                        if (item == "role1" || item == "role2" || item == "role3" || item == "role4") {
+                                                            return (
+                                                                <Box className={classes.rolePill} sx={{ background: getroleColor(item).pill }} key={index}>
+                                                                    <Box display={"flex"} alignItems={"center"}>
+                                                                        <Box className={classes.roleAvatar} sx={{ background: getroleColor(item).circle }}></Box>
+                                                                        <Typography sx={{ fontSize: 12, color: '#76808D' }}>{transformRole(item).label.length > 5 ? transformRole(item).label.substring(0, 5) + '...' : transformRole(item).label}</Typography>
+                                                                    </Box>
+                                                                    <Box sx={{ cursor: 'pointer' }} display={"flex"} alignItems={"center"} justifyContent={"center"} onClick={() => handleRemoveRole(item)}>
+                                                                        <IoIosClose color="#76808D" size={24} />
+                                                                    </Box>
+                                                                </Box>
+                                                            )
+                                                        }
+                                                        else return null
+                                                    })
+                                                }
+
+                                            </Box>
+                                        </Box>
+                                        <Button
+                                            size="small" variant="contained" className={classes.createBtn} color="secondary" onClick={() => { setRoleType('Lomads'); setOpenRolesList(true) }}>
+                                            <AddIcon sx={{ fontSize: 18 }} /> ADD
+                                        </Button>
+                                    </Box>
+                                    {
+                                        _get(DAO, 'discord', null) &&
+                                        <Box sx={{ marginBottom: '1rem' }} display={"flex"} alignItems={"flex-start"} justifyContent={"space-between"}>
+                                            <Box display={"flex"} flexDirection={"column"}>
+                                                <Typography sx={{ color: '#76808D', fontSize: '16px', fontWeight: '700', opacity: '0.3' }}>Discord Roles</Typography>
+                                                <Box display={"flex"} flexWrap={"wrap"} sx={{ marginTop: '5px' }}>
+
+                                                    {
+                                                        validRoles && validRoles.map((item: any, index: number) => {
+                                                            if (item !== "role1" && item !== "role2" && item !== "role3" && item !== "role4") {
+                                                                return (
+                                                                    <Box className={classes.rolePill} sx={{ background: getroleColor(item).pill }} key={index}>
+                                                                        <Box display={"flex"} alignItems={"center"}>
+                                                                            <Box className={classes.roleAvatar} sx={{ background: getroleColor(item).circle }}></Box>
+                                                                            <Typography sx={{ fontSize: 14, color: '#76808D' }}>{getrolename(item).length > 5 ? getrolename(item).substring(0, 5) + '...' : getrolename(item)}</Typography>
+                                                                        </Box>
+                                                                        <Box sx={{ cursor: 'pointer' }} display={"flex"} alignItems={"center"} justifyContent={"center"} onClick={() => handleRemoveRole(item)}>
+                                                                            <IoIosClose color="#76808D" size={24} />
+                                                                        </Box>
+                                                                    </Box>
+                                                                )
+                                                            }
+                                                            else return null
+                                                        })
+                                                    }
+
+                                                </Box>
+                                            </Box>
+                                            <Button
+                                                size="small" variant="contained" className={classes.createBtn} color="secondary" onClick={() => { setRoleType('Discord'); setOpenRolesList(true) }}>
+                                                <AddIcon sx={{ fontSize: 18 }} /> ADD
+                                            </Button>
+                                        </Box>
+                                    }
+
+                                    <Box sx={{ marginBottom: '1rem' }} display={"flex"} alignItems={"flex-start"} justifyContent={"space-between"}>
+                                        <Box display={"flex"} flexDirection={"column"}>
+                                            <Typography sx={{ color: '#76808D', fontSize: '16px', fontWeight: '700', opacity: '0.3' }}>Invitation</Typography>
+                                            <Box display={"flex"} flexDirection={'column'} sx={{ marginTop: '1rem' }}>
+
+                                                {
+                                                    invitations.length > 0 && invitations.map((item: any, index: number) => {
+                                                        return (
+                                                            <Box display={"flex"} sx={{ marginBottom: '0.5rem' }} key={index}>
+                                                                <Avatar name={item.name} wallet={item.address} />
+                                                                <Box sx={{ cursor: 'pointer', marginLeft: '1rem' }} onClick={() => handleRemoveInvitation(item)}>
+                                                                    <IoIosClose color="#76808D" size={24} />
+                                                                </Box>
+                                                            </Box>
+
+                                                        )
+                                                    })
+                                                }
+                                            </Box>
+                                        </Box>
+                                        <Button
+                                            size="small" variant="contained" className={classes.createBtn} color="secondary" onClick={() => setOpenInviteMember(prev => !prev)}>
+                                            <AddIcon sx={{ fontSize: 18 }} /> INVITE
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            }
+                        </Box>
+
+                        <Box className={classes.modalRow}>
+                            <Box sx={{ marginBottom: '10px' }}><Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Task Performance</Typography></Box>
+                            <Box sx={{ margin: '1rem 0' }} display={"flex"} alignItems={"center"}>
+                                <Box sx={{ marginRight: '11px' }}><Typography sx={{ color: !isSingleContributor ? '#C94B32' : '#76808D' }}>INVITE SUBMISSION</Typography></Box>
+                                <Box><Switch checked={isSingleContributor} unidirectional={false} checkedSVG="lock" onChange={() => setIsSingleContributor((prev: boolean) => !prev)} /></Box>
+                                <Box sx={{ marginLeft: '3px' }}><Typography sx={{ color: isSingleContributor ? '#C94B32' : '#76808D' }}>APPLICATION FIRST,<br /><span style={{ fontSize: '12px' }}>THEN INVITE SUBMISSION</span></Typography></Box>
+                            </Box>
                         </Box>
 
                         <Box className={classes.modalRow} sx={{ margin: '0px !important' }} id="error-sublink">

@@ -335,6 +335,7 @@ export default () => {
         };
         project['daoId'] = DAO?._id;
         project['members'] = [];
+        project['validRoles'] = [];
 
         if (!toggle) {
             let arr = [];
@@ -345,7 +346,7 @@ export default () => {
                 }
             }
             project['members'] = arr;
-            project['validRoles'] = [];
+
             project['inviteType'] = 'Open';
         }
 
@@ -357,8 +358,8 @@ export default () => {
         if (toggle && selectedMembers.length > 0) {
             let temp: any[] = [...project['members'], ..._uniqBy(selectedMembers, m => m.address)]
             project['members'] = [..._uniqBy(temp, m => m.address)];
-            project['validRoles'] = [];
             project['inviteType'] = 'Invitation';
+            project['invitations'] = selectedMembers;
         }
 
         // if (toggle && selectType === 'Roles') {
