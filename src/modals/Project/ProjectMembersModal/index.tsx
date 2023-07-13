@@ -21,6 +21,9 @@ import useTerminology from 'hooks/useTerminology';
 import { updateProjectMembersAction } from "store/actions/project";
 import theme from "theme";
 
+import { IoIosClose } from 'react-icons/io';
+import AddIcon from '@mui/icons-material/Add';
+
 const useStyles = makeStyles((theme: any) => ({
     root: {
         height: '100vh',
@@ -76,7 +79,27 @@ const useStyles = makeStyles((theme: any) => ({
         display: "flex !important",
         alignItems: "center !important",
         justifyContent: "flex-start !important"
-    }
+    },
+    inviteCard: {
+        width: 404,
+        background: '#FFF',
+        borderRadius: '5px !important',
+        padding: 22
+    },
+    roleAvatar: {
+        height: 14,
+        width: 14,
+        borderRadius: '50% !important',
+        marginRight: '5px !important'
+    },
+    createBtn: {
+        width: '115px',
+        height: '40px',
+        color: '#C94B32 !important',
+        display: 'flex !important',
+        alignItems: 'center !important',
+        justifyContent: 'space-around !important'
+    },
 }));
 
 interface Props {
@@ -97,6 +120,12 @@ export default ({ open, closeModal }: Props) => {
     const [selectType, setSelectType] = useState(_get(Project, 'inviteType', ''));
 
     const [selectedRoles, setSelectedRoles] = useState(_get(Project, 'validRoles', []));
+
+    const [selectedMembers, setSelectedMembers] = useState<any[]>(_get(Project, 'invitations', []));
+
+    const [roleType, setRoleType] = useState('');
+    const [openRolesList, setOpenRolesList] = useState(false);
+    const [openInviteMember, setOpenInviteMember] = useState(false);
 
     // runs after updating members
     useEffect(() => {
@@ -253,6 +282,50 @@ export default ({ open, closeModal }: Props) => {
         )
     }
 
+    const getroleColor = (roleId: any) => {
+
+        if (roleId == "role1" || roleId == "role2" || roleId == "role3" || roleId == "role4") {
+            if (roleId === 'role1')
+                return { pill: 'rgba(146, 225, 168, 0.3)', circle: 'rgba(146, 225, 168, 1)' };
+            else if (roleId === 'role2')
+                return { pill: 'rgba(137,179,229,0.3)', circle: 'rgba(137,179,229,1)' };
+            else if (roleId === 'role3')
+                return { pill: 'rgba(234,100,71,0.3)', circle: 'rgba(234,100,71,1)' };
+            else if (roleId === 'role4')
+                return { pill: 'rgba(146, 225, 168, 0.3)', circle: 'rgba(146, 225, 168, 1)' };
+        }
+        for (let index = 0; index < Object.keys(_get(DAO, 'discord', {})).length; index++) {
+            const element = Object.keys(_get(DAO, 'discord', {}))[index];
+            const rolename_discord = _find(DAO.discord[element].roles, r => r.id === roleId)
+            if (rolename_discord) {
+                return { pill: `${_get(rolename_discord, 'roleColor', '#99aab5')}50`, circle: _get(rolename_discord, 'roleColor', '#99aab5') }
+            }
+        }
+        return { pill: '#99aab550', circle: '#99aab5' };
+    };
+
+    const getrolename = (roleId: any) => {
+
+        for (let index = 0; index < Object.keys(_get(DAO, 'discord', {})).length; index++) {
+            const element = Object.keys(_get(DAO, 'discord', {}))[index];
+            const rolename_discord = _find(DAO.discord[element].roles, r => r.id === roleId)
+            if (rolename_discord) {
+                return rolename_discord.name
+            }
+        }
+        return "";
+    };
+
+    const handleRemoveRole = (role: any) => {
+        let newRoles = selectedRoles.filter((item: any) => item !== role)
+        setSelectedRoles(newRoles);
+    }
+
+    const handleRemoveInvitation = (invite: any) => {
+        let newInvites = selectedMembers.filter((item: any) => item.address !== invite.address)
+        setSelectedMembers(newInvites)
+    }
+
     return (
         <Drawer
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
@@ -277,6 +350,111 @@ export default ({ open, closeModal }: Props) => {
                         <Box><Switch checked={toggle} checkedSVG="lock" onChange={() => setToggle(!toggle)} /></Box>
                         <Box sx={{ marginLeft: '3px' }}><Typography sx={{ color: toggle ? '#C94B32' : '#76808D' }}>FILTER BY</Typography></Box>
                     </Box>
+
+                    {/* <Box className={classes.inviteCard} display={"flex"} flexDirection={"column"}>
+                        <Box sx={{ marginBottom: '20px' }}><Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>CONTRIBUTORS:</Typography></Box>
+                        <Box display={"flex"} alignItems={"center"} sx={{ marginBottom: '1rem' }}>
+                            <Box sx={{ marginRight: '11px' }}><Typography sx={{ color: !toggle ? '#C94B32' : '#76808D' }}>OPEN FOR ALL</Typography></Box>
+                            <Box><Switch unidirectional={false} checkedSVG="lock" onChange={() => setToggle(!toggle)} /></Box>
+                            <Box sx={{ marginLeft: '3px' }}><Typography sx={{ color: toggle ? '#C94B32' : '#76808D' }}>FILTER BY</Typography></Box>
+                        </Box>
+                        {
+                            toggle &&
+                            <Box sx={{ width: '100%' }}>
+                                <Box sx={{ marginBottom: '1rem' }} display={"flex"} alignItems={"flex-start"} justifyContent={"space-between"}>
+                                    <Box display={"flex"} flexDirection={"column"}>
+                                        <Typography sx={{ color: '#76808D', fontSize: '16px', fontWeight: '700', opacity: '0.3' }}>Lomads Roles</Typography>
+                                        <Box display={"flex"} flexWrap={"wrap"} sx={{ marginTop: '5px' }}>
+
+                                            {
+                                                selectedRoles.length > 0 && selectedRoles.map((item: any, index: number) => {
+                                                    if (item == "role1" || item == "role2" || item == "role3" || item == "role4") {
+                                                        return (
+                                                            <Box className={classes.rolePill} sx={{ background: getroleColor(item).pill }} key={index}>
+                                                                <Box display={"flex"} alignItems={"center"}>
+                                                                    <Box className={classes.roleAvatar} sx={{ background: getroleColor(item).circle }}></Box>
+                                                                    <Typography sx={{ fontSize: 12, color: '#76808D' }}>{transformRole(item).label.length > 5 ? transformRole(item).label.substring(0, 5) + '...' : transformRole(item).label}</Typography>
+                                                                </Box>
+                                                                <Box sx={{ cursor: 'pointer' }} display={"flex"} alignItems={"center"} justifyContent={"center"} onClick={() => handleRemoveRole(item)}>
+                                                                    <IoIosClose color="#76808D" size={24} />
+                                                                </Box>
+                                                            </Box>
+                                                        )
+                                                    }
+                                                    else return null
+                                                })
+                                            }
+
+                                        </Box>
+                                    </Box>
+                                    <Button
+                                        size="small" variant="contained" className={classes.createBtn} color="secondary" onClick={() => { setRoleType('Lomads'); setOpenRolesList(true) }}>
+                                        <AddIcon sx={{ fontSize: 18 }} /> ADD
+                                    </Button>
+                                </Box>
+                                {
+                                    _get(DAO, 'discord', null) &&
+                                    <Box sx={{ marginBottom: '1rem' }} display={"flex"} alignItems={"flex-start"} justifyContent={"space-between"}>
+                                        <Box display={"flex"} flexDirection={"column"}>
+                                            <Typography sx={{ color: '#76808D', fontSize: '16px', fontWeight: '700', opacity: '0.3' }}>Discord Roles</Typography>
+                                            <Box display={"flex"} flexWrap={"wrap"} sx={{ marginTop: '5px' }}>
+
+                                                {
+                                                    selectedRoles && selectedRoles.map((item: any, index: number) => {
+                                                        if (item !== "role1" && item !== "role2" && item !== "role3" && item !== "role4") {
+                                                            return (
+                                                                <Box className={classes.rolePill} sx={{ background: getroleColor(item).pill }} key={index}>
+                                                                    <Box display={"flex"} alignItems={"center"}>
+                                                                        <Box className={classes.roleAvatar} sx={{ background: getroleColor(item).circle }}></Box>
+                                                                        <Typography sx={{ fontSize: 14, color: '#76808D' }}>{getrolename(item).length > 5 ? getrolename(item).substring(0, 5) + '...' : getrolename(item)}</Typography>
+                                                                    </Box>
+                                                                    <Box sx={{ cursor: 'pointer' }} display={"flex"} alignItems={"center"} justifyContent={"center"} onClick={() => handleRemoveRole(item)}>
+                                                                        <IoIosClose color="#76808D" size={24} />
+                                                                    </Box>
+                                                                </Box>
+                                                            )
+                                                        }
+                                                        else return null
+                                                    })
+                                                }
+
+                                            </Box>
+                                        </Box>
+                                        <Button
+                                            size="small" variant="contained" className={classes.createBtn} color="secondary" onClick={() => { setRoleType('Discord'); setOpenRolesList(true) }}>
+                                            <AddIcon sx={{ fontSize: 18 }} /> ADD
+                                        </Button>
+                                    </Box>
+                                }
+
+                                <Box sx={{ marginBottom: '1rem' }} display={"flex"} alignItems={"flex-start"} justifyContent={"space-between"}>
+                                    <Box display={"flex"} flexDirection={"column"}>
+                                        <Typography sx={{ color: '#76808D', fontSize: '16px', fontWeight: '700', opacity: '0.3' }}>Invitation</Typography>
+                                        <Box display={"flex"} flexDirection={'column'} sx={{ marginTop: '1rem' }}>
+
+                                            {
+                                                selectedMembers.length > 0 && selectedMembers.map((item: any, index: number) => {
+                                                    return (
+                                                        <Box display={"flex"} sx={{ marginBottom: '0.5rem' }} key={index}>
+                                                            <Avatar name={item.name} wallet={item.address} />
+                                                            <Box sx={{ cursor: 'pointer', marginLeft: '1rem' }} onClick={() => handleRemoveInvitation(item)}>
+                                                                <IoIosClose color="#76808D" size={24} />
+                                                            </Box>
+                                                        </Box>
+
+                                                    )
+                                                })
+                                            }
+                                        </Box>
+                                    </Box>
+                                    <Button
+                                        size="small" variant="contained" className={classes.createBtn} color="secondary" onClick={() => setOpenInviteMember(prev => !prev)}>
+                                        <AddIcon sx={{ fontSize: 18 }} /> INVITE
+                                    </Button>
+                                </Box>
+                            </Box>
+                        }
+                    </Box> */}
 
                     {
                         !toggle &&

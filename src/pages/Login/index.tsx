@@ -117,7 +117,7 @@ export default () => {
     }, [selectedChainId])
 
     useEffect(() => {
-        console.log("TOKEN , USER, ACC", token , user , account)
+        console.log("TOKEN , USER, ACC", token, user, account)
         if (token && user && account) {
             if (from)
                 navigate(from)
@@ -163,7 +163,7 @@ export default () => {
         }
         if (token) {
             let userInfo = null;
-            if(web3Auth?.connectedAdapterName === "openlogin")
+            if (web3Auth?.connectedAdapterName === "openlogin")
                 userInfo = await web3Auth?.getUserInfo()
             dispatch(createAccountAction({ token, userInfo }))
         }
@@ -174,8 +174,8 @@ export default () => {
             <Grid container className={classes.root}>
                 <Container style={{ position: 'absolute', top: 0 }} maxWidth="lg">
                     <Box sx={{ mt: 3 }} display="flex" flexDirection="row" alignItems="center" style={{ float: 'right' }}>
-                        <Link rel="noopener noreferrer" target="_blank" href="https://lomads.medium.com/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor:'pointer' }}>BLOG</Link>
-                        <Link rel="noopener noreferrer" target="_blank" href="https://lomads-1.gitbook.io/lomads/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor:'pointer' }}>DOCS</Link>
+                        <Link rel="noopener noreferrer" target="_blank" href="https://lomads.medium.com/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer' }}>BLOG</Link>
+                        <Link rel="noopener noreferrer" target="_blank" href="https://lomads-1.gitbook.io/lomads/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer' }}>DOCS</Link>
                     </Box>
                 </Container>
                 <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
@@ -196,13 +196,13 @@ export default () => {
                         </Button> */}
                     </Box>
                     <Typography mt={2} variant="h2" style={{ fontSize: '16px', color: 'rgba(27, 43, 65, 0.5)', cursor: 'pointer' }}>Continue without wallet</Typography>
-                    <Box sx={{ mt: 2 }}  display="flex" flexDirection="row" justifyContent="center" alignItems="center">
-                            <Box onClick={() => handleLogin(WALLET_ADAPTERS.OPENLOGIN, 'google')} style={{ marginRight: 8 }}>
-                                <img style={{ width: 100, cursor: 'pointer' }} src={GMAIL} />
-                            </Box>
-                            <Box onClick={() => handleLogin(WALLET_ADAPTERS.OPENLOGIN, 'apple')} style={{ marginLeft: 8 }}>
-                                <img style={{ width: 80, cursor: 'pointer' }} src={APPLE} />
-                            </Box>
+                    <Box sx={{ mt: 2 }} display="flex" flexDirection="row" justifyContent="center" alignItems="center">
+                        <Box onClick={() => handleLogin(WALLET_ADAPTERS.OPENLOGIN, 'google')} style={{ marginRight: 8 }}>
+                            <img style={{ width: 100, cursor: 'pointer' }} src={GMAIL} />
+                        </Box>
+                        <Box onClick={() => handleLogin(WALLET_ADAPTERS.OPENLOGIN, 'apple')} style={{ marginLeft: 8 }}>
+                            <img style={{ width: 80, cursor: 'pointer' }} src={APPLE} />
+                        </Box>
                     </Box>
                     {/* <Box mt={4} display="flex" flexDirection="row" alignItems="center">
                         <Typography variant='body1' fontWeight="bold" mr={2}>Select Blockchain:</Typography>

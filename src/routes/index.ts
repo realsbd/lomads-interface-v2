@@ -8,6 +8,7 @@ import DefaultLayout from 'layouts/DefaultLayout';
 import LoginPage from 'pages/Login';
 import DashboardPage from 'pages/Dashboard';
 import CreateProjectPage from 'pages/Project/CreateProject';
+import StarterPage from 'pages/Starter';
 import ProjectDetailsPage from 'pages/Project/ProjectDetails';
 import ProjectPreviewPage from 'pages/Project/ProjectPreview';
 import ProjectKRAPage from 'pages/Project/ProjectKRA';
@@ -244,5 +245,12 @@ export default [
 		layout: DefaultLayout,
 		private: true,
 		component: TaskPreviewPage
+	},
+	{
+		path: '/starter',
+		exact: true,
+		layout: LandingLayout,
+		private: true,
+		component: StarterPage
 	},
 ];

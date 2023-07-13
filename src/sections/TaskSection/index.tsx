@@ -301,15 +301,14 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                             <span>
                                 <Button
                                     style={{
-                                        ...( isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {})
+                                        ...(isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {})
                                     }}
                                     size="small" variant="contained" className={classes.createBtn} color="secondary" onClick={() => setOpenCreateTask(true)}>
                                     <AddIcon sx={{ fontSize: 18 }} /> CREATE
                                 </Button>
                             </span>
-                    </BootstrapTooltip>
-                    }
-                    {/* <IconButton onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { active: value } }) : navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }} sx={{ marginRight: '20px' }}>
+                     </BootstrapTooltip>
+                     {/* <IconButton onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { active: value } }) : navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }} sx={{ marginRight: '20px' }}>
                         <img src={expandIcon} alt="archive-icon" />
                     </IconButton>
                     <IconButton
@@ -322,7 +321,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                     <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn} onClick={() => setOpenCreateTask(true)}>
                         <AddIcon sx={{ fontSize: 18 }} /> CREATE
                     </Button> */}
-                </Box> }
+                    </Box>}
             </Box>
             <Box style={{ position: "relative" }}>
                 <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>

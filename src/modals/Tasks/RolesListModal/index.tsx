@@ -47,15 +47,18 @@ interface Props {
     closeModal(): any;
     hideBackdrop: boolean;
     validRoles: any,
+    roleType: any;
     handleValidRoles(action: any): void;
 }
 
-export default ({ open, closeModal, hideBackdrop, validRoles, handleValidRoles }: Props) => {
+export default ({ open, closeModal, hideBackdrop, validRoles, roleType, handleValidRoles }: Props) => {
     const classes = useStyles();
     const { DAO } = useDAO();
     const { transformRole } = useTerminology(_get(DAO, 'terminologies'));
 
     const [roles, setRoles] = useState(validRoles);
+
+    console.log("valid roles : ", validRoles);
 
     const all_roles = useMemo(() => {
         let roles: any[] = [];
@@ -80,49 +83,48 @@ export default ({ open, closeModal, hideBackdrop, validRoles, handleValidRoles }
             PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
             anchor={'right'}
             open={open}
-            sx={{ zIndex: theme.zIndex.appBar + 1  }}
+            sx={{ zIndex: theme.zIndex.appBar + 1 }}
             hideBackdrop={hideBackdrop}
         >
             <Box className={classes.modalConatiner}>
 
-                <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
-                    <Typography className={classes.modalTitle}>Select Roles</Typography>
-                </Box>
+                {
+                    roleType === 'Lomads' &&
+                    <Box display="flex" flexDirection="column" sx={{ width: '100%', marginBottom: '20px' }}>
+                        <Typography sx={{ color: '#76808D', fontSize: '16px', fontWeight: '700', marginBottom: '20px' }}>Organisation Roles</Typography>
+                        {
+                            (_get(DAO, 'terminologies') ? Object.keys(_get(DAO, 'terminologies.roles', {})) : Object.keys(DEFAULT_ROLES)).map((key, index) => {
+                                return (
+                                    <>
+                                        <Box display={"flex"} alignItems={"center"} key={index} onClick={() => handleAddRoles(key)}>
+                                            <Chip
+                                                label={_get(transformRole(key), 'label')}
+                                                className={classes.rolePill}
+                                                avatar={
+                                                    <Box sx={
+                                                        index === 0 ? { background: 'rgba(146, 225, 168, 1)', borderRadius: '50% !important', } :
+                                                            index === 1 ? { background: 'rgba(137,179,229,1)', borderRadius: '50% !important', } :
+                                                                index === 2 ? { background: 'rgba(234,100,71,1)', borderRadius: '50% !important', } : { background: 'rgba(146, 225, 168, 1)', borderRadius: '50% !important', }
 
-                <Box display="flex" flexDirection="column" sx={{ width: '100%', marginBottom: '20px' }}>
-                    <Typography sx={{ color: '#76808D', fontSize: '16px', fontWeight: '700', marginBottom: '20px' }}>Organisation Roles</Typography>
-                    {
-                        (_get(DAO, 'terminologies') ? Object.keys(_get(DAO, 'terminologies.roles', {})) : Object.keys(DEFAULT_ROLES)).map((key, index) => {
-                            return (
-                                <>
-                                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} key={index} onClick={() => handleAddRoles(key)}>
-                                        <Chip
-                                            label={_get(transformRole(key), 'label')}
-                                            className={classes.rolePill}
-                                            avatar={
-                                                <Box sx={
-                                                    index === 0 ? { background: 'rgba(146, 225, 168, 1)', borderRadius: '50% !important', } :
-                                                        index === 1 ? { background: 'rgba(137,179,229,1)', borderRadius: '50% !important', } :
-                                                            index === 2 ? { background: 'rgba(234,100,71,1)', borderRadius: '50% !important', } : { background: 'rgba(146, 225, 168, 1)', borderRadius: '50% !important', }
-
-                                                }></Box>
-                                            }
-                                            sx={
-                                                index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } :
-                                                    index === 1 ? { background: 'rgba(137,179,229,0.3)' } :
-                                                        index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }
-                                            }
-                                        />
-                                        <Checkbox />
-                                    </Box>
-                                </>
-                            )
-                        })
-                    }
-                </Box>
+                                                    }></Box>
+                                                }
+                                                sx={
+                                                    index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } :
+                                                        index === 1 ? { background: 'rgba(137,179,229,0.3)' } :
+                                                            index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }
+                                                }
+                                            />
+                                            <Checkbox />
+                                        </Box>
+                                    </>
+                                )
+                            })
+                        }
+                    </Box>
+                }
 
                 {
-                    all_roles && all_roles.length > 0 &&
+                    roleType === 'Discord' && all_roles && all_roles.length > 0 &&
                     <>
                         <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
                             <Typography sx={{ color: '#76808D', fontSize: '16px', fontWeight: '700', marginBottom: '20px' }}>Discord Roles</Typography>
