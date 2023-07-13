@@ -345,13 +345,13 @@ export default ({ open, closeModal }: Props) => {
                 </Box>
                 <Box display="flex" flexDirection="column" alignItems={"center"} sx={{ width: '80%' }}>
 
-                    {/* <Box display={"flex"} alignItems={"center"}>
+                    <Box display={"flex"} alignItems={"center"}>
                         <Box sx={{ marginRight: '11px' }}><Typography sx={{ color: !toggle ? '#C94B32' : '#76808D' }}>OPEN FOR ALL</Typography></Box>
                         <Box><Switch checked={toggle} checkedSVG="lock" onChange={() => setToggle(!toggle)} /></Box>
                         <Box sx={{ marginLeft: '3px' }}><Typography sx={{ color: toggle ? '#C94B32' : '#76808D' }}>FILTER BY</Typography></Box>
-                    </Box> */}
+                    </Box>
 
-                    <Box className={classes.inviteCard} display={"flex"} flexDirection={"column"}>
+                    {/* <Box className={classes.inviteCard} display={"flex"} flexDirection={"column"}>
                         <Box sx={{ marginBottom: '20px' }}><Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>CONTRIBUTORS:</Typography></Box>
                         <Box display={"flex"} alignItems={"center"} sx={{ marginBottom: '1rem' }}>
                             <Box sx={{ marginRight: '11px' }}><Typography sx={{ color: !toggle ? '#C94B32' : '#76808D' }}>OPEN FOR ALL</Typography></Box>
@@ -454,9 +454,9 @@ export default ({ open, closeModal }: Props) => {
                                 </Box>
                             </Box>
                         }
-                    </Box>
+                    </Box> */}
 
-                    {/* {
+                    {
                         !toggle &&
                         <Typography sx={{ marginTop: '35px', fontSize: 14, fontStyle: 'italic', fontWeight: 400 }}>Any member can see this workplace</Typography>
                     }
@@ -480,7 +480,7 @@ export default ({ open, closeModal }: Props) => {
 
                     {
                         toggle && selectType === 'Roles' && handleRenderRolesList()
-                    } */}
+                    }
 
                     <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%', marginTop: '20px' }}>
                         <Button variant="outlined" sx={{ marginRight: '20px', width: '193px' }} onClick={closeModal}>CANCEL</Button>

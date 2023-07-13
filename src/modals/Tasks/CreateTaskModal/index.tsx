@@ -646,7 +646,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                             </Box>
                         </Box>
 
-                        {/* <Box className={classes.modalRow}>
+                        <Box className={classes.modalRow}>
                             <Box sx={{ marginBottom: '10px' }}><Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Contribution</Typography></Box>
                             <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                                 <Box
@@ -728,9 +728,9 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                                     </Button>
                                 </Box>
                             }
-                        </Box> */}
+                        </Box>
 
-                        <Box className={classes.modalRow}>
+                        {/* <Box className={classes.modalRow}>
                             <Box sx={{ marginBottom: '10px' }}><Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>Contributors</Typography></Box>
                             <Box sx={{ margin: '1rem 0' }} display={"flex"} alignItems={"center"}>
                                 <Box sx={{ marginRight: '11px' }}><Typography sx={{ color: contributionType === 'open' ? '#C94B32' : '#76808D' }}>OPEN FOR ALL</Typography></Box>
@@ -843,7 +843,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                                 <Box><Switch unidirectional={false} checkedSVG="lock" onChange={() => setIsSingleContributor(prev => !prev)} /></Box>
                                 <Box sx={{ marginLeft: '3px' }}><Typography sx={{ color: isSingleContributor ? '#C94B32' : '#76808D' }}>APPLICATION FIRST,<br /><span style={{ fontSize: '12px' }}>THEN INVITE SUBMISSION</span></Typography></Box>
                             </Box>
-                        </Box>
+                        </Box> */}
 
                         <Box className={classes.modalRow} sx={{ margin: '0px !important' }} id="error-sublink">
                             <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} sx={{ marginBottom: '10px' }}>
