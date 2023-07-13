@@ -222,7 +222,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                     }}
                 >
                     <Tab label={`My ${transformTask().labelPlural}`} {...a11yProps(0)} />
-                    { can(myRole, 'task.tabs.manage') &&  <>
+                    { can(myRole, 'task.tabs.manage') && 
                     <Tab
                         label="Manage"
                         {...a11yProps(1)}
@@ -242,7 +242,8 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                                 :
                                 <></>
                         }
-                    />
+                    /> }
+                    { can(myRole, 'task.tabs.manage') && 
                     <Tab
                         label="Drafts"
                         {...a11yProps(2)}
@@ -263,7 +264,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                                 <></>
                         }
                     />
-                    </> }
+                     }
                     {  can(myRole, 'task.tabs.all') && <Tab label={`All ${transformTask().labelPlural}`} {...a11yProps(3)} /> }
                 </Tabs>
                 {
