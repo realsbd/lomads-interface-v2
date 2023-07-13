@@ -350,48 +350,20 @@ export default () => {
             project['inviteType'] = 'Open';
         }
 
-        if (toggle && selectType === 'Invitation') {
-            project['members'] = _uniqBy(selectedMembers, m => m.address);
-            project['validRoles'] = [];
-            project['inviteType'] = 'Invitation';
-        }
-        // if (toggle && selectedMembers.length > 0) {
-        //     let temp: any[] = [...project['members'], ..._uniqBy(selectedMembers, m => m.address)]
-        //     project['members'] = [..._uniqBy(temp, m => m.address)];
+        // if (toggle && selectType === 'Invitation') {
+        //     project['members'] = _uniqBy(selectedMembers, m => m.address);
+        //     project['validRoles'] = [];
         //     project['inviteType'] = 'Invitation';
-        //     project['invitations'] = selectedMembers;
         // }
-
-        if (toggle && selectType === 'Roles') {
-            let arr = [];
-            for (let i = 0; i < DAO.members.length; i++) {
-                let user = DAO.members[i];
-                if (user.deletedAt === null) {
-                    if (user.discordRoles) {
-                        let myDiscordRoles: any[] = [];
-                        Object.keys(user.discordRoles).forEach(function (key, index) {
-                            myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
-                        })
-                        let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
-
-                        if (index > -1) {
-                            arr.push({ name: user.member.name, address: user.member.wallet })
-                        }
-                    }
-                    else {
-                        if (selectedRoles.includes(user.role)) {
-                            arr.push({ name: user.member.name, address: user.member.wallet })
-                        }
-                    }
-                }
-            }
-            project['members'] = _uniqBy(arr, m => m.address);
-            project['validRoles'] = selectedRoles;
-            project['inviteType'] = 'Roles';
+        if (toggle && selectedMembers.length > 0) {
+            let temp: any[] = [...project['members'], ..._uniqBy(selectedMembers, m => m.address)]
+            project['members'] = [..._uniqBy(temp, m => m.address)];
+            project['inviteType'] = 'Invitation';
+            project['invitations'] = selectedMembers;
         }
 
-        // if (toggle && selectedRoles.length > 0) {
-        //     let arr: any[] = [...project['members']];
+        // if (toggle && selectType === 'Roles') {
+        //     let arr = [];
         //     for (let i = 0; i < DAO.members.length; i++) {
         //         let user = DAO.members[i];
         //         if (user.deletedAt === null) {
@@ -413,10 +385,38 @@ export default () => {
         //             }
         //         }
         //     }
-        //     project['members'] = [..._uniqBy(arr, m => m.address)];
+        //     project['members'] = _uniqBy(arr, m => m.address);
         //     project['validRoles'] = selectedRoles;
         //     project['inviteType'] = 'Roles';
         // }
+
+        if (toggle && selectedRoles.length > 0) {
+            let arr: any[] = [...project['members']];
+            for (let i = 0; i < DAO.members.length; i++) {
+                let user = DAO.members[i];
+                if (user.deletedAt === null) {
+                    if (user.discordRoles) {
+                        let myDiscordRoles: any[] = [];
+                        Object.keys(user.discordRoles).forEach(function (key, index) {
+                            myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
+                        })
+                        let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
+
+                        if (index > -1) {
+                            arr.push({ name: user.member.name, address: user.member.wallet })
+                        }
+                    }
+                    else {
+                        if (selectedRoles.includes(user.role)) {
+                            arr.push({ name: user.member.name, address: user.member.wallet })
+                        }
+                    }
+                }
+            }
+            project['members'] = [..._uniqBy(arr, m => m.address)];
+            project['validRoles'] = selectedRoles;
+            project['inviteType'] = 'Roles';
+        }
 
         console.log(project)
 

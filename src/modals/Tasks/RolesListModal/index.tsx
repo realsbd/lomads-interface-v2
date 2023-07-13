@@ -114,7 +114,7 @@ export default ({ open, closeModal, hideBackdrop, validRoles, roleType, handleVa
                                                             index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }
                                                 }
                                             />
-                                            <Checkbox />
+                                            <Checkbox checked={!(roles.some((m: any) => m.toLowerCase() === key.toLowerCase()) === false)} />
                                         </Box>
                                     </>
                                 )
@@ -139,7 +139,7 @@ export default ({ open, closeModal, hideBackdrop, validRoles, roleType, handleVa
                                                     avatar={<Box sx={{ background: _get(discord_value, 'roleColor', '#99aab5'), borderRadius: '50%' }}></Box>}
                                                     sx={{ background: `${_get(discord_value, 'roleColor', '#99aab5')}50` }}
                                                 />
-                                                <Checkbox />
+                                                <Checkbox checked={!(roles.some((m: any) => m.toLowerCase() === discord_value.id.toLowerCase()) === false)} />
                                             </Box>
                                         </>
                                     )
