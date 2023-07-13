@@ -14,7 +14,7 @@ import { useAppSelector } from "helpers/useAppSelector";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { toast } from 'react-hot-toast';
 import axiosHttp from 'api'
-import { SUPPORTED_CHAIN_IDS, SupportedChainId, CHAIN_GAS_STATION } from 'constants/chains'
+import { SUPPORTED_CHAIN_IDS, SupportedChainId, CHAIN_GAS_STATION, GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
 import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
 import { ethers } from "ethers";
@@ -545,7 +545,7 @@ export default () => {
 
 	const hasNewSafe = async (currentSafes: any) => {
 		try {
-			const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+			const latestSafes = await axios.get(`${GNOSIS_SAFE_BASE_URLS[state?.selectedChainId]}/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
 			if (latestSafes.length > currentSafes.length)
 				return latestSafes
 			else
@@ -570,7 +570,7 @@ export default () => {
 		const params = {
 			members: value.map((m: any) => {
 				return {
-					...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
+					...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: 'role1'
 				}
 			}),
 			safe: {
@@ -631,47 +631,48 @@ export default () => {
 				const safeAccountConfig: SafeAccountConfig = { owners, threshold };
 
 				let currentSafes: Array<string> = []
-				if (chainId === SupportedChainId.POLYGON)
-					currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+				// if (chainId === SupportedChainId.POLYGON)
+				currentSafes = await axios.get(`${GNOSIS_SAFE_BASE_URLS[state?.selectedChainId]}/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
 				await safeFactory
 					.deploySafe({ safeAccountConfig })
 					.then(async (tx) => {
 						console.log("txn txn", tx)
-						const value = state?.members?.reduce((final: any, current: any) => {
-							let object = final.find(
-								(item: any) => item.address === current.address
-							);
-							if (object) {
-								return final;
-							}
-							return final.concat([current]);
-						}, []);
-						const params = {
-							members: value.map((m: any) => {
-								return {
-									...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
-								}
-							}),
-							safe: {
-								name: state?.safeName,
-								address: tx.getAddress(),
-								owners: owners,
-								threshold: state?.threshold,
-								chainId: state?.selectedChainId,
-								token: {
-									tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
-									symbol: CHAIN_INFO[state?.selectedChainId]?.nativeCurrency?.symbol
-								}
-							}
-						}
-						axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
-							.then(res => {
-								setisLoading(false);
-								if (location?.state?.createFlow)
-									window.location.href = `/${daoURL}/welcome`
-								else
-									window.location.href = `/${daoURL}/settings`
-							})
+						checkNewSafe(currentSafes, owners)
+						// const value = state?.members?.reduce((final: any, current: any) => {
+						// 	let object = final.find(
+						// 		(item: any) => item.address === current.address
+						// 	);
+						// 	if (object) {
+						// 		return final;
+						// 	}
+						// 	return final.concat([current]);
+						// }, []);
+						// const params = {
+						// 	members: value.map((m: any) => {
+						// 		return {
+						// 			...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
+						// 		}
+						// 	}),
+						// 	safe: {
+						// 		name: state?.safeName,
+						// 		address: tx.getAddress(),
+						// 		owners: owners,
+						// 		threshold: state?.threshold,
+						// 		chainId: state?.selectedChainId,
+						// 		token: {
+						// 			tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
+						// 			symbol: CHAIN_INFO[state?.selectedChainId]?.nativeCurrency?.symbol
+						// 		}
+						// 	}
+						// }
+						// axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
+						// 	.then(res => {
+						// 		setisLoading(false);
+						// 		if (location?.state?.createFlow)
+						// 			window.location.href = `/${daoURL}/welcome`
+						// 		else
+						// 			window.location.href = `/${daoURL}/settings`
+						// 	})
 					})
 					.catch(async (err) => {
 						console.log("An error occured while creating safe", err);
