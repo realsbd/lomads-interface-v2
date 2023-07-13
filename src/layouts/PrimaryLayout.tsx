@@ -114,7 +114,7 @@ export default ({ children } : any) => {
                   <Box ml={4} flexGrow={1}>
 
                   </Box>
-                  <IconButton onClick={() => navigate(`/${DAO?.url}`)} sx={{ width: 37, height: 37, borderRadius: 1, backgroundColor: 'rgba(27, 43, 65, 0.2)' }}>
+                  <IconButton onClick={() => { window.location.href = `/${DAO?.url}` }} sx={{ width: 37, height: 37, borderRadius: 1, backgroundColor: 'rgba(27, 43, 65, 0.2)' }}>
                     <Close sx={{ color: '#FFF' }} />
                   </IconButton>
                 </Box>

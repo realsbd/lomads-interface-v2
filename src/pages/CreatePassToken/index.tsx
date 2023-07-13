@@ -354,6 +354,7 @@ export default () => {
         } else {
             try {
                 setDeployContractLoading(true)
+                setNetworkError("Please wait while we deploy pass token, it can take several minutes")
                 const params: SBTParams = {
                     chainId: stateX?.selectedChainId,
                     name: `${stateX?.symbol} SBT`,
@@ -386,11 +387,14 @@ export default () => {
                         membersList: stateX?.whitelisted ? _get(DAO, 'members', []).map((m:any) => { return { name: m.member.name, address: m.member.wallet }}) : [],
                         daoId: _get(DAO, '_id', null)
                     }
+                    setNetworkError(null)
                     axiosHttp.post('contract', contractJSON)
                     .then(res => {
                         setTimeout(() => { window.location.href = `/${_get(DAO, 'url', '')}` }, 500)
                     })
-                    .finally(() =>  setDeployContractLoading(false))
+                    .finally(() =>  { 
+                        setDeployContractLoading(false) 
+                    })
                 }
             }
             catch(e) {
@@ -874,7 +878,7 @@ export default () => {
                                 >
                                     Create pass token
                                 </Button>
-                                {networkError && <Typography my={2} textAlign="center" color="error" variant="body2">{networkError}</Typography>}
+                                {networkError && <Typography my={2} style={{ color: '#FFF', opacity: 0.7}} textAlign="center" color="error" variant="body2">{networkError}</Typography>}
                             </Box>
                         </Box>
                 }

@@ -6,6 +6,7 @@ import LomadsAvatar from "components/Avatar"
 import IconButton from "components/IconButton"
 import CloseSVG from 'assets/svg/close-new.svg'
 import EditSVG from 'assets/svg/edit.svg'
+import LINK_SVG from 'assets/svg/ico-link.svg'
 import SafeSVG from 'assets/svg/safe.svg'
 import Checkbox from "components/Checkbox";
 import Menu from '@mui/material/Menu';
@@ -25,6 +26,7 @@ import { beautifyHexToken } from "utils"
 import { useNavigate } from "react-router-dom"
 import theme from "theme"
 import TextInput from "components/TextInput"
+import axiosHttp from 'api'
 import useSafe from "hooks/useSafe"
 import { off } from "process"
 import SwitchChain from "components/SwitchChain"
@@ -104,10 +106,11 @@ const SafeModal = ({ open, onClose }: any) => {
     const dispatch = useAppDispatch()
     const { chainId } = useWeb3Auth()
     const navigate = useNavigate();
-    const { DAO } = useDAO();
+    const { DAO, loadDAO } = useDAO();
     const { loadSafe } = useSafe()
     const [active, setActive] = useState<any>(null)
     const [editMode, setEditMode] = useState<any>(false)
+    const [safeName, setSafeName] = useState<any>(null)
     const { updateOwnersWithThreshold } = useGnosisSafeTransaction()
     const [DAOMemberList, setDAOMemberList] = useState([])
     const [updateLoading, setUpdateLoading] = useState(false)
@@ -157,15 +160,19 @@ const SafeModal = ({ open, onClose }: any) => {
         } else {
             try {
                 setUpdateLoading(true)
-                await updateOwnersWithThreshold({
-                    safeAddress: active?.address,
-                    chainId: active?.chainId,
-                    newOwners: newOwners.map((o: any) => o.wallet),
-                    removeOwners: removeOwners.map((o: any) => o.wallet),
-                    threshold: active?.threshold,
-                    ownerCount: DAOMemberList.filter((mem: any) => mem.owner).length,
-                    thresholdChanged: loadSafe(active?.address).threshold !== active?.threshold
-                })
+                if(newOwners.map((o: any) => o.wallet).length > 0 || removeOwners.map((o: any) => o.wallet).length > 0 || loadSafe(active?.address).threshold !== active?.threshold) {
+                    await updateOwnersWithThreshold({
+                        safeAddress: active?.address,
+                        chainId: active?.chainId,
+                        newOwners: newOwners.map((o: any) => o.wallet),
+                        removeOwners: removeOwners.map((o: any) => o.wallet),
+                        threshold: active?.threshold,
+                        ownerCount: DAOMemberList.filter((mem: any) => mem.owner).length,
+                        thresholdChanged: loadSafe(active?.address).threshold !== active?.threshold
+                    })
+                }
+                await axiosHttp.patch(`safe/${active?.address}`, { name: safeName })
+                loadDAO(DAO?.url)
                 setUpdateLoading(false)
                 setEditMode(false)
             } catch (e) {
@@ -177,31 +184,18 @@ const SafeModal = ({ open, onClose }: any) => {
 
     const renderEditMode = () => {
         return (
-            <Box style={{ paddingTop: 24, paddingBottom: 80 }}>
-                <Box sx={{ mt: 2 }}>
-                    <Typography style={{ fontSize: '12px', fontStyle: 'italic', fontWeight: 400 }}>Any transaction requires the confirmation of</Typography>
-                    <Box sx={{ mt: 1 }} display="flex" flexDirection="row" alignItems="center">
-                        {/* <Box onClick={handleClick} sx={{ p:2, cursor: 'pointer', width: 112, height: 40, borderRadius: '10px', backgroundColor: "#FFF" }} display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
-                            <Box>{ safe?.threshold }</Box>
-                            <ArrowDropDownIcon/>
-                        </Box> */}
-                        {active && <TextInput key={active.address} select style={{ minWidth: 80 }} size="small" value={active?.threshold}
-                            onChange={(e: any) => setActive((prev: any) => { return { ...prev, threshold: e.target.value } })}>
-                            {
-                                [...Array(DAOMemberList.filter((mem: any) => mem.owner).length).keys()]?.map((_o: any, _i: number) => {
-                                    return (
-                                        <MenuItem key={_i + 1} value={_i + 1}>{_i + 1}</MenuItem>
-                                    )
-                                })
-                            }
-                        </TextInput>}
-                        <Typography style={{ marginLeft: 16, fontSize: '12px', fontStyle: 'italic', fontWeight: 400 }}>{`of ${DAOMemberList.filter((mem: any) => mem.owner).length} Owners`}</Typography>
-                    </Box>
-                </Box>
+            <Box style={{ paddingTop: 60, paddingBottom: 80 }}>
+                <TextInput
+                    label="Name"
+                    value={safeName}
+                    onChange={(e:any) => setSafeName(e.target.value)}
+                    fullWidth
+                />
+                <Box style={{ height: 3, backgroundColor: "#C94B32", width: 300, margin: '32px auto' }} ></Box>
                 <Box sx={{ mt: 2 }} display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                     <Typography style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, color: "#76808d", fontSize: 14 }}>Select owners</Typography>
                 </Box>
-                <List dense sx={{ mt: 2 }}>
+                <List dense sx={{ mt: 2, maxHeight: 300, overflow: 'hidden', overflowY: 'scroll' }}>
                     {
                         DAOMemberList?.map((member: any) => {
                             const labelId = `checkbox-list-label-${member.wallet}`;
@@ -222,6 +216,27 @@ const SafeModal = ({ open, onClose }: any) => {
                         })
                     }
                 </List>
+                <Box style={{ height: 3, backgroundColor: "#C94B32", width: 300, margin: '32px auto' }} ></Box>
+                <Box sx={{ mt: 2 }}>
+                    <Typography style={{ fontSize: '12px', fontStyle: 'italic', fontWeight: 400 }}>Any transaction requires the confirmation of</Typography>
+                    <Box sx={{ mt: 1 }} display="flex" flexDirection="row" alignItems="center">
+                        {/* <Box onClick={handleClick} sx={{ p:2, cursor: 'pointer', width: 112, height: 40, borderRadius: '10px', backgroundColor: "#FFF" }} display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
+                            <Box>{ safe?.threshold }</Box>
+                            <ArrowDropDownIcon/>
+                        </Box> */}
+                        {active && <TextInput key={active.address} select style={{ minWidth: 80 }} size="small" value={active?.threshold}
+                            onChange={(e: any) => setActive((prev: any) => { return { ...prev, threshold: e.target.value } })}>
+                            {
+                                [...Array(DAOMemberList.filter((mem: any) => mem.owner).length).keys()]?.map((_o: any, _i: number) => {
+                                    return (
+                                        <MenuItem key={_i + 1} value={_i + 1}>{_i + 1}</MenuItem>
+                                    )
+                                })
+                            }
+                        </TextInput>}
+                        <Typography style={{ marginLeft: 16, fontSize: '12px', fontStyle: 'italic', fontWeight: 400 }}>{`of ${DAOMemberList.filter((mem: any) => mem.owner).length} Owners`}</Typography>
+                    </Box>
+                </Box>
                 {active && <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
                     <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
                         <Button onClick={() => setEditMode(false)} sx={{ mr: 1 }} fullWidth variant='outlined' size="small">Cancel</Button>
@@ -261,20 +276,44 @@ const SafeModal = ({ open, onClose }: any) => {
                                                 return safe
                                             })} expanded={active && active?._id === safe?._id}>
                                                 <AccordionSummary
-                                                    expandIcon={<ExpandMoreIcon color="primary" />}
+                                                    expandIcon={
+                                                        <ExpandMoreIcon color="primary" />
+                                                    }
                                                     aria-controls={`panel1bh-header-${safe?.address}`}
                                                     id={`panel1bh-header-${safe?.address}`}
                                                     className={clsx(safe?.enabled ? [classes.safeItem] : [classes.safeItem, classes.safeDisabled])}
                                                 >
-                                                    <Box display="flex" flexDirection="row" alignItems="center">
+                                                    <Box display="flex" flexDirection="row" alignItems="center" width={"100%"}>
                                                         <Box className={classes.ChainLogo}>
                                                             <img width={18} height={18} src={CHAIN_INFO[safe?.chainId]?.logoUrl} alt="seek-logo" />
                                                         </Box>
                                                         {/* <Avatar sx={{ width: 32, height: 32 }} src={CHAIN_INFO[safe?.chainId]?.logoUrl} /> */}
-                                                        <Box sx={{ ml: 2 }}>
+                                                        <Box sx={{ ml: 2, flexGrow: 1 }}>
                                                             <Typography style={{ color: "#1B2B41", fontWeight: 600, fontSize: 14, fontFamily: 'Inter, sans-serif' }}>{safe?.name || 'Multi-sig wallet'}</Typography>
-                                                            <Typography style={{ color: "#1B2B41", opacity: 0.59, fontWeight: 600, fontSize: 14, fontFamily: 'Inter, sans-serif' }}>{beautifyHexToken(safe?.address)}</Typography>
+                                                            <Typography style={{ color: "#1B2B41", opacity: 0.59, fontWeight: 600, fontSize: 14, fontFamily: 'Inter, sans-serif' }}>{beautifyHexToken(safe?.address)}
+                                                                <span onClick={e => {
+                                                                    e.stopPropagation()
+                                                                    navigator.clipboard.writeText(safe?.address)
+                                                                    toast.success('Copied to clipboard')
+                                                                }}>
+                                                                    <img style={{ marginLeft: 16, width: 16, height: 16 }} src={LINK_SVG} />
+                                                                </span>
+                                                            </Typography>
                                                         </Box>
+                                                        <IconButton onClick={(e:any) => {
+                                                                e.stopPropagation()
+                                                                setActive((prev: any) => {
+                                                                    if (prev && prev._id === safe._id) {
+                                                                        return null
+                                                                    }
+                                                                    return safe
+                                                                })
+                                                                setSafeName(safe?.name)
+                                                                setDAOMemberList(DAO?.members?.map((member: any) => member?.member).map((member: any) => { return { ...member, owner: safe?.owners?.map((o: any) => toChecksumAddress(o.wallet)).indexOf(toChecksumAddress(member?.wallet)) > -1 } }))
+                                                                setEditMode((prev: any) => !prev)
+                                                            }}>
+                                                                <img src={EditSVG} />
+                                                        </IconButton>
                                                     </Box>
                                                 </AccordionSummary>
                                                 <AccordionDetails key={`panel1bh-header-${safe?.address}`} 
@@ -289,13 +328,13 @@ const SafeModal = ({ open, onClose }: any) => {
                                                             <Typography className={classes.ownerTitle}>{`${active?.owners?.length} Owners`}</Typography>
                                                             <Box>
                         
-                                                            {active && <IconButton onClick={() => {
+                                                            {/* {active && <IconButton onClick={() => {
                                                                 console.log(active?.owners)
                                                                 setDAOMemberList(DAO?.members?.map((member: any) => member?.member).map((member: any) => { return { ...member, owner: active?.owners?.map((o: any) => toChecksumAddress(o.wallet)).indexOf(toChecksumAddress(member?.wallet)) > -1 } }))
                                                                 setEditMode((prev: any) => !prev)
                                                             }}>
                                                                 <img src={EditSVG} />
-                                                            </IconButton>}
+                                                            </IconButton>} */}
                                                             </Box>
                                                         </Box>
                                                         {active && <Box style={{ maxHeight: 250, overflow: 'hidden', overflowY: 'auto' }}>

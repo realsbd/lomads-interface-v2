@@ -95,7 +95,7 @@ export default ({ showProjects, list, isHelpIconOpen, highlightMembers }: any) =
     const dispatch = useAppDispatch()
     const { account } = useWeb3Auth()
     const { DAO } = useDAO();
-    const { myRole } = useRole(DAO, account, undefined)
+    const { myRole, can } = useRole(DAO, account, undefined)
     const { transformRole } = useTerminology(_get(DAO, 'terminologies'))
 
     const { adminSafes } = useSafe()
@@ -213,12 +213,12 @@ export default ({ showProjects, list, isHelpIconOpen, highlightMembers }: any) =
                 <Box display={"flex"} alignItems={"center"}>
                     <img src={membersGroup} alt="membersGroup" />
                     <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{eligibleMembers?.length} {eligibleMembers?.length > 1 ? 'members' : 'member'}</Typography>
-                    <Box sx={{ cursor: 'pointer', margin: '0 20px' }} onClick={() => setShowEditMember(true)}>
+                    { can(myRole, 'members.edit') && <Box sx={{ cursor: 'pointer', margin: '0 20px' }} onClick={() => setShowEditMember(true)}>
                         <img src={editSvg} alt="edit-svg" style={{ height: '40px', width: '40px' }} />
-                    </Box>
-                    <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn} onClick={() => setShowAddMember(true)}>
+                    </Box> }
+                    { can(myRole, 'members.add') && <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn} onClick={() => setShowAddMember(true)}>
                         <AddIcon sx={{ fontSize: 18 }} /> MEMBER
-                    </Button>
+                    </Button> }
                 </Box>
             </Box>
 

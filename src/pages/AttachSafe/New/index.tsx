@@ -729,7 +729,7 @@ export default () => {
 					</Box>
 				</Box>
 				<Typography className={classes.safeFooter}>
-					By continuing you consent to the terms of use and privacy policy of Gnosis Safe
+					By continuing you consent to the <span onClick={() => window.open('https://safe.global/terms', '_blank')} style={{ textDecoration: 'underline', cursor: 'pointer' }}>Terms of Use</span> and <span onClick={() => window.open('https://safe.global/privacy', '_blank')} style={{ textDecoration: 'underline', cursor: 'pointer' }}>Privacy Policy</span> of Gnosis Safe
 				</Typography>
 				{/* <Box className={classes.safeFooter}>
 					You’re about to create a new safe and will have to confirm a

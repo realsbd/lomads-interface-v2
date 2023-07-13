@@ -328,7 +328,8 @@ export default ({ children }: any) => {
                 <Box onClick={() => {
                   if (DAO?.url !== dao?.url) {
                     resetDAO();
-                    setTimeout(() => navigate(`/${dao?.url}`), 100)
+                    //setTimeout(() => navigate(`/${dao?.url}`), 100)
+                    setTimeout(() => { window.location.href = `/${dao?.url}` }, 100)
                   }
                 }} className={classes.stripItem}>
                   <Box className={classes.invertedBox}>

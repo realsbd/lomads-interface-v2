@@ -164,7 +164,10 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
                 setValue(0);
             }
             else {
-                setValue(1);
+                if(can(myRole, 'project.tabs.all'))
+                    setValue(1);
+                else
+                    setValue(0);
             }
         }
     }, [myProjects, initialCheck]);
@@ -183,7 +186,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
                     }}
                 >
                     <Tab label={`My ${transformWorkspace().labelPlural}`} {...a11yProps(0)} />
-                    <Tab label={`All ${transformWorkspace().labelPlural}`} {...a11yProps(1)} />
+                   { can(myRole, 'project.tabs.all') && <Tab label={`All ${transformWorkspace().labelPlural}`} {...a11yProps(1)} /> }
                 </Tabs>
 
                 <Box display={"flex"} alignItems={"center"}>
@@ -212,19 +215,21 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
                             </IconButton>
                         </span>
                     </BootstrapTooltip>
-                    <BootstrapTooltip arrow open={isHelpIconOpen}
-                        placement="top-start"
-                        title="Create Workspace">
-                            <span>
-                                <Button
-                                    style={{
-                                        ...( isHelpIconOpen ? { zIndex: 1500, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {})
-                                    }}
-                                    size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/project/create`)}>
-                                    <AddIcon sx={{ fontSize: 18 }} /> CREATE
-                                </Button>
-                            </span>
-                    </BootstrapTooltip>
+                    { can(myRole, 'project.create') &&
+                        <BootstrapTooltip arrow open={isHelpIconOpen}
+                            placement="top-start"
+                            title="Create Workspace">
+                                <span>
+                                    <Button
+                                        style={{
+                                            ...( isHelpIconOpen ? { zIndex: 1500, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {})
+                                        }}
+                                        size="small" variant="contained" color="secondary" className={classes.createBtn} onClick={() => navigate(`/${DAO.url}/project/create`)}>
+                                        <AddIcon sx={{ fontSize: 18 }} /> CREATE
+                                    </Button>
+                                </span>
+                        </BootstrapTooltip>
+                    }
                     {/* <IconButton onClick={() => navigate(`/${DAO.url}/projects`, { state: { active: value } })} sx={{ marginRight: '20px' }}>
                         <img src={expandIcon} alt="archive-icon" />
                     </IconButton>

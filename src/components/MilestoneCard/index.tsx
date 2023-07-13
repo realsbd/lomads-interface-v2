@@ -7,6 +7,7 @@ import { FiCheck } from "react-icons/fi";
 interface MilestoneCardProps {
     index: number,
     milestone: any,
+    editable: any,
     openModal(action1: any, action2: number): void,
 }
 
@@ -37,7 +38,7 @@ const useStyles = makeStyles((theme: any) => ({
     },
 }));
 
-export default ({ index, milestone, openModal }: MilestoneCardProps) => {
+export default ({ index, milestone, editable = true, openModal }: MilestoneCardProps) => {
     const classes = useStyles();
 
     if (milestone.complete) {
@@ -52,9 +53,9 @@ export default ({ index, milestone, openModal }: MilestoneCardProps) => {
                             </Box>
                             <Typography sx={{ color: '#76808D' }}>{milestone.deadline}</Typography>
                         </Box>
-                        <Box onClick={() => openModal(milestone, index)} display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ height: 28, width: 28, borderRadius: 28, backgroundColor: '#188C7C', cursor: "pointer" }}>
+                        { editable && <Box onClick={() => openModal(milestone, index)} display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ height: 28, width: 28, borderRadius: 28, backgroundColor: '#188C7C', cursor: "pointer" }}>
                             <FiCheck size={20} color="#FFF" />
-                        </Box>
+                        </Box> }
                     </CardContent>
                 </Card>
             </>

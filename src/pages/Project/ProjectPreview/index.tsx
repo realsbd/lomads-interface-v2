@@ -536,7 +536,7 @@ export default () => {
                                     {
                                         _get(Project, 'milestones', []).map((item: any, index: number) => {
                                             return (
-                                                <MilestoneCard index={index} milestone={item} openModal={(value1: any, value2: number) => selectMilestone(value1, value2)} />
+                                                <MilestoneCard editable={false} index={index} milestone={item} openModal={(value1: any, value2: number) => selectMilestone(value1, value2)} />
                                             )
                                         })
                                     }
