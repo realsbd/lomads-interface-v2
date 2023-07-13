@@ -225,9 +225,9 @@ export default ({ open, closeModal }: Props) => {
                                 </Box>
                             </Box>
                             <Box>
-                                <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn}>
+                                {/* <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn}>
                                     REQUEST PAYMENT
-                                </Button>
+                                </Button> */}
                             </Box>
                         </Box>
 

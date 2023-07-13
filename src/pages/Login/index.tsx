@@ -155,18 +155,24 @@ export default () => {
     const handleLogin = async (loginType = WALLET_ADAPTERS.METAMASK, provider: undefined | string = undefined) => {
         dispatch(logoutAction())
         await logout()
-        let token = null;
-        if (loginType === WALLET_ADAPTERS.METAMASK) {
-            token = await login(loginType);
-        } else if (loginType === WALLET_ADAPTERS.OPENLOGIN) {
-            token = await login(WALLET_ADAPTERS.OPENLOGIN, provider);
+        if(window?.ethereum){
+            const chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', 5)]
+            dispatch(setNetworkConfig({ selectedChainId: +_get(window?.ethereum, 'networkVersion', 5), chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
         }
-        if (token) {
-            let userInfo = null;
-            if (web3Auth?.connectedAdapterName === "openlogin")
-                userInfo = await web3Auth?.getUserInfo()
-            dispatch(createAccountAction({ token, userInfo }))
-        }
+        setTimeout(async () => {
+            let token = null;
+            if (loginType === WALLET_ADAPTERS.METAMASK) {
+                token = await login(loginType);
+            } else if (loginType === WALLET_ADAPTERS.OPENLOGIN) {
+                token = await login(WALLET_ADAPTERS.OPENLOGIN, provider);
+            }
+            if (token) {
+                let userInfo = null;
+                if (web3Auth?.connectedAdapterName === "openlogin")
+                    userInfo = await web3Auth?.getUserInfo()
+                dispatch(createAccountAction({ token, userInfo }))
+            }
+        }, 500)
     }
 
     return (
