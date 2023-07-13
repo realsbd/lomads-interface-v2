@@ -538,7 +538,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                             </IconButton>
                             <img src={createTaskSvg} alt="frame-icon" />
                             <Typography color="primary" variant="subtitle1" className={classes.heading}>New task {creationType === 'Create' ? 'created!' : 'drafted!'}</Typography>
-                            <Typography style={{ textAlign: 'center', fontStyle: 'italic', color: ' #76808D' }}>The new task is {creationType === 'Create' ? 'created' : 'drafted'}.<br />You will be redirected in a few seconds.</Typography>
+                            <Typography style={{ textAlign: 'center', fontStyle: 'italic', color: ' #76808D' }}>The new {transformTask().label} is {creationType === 'Create' ? 'created' : 'drafted'}.<br />You will be redirected in a few seconds.</Typography>
                         </Box>
                     </Box>
                     :

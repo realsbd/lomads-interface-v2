@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react"
-import { get as _get, find as _find } from 'lodash'
+import React, { useCallback, useEffect, useState } from "react"
+import { get as _get, find as _find, isEmpty as _isEmpty } from 'lodash'
 import { makeStyles } from '@mui/styles';
-import { Drawer, Box, Typography, Select, FormControl, InputLabel, MenuItem, List, ListItem, ListItemText, ListItemButton, ListItemIcon, Divider } from "@mui/material"
+import { Drawer, Box, Typography, Select, FormControl, InputLabel, MenuItem, List, ListItem, ListItemText, ListItemButton, ListItemIcon, Divider, Dialog, DialogContent, DialogActions, TextField, DialogContentText, DialogTitle } from "@mui/material"
 import DoubleEuroSvg from 'assets/svg/doubleEuro.svg'
 import Button from "components/Button";
 import theme from "theme";
@@ -22,6 +22,7 @@ import SwitchChain from "components/SwitchChain";
 import useGnosisSafeTransaction from "hooks/useGnosisSafeTransaction";
 import { useWeb3Auth } from "context/web3Auth";
 import useOffChainTransaction from "hooks/useOffChainTransaction";
+import { ethers } from "ethers";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -73,6 +74,9 @@ export default ({ open, onClose }: any) => {
     const { createSafeTransaction: createOffChainSafeTransaction } = useOffChainTransaction();
     const [sendTokensLoading, setSendTokensLoading] = useState(false)
     const [networkError, setNetworkError] = useState<any>(null)
+    const [showAddNewMember, setShowAddNewMember] = useState<any>(false)
+    const [memberPlaceholder, setMemberPlaceholder] = useState({ name: null, address: null })
+    const [errors, setErrors] = useState<any>({})
     const [state, setState] = useState<any>({
         members: []
     })
@@ -185,14 +189,49 @@ export default ({ open, onClose }: any) => {
             </Box> 
         )
     }
-    
+
+    const isAddressValid = (holderAddress: string) => {
+        const isValid: boolean = ethers.utils.isAddress(holderAddress);
+        return isValid;
+    };
+
+    const isPresent = useCallback((address:string) => {
+        if(state.members) {
+            if(_find(state.members, (m:any) => m.address === address))
+                return true
+        }
+        return false
+    }, [state.members])
+
+    const handleAddMember = (member:any) => {
+        let err: any = {}
+        setErrors(err)
+        if(!isAddressValid(member.address)) {
+            err["address"] = "Enter valid address"
+        }
+        if(isPresent(member.address))
+            err["address"] = "Address already exists."
+        if (_isEmpty(err)) {
+            setMemberPlaceholder({ name: null, address: null })
+            setState((prev: any) => {
+                return {
+                    ...prev,
+                    members: [{ name: member.name, address: member.address, selected: true }, ...prev.members ]
+                }
+            })
+            setShowAddNewMember(false)
+        } else {
+            setErrors(err);
+        }
+    }
+
 
     const RenderRecipientBody = () => {
         return (
             <Box style={{ paddingTop: 80, paddingBottom: 80 }}>
                 <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                     <Typography style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, color: "#76808d", fontSize: 14 }}>Select Recipients</Typography>
-                    <Button size="small" color="secondary" variant="contained">Add new recipient</Button>
+                    <Button onClick={() => { setErrors({}); setShowAddNewMember(true); }} size="small" color="secondary" variant="contained">Add new recipient</Button>
                 </Box>
                 <List dense sx={{ mt: 2 }}>
                     {
@@ -215,6 +254,39 @@ export default ({ open, onClose }: any) => {
                         })
                     }
                 </List>
+                <Dialog open={showAddNewMember} onClose={() => setShowAddNewMember(false)}>
+                    <DialogTitle sx={{ fontSize: 18, fontWeight: 600 }}>Add member:</DialogTitle>
+                    <DialogContent>
+                    <Box height={150} display="flex" flexDirection="row" justifyContent="flex-start" alignItems="center">
+                        <Box sx={{ width: 150, mr: 1 }}>
+                            <TextInput 
+                                fullWidth 
+                                error={errors['name']}
+                                helperText={errors['name']}
+                                value={memberPlaceholder?.name}
+                                onChange={(e:any) => setMemberPlaceholder((prev:any) => { return { ...prev, name: e.target.value } })}
+                                label="Name" 
+                                placeholder="Name"
+                            />
+                        </Box>
+                        <Box sx={{ width: 300, ml: 1 }}>
+                            <TextInput 
+                                fullWidth 
+                                error={errors['address']}
+                                helperText={errors['address']}
+                                label="Address"
+                                onChange={(e:any) => setMemberPlaceholder((prev:any) => { return { ...prev, address: e.target.value } })}
+                                value={memberPlaceholder?.address}
+                                placeholder="ENS Domain or Wallet Address"
+                            />
+                        </Box>
+                    </Box>
+                    </DialogContent>
+                    <DialogActions sx={{ p: 2 }}>
+                        <Button fullWidth onClick={() => setShowAddNewMember(false)} size="small" variant="outlined">Cancel</Button>
+                        <Button fullWidth onClick={() => handleAddMember({ name: memberPlaceholder?.name, address: memberPlaceholder?.address })} size="small" variant="contained">Add</Button>
+                    </DialogActions>
+                </Dialog>
             </Box>
         )
     }

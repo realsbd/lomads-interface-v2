@@ -286,6 +286,13 @@ export default ({ children }: any) => {
               </BootstrapTooltip> :
               <Skeleton variant="rectangular" animation="wave" width={116} height={107} sx={{ borderBottomRightRadius: 30 }} />
           }
+          <Box sx={{ mt: 0 }} style={{ padding: 0, height: '100%', flex: 1 }}>
+              <Box display="flex" minHeight={107} sx={{ pb: 2, pt: 3, pr: 4 }} flexDirection="row" alignItems="flex-start">
+                <Box sx={{ flexGrow: 1, ml: 4 }}>
+                </Box>
+                <Account/>
+              </Box>
+            </Box>
         </Toolbar>
       </AppBar>
       <Box style={{ width: drawerWidth, background: 'transparent' }} ></Box>
@@ -299,7 +306,7 @@ export default ({ children }: any) => {
                 <Box onClick={() => {
                   if (DAO?.url !== dao?.url) {
                     resetDAO();
-                    setTimeout(() => navigate(`/${dao?.url}`), 100)
+                    setTimeout(() => { window.location.href = `/${dao?.url}` }, 100)
                   }
                 }} className={classes.stripItem}>
                   <Box className={classes.invertedBox}>

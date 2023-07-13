@@ -302,7 +302,7 @@ export default ({ children }: any) => {
         <Box style={{ zIndex: theme.zIndex.appBar, position: 'fixed', top: 0, left: 0 }}>
             {
               DAO ?
-              <HeaderLogo onClick={() => navigate(`/${DAO?.url}`)} dao={DAO} onMouseLeave={hideDrawer} onMouseEnter={showDrawer} /> : 
+              <HeaderLogo onClick={() => window.location.href = `/${DAO?.url}`} dao={DAO} onMouseLeave={hideDrawer} onMouseEnter={showDrawer} /> : 
               <Skeleton variant="rectangular" animation="wave" width={116} height={107} sx={{ borderBottomRightRadius: 30 }} />
             }
         </Box>
@@ -313,7 +313,7 @@ export default ({ children }: any) => {
                     <Box sx={{ flexGrow: 1, ml: 4 }}>
 
                     </Box>
-                    <Account options={false} />
+                    <Account  />
                 </Box>
             </Box> : 
             <Box sx={{ mt: 0 }} style={{ padding: 0, height: '100%', flex: 1 }}>

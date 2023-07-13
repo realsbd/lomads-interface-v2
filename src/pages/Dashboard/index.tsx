@@ -336,6 +336,7 @@ export default () => {
                 sx={{ zIndex: currWalkThroughObj.step === 4 || currWalkThroughObj.step === 3 ? 1400 : 0 }}>
                 <Treasury showWalkThrough={showWalkThrough} isHelpIconOpen={isHelpIconOpen} />
             </Grid>}
+            { can(myRole, 'members.view') &&
             <Grid sm={12}
                 sx={{ zIndex: currWalkThroughObj.step === 5 ? 1400 : 0 }}
                 id="members">
@@ -345,7 +346,7 @@ export default () => {
                     isHelpIconOpen={isHelpIconOpen}
                     highlightMembers={currWalkThroughObj.step === 5}
                 />
-            </Grid>
+            </Grid> }
             <Box
                 sx={{ width: '100%', position: 'fixed', left: '33px', bottom: '44px', cursor: 'pointer', zIndex: isHelpIconOpen ? 1300 : 1000 }}
                 id="question-mark"

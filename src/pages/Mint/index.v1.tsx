@@ -284,9 +284,9 @@ export default () => {
                 }
             } catch (e) {
                 console.log(e)
-                if(typeof e === 'string')
-                    setNetworkError(e)
-                setTimeout(() => setNetworkError(null), 3000)
+                // if(typeof e === 'string')
+                //     setNetworkError(e)
+                // setTimeout(() => setNetworkError(null), 3000)
             }
         };
     
