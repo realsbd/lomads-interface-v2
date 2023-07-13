@@ -97,6 +97,7 @@ export default ({ open, closeModal, hideBackdrop, selectedApplicants, reviewer, 
                                                 edge="center"
                                                 tabIndex={-1}
                                                 inputProps={{ 'aria-labelledby': labelId }}
+                                                checked={!(selectedMembers.some((m: any) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false)}
                                             />
                                         </Box>
                                     </ListItem>
