@@ -308,6 +308,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                                 </Button>
                             </span>
                      </BootstrapTooltip>
+                    }
                      {/* <IconButton onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { active: value } }) : navigate(`/${DAO.url}/tasks`, { state: { active: value } }) }} sx={{ marginRight: '20px' }}>
                         <img src={expandIcon} alt="archive-icon" />
                     </IconButton>
