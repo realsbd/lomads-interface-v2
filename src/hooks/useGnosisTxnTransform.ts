@@ -331,12 +331,12 @@ export default () => {
 
     const transformEthTxn = (transaction: any, safeAddress: string) => {
         const safe = loadSafe(safeAddress)
-        let tokenAddress = transaction?.tokenInfo?.address ? transaction?.tokenInfo?.address : _get(transaction, 'transfers[0].tokenAddress', null) ? _get(transaction, 'transfers[0].tokenAddress', null) : process.env.REACT_APP_NATIVE_TOKEN_ADDRESS
+        let tokenAddress = _get(transaction, 'transfers[0].tokenAddress', null) ? _get(transaction, 'transfers[0].tokenAddress', null) : process.env.REACT_APP_NATIVE_TOKEN_ADDRESS
         const erc20Token: any = getERC20Token(tokenAddress, safeAddress);
         if(!erc20Token)
             return [];
-        const decimals = transaction?.tokenInfo?.decimals ? transaction?.tokenInfo?.decimals : _get(transaction, 'transfers[0].tokenInfo.decimals', null) ? _get(transaction, 'transfers[0].tokenInfo.decimals', null) : (erc20Token?.token?.decimals ||  erc20Token?.token?.decimal)
-        const value = transaction?.value ? transaction?.value :  _get(transaction, 'transfers[0].value', '0x')
+        const decimals = _get(transaction, 'transfers[0].tokenInfo.decimals', null) ? _get(transaction, 'transfers[0].tokenInfo.decimals', null) : (erc20Token?.token?.decimals ||  erc20Token?.token?.decimal)
+        const value = _get(transaction, 'transfers[0].value', '0x')
         return [{
             txHash: _get(transaction, 'txHash', ''),
             transactionHash: _get(transaction, 'transactionHash', ''),
@@ -346,10 +346,10 @@ export default () => {
             offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
             value: value,
             formattedValue: decimals > 0  ? (+value / ( 10 ** decimals  )) : +value,
-            symbol: transaction?.tokenInfo?.symbol || _get(transaction, 'transfers[0].tokenInfo.symbol', null) || erc20Token?.token?.symbol,
+            symbol: _get(transaction, 'transfers[0].tokenInfo.symbol', null) || erc20Token?.token?.symbol,
             decimals: decimals,
             fiatConversion: erc20Token?.fiatConversion,
-            tokenAddress: tokenAddress || erc20Token?.tokenAddress || transaction?.token?.tokenAddress,
+            tokenAddress: erc20Token?.tokenAddress || transaction?.token?.tokenAddress,
             to: _get(transaction, 'from', null) ? _get(transaction, 'from', null) : _get(transaction, 'to', "0x"),
             confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
             confirmations: _get(transaction, 'confirmations', [])?.length || 0,
@@ -367,7 +367,7 @@ export default () => {
     }
 
     const transformTx = (transaction: any, labels: any, safeAddress: string) => {
-        if (transaction.txType === "ETHEREUM_TRANSACTION" || transaction.type === "ERC20_TRANSFER" || transaction.type === "ETHER_TRANSFER") {
+        if (transaction.txType === "ETHEREUM_TRANSACTION") {
             const data = transformEthTxn(transaction, safeAddress)
             return data
         } else {
