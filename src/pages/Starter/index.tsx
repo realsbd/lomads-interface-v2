@@ -73,7 +73,9 @@ export default () => {
                     <Typography className={classes.italicHeader}>Achieve unprecedented efficiency</Typography>
                     <Typography className={classes.boldHeader}>While empowering members of your</Typography>
                     <Typography className={classes.boldHeader}>organization with personal data sovereignty</Typography>
-                    <Button variant='contained' sx={{ marginTop: '41px' }} onClick={() => navigate(`/organisation/create`)}>CREATE ORGANISATION</Button>
+                    <Box display="flex" flexDirection="row" justifyContent="center">
+                        <Button variant='contained' sx={{ marginTop: '41px' }} onClick={() => navigate(`/organisation/create`)}>CREATE ORGANISATION</Button>
+                    </Box>
                 </Box>
                 <Box display="flex" flexDirection="row" justifyContent="center">
                     <Typography sx={{ fontSize: '36px', fontWeight: '700', color: '#B12F15', lineHeight: '40px', marginBottom: '58px' }}>See what's inside</Typography>

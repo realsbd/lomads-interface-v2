@@ -155,11 +155,13 @@ export default () => {
     const handleLogin = async (loginType = WALLET_ADAPTERS.METAMASK, provider: undefined | string = undefined) => {
         dispatch(logoutAction())
         await logout()
-        if(window?.ethereum){
-            const chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', 5)]
-            dispatch(setNetworkConfig({ selectedChainId: +_get(window?.ethereum, 'networkVersion', 5), chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
-        }
-        setTimeout(async () => {
+        console.log("window?.ethereum", window?.ethereum)
+        // if(window?.ethereum){
+        //     const chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', 5)]
+        //     console.log(chainInfo)
+        //     dispatch(setNetworkConfig({ selectedChainId: +_get(window?.ethereum, 'networkVersion', 5), chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+        // }
+        //setTimeout(async () => {
             let token = null;
             if (loginType === WALLET_ADAPTERS.METAMASK) {
                 token = await login(loginType);
@@ -172,7 +174,7 @@ export default () => {
                     userInfo = await web3Auth?.getUserInfo()
                 dispatch(createAccountAction({ token, userInfo }))
             }
-        }, 500)
+        //}, 1000)
     }
 
     return (
