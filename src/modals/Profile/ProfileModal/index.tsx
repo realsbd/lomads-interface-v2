@@ -77,22 +77,22 @@ export default ({ open, closeModal }: Props) => {
     const [nftData, setNftData] = useState<any>({})
 
     useEffect(() => {
-        if(open == true) {
+        if (open == true) {
             dispatch(loadUserTransactionAction(account))
         }
     }, [open])
 
     const computedTxns = useMemo(() => {
-        if(transactions && chain) {
-            let txns = transactions.filter((transaction: any) => transaction?.chainId === chain && _get(transaction,`metadata.${account}.parsedTxValue.formattedValue`) && _get(transaction,`metadata.${account}.parsedTxValue.symbol`) && _get(transaction,`metadata.${account}.parsedTxValue.formattedValue`) !== "" && _get(transaction,`metadata.${account}.parsedTxValue.symbol`) !== "")
-            txns = _sortBy(txns, [(tx:any) => tx?.rawTx?.isExecuted, (tx:any) => tx?.rawTx?.executionDate], ['desc', 'desc'])
+        if (transactions && chain) {
+            let txns = transactions.filter((transaction: any) => (transaction?.chainId === chain || _get(transaction, `metadata.${account}.parsedTxValue.symbol`) === 'SWEAT') && _get(transaction, `metadata.${account}.parsedTxValue.formattedValue`) && _get(transaction, `metadata.${account}.parsedTxValue.symbol`) && _get(transaction, `metadata.${account}.parsedTxValue.formattedValue`) !== "" && _get(transaction, `metadata.${account}.parsedTxValue.symbol`) !== "")
+            txns = _sortBy(txns, [(tx: any) => tx?.rawTx?.isExecuted, (tx: any) => tx?.rawTx?.executionDate], ['desc', 'desc'])
             return txns
         }
         return []
     }, [transactions, chain])
 
     const fiatValue = useMemo(() => {
-        if(computedTxns) {
+        if (computedTxns) {
             computedTxns.reduce((a: any, b: any) => a + _get(b, `metadata.${account}.fiatConversion`, 0), 0)
         }
         return 0
@@ -100,16 +100,14 @@ export default ({ open, closeModal }: Props) => {
 
     const coinCount = useMemo(() => {
         let count: any = {}
-        if(computedTxns && chain) {
-            let txns = _groupBy(computedTxns, (txn:any) => _get(txn, `metadata.${account}.parsedTxValue.symbol`))
+        if (computedTxns && chain) {
+            let txns = _groupBy(computedTxns, (txn: any) => _get(txn, `metadata.${account}.parsedTxValue.symbol`))
             Object.keys(txns).map(token => {
-                count[token] = txns[token].reduce((a:any, b:any) =>  a + (+_get(b, `metadata.${account}.parsedTxValue.formattedValue`)), 0)
+                count[token] = txns[token].reduce((a: any, b: any) => b?.rawTx?.isExecuted ? a + (+_get(b, `metadata.${account}.parsedTxValue.formattedValue`)) : a + 0, 0)
             })
         }
         return count
     }, [chain, computedTxns])
-
-    console.log("computedTxns", computedTxns)
 
     useEffect(() => {
         if (account && provider && chainId)
@@ -172,8 +170,8 @@ export default ({ open, closeModal }: Props) => {
                             label="Name"
                             placeholder="Name"
                             fullWidth
-                            onKeyDown={(e:any) => {
-                                if(e.key === 'Enter') {
+                            onKeyDown={(e: any) => {
+                                if (e.key === 'Enter') {
                                     handleUpdateName()
                                 }
                             }}
@@ -191,10 +189,10 @@ export default ({ open, closeModal }: Props) => {
                             <Box sx={{ width: '100%' }} display={"flex"} flexWrap={"wrap"}>
                                 {
                                     nftData.map((asset: any) => {
-                                        if(!asset) return;
+                                        if (!asset) return;
                                         return (
                                             <Box sx={{ width: 250, height: 150, overflow: 'hidden', borderRadius: '5px', marginBottom: '10px', marginRight: '10px', position: 'relative' }}>
-                                                <img style={{ height: 25, width: 25, position: 'absolute', top: 15, right: 15, zIndex: 2 }} src={ _get(CHAIN_INFO, `${asset?.chainId || DAO?.chainId || 5}.logoUrl`) } />
+                                                <img style={{ height: 25, width: 25, position: 'absolute', top: 15, right: 15, zIndex: 2 }} src={_get(CHAIN_INFO, `${asset?.chainId || DAO?.chainId || 5}.logoUrl`)} />
                                                 <Box
                                                     display={"flex"} alignItems={"flex-end"} justifyContent={"flex-end"}
                                                     sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, background: 'rgba(0, 0, 0, 0.5)', padding: '15px', zIndex: 1 }}>
@@ -218,7 +216,7 @@ export default ({ open, closeModal }: Props) => {
                                 <Typography sx={{ marginRight: '30px', fontSize: 16, fontWeight: 700, color: '#76808D' }}>My Earnings</Typography>
                                 <Box sx={{ width: '175px' }}>
                                     <MuiSelect
-                                        options={SUPPORTED_CHAIN_IDS.map((c:any) => { return { label: CHAIN_INFO[c].label, value: c } })}
+                                        options={SUPPORTED_CHAIN_IDS.map((c: any) => { return { label: CHAIN_INFO[c].label, value: c } })}
                                         selected={chain}
                                         setSelectedValue={(value) => setChain(value)}
                                     />
@@ -237,37 +235,37 @@ export default ({ open, closeModal }: Props) => {
                         >
                             <Box display={"flex"} alignItems={"center"}>
                                 {
-                                    Object.keys(coinCount).map((c:any) => {
+                                    Object.keys(coinCount).map((c: any) => {
                                         return (
                                             <Box sx={{ marginRight: '16px' }} display={"flex"} alignItems={"center"}>
-                                                <Typography sx={{ color: '#76808D', fontWeight: 700, marginRight: "5px" }}>{ parseFloat(coinCount[c]).toFixed(3) }</Typography>
-                                                <Typography sx={{ color: '#76808D', fontWeight: 700 }}>{ c }</Typography>
+                                                <Typography sx={{ color: '#76808D', fontWeight: 700, marginRight: "5px" }}>{parseFloat(coinCount[c]).toFixed(3)}</Typography>
+                                                <Typography sx={{ color: '#76808D', fontWeight: 700 }}>{c}</Typography>
                                             </Box>
                                         )
                                     })
                                 }
                             </Box>
-                            { fiatValue ? <Box display={"flex"} alignItems={"center"}>
+                            {fiatValue ? <Box display={"flex"} alignItems={"center"}>
                                 <img src={hkLogo} alt="icon-alt" style={{ marginRight: '5px' }} />
                                 <Typography sx={{ color: '#188C7C', fontWeight: 700, marginRight: '2px' }}>${fiatValue}</Typography>
                                 <Typography sx={{ color: '#76808D', fontWeight: 700 }}>total</Typography>
-                            </Box> : null }
+                            </Box> : null}
                         </Box>
 
                         <Box sx={{ width: '100%', maxHeight: 500, overflow: 'hidden', overflowY: 'auto' }} display={"flex"} flexDirection={"column"}>
-                            { computedTxns && computedTxns.map((transaction:any) => {
+                            {computedTxns && computedTxns.map((transaction: any) => {
                                 return (
                                     <Box sx={{ width: '100%', minHeight: 50 }} display={"flex"} flexDirection="row" alignItems={"center"}>
                                         <Box sx={{ width: '70%' }} display={"flex"} alignItems={"center"}>
-                                            <Typography sx={{ width: '20%', marginRight: '20px', color: '#76808D', fontWeight: 700, fontSize: '14px' }}>{ _get(transaction,`metadata.${account}.parsedTxValue.formattedValue`) } { _get(transaction,`metadata.${account}.parsedTxValue.symbol`)}</Typography>
+                                            <Typography sx={{ width: '20%', marginRight: '20px', color: '#76808D', fontWeight: 700, fontSize: '14px' }}>{_get(transaction, `metadata.${account}.parsedTxValue.formattedValue`)} {_get(transaction, `metadata.${account}.parsedTxValue.symbol`)}</Typography>
                                             <Box display={"flex"} flexDirection={"column"}>
-                                                <Typography sx={{ color: '#76808D', fontWeight: 700, }}>{ _get(transaction,`metadata.${account}.label`) }</Typography>
-                                                { <Typography sx={{ color: '#76808D', }}>{ transaction?.daoId?.name }</Typography> }
+                                                <Typography sx={{ color: '#76808D', fontWeight: 700, }}>{_get(transaction, `metadata.${account}.label`)}</Typography>
+                                                {<Typography sx={{ color: '#76808D', }}>{transaction?.daoId?.name}</Typography>}
                                             </Box>
                                         </Box>
                                         <Box sx={{ width: '30%' }} display={"flex"} flexDirection={"column"} alignItems={"flex-end"} justifyContent={"center"}>
-                                            <Typography sx={{ color: '#76808D', opacity: '0.6', fontWeight: 700, fontSize: '14px', textTransform: 'uppercase' }}>{ transaction?.rawTx?.isExecuted? 'Paid' : 'Awaiting Payment' }</Typography>
-                                            {  transaction?.rawTx?.isExecuted && <Typography sx={{ color: '#76808D', opacity: '0.6', fontWeight: 700, fontSize: '14px', textTransform: 'uppercase' }}>{ moment(transaction?.rawTx?.executionDate).format('MM/DD HH:mm') }</Typography> }
+                                            <Typography sx={{ color: '#76808D', opacity: '0.6', fontWeight: 700, fontSize: '14px', textTransform: 'uppercase' }}>{transaction?.rawTx?.isExecuted ? 'Paid' : 'Awaiting Payment'}</Typography>
+                                            {transaction?.rawTx?.isExecuted && <Typography sx={{ color: '#76808D', opacity: '0.6', fontWeight: 700, fontSize: '14px', textTransform: 'uppercase' }}>{moment(transaction?.rawTx?.executionDate).format('MM/DD HH:mm')}</Typography>}
                                         </Box>
                                     </Box>
                                 )

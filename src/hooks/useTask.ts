@@ -70,6 +70,15 @@ export default () => {
         return false
     }
 
+    const amIEligibleInvitation = (task: any) => {
+        const user = _find(_get(DAO, 'members', []), m => toChecksumAddress(_get(m, 'member.wallet', '')) === toChecksumAddress(account))
+        if (user) {
+            let index = task?.invitations.findIndex((item: any) => item.address.toLowerCase() === account.toLowerCase());
+            return index > -1
+        }
+        return false
+    }
+
     const amIEligibleDiscord = (task: any) => {
         const user = _find(_get(DAO, 'members', []), m => toChecksumAddress(_get(m, 'member.wallet', '')) === toChecksumAddress(account))
         if (user) {
@@ -115,12 +124,12 @@ export default () => {
             return submissions.length
         return 0
     };
-    
+
 
     const getTaskStatus = (task: any) => {
         let notification = {}
-        if(((((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' ) && submissionCount(task) > 0  ) || applicationCount(task) > 0) && amICreator(task)) {
-            if(((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' ) && submissionCount(task) > 0 ) {
+        if (((((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') && submissionCount(task) > 0) || applicationCount(task) > 0) && amICreator(task)) {
+            if (((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') && submissionCount(task) > 0) {
                 notification = { icon: submissionDashboard, count: submissionCount(task) }
             } else if (applicationCount(task) > 0) {
                 notification = { icon: applicationDashboard, count: applicationCount(task) }
@@ -136,7 +145,7 @@ export default () => {
         /* If task was manually assigned---check if current user is approved applicant or other user*/
         else if (task.contributionType === 'assign' && task.taskStatus === 'assigned') {
             if (amIApproved(task))
-                return { notification, status: "Assigned to me", color: '#0EC1B0', icon: assign, group: ["Assigned to me"]  }
+                return { notification, status: "Assigned to me", color: '#0EC1B0', icon: assign, group: ["Assigned to me"] }
             else {
                 if (amIRejected(task))
                     return { status: "Rejected", color: '#E23B53', icon: rejected, group: ["Rejected"] }
@@ -156,8 +165,9 @@ export default () => {
             } else {
                 if (amIApplicant(task))
                     return { notification, status: "Applied", color: "#FFB600", icon: applied, group: ['Applied'] }
-                return { notification, status: "Open", color: "#4BA1DB", icon: openSvg, 
-                    group: amICreator(task) &&  submissionCount(task) > 0 ? ['Open', 'Submitted'] : ['Open']
+                return {
+                    notification, status: "Open", color: "#4BA1DB", icon: openSvg,
+                    group: amICreator(task) && submissionCount(task) > 0 ? ['Open', 'Submitted'] : ['Open']
                 }
             }
         }
@@ -176,8 +186,9 @@ export default () => {
             } else {
                 if (amIRejected(task))
                     return { notification, status: "Rejected", color: "#E23B53", icon: rejected, group: ["Rejected"] }
-                return { notification, status: "Open", color: "#4BA1DB", icon: openSvg, 
-                    group: amICreator(task) &&  submissionCount(task) > 0 ? ['Open', 'Submitted'] : ['Open']
+                return {
+                    notification, status: "Open", color: "#4BA1DB", icon: openSvg,
+                    group: amICreator(task) && submissionCount(task) > 0 ? ['Open', 'Submitted'] : ['Open']
                 }
             }
         }
@@ -241,6 +252,21 @@ export default () => {
                             return { renderBody: 'DOES_NOT_FIT_YOUR_ROLE' }
                         }
                     }
+
+                    else if (task.invitations.length > 0) {
+                        if (amIEligibleInvitation(task)) {
+                            if (task.isSingleContributor) {
+                                return { renderBody: 'INVITE_APPLY' }
+                            }
+                            else {
+                                return { renderBody: 'INVITE_SUBMIT' }
+                            }
+                        }
+                        else {
+                            return { renderBody: 'NOT_INVITED' }
+                        }
+                    }
+
                     else if (!task.archivedAt && !task.deletedAt) {
                         if (task.isSingleContributor) {
                             return { renderBody: 'TASK_NEEDS_CONTRIBUTOR' }
