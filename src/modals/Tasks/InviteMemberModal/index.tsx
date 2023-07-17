@@ -87,7 +87,7 @@ export default ({ open, closeModal, hideBackdrop, selectedApplicants, reviewer, 
                     <Typography sx={{ color: '#76808D', fontSize: '16px', fontWeight: '700', marginBottom: '20px' }}>Invite members</Typography>
                     <List>
                         {
-                            _sortBy(_get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id && m.deletedAt === null), m => _get(m, 'member.name', '').toLowerCase(), 'asc').filter((member: any) => toChecksumAddress(member?.member.wallet) !== account).map((item: any, index: number) => {
+                            _sortBy(_get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id && m.deletedAt === null), m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item: any, index: number) => {
                                 const labelId = `checkbox-list-label-${item.member.wallet}`;
                                 return (
                                     <ListItem disablePadding key={item.member.wallet}>

@@ -431,8 +431,9 @@ export default ({ open, closeModal, task }: Props) => {
             taskOb.isFilterRoles = isFilterRoles;
             taskOb.validRoles = isFilterRoles ? validRoles : [];
             taskOb.reviewer = reviewer;
-            task.invitations = invitations;
+            taskOb.invitations = invitations;
             taskOb.members = members;
+            console.log("finalk invitations : ", invitations)
             dispatch(editTaskAction({ payload: taskOb, daoUrl: _get(DAO, 'url', ''), taskId: task._id }))
         }
     }
@@ -479,7 +480,7 @@ export default ({ open, closeModal, task }: Props) => {
         tsk.isSingleContributor = isSingleContributor;
         tsk.isFilterRoles = isFilterRoles;
         tsk.validRoles = validRoles;
-        task.invitations = invitations;
+        tsk.invitations = invitations;
 
         dispatch(editDraftTaskAction({ payload: tsk, daoUrl: _get(DAO, 'url', ''), taskId: _get(task, '_id', '') }))
     }
@@ -591,7 +592,7 @@ export default ({ open, closeModal, task }: Props) => {
             taskOb.isSingleContributor = isSingleContributor;
             taskOb.isFilterRoles = isFilterRoles;
             taskOb.validRoles = isFilterRoles ? validRoles : [];
-            task.invitations = invitations;
+            taskOb.invitations = invitations;
             dispatch(convertDraftTaskAction({ payload: taskOb, daoUrl: _get(DAO, 'url', ''), taskId: _get(task, '_id', '') }))
         }
     }

@@ -39,14 +39,14 @@ export default ({ transaction, executableNonce }: any) => {
         for (let index = 0; index < txn.length; index++) {
             const tx = txn[index];
             const metadata = _get(transaction, `metadata.${tx.to}`)
-            const token = _find(_get(safeTokens, transaction?.safeAddress, []), (tkn:any) => tkn?.tokenAddress === tx?.tokenAddress)
+            const token = _find(_get(safeTokens, transaction?.safeAddress, []), (tkn: any) => tkn?.tokenAddress === tx?.tokenAddress)
             if (!tx.to || tx.to === "0x") break;
             let actions: any = {}
             if (metadata?.sweatConversion) {
                 // reset sweat for recipient && update user earnings
-                actions = { 
-                    ...actions, 
-                    "RESET_SWEAT": { user: tx?.to, daoId: DAO?._id, }, 
+                actions = {
+                    ...actions,
+                    "RESET_SWEAT": { user: tx?.to, daoId: DAO?._id, },
                     "UPDATE_EARNING": { user: tx?.to, daoId: DAO?._id, symbol: tx?.symbol, value: +tx?.formattedValue, currency: tx?.tokenAddress || 'SWEAT' },
                     "UPDATE_FIAT_CONVERSION": { txId: transaction?._id, recipient: tx?.to, fiatConversion: token?.fiatConversion }
                 }
@@ -60,8 +60,8 @@ export default ({ transaction, executableNonce }: any) => {
                 }
             } else if (metadata?.recurringPaymentAmount) {
                 // update recurring payment status
-                actions = { 
-                    ...actions, 
+                actions = {
+                    ...actions,
                     "RECURRING_PAYMENT": { safeTxHash: transaction?.rawTx?.safeTxHash, reject }
                 }
             } else {
@@ -74,13 +74,13 @@ export default ({ transaction, executableNonce }: any) => {
             }
             actionList.push(actions)
         }
-        if(actionList.length > 0) {
-              await axiosHttp.post(`gnosis-safe/${transaction?.rawTx?.safeTxHash}/executed`, actionList)  
-              .then(res => {
-                console.log(res.data)
-                const safes = DAO?.safes.map((safe: any) => safe?.address)
-                dispatch(loadRecurringPaymentsAction({ safes }))
-              })
+        if (actionList.length > 0) {
+            await axiosHttp.post(`gnosis-safe/${transaction?.rawTx?.safeTxHash}/executed`, actionList)
+                .then(res => {
+                    console.log(res.data)
+                    const safes = DAO?.safes.map((safe: any) => safe?.address)
+                    dispatch(loadRecurringPaymentsAction({ safes }))
+                })
         }
     }
 
@@ -90,6 +90,12 @@ export default ({ transaction, executableNonce }: any) => {
     if (transaction?.daoId && transaction?.rawTx?.token?.tokenAddress === 'SWEAT' && transaction?.daoId !== DAO?._id)
         return null
 
+    // if (transaction?.rawTx?.daoId && transaction?.rawTx?.daoId !== DAO?._id)
+    //     return null
+
+    // if (transaction?.daoId && transaction?.daoId !== DAO?._id)
+    //     return null
+
     if (!txn) return null
 
     return (
@@ -97,7 +103,7 @@ export default ({ transaction, executableNonce }: any) => {
             {
                 txn.map((tx: any, _i: number) => (
                     <TableRow>
-                        <CreditDebit credit={tx?.isCredit} fiatConversion={ tx?.executionDate ? _get(transaction, `metadata.${tx?.to}.fiatConversion`, undefined) : _get(tx, 'fiatConversion', undefined)} executed={tx?.executionDate} amount={tx?.formattedValue} token={tx?.symbol} />
+                        <CreditDebit credit={tx?.isCredit} fiatConversion={tx?.executionDate ? _get(transaction, `metadata.${tx?.to}.fiatConversion`, undefined) : _get(tx, 'fiatConversion', undefined)} executed={tx?.executionDate} amount={tx?.formattedValue} token={tx?.symbol} />
                         <Label transaction={transaction} recipient={tx?.to} />
                         <Recipient safeAddress={transaction?.safeAddress} credit={tx?.isCredit} recipient={tx?.to} token={tx?.symbol} />
                         <Tag transaction={transaction} recipient={tx?.to} />

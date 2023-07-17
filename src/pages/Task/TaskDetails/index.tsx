@@ -345,7 +345,7 @@ export default () => {
     const showFitRoleApply = () => {
         return (
             <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
-                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task<br />fits your role.</Typography>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task<br />fit your role.</Typography>
                 {
                     moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt && !Task.isDummy
                         ?
@@ -360,7 +360,7 @@ export default () => {
     const showFitRoleSubmit = () => {
         return (
             <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
-                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task<br />fits your role.</Typography>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task<br />fit your role.</Typography>
                 {
                     !Task.draftedAt && <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => setOpenSubmitModal(true)}>SUBMIT WORK</Button>
                 }
@@ -371,7 +371,41 @@ export default () => {
     const showDoesNotFitRole = () => {
         return (
             <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
-                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task does not<br />fits your role.</Typography>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task does not<br />fit your role.</Typography>
+            </Box>
+        )
+    }
+
+    const showInviteApply = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task<br />fit your role.</Typography>
+                {
+                    moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt && !Task.isDummy
+                        ?
+                        null
+                        :
+                        <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => setOpenApplyModal(true)}>APPLY</Button>
+                }
+            </Box>
+        )
+    }
+
+    const showInviteSubmit = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task<br />fit your role.</Typography>
+                {
+                    !Task.draftedAt && <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => setOpenSubmitModal(true)}>SUBMIT WORK</Button>
+                }
+            </Box>
+        )
+    }
+
+    const showNotInvited = () => {
+        return (
+            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
+                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task does not<br />fit your role.</Typography>
             </Box>
         )
     }
@@ -484,6 +518,21 @@ export default () => {
 
             case 'FITS_YOUR_ROLE_SUBMIT':
                 return showFitRoleSubmit();
+
+
+
+
+            case 'INVITE_APPLY':
+                return showInviteApply();
+
+            case 'INVITE_SUBMIT':
+                return showInviteSubmit();
+
+            case 'NOT_INVITED':
+                return showNotInvited();
+
+
+
 
             case 'DOES_NOT_FIT_YOUR_ROLE':
                 return showDoesNotFitRole();

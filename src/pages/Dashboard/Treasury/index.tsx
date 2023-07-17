@@ -101,7 +101,7 @@ const useStyles = makeStyles((theme: any) => ({
         fontStyle: 'normal',
         fontWeight: '400 !important',
         fontSize: '20px !important',
-        lineHeight:'27px !important',
+        lineHeight: '27px !important',
         color: '#1B2B41',
         opacity: 0.3
     },
@@ -131,9 +131,9 @@ const useStyles = makeStyles((theme: any) => ({
         cursor: "pointer",
         padding: "10px"
     }
-  }));
+}));
 
-export default ({isHelpIconOpen, showWalkThrough}: any) => {
+export default ({ isHelpIconOpen, showWalkThrough }: any) => {
     const classes = useStyles();
     const dispatch = useAppDispatch()
     const downloadRef = useRef<any>()
@@ -150,9 +150,11 @@ export default ({isHelpIconOpen, showWalkThrough}: any) => {
     const [csvLoading, setCsvLoading] = useState(false);
     const { transformTx } = useGnosisTxnTransform();
     const [downloadableData, setDownloadableData] = useState([])
-    
+
 
     const { treasury, recurringPayments } = useAppSelector((store: any) => store.treasury)
+
+    console.log("trasury : ", treasury);
 
     const handleDownloadCsv = async () => {
         try {
@@ -171,7 +173,7 @@ export default ({isHelpIconOpen, showWalkThrough}: any) => {
             let csvData = []
             let safesList = DAO?.safes;
             const filename = `${moment().unix()}`
-            const safes = _uniqBy(safesList, (sl:any) => sl?.address)?.map((safe:any) => {
+            const safes = _uniqBy(safesList, (sl: any) => sl?.address)?.map((safe: any) => {
                 return axios.get(`${GNOSIS_SAFE_BASE_URLS[safe?.chainId]}/api/v1/safes/${safe.address}/all-transactions/?limit=1000&offset=0`)
             })
             const safesDump = await Promise.all(safes);
@@ -182,18 +184,18 @@ export default ({isHelpIconOpen, showWalkThrough}: any) => {
                 console.log("DUMP", dump)
                 for (let index = 0; index < dump.length; index++) {
                     const txn: any = dump[index];
-                    const metadata = _find(treasury, (tx:any) => tx?.safeAddress === safe?.address && (tx?.rawTx?.safeTxHash === txn?.safeTxHash || tx?.rawTx?.txHash === txn?.txHash))
+                    const metadata = _find(treasury, (tx: any) => tx?.safeAddress === safe?.address && (tx?.rawTx?.safeTxHash === txn?.safeTxHash || tx?.rawTx?.txHash === txn?.txHash))
                     const transformedTxn = transformTx(txn, [], safe?.address)
                     for (let index = 0; index < transformedTxn.length; index++) {
                         const ttxn = transformedTxn[index];
-                        if(ttxn?.to !== '0x') {
+                        if (ttxn?.to !== '0x') {
                             csvData.push({
                                 safeAddress: safe?.address,
                                 transactionHash: ttxn?.txHash && ttxn?.txHash !== '' ? ttxn?.txHash : ttxn?.transactionHash,
                                 incomingAmount: ttxn?.isCredit ? ttxn?.formattedValue : '',
-                                incomingToken: ttxn?.isCredit ? ttxn?.symbol: '',
+                                incomingToken: ttxn?.isCredit ? ttxn?.symbol : '',
                                 outgoingAmount: !ttxn?.isCredit ? ttxn?.formattedValue : '',
-                                outgoingToken: !ttxn?.isCredit ? ttxn?.symbol: '',
+                                outgoingToken: !ttxn?.isCredit ? ttxn?.symbol : '',
                                 description: metadata ? metadata[ttxn?.to]?.label || '' : '',
                                 recipientWallet: ttxn?.to,
                                 executionDate: ttxn?.executionDate ? ttxn?.executionDate : 'pending'
@@ -202,32 +204,32 @@ export default ({isHelpIconOpen, showWalkThrough}: any) => {
                     }
                 }
             }
-            csvData = _orderBy(csvData, (c:any) => c.executionDate, ['desc'])
+            csvData = _orderBy(csvData, (c: any) => c.executionDate, ['desc'])
             setCsvLoading(false)
             saveAsCsv({ data: csvData, fields, filename })
-        } catch(e) {
+        } catch (e) {
             setCsvLoading(false)
             console.error(e)
         }
     }
 
     const allTokens = useMemo(() => {
-        if(safeTokens) {
+        if (safeTokens) {
             let at: any = []
             let final: any = []
-            Object.values(safeTokens).map((st:any) => { at = at.concat(st) })
+            Object.values(safeTokens).map((st: any) => { at = at.concat(st) })
             for (let index = 0; index < at.length; index++) {
                 let token: any = at[index];
-                if(token.tokenAddress === 'SWEAT') continue;
-                const exists = _find(final, a => (a.tokenAddress === token.tokenAddress && token.token.symbol === a.token.symbol)) 
-                if(exists){
+                if (token.tokenAddress === 'SWEAT') continue;
+                const exists = _find(final, a => (a.tokenAddress === token.tokenAddress && token.token.symbol === a.token.symbol))
+                if (exists) {
                     token = {
                         ...token,
                         balance: +token.balance + (+exists.balance),
                         fiatBalance: +token.fiatBalance + (+exists.fiatBalance),
                     }
                     final = final.map((t: any) => {
-                        if(t.tokenAddress === token.tokenAddress && token.token.symbol === t.token.symbol) {
+                        if (t.tokenAddress === token.tokenAddress && token.token.symbol === t.token.symbol) {
                             return token
                         }
                         return t
@@ -237,21 +239,21 @@ export default ({isHelpIconOpen, showWalkThrough}: any) => {
                     final = [...final, token]
                 }
             }
-    
+
             return final
         }
         return []
     }, [safeTokens])
 
     useEffect(() => {
-        if(DAO?.url) {
-            const safes = DAO?.safes?.map((safe:any) => safe?.address)
+        if (DAO?.url) {
+            const safes = DAO?.safes?.map((safe: any) => safe?.address)
             dispatch(loadRecurringPaymentsAction({ safes }))
         }
     }, [DAO?.url])
 
     useEffect(() => {
-        if(DAO?.url) {
+        if (DAO?.url) {
             let safes = DAO?.safes ? DAO?.safes.map((safe: any) => safe.address) : [DAO?.safe?.address]
             dispatch(loadTreasuryAction({ safes, daoId: DAO?._id }))
         }
@@ -259,7 +261,7 @@ export default ({isHelpIconOpen, showWalkThrough}: any) => {
 
     const computeExecutableNonce = useCallback((safeAddress: string) => {
         let safeTxn = treasury.filter((txn: any) => txn?.safeAddress === safeAddress && !txn?.rawTx?.offChain)
-        const txn = _orderBy(safeTxn, [p => p?.rawTx?.isExecuted,  p => p?.rawTx?.executionDate, p => p?.rawTx?.nonce], ['asc', 'desc','asc'])
+        const txn = _orderBy(safeTxn, [p => p?.rawTx?.isExecuted, p => p?.rawTx?.executionDate, p => p?.rawTx?.nonce], ['asc', 'desc', 'asc'])
         return _get(txn, `[0].rawTx.nonce`, 0)
     }, [treasury])
 
@@ -270,134 +272,135 @@ export default ({isHelpIconOpen, showWalkThrough}: any) => {
         };
     }
 
-    const nextQueue = (rtransaction:any) => {
-		if(rtransaction && rtransaction.queue) {
-			let queue = rtransaction.queue.filter((q:any) => !q.moduleTxnHash);
-			queue = _orderBy(queue, q => q.nonce, 'asc')
-			if(queue && queue.length > 0) return queue[0]
-		}
-		return null
-	}
+    const nextQueue = (rtransaction: any) => {
+        if (rtransaction && rtransaction.queue) {
+            let queue = rtransaction.queue.filter((q: any) => !q.moduleTxnHash);
+            queue = _orderBy(queue, q => q.nonce, 'asc')
+            if (queue && queue.length > 0) return queue[0]
+        }
+        return null
+    }
 
     const recurringTreasuryTxns = useMemo(() => {
-		if(!recurringPayments) return []
-		const rp = recurringPayments.filter((rtx:any) => {
-			const nQ = nextQueue(rtx);
-			if(rtx.active && nQ && nQ.nonce < moment().utc().endOf('day').unix() && (account === toChecksumAddress(rtx.receiver.wallet))) 
-				return true
-			return false
-		})
-		return rp
-	}, [recurringPayments])
+        if (!recurringPayments) return []
+        const rp = recurringPayments.filter((rtx: any) => {
+            const nQ = nextQueue(rtx);
+            if (rtx.active && nQ && nQ.nonce < moment().utc().endOf('day').unix() && (account === toChecksumAddress(rtx.receiver.wallet)))
+                return true
+            return false
+        })
+        return rp
+    }, [recurringPayments])
 
-    const handleSyncSafe = () => 
-        dispatch(syncSafeAction({ safes: DAO?.safes?.map((safe:any) => safe?.address) }))
-    
+    const handleSyncSafe = () =>
+        dispatch(syncSafeAction({ safes: DAO?.safes?.map((safe: any) => safe?.address) }))
+
 
     return (
         <Grid container>
             <Grid item sm={12}>
-                { (!DAO || !treasury)  ? 
-                <Skeleton sx={{ borderRadius: 1 }}  variant="rectangular" height={72} animation="wave" /> :
-                <Box className={classes.header}>
-                    <Tabs
-                        value={activeTab}
-                        onChange={(e: any, val: any) => setActiveTab(val)}
-                        aria-label="basic tabs example"
-                        TabIndicatorProps={{ hidden: true }}
-                        sx={{
-                            '& button': { color: 'rgba(118, 128, 141,0.5)', marginRight: '10px', textTransform: 'capitalize', fontSize: '22px', fontWeight: '400' },
-                            '& button.Mui-selected': { color: 'rgba(118, 128, 141,1)' },
-                        }}
-                    >
-                        <Tab label="Treasury" {...a11yProps(0)} />
-                        <Tab label="Recurring payments" {...a11yProps(1)} />
-                    </Tabs>
-                    <Box>
-                        { activeTab == 0 && 
-                        <Box display="flex" flexDirection="row" alignItems="center">
-                            { adminSafes && adminSafes?.length > 0 && <Button onClick={() => setShowSendToken(true)} sx={{ color: palette?.primary?.main }} size="small" variant="contained" color="secondary">SEND TOKEN</Button> }
-                            <Button variant="contained" color="secondary" sx={{ padding: 0, ml: 2, minWidth: 40, maxWidth: 40, maxHeight: 40 }} onClick={() => handleDownloadCsv()}>
-                                { !csvLoading ? <img src={exportBtn}/> : <LeapFrog size={20} color="#C94B32" /> }
-                            </Button>
+                {(!DAO || !treasury) ?
+                    <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={72} animation="wave" /> :
+                    <Box className={classes.header}>
+                        <Tabs
+                            value={activeTab}
+                            onChange={(e: any, val: any) => setActiveTab(val)}
+                            aria-label="basic tabs example"
+                            TabIndicatorProps={{ hidden: true }}
+                            sx={{
+                                '& button': { color: 'rgba(118, 128, 141,0.5)', marginRight: '10px', textTransform: 'capitalize', fontSize: '22px', fontWeight: '400' },
+                                '& button.Mui-selected': { color: 'rgba(118, 128, 141,1)' },
+                            }}
+                        >
+                            <Tab label="Treasury" {...a11yProps(0)} />
+                            <Tab label="Recurring payments" {...a11yProps(1)} />
+                        </Tabs>
+                        <Box>
+                            {activeTab == 0 &&
+                                <Box display="flex" flexDirection="row" alignItems="center">
+                                    {adminSafes && adminSafes?.length > 0 && <Button onClick={() => setShowSendToken(true)} sx={{ color: palette?.primary?.main }} size="small" variant="contained" color="secondary">SEND TOKEN</Button>}
+                                    <Button variant="contained" color="secondary" sx={{ padding: 0, ml: 2, minWidth: 40, maxWidth: 40, maxHeight: 40 }} onClick={() => handleDownloadCsv()}>
+                                        {!csvLoading ? <img src={exportBtn} /> : <LeapFrog size={20} color="#C94B32" />}
+                                    </Button>
+                                </Box>
+                            }
                         </Box>
-                        }
-                    </Box>
-                </Box> }
+                    </Box>}
             </Grid>
             <Grid style={{ position: "relative" }} mt={0.5} mb={1} item sm={12}>
-            {isHelpIconOpen &&
-                <Box className={classes.helpCard}>
-                    Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!
-                </Box>
-            }
-            { activeTab == 0 ?
-            <Box>
-                { (!DAO || !treasury)  ? 
-                <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={72} animation="wave" /> :
-                <Box className={classes.tokenHeader}>
-                    <Box>
-                        <Typography style={{ color: "#188C7C", fontWeight: "700", fontSize: 14 }}>{ `$${(allTokens.reduce((a: any, b:any) => a + (+b.fiatBalance), 0)).toFixed(3)} Total Balance` }</Typography>
-                    </Box>
-                    <Box className={classes.stack} flexGrow={1}>
-                        <Stack padding={"6px"} height={72} alignItems="center" justifyContent="flex-end" spacing={2} direction="row">
-                            {
-                                allTokens.map((token: any) => {
-                                    return (
-                                        <Typography style={{ color: "#76808d", fontWeight: "700", fontSize: 14 }}>{ `${(token.balance / 10 ** (token.token.decimal || token.token.decimals)).toFixed(3)}` }<span style={{ marginLeft: 6, color: "hsla(214,9%,51%,.5)", fontWeight: "700", fontSize: 14 }}>{token.token.symbol}</span></Typography>
-                                    )
-                                })
-                            }
-                        </Stack>
-                    </Box>
-                </Box>
-                }
-            </Box> : null }
-            { activeTab == 1 && adminSafes && adminSafes?.length > 0  ?
-            <Box>
-                <Box className={classes.reccurHeader}>
-                    <Box></Box>
-                    <Box>
-                      { adminSafes && adminSafes?.length > 0 && <Button onClick={() => { setActiveTransaction(null); setShowRecurringPayment(true) }} color="secondary" variant="contained" startIcon={<AddIcon color="primary" />} size="small" ><Typography color="primary">NEW RECURRING PAYMENT</Typography></Button> }
-                    </Box>
-                </Box>
-            </Box> : null }
-            { activeTab == 0 &&
-            <Box mt={0.5}>
-                { (!DAO || !treasury || !safeTokens)  ? 
-                   <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={showWalkThrough? 400 : 500} animation="wave" /> :
-                    <Box className={classes.table}>
-                        <TableContainer  style={{ maxHeight: showWalkThrough? 400 : 500 }} component={Box}>
-                            <Table size="medium" stickyHeader aria-label="simple table">
-                                <TableBody>
-                                    {
-                                        DAO && recurringPayments && recurringTreasuryTxns && recurringTreasuryTxns.map((txn:any) => {
-                                           return <RecurringRow transaction={txn} />
-                                        })
-                                    }
-                                    {
-                                        DAO && treasury && treasury.map((txn:any) => {
-                                            const executableNonce = computeExecutableNonce(txn?.safeAddress)
-                                           return <Row transaction={txn} executableNonce={executableNonce} />
-                                        })
-                                    }
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                {isHelpIconOpen &&
+                    <Box className={classes.helpCard}>
+                        Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!
                     </Box>
                 }
-            </Box>
-            }
-            { activeTab == 1 &&
-            <Box mt={0.5}>
-                <RecurringPayment onRecurringEdit={(txn:any) => { 
-                    setActiveTransaction(txn); 
-                    setTimeout(() => {
-                        setShowRecurringPayment(true) 
-                    }, 500)
-                }} />
-            </Box>
-            }
+                {activeTab == 0 ?
+                    <Box>
+                        {(!DAO || !treasury) ?
+                            <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={72} animation="wave" /> :
+                            <Box className={classes.tokenHeader}>
+                                <Box>
+                                    <Typography style={{ color: "#188C7C", fontWeight: "700", fontSize: 14 }}>{`$${(allTokens.reduce((a: any, b: any) => a + (+b.fiatBalance), 0)).toFixed(3)} Total Balance`}</Typography>
+                                </Box>
+                                <Box className={classes.stack} flexGrow={1}>
+                                    <Stack padding={"6px"} height={72} alignItems="center" justifyContent="flex-end" spacing={2} direction="row">
+                                        {
+                                            allTokens.map((token: any) => {
+                                                return (
+                                                    <Typography style={{ color: "#76808d", fontWeight: "700", fontSize: 14 }}>{`${(token.balance / 10 ** (token.token.decimal || token.token.decimals)).toFixed(3)}`}<span style={{ marginLeft: 6, color: "hsla(214,9%,51%,.5)", fontWeight: "700", fontSize: 14 }}>{token.token.symbol}</span></Typography>
+                                                )
+                                            })
+                                        }
+                                    </Stack>
+                                </Box>
+                            </Box>
+                        }
+                    </Box> : null}
+                {activeTab == 1 && adminSafes && adminSafes?.length > 0 ?
+                    <Box>
+                        <Box className={classes.reccurHeader}>
+                            <Box></Box>
+                            <Box>
+                                {adminSafes && adminSafes?.length > 0 && <Button onClick={() => { setActiveTransaction(null); setShowRecurringPayment(true) }} color="secondary" variant="contained" startIcon={<AddIcon color="primary" />} size="small" ><Typography color="primary">NEW RECURRING PAYMENT</Typography></Button>}
+                            </Box>
+                        </Box>
+                    </Box> : null}
+                {activeTab == 0 &&
+                    <Box mt={0.5}>
+                        {(!DAO || !treasury || !safeTokens) ?
+                            <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={showWalkThrough ? 400 : 500} animation="wave" /> :
+                            <Box className={classes.table}>
+                                <TableContainer style={{ maxHeight: showWalkThrough ? 400 : 500 }} component={Box}>
+                                    <Table size="medium" stickyHeader aria-label="simple table">
+                                        <TableBody>
+                                            {
+                                                DAO && recurringPayments && recurringTreasuryTxns && recurringTreasuryTxns.map((txn: any) => {
+                                                    return <RecurringRow transaction={txn} />
+                                                })
+                                            }
+                                            {
+                                                DAO && treasury && treasury.map((txn: any) => {
+                                                    console.log("transactions : ", txn)
+                                                    const executableNonce = computeExecutableNonce(txn?.safeAddress)
+                                                    return <Row transaction={txn} executableNonce={executableNonce} />
+                                                })
+                                            }
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Box>
+                        }
+                    </Box>
+                }
+                {activeTab == 1 &&
+                    <Box mt={0.5}>
+                        <RecurringPayment onRecurringEdit={(txn: any) => {
+                            setActiveTransaction(txn);
+                            setTimeout(() => {
+                                setShowRecurringPayment(true)
+                            }, 500)
+                        }} />
+                    </Box>
+                }
             </Grid>
             <SendToken open={showSendToken} onClose={() => setShowSendToken(false)} />
             <CreateRecurringPayment transaction={activeTransaction} open={showRecurringPayment} onClose={() => { setActiveTransaction(null); setShowRecurringPayment(false) }} />

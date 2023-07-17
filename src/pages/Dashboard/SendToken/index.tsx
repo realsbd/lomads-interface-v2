@@ -26,23 +26,23 @@ import { ethers } from "ethers";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
-        width: '575px', 
-        position: 'relative', 
-        flex: 1, 
-        padding: '32px 72px 32px 72px', 
+        width: '575px',
+        position: 'relative',
+        flex: 1,
+        padding: '32px 72px 32px 72px',
         borderRadius: '20px 0px 0px 20px'
     },
     footer: {
         width: 575,
         minHeight: 80,
-        background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', 
-        position: 'fixed', 
+        background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)',
+        position: 'fixed',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         bottom: 0,
-        borderRadius: '0px 0px 0px 20px', 
+        borderRadius: '0px 0px 0px 20px',
         padding: '0px 72px 0px 72px',
     },
     currencyBody: {
@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme: any) => ({
         textAlign: 'center',
         margin: '24px 0 !important'
     }
-  }));
+}));
 
 export default ({ open, onClose }: any) => {
     const classes = useStyles()
@@ -83,47 +83,55 @@ export default ({ open, onClose }: any) => {
     const [tab, setTab] = useState(1)
 
     useEffect(() => {
-        if(DAO && DAO?.url){
+        if (DAO && DAO?.url) {
             setTab(1)
-            setState((prev:any) => { return { ...prev, 
-                safeAddress: _get(adminSafes, '[0].address', null),
-                token: _get(safeTokens, `${_get(adminSafes, '[0].address', null)}[0].tokenAddress`, process.env.REACT_APP_NATIVE_TOKEN_ADDRESS),
-                members: DAO?.members?.map((member:any) => { return { name: member?.member?.name, address: member?.member?.wallet, selected: false } })
-            } })
+            setState((prev: any) => {
+                return {
+                    ...prev,
+                    safeAddress: _get(adminSafes, '[0].address', null),
+                    token: _get(safeTokens, `${_get(adminSafes, '[0].address', null)}[0].tokenAddress`, process.env.REACT_APP_NATIVE_TOKEN_ADDRESS),
+                    members: DAO?.members?.map((member: any) => { return { name: member?.member?.name, address: member?.member?.wallet, selected: false } })
+                }
+            })
         }
     }, [DAO?.url, open, adminSafes])
 
     const toggleMember = (member: any) => {
-        setState((prev: any) => { return { ...prev, members: prev.members.map((mem:any) => { 
-            if(member.address === mem.address)
-                return { ...mem, selected: !mem.selected } 
-            return mem
-        }) } })
+        setState((prev: any) => {
+            return {
+                ...prev, members: prev.members.map((mem: any) => {
+                    if (member.address === mem.address)
+                        return { ...mem, selected: !mem.selected }
+                    return mem
+                })
+            }
+        })
     }
 
     const handleSendTokens = async () => {
         const safe = loadSafe(state?.safeAddress)
         console.log("safe", safe)
-        if((+safe?.chainId !== +currentChainId) && state?.token !== "SWEAT")
-            return toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId}/>)
-        const send = state?.members?.filter((member:any) => member?.selected).map((member:any) => { return { recipient: member?.address, amount: member?.amount, label: member?.label, tag: member?.tag } })
+        if ((+safe?.chainId !== +currentChainId) && state?.token !== "SWEAT")
+            return toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId} />)
+        const send = state?.members?.filter((member: any) => member?.selected).map((member: any) => { return { recipient: member?.address, amount: member?.amount, label: member?.label, tag: member?.tag } })
         try {
             setSendTokensLoading(true)
-            const method = state?.token === "SWEAT" ? createOffChainSafeTransaction : createSafeTransaction
+            const method = state?.token === "SWEAT" ? createOffChainSafeTransaction : createSafeTransaction;
+            console.log("method", method)
             const txn = await method({
                 chainId: safe?.chainId,
                 safeAddress: state?.safeAddress,
                 tokenAddress: state?.token,
                 send,
                 daoId: _get(DAO, '_id', null),
-                isSafeOwner: _find(safe.owners, (owner:any) => owner?.wallet === account) !== null
+                isSafeOwner: _find(safe.owners, (owner: any) => owner?.wallet === account) !== null
             })
             onClose()
             return setSendTokensLoading(false)
         } catch (e) {
             setSendTokensLoading(false)
             console.log(e)
-            if(typeof e === 'string')
+            if (typeof e === 'string')
                 setNetworkError(e)
             setTimeout(() => setNetworkError(null), 3000)
             return;
@@ -138,7 +146,7 @@ export default ({ open, onClose }: any) => {
                 <Box
                     component="form"
                     sx={{
-                    '& .MuiTextField-root': { m: 1, width: '350px' },
+                        '& .MuiTextField-root': { m: 1, width: '350px' },
                     }}
                     noValidate
                     autoComplete="off"
@@ -149,12 +157,12 @@ export default ({ open, onClose }: any) => {
                         fullWidth
                         label="Treasury"
                         value={state?.safeAddress}
-                        onChange={(e:any) =>  setState((prev:any) => { return { ...prev, safeAddress: e.target.value } })}
+                        onChange={(e: any) => setState((prev: any) => { return { ...prev, safeAddress: e.target.value } })}
                     >
                         {
-                            activeSafes?.map((safe:any) => {
+                            activeSafes?.map((safe: any) => {
                                 return (
-                                    <MenuItem disabled={!_find(adminSafes, (a:any) => a._id === safe?._id)} key={safe?.address} value={safe?.address}>{ (safe?.name || "Multi-sig wallet") +" ("+ beautifyHexToken(safe?.address) +")" }</MenuItem>
+                                    <MenuItem disabled={!_find(adminSafes, (a: any) => a._id === safe?._id)} key={safe?.address} value={safe?.address}>{(safe?.name || "Multi-sig wallet") + " (" + beautifyHexToken(safe?.address) + ")"}</MenuItem>
                                 )
                             })
                         }
@@ -163,7 +171,7 @@ export default ({ open, onClose }: any) => {
                 <Box
                     component="form"
                     sx={{
-                    '& .MuiTextField-root': { m: 1, width: '350px' },
+                        '& .MuiTextField-root': { m: 1, width: '350px' },
                     }}
                     noValidate
                     autoComplete="off"
@@ -175,18 +183,18 @@ export default ({ open, onClose }: any) => {
                         disabled={!state?.safeAddress}
                         label="Token"
                         value={state?.token}
-                        onChange={(e:any) =>  setState((prev:any) => { return { ...prev, token: e.target.value } })}
+                        onChange={(e: any) => setState((prev: any) => { return { ...prev, token: e.target.value } })}
                     >
                         {
-                            _get(safeTokens, state?.safeAddress, [])?.map((token:any) => {
+                            _get(safeTokens, state?.safeAddress, [])?.map((token: any) => {
                                 return (
-                                    <MenuItem key={token?.tokenAddress} value={token?.tokenAddress}>{ token?.token?.symbol }</MenuItem>
+                                    <MenuItem key={token?.tokenAddress} value={token?.tokenAddress}>{token?.token?.symbol}</MenuItem>
                                 )
                             })
                         }
                     </TextInput>
                 </Box>
-            </Box> 
+            </Box>
         )
     }
 
@@ -195,28 +203,28 @@ export default ({ open, onClose }: any) => {
         return isValid;
     };
 
-    const isPresent = useCallback((address:string) => {
-        if(state.members) {
-            if(_find(state.members, (m:any) => m.address === address))
+    const isPresent = useCallback((address: string) => {
+        if (state.members) {
+            if (_find(state.members, (m: any) => m.address === address))
                 return true
         }
         return false
     }, [state.members])
 
-    const handleAddMember = (member:any) => {
+    const handleAddMember = (member: any) => {
         let err: any = {}
         setErrors(err)
-        if(!isAddressValid(member.address)) {
+        if (!isAddressValid(member.address)) {
             err["address"] = "Enter valid address"
         }
-        if(isPresent(member.address))
+        if (isPresent(member.address))
             err["address"] = "Address already exists."
         if (_isEmpty(err)) {
             setMemberPlaceholder({ name: null, address: null })
             setState((prev: any) => {
                 return {
                     ...prev,
-                    members: [{ name: member.name, address: member.address, selected: true }, ...prev.members ]
+                    members: [{ name: member.name, address: member.address, selected: true }, ...prev.members]
                 }
             })
             setShowAddNewMember(false)
@@ -235,12 +243,12 @@ export default ({ open, onClose }: any) => {
                 </Box>
                 <List dense sx={{ mt: 2 }}>
                     {
-                        state?.members?.map((member:any) => {
+                        state?.members?.map((member: any) => {
                             const labelId = `checkbox-list-label-${member.wallet}`;
                             return (
                                 <ListItem
-                                disablePadding key={member.wallet}>
-                                    <ListItemButton onClick={() => toggleMember(member)}  role={undefined} dense>
+                                    disablePadding key={member.wallet}>
+                                    <ListItemButton onClick={() => toggleMember(member)} role={undefined} dense>
                                         <Avatar name={_get(member, 'name', '')} wallet={_get(member, 'address', '')} />
                                         <Checkbox
                                             edge="end"
@@ -257,30 +265,30 @@ export default ({ open, onClose }: any) => {
                 <Dialog open={showAddNewMember} onClose={() => setShowAddNewMember(false)}>
                     <DialogTitle sx={{ fontSize: 18, fontWeight: 600 }}>Add member:</DialogTitle>
                     <DialogContent>
-                    <Box height={150} display="flex" flexDirection="row" justifyContent="flex-start" alignItems="center">
-                        <Box sx={{ width: 150, mr: 1 }}>
-                            <TextInput 
-                                fullWidth 
-                                error={errors['name']}
-                                helperText={errors['name']}
-                                value={memberPlaceholder?.name}
-                                onChange={(e:any) => setMemberPlaceholder((prev:any) => { return { ...prev, name: e.target.value } })}
-                                label="Name" 
-                                placeholder="Name"
-                            />
+                        <Box height={150} display="flex" flexDirection="row" justifyContent="flex-start" alignItems="center">
+                            <Box sx={{ width: 150, mr: 1 }}>
+                                <TextInput
+                                    fullWidth
+                                    error={errors['name']}
+                                    helperText={errors['name']}
+                                    value={memberPlaceholder?.name}
+                                    onChange={(e: any) => setMemberPlaceholder((prev: any) => { return { ...prev, name: e.target.value } })}
+                                    label="Name"
+                                    placeholder="Name"
+                                />
+                            </Box>
+                            <Box sx={{ width: 300, ml: 1 }}>
+                                <TextInput
+                                    fullWidth
+                                    error={errors['address']}
+                                    helperText={errors['address']}
+                                    label="Address"
+                                    onChange={(e: any) => setMemberPlaceholder((prev: any) => { return { ...prev, address: e.target.value } })}
+                                    value={memberPlaceholder?.address}
+                                    placeholder="ENS Domain or Wallet Address"
+                                />
+                            </Box>
                         </Box>
-                        <Box sx={{ width: 300, ml: 1 }}>
-                            <TextInput 
-                                fullWidth 
-                                error={errors['address']}
-                                helperText={errors['address']}
-                                label="Address"
-                                onChange={(e:any) => setMemberPlaceholder((prev:any) => { return { ...prev, address: e.target.value } })}
-                                value={memberPlaceholder?.address}
-                                placeholder="ENS Domain or Wallet Address"
-                            />
-                        </Box>
-                    </Box>
                     </DialogContent>
                     <DialogActions sx={{ p: 2 }}>
                         <Button fullWidth onClick={() => setShowAddNewMember(false)} size="small" variant="outlined">Cancel</Button>
@@ -300,7 +308,7 @@ export default ({ open, onClose }: any) => {
                     <Box
                         component="form"
                         sx={{
-                        '& .MuiTextField-root': { m: 1, width: '350px' },
+                            '& .MuiTextField-root': { m: 1, width: '350px' },
                         }}
                         noValidate
                         autoComplete="off"
@@ -311,12 +319,12 @@ export default ({ open, onClose }: any) => {
                             fullWidth
                             label="Treasury"
                             value={state?.safeAddress}
-                            onChange={(e:any) =>  setState((prev:any) => { return { ...prev, safeAddress: e.target.value } })}
+                            onChange={(e: any) => setState((prev: any) => { return { ...prev, safeAddress: e.target.value } })}
                         >
                             {
-                                activeSafes?.map((safe:any) => {
+                                activeSafes?.map((safe: any) => {
                                     return (
-                                        <MenuItem key={safe?.address} value={safe?.address}>{ (safe?.name || "Multi-sig wallet") +" ("+ beautifyHexToken(safe?.address) +")" }</MenuItem>
+                                        <MenuItem key={safe?.address} value={safe?.address}>{(safe?.name || "Multi-sig wallet") + " (" + beautifyHexToken(safe?.address) + ")"}</MenuItem>
                                     )
                                 })
                             }
@@ -325,7 +333,7 @@ export default ({ open, onClose }: any) => {
                     <Box
                         component="form"
                         sx={{
-                        '& .MuiTextField-root': { m: 1, width: '350px' },
+                            '& .MuiTextField-root': { m: 1, width: '350px' },
                         }}
                         noValidate
                         autoComplete="off"
@@ -337,18 +345,18 @@ export default ({ open, onClose }: any) => {
                             disabled={!state?.safeAddress}
                             label="Token"
                             value={state?.token}
-                            onChange={(e:any) =>  setState((prev:any) => { return { ...prev, token: e.target.value } })}
+                            onChange={(e: any) => setState((prev: any) => { return { ...prev, token: e.target.value } })}
                         >
                             {
-                                _get(safeTokens, state?.safeAddress, [])?.map((token:any) => {
+                                _get(safeTokens, state?.safeAddress, [])?.map((token: any) => {
                                     return (
-                                        <MenuItem key={token?.tokenAddress} value={token?.tokenAddress}>{ token?.token?.symbol }</MenuItem>
+                                        <MenuItem key={token?.tokenAddress} value={token?.tokenAddress}>{token?.token?.symbol}</MenuItem>
                                     )
                                 })
                             }
                         </TextInput>
                     </Box>
-                    <Box sx={{ my:3 }} style={{ alignSelf: 'center', backgroundColor: '#c94b32', border: '2px solid #c94b32', borderRadius: '50px', height: 0, width: '210px' }} ></Box>
+                    <Box sx={{ my: 3 }} style={{ alignSelf: 'center', backgroundColor: '#c94b32', border: '2px solid #c94b32', borderRadius: '50px', height: 0, width: '210px' }} ></Box>
                     <Box style={{ width: '100%' }}>
                         {
                             state?.members?.filter((member: any) => member.selected).map((member: any) => {
@@ -361,29 +369,42 @@ export default ({ open, onClose }: any) => {
                                             </IconButton>
                                         </Box>
                                         <Box sx={{ mt: 1.5 }} display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
-                                            <AmountInput onChange={(e:any) => { 
-                                                setState((prev: any) => { return { ...prev, members: prev.members.map((mem:any) => { 
-                                                    if(member.address === mem.address)
-                                                        return { ...mem, amount: e } 
-                                                    return mem
-                                                }) } })
-                                             }} value={member?.amount} />
-                                             <TextInput onChange={(e:any) => {
-                                                setState((prev: any) => { return { ...prev, members: prev.members.map((mem:any) => { 
-                                                    if(member.address === mem.address)
-                                                        return { ...mem, label: e.target.value } 
-                                                    return mem
-                                                }) } })
-                                             }} sx={{ mx: 1 }} placeholder="Reason for transaction" size="small"/>
-                                             <Box style={{ width: 150 }}>
-                                                <CreatableSelectTag onChangeOption={(e:any) => {
-                                                    setState((prev: any) => { return { ...prev, members: prev.members.map((mem:any) => { 
-                                                        if(member.address === mem.address)
-                                                            return { ...mem, tag: e } 
-                                                        return mem
-                                                    }) } })
-                                                }}/>
-                                             </Box>
+                                            <AmountInput onChange={(e: any) => {
+                                                console.log("value : ", typeof (e), e)
+                                                setState((prev: any) => {
+                                                    return {
+                                                        ...prev, members: prev.members.map((mem: any) => {
+                                                            if (member.address === mem.address)
+                                                                return { ...mem, amount: e }
+                                                            return mem
+                                                        })
+                                                    }
+                                                })
+                                            }} value={member?.amount} />
+                                            <TextInput onChange={(e: any) => {
+                                                setState((prev: any) => {
+                                                    return {
+                                                        ...prev, members: prev.members.map((mem: any) => {
+                                                            if (member.address === mem.address)
+                                                                return { ...mem, label: e.target.value }
+                                                            return mem
+                                                        })
+                                                    }
+                                                })
+                                            }} sx={{ mx: 1 }} placeholder="Reason for transaction" size="small" />
+                                            <Box style={{ width: 150 }}>
+                                                <CreatableSelectTag onChangeOption={(e: any) => {
+                                                    setState((prev: any) => {
+                                                        return {
+                                                            ...prev, members: prev.members.map((mem: any) => {
+                                                                if (member.address === mem.address)
+                                                                    return { ...mem, tag: e }
+                                                                return mem
+                                                            })
+                                                        }
+                                                    })
+                                                }} />
+                                            </Box>
                                         </Box>
                                     </Box>
                                 )
@@ -393,9 +414,9 @@ export default ({ open, onClose }: any) => {
                     <Box sx={{ my: 2 }}>
                         <Button onClick={() => setTab(2)} size="small" color="secondary" variant="contained">Add a member</Button>
                     </Box>
-                    <Box sx={{ my:3 }} style={{ alignSelf: 'center', backgroundColor: '#c94b32', border: '2px solid #c94b32', borderRadius: '50px', height: 0, width: '210px' }} ></Box>
+                    <Box sx={{ my: 3 }} style={{ alignSelf: 'center', backgroundColor: '#c94b32', border: '2px solid #c94b32', borderRadius: '50px', height: 0, width: '210px' }} ></Box>
                 </Box>
-            </Box> 
+            </Box>
         )
     }
 
@@ -410,29 +431,29 @@ export default ({ open, onClose }: any) => {
                 <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={onClose}>
                     <img src={CloseSVG} />
                 </IconButton>
-                { tab === 1 ? RenderTransactionBody() :
-                  tab === 2 ? RenderRecipientBody() :
-                  tab === 3 ? RenderSendTokenBody() :
-                  null
+                {tab === 1 ? RenderTransactionBody() :
+                    tab === 2 ? RenderRecipientBody() :
+                        tab === 3 ? RenderSendTokenBody() :
+                            null
                 }
             </Box>
             <Box className={classes.footer}>
                 {
                     tab === 1 ?
-                    <Button onClick={() => setTab(2)} disabled={!state?.safeAddress || !state?.token} color="primary" variant="contained" size="small">Next</Button> :
-                    tab === 2 ?
-                    <Box width={"100%"} display="flex" flexDirection="row" alignItems="center">
-                        <Button sx={{ mx: 1 }} onClick={() => setTab(1)} fullWidth color="primary" variant="outlined" size="small">Cancel</Button>
-                        <Button sx={{ mx: 1 }} onClick={() => setTab(3)} disabled={state?.members?.filter((m:any) => m.selected).length == 0} fullWidth color="primary" variant="contained" size="small">Next</Button>
-                    </Box> :
-                    tab === 3 ?
-                    <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" sx={{ pb: 1 }}>
-                        { networkError ? <Box sx={{ py: 1 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                            <Typography style={{ textAlign: 'center' }} color="error">{ networkError }</Typography>
-                        </Box> : null }
-                        <Button loading={sendTokensLoading} disabled={sendTokensLoading} onClick={() => handleSendTokens()} color="primary" variant="contained" size="small">Send Tokens</Button>
-                    </Box> :
-                    null
+                        <Button onClick={() => setTab(2)} disabled={!state?.safeAddress || !state?.token} color="primary" variant="contained" size="small">Next</Button> :
+                        tab === 2 ?
+                            <Box width={"100%"} display="flex" flexDirection="row" alignItems="center">
+                                <Button sx={{ mx: 1 }} onClick={() => setTab(1)} fullWidth color="primary" variant="outlined" size="small">Cancel</Button>
+                                <Button sx={{ mx: 1 }} onClick={() => setTab(3)} disabled={state?.members?.filter((m: any) => m.selected).length == 0} fullWidth color="primary" variant="contained" size="small">Next</Button>
+                            </Box> :
+                            tab === 3 ?
+                                <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" sx={{ pb: 1 }}>
+                                    {networkError ? <Box sx={{ py: 1 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                                        <Typography style={{ textAlign: 'center' }} color="error">{networkError}</Typography>
+                                    </Box> : null}
+                                    <Button loading={sendTokensLoading} disabled={sendTokensLoading} onClick={() => handleSendTokens()} color="primary" variant="contained" size="small">Send Tokens</Button>
+                                </Box> :
+                                null
                 }
             </Box>
         </Drawer>
