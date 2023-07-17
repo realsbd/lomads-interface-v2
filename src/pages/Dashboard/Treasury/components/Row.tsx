@@ -50,11 +50,11 @@ export default ({ transaction, executableNonce }: any) => {
                     "UPDATE_EARNING": { user: tx?.to, daoId: DAO?._id, symbol: tx?.symbol, value: +tx?.formattedValue, currency: tx?.tokenAddress || 'SWEAT' },
                     "UPDATE_FIAT_CONVERSION": { txId: transaction?._id, recipient: tx?.to, fiatConversion: token?.fiatConversion }
                 }
-            } else if (metadata?.taskId) {
+            } else if (metadata?.taskId || transaction?.rawTx?.taskId) {
                 // close task && update payment for user
                 actions = {
                     ...actions,
-                    "TASK_PAID": { taskId: metadata?.taskId, user: tx?.to },
+                    "TASK_PAID": { taskId: metadata?.taskId || transaction?.rawTx?.taskId, user: tx?.to },
                     "UPDATE_EARNING": { user: tx?.to, daoId: DAO?._id, symbol: tx?.symbol, value: +tx?.formattedValue, currency: tx?.tokenAddress || 'SWEAT' },
                     "UPDATE_FIAT_CONVERSION": { txId: transaction?._id, recipient: tx?.to, fiatConversion: token?.fiatConversion }
                 }
