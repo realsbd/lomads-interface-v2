@@ -112,7 +112,8 @@ export default () => {
                             symbol: token ? token?.token?.symbol : 'SWEAT',
                             decimals: token ? token?.token?.decimals : 18,
                             tokenAddress: tokenAddress
-                        }, label: v.label, tag: v.tag
+                        }, label: v.label, tag: v.tag,
+                        taskId: v?.taskId || undefined
                     }
                 }), {})
             }
