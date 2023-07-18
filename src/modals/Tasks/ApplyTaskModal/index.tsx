@@ -67,8 +67,7 @@ const useStyles = makeStyles((theme: any) => ({
         height: 50,
         borderRadius: '5px',
         cursor: 'pointer',
-        margin: '0 !important',
-        marginTop: '10px !important'
+        margin: '0 !important'
     },
     linkArea: {
         width: '100% !important',
@@ -239,7 +238,7 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                 </Box>
                 <Box display="flex" flexDirection="column" sx={{ width: '80%' }}>
                     <Typography className={classes.label}>Add links</Typography>
-                    <Box display="flex" justifyContent={"space-between"} sx={{ height: '80px' }}>
+                    <Box display="flex" flexDirection="row" alignItems="center" justifyContent={"space-between"} sx={{ height: '80px' }}>
                         <TextInput
                             sx={{ width: 145 }}
                             placeholder="Ex Portfolio"

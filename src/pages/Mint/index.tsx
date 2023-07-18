@@ -941,6 +941,8 @@ export default () => {
                                 <Typography sx={{ marginLeft: "20px", maxWidth: 800 }} className={classes.subtitle}>{DAO ? DAO.description : ''}</Typography>
                             </Box>
                         </Box>
+                        <Typography sx={{ mt: 1 }} className={classes.title}>Mint your membership token to join { DAO?.name }.</Typography>
+                        <Typography sx={{ mb: 2, mt: 1 }} className={classes.subtitle}>Your contact details are securely encrypted on the membership token.</Typography>
                         <Box mt={0} style={{ width: '100%', minHeight: '568px', display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
                             <Grid container style={{ boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)', height: '100%' }}>
                                 <Grid p={2} item xs={12} sm={4} style={{ backgroundColor: '#FDEEEC', borderRadius: '5px 0 0 5px' }}>
@@ -1232,7 +1234,7 @@ export default () => {
                                     onChange={(e: any) => setState((prev: any) => { return { ...prev, referralCode: e.target.value } } )}
                                     placeholder="Go Gondor" sx={{ my: 1 }} fullWidth label="Invite code" /> */}
                                 <Box mt={4}>
-                                    <Typography style={{ fontWeight: 700, fontSize: 16 }}>Contact details</Typography>
+                                   { contract?.contactDetail.length > 0 && <Typography style={{ fontWeight: 700, fontSize: 16 }}>Contact details</Typography> }
                                     {
                                         contract?.contactDetail.indexOf('email') > -1 &&
                                         <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>

@@ -291,15 +291,16 @@ const SafeModal = ({ open, onClose }: any) => {
                                                         <Box sx={{ ml: 2, flexGrow: 1 }}>
                                                             <Typography style={{ color: "#1B2B41", fontWeight: 600, fontSize: 14, fontFamily: 'Inter, sans-serif' }}>{safe?.name || 'Multi-sig wallet'}</Typography>
                                                             <Typography style={{ color: "#1B2B41", opacity: 0.59, fontWeight: 600, fontSize: 14, fontFamily: 'Inter, sans-serif' }}>{beautifyHexToken(safe?.address)}
-                                                                <span onClick={e => {
-                                                                    e.stopPropagation()
-                                                                    navigator.clipboard.writeText(safe?.address)
-                                                                    toast.success('Copied to clipboard')
-                                                                }}>
-                                                                    <img style={{ marginLeft: 16, width: 16, height: 16 }} src={LINK_SVG} />
-                                                                </span>
+                                                               
                                                             </Typography>
                                                         </Box>
+                                                        <IconButton style={{ marginRight: 6 }} onClick={(e:any) => {
+                                                                e.stopPropagation()
+                                                                navigator.clipboard.writeText(safe?.address)
+                                                                    toast.success('Copied to clipboard')
+                                                            }}>
+                                                                <img src={LINK_SVG} />
+                                                        </IconButton>
                                                         <IconButton onClick={(e:any) => {
                                                                 e.stopPropagation()
                                                                 setActive((prev: any) => {

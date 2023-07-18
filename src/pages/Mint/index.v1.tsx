@@ -592,7 +592,7 @@ export default () => {
                     <Box mt={8} display="flex" alignItems="center" justifyContent="center">
                         <img src={MintSBTSvg}/>
                     </Box>
-                    <Typography sx={{ mt: 2 }} className={classes.title}>{ balance === 1 ? 'Update your pass token' : 'To join the organisation mint your pass token' }</Typography>
+                    <Typography sx={{ mt: 2 }} className={classes.title}>{ balance === 1 ? 'Update your pass token' : `To join ${DAO?.name} mint your pass token` }</Typography>
                     <Box mt={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
                         {/* <Box onClick={() => navigate(-1)} height={77} width={50} style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
                             <img src={BackArrowSVG} />
@@ -792,7 +792,7 @@ export default () => {
                                 onChange={(e: any) => setState((prev: any) => { return { ...prev, referralCode: e.target.value } } )}
                                 placeholder="Go Gondor" sx={{ my: 1 }} fullWidth label="Invite code" /> */}
                             <Box mt={4}>
-                                <Typography style={{ fontWeight: 700, fontSize: 16 }}>Contact details</Typography>
+                               { contract?.contactDetail && contract?.contactDetail.length > 0 && <Typography style={{ fontWeight: 700, fontSize: 16 }}>Contact details</Typography> }
                                 {
                                     contract?.contactDetail.indexOf('email') > -1 &&
                                     <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>

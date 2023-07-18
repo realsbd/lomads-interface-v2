@@ -893,6 +893,7 @@ export default ({ open, closeModal, selectedProject }: Props) => {
                                         id="outlined-select-currency"
                                         select
                                         fullWidth
+                                        disabled={activeSafes.length < 2}
                                         label="Treasury"
                                         value={safeAddress}
                                         onChange={(e: any) => {

@@ -385,6 +385,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                             <TextInput
                                 id="outlined-select-currency"
                                 select
+                                disabled={DAO?.safes.length < 2}
                                 fullWidth
                                 label="Treasury"
                                 value={safeAddress}

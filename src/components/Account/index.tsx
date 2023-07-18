@@ -130,12 +130,13 @@ export default ({ children, options = true, ...props }: any) => {
 		// } else {
 		//   connector.resetState();
 		// }
-		localStorage.clear()
+		await localStorage.clear()
 		sessionStorage.clear()
 		dispatch(setTokenAction(null))
 		dispatch(setUserAction(null))
 		dispatch(logoutAction())
 		try { await logout() } catch (e) { console.log(e) }
+		await localStorage.setItem("MANUAL_DISCONNECT", "true")
 		window.location.reload()
 	};
 

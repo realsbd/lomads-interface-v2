@@ -6,7 +6,7 @@ import PercentIcon from '@mui/icons-material/Percent';
 import IconButton from 'components/IconButton';
 import TextInput from 'components/TextInput';
 import Button from "components/Button";
-
+import compensationStar from 'assets/svg/compensationStar.svg';
 import CloseSVG from 'assets/svg/closeNew.svg'
 import MilestoneSVG from 'assets/svg/milestone.svg'
 import Dropdown from "components/Dropdown";
@@ -116,6 +116,8 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
             setMembers(Project?.members)
     }, [Project])
 
+    console.log("selectedMilestone", selectedMilestone)
+
     const handleCreateTransaction = async () => {
         setNetworkError(null)
         if(Project.isDummy) {
@@ -207,6 +209,15 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
                     <img src={MilestoneSVG} alt="project-resource" />
                     <Typography className={classes.modalTitle}>Assign Contributions</Typography>
                     <Typography className={classes.modalSubtitle}>Mark the milestone as completed and reward the contributors</Typography>
+                </Box>
+                <Box>
+                    <Box sx={{ mb: 3 }} display="flex" flexDirection="row" alignItems="center">
+                        <Typography sx={{ color: '#76808D', fontSize: '16px' }}>Compensation</Typography>
+                        <Box display="flex" alignItems="center" justifyContent={"center"} sx={{ width: '127px', height: '35px', }}>
+                            <img src={compensationStar} alt="compensation-star" style={{ marginRight: '7px' }} />
+                            <Typography>{ +Project?.compensation?.amount * (+selectedMilestone?.amount / 100) } {_get(Project, 'compensation.symbol', '')}</Typography>
+                        </Box>
+                    </Box>
                 </Box>
                 <Box display="flex" flexDirection="column" justifyContent={"space-between"} alignItems={"center"} sx={{ width: '100%', height: '100%' }}>
                     <Box display="flex" flexDirection="column" alignItems={"center"} sx={{ width: '80%' }}>

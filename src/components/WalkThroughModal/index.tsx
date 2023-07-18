@@ -84,7 +84,7 @@ export default function WalkThrough({
             variant="outlined"
             onClick={endWalkThrough}
             size="small">
-            Later Thanks!
+            No, Thanks!
           </Button>
           <Button
             variant="contained"

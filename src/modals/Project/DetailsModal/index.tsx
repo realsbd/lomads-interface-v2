@@ -16,6 +16,7 @@ import { useAppDispatch } from "helpers/useAppDispatch";
 import { useAppSelector } from "helpers/useAppSelector";
 import { updateProjectDetailsAction } from "store/actions/project";
 import theme from "theme";
+import useTerminology from "hooks/useTerminology";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -70,6 +71,9 @@ export default ({ open, closeModal }: Props) => {
     const [name, setName] = useState<string>(_get(Project, 'name', ''));
     const [desc, setDesc] = useState<string>(_get(Project, 'description', ''));
 
+
+    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'));
+
     // runs after updating a project
     useEffect(() => {
         if (updateProjectDetailsLoading === false) {
@@ -96,14 +100,14 @@ export default ({ open, closeModal }: Props) => {
                 </IconButton>
                 <Box display="flex" flexDirection="column" alignItems="center">
                     <img src={createProjectSvg} alt="project-resource" />
-                    <Typography className={classes.modalTitle}>Project Details</Typography>
+                    <Typography className={classes.modalTitle}>{ transformWorkspace().label } Details</Typography>
                 </Box>
                 <Box display="flex" flexDirection="column" alignItems={"center"} sx={{ width: '80%', marginTop: '35px' }}>
                     <Paper className={classes.paperContainer} sx={{ width: 394 }}>
                         <Box sx={{ marginBottom: '20px' }}>
                             <TextInput
-                                label="Name of the project"
-                                placeholder="Super project"
+                                label={`Name of the ${ transformWorkspace().label }`}
+                                placeholder={ `Super ${ transformWorkspace().label }` }
                                 fullWidth
                                 value={name}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}

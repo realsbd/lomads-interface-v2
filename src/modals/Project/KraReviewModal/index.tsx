@@ -88,7 +88,11 @@ export default ({ open, closeModal }: Props) => {
             slots.push({ start, end });
             start = moment.unix(end).add(1, 'day').startOf('day').unix();
             // @ts-ignore
-            end = moment.unix(start).add(1, freq).endOf('day').unix();
+            if(freq === 'day')
+                end = moment.unix(start).endOf('day').unix();
+            else
+                // @ts-ignore
+                end = moment.unix(start).add(1, freq).endOf('day').unix();
         } while (start < moment().unix())
 
         slots = slots.map(slot => {
@@ -140,11 +144,13 @@ export default ({ open, closeModal }: Props) => {
     const handleSubmit = () => {
         const kra = { ...Project.kra };
         kra.tracker = getSlots.map(slot => {
+            //console.log(moment.unix(slot.start).format(), "--->", moment.unix(slot.end).format())
             // @ts-ignore
             if (slot.start === currentSlot.start && slot.end === currentSlot.end)
                 return currentSlot
             return slot
         })
+        console.log(kra.tracker)
         dispatch(updateProjectKraAction({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { kra } }))
     }
 

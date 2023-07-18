@@ -154,7 +154,10 @@ export default () => {
                         symbol: safeToken?.token?.symbol,
                         decimals: safeToken?.token?.decimals,
                         tokenAddress: safeToken?.tokenAddress
-                    }, label: v.label, tag: v.tag, sweatConversion: v.sweatConversion ? v.sweatConversion : undefined, taskId: v?.taskId || undefined }}), {}) 
+                    }, label: v.label,
+                        tag: v.tag, 
+                        sweatConversion: v.sweatConversion ? v.sweatConversion : undefined, 
+                        taskId: v?.taskId || undefined }}), {}) 
                 }
                 console.log(payload)
                 dispatch(CreateTreasuryTransactionAction(payload))

@@ -120,8 +120,15 @@ export default () => {
     useEffect(() => {
         console.log("TOKEN , USER, ACC", token, user, account)
         if (token && user && account) {
-            if (from)
-                navigate(from)
+            if (from){
+                const manDisc = localStorage.getItem("MANUAL_DISCONNECT")
+                if(!manDisc)
+                    navigate(from)
+                else {
+                    localStorage.removeItem("MANUAL_DISCONNECT")
+                    navigate('/')
+                }
+            }
             else
                 navigate('/')
         }

@@ -156,13 +156,6 @@ export default [
 		component: DashboardPage
 	},
 	{
-		path: '/:daoURL',
-		exact: true,
-		layout: DashboardLayout,
-		private: true,
-		component: DashboardPage
-	},
-	{
 		path: '/:daoURL/project/create',
 		exact: true,
 		layout: DefaultLayout,
@@ -253,4 +246,11 @@ export default [
 		private: true,
 		component: StarterPage
 	},
+	{
+		path: '/:daoURL',
+		exact: true,
+		layout: DashboardLayout,
+		private: true,
+		component: DashboardPage
+	}
 ];

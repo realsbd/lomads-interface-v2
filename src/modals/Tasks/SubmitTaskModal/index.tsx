@@ -191,10 +191,10 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
             setNoteError('Enter a note');
             return;
         }
-        else if (Task?.submissionLink && Task?.submissionLink.length == 0 && resourceList.length === 0) {
-            setLinkError("Enter atleast one link")
-            return;
-        }
+        // else if (Task?.submissionLink && Task?.submissionLink.length == 0 && resourceList.length === 0) {
+        //     setLinkError("Enter atleast one link")
+        //     return;
+        // }
         else {
             const payload = {
                 daoUrl: _get(DAO, 'url', ''),
@@ -307,7 +307,6 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
                         <Button
                             variant="contained"
                             onClick={handleSubmitWorkAsync}
-                            disabled={resourceList.length === 0}
                             sx={{ width: '184px' }}
                             loading={submitTaskLoading}
                         >

@@ -669,8 +669,8 @@ export default ({ open, closeModal, task }: Props) => {
 
                             <Box className={classes.modalRow} id="error-name">
                                 <TextInput
-                                    label="Name of the project"
-                                    placeholder="Super project"
+                                    label="Name of the task"
+                                    placeholder="Super task"
                                     fullWidth
                                     value={name}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setName(e.target.value); setErrorName('') }}
@@ -991,6 +991,7 @@ export default ({ open, closeModal, task }: Props) => {
                                         select
                                         fullWidth
                                         label="Treasury"
+                                        disabled={DAO?.safes.length < 2}
                                         value={safeAddress}
                                         onChange={(e: any) => {
                                             setSafeAddress(e.target.value)

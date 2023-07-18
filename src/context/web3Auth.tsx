@@ -64,12 +64,13 @@ export const Web3AuthProvider: FunctionComponent<IWeb3AuthState> = ({ children }
 
 const handleAccountsChanged = async () => {
     try {
-      localStorage.clear()
+      await localStorage.clear()
       sessionStorage.clear()
       dispatch(setTokenAction(null))
       dispatch(setUserAction(null))
       dispatch(logoutAction())
       await logout()
+      await localStorage.setItem("MANUAL_DISCONNECT", "true")
     } catch(e) {
       console.log(e)
     }

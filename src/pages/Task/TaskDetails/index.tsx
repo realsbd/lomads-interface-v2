@@ -44,6 +44,7 @@ import ReviewModal from "modals/Tasks/ReviewModal";
 import useTask from "hooks/useTask";
 import useRole from "hooks/useRole";
 import EditTaskModal from "modals/Tasks/EditTaskModal";
+import useTerminology from "hooks/useTerminology";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -107,7 +108,7 @@ const useStyles = makeStyles((theme: any) => ({
         padding: '0 22px !important',
     },
     closeBtn: {
-        width: '165px',
+        width: '190px',
         height: '40px',
         background: '#FFFFFF !important',
         boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), - 3px - 3px 8px rgba(201, 75, 50, 0.1) !important',
@@ -149,6 +150,8 @@ export default () => {
     // @ts-ignore
     const { setTaskLoading, Task: storeTask } = useAppSelector(store => store.task);
     const { transformTask } = useTask();
+
+    const { transformTask: transaformLabel } = useTerminology(_get(DAO, 'terminologies'))
 
     const { myRole, can } = useRole(DAO, account, undefined);
 
@@ -655,7 +658,7 @@ export default () => {
                                         {
                                             Task?.archivedAt === null && (amICreator || can(myRole, 'task.close')) &&
                                             <Button size="small" variant="contained" color="secondary" className={classes.closeBtn} onClick={() => setOpenCloseModal(true)}>
-                                                CLOSE TASK
+                                                { `CLOSE ${ transaformLabel().label.toUpperCase() }` }
                                             </Button>
                                         }
                                     </>
@@ -802,7 +805,7 @@ export default () => {
                     } */}
 
                     <Box display="flex" alignItems="center">
-                        <Typography sx={{ fontSize: 16, opacity: '0.5' }}>Created At {moment(Task.createdAt).format('L')} {moment(Task.createdAt).format('LT')}</Typography>
+                        <Typography sx={{ fontSize: 16, opacity: '0.5' }}>Created on {moment(Task.createdAt).format('L')} {moment(Task.createdAt).format('LT')}</Typography>
                     </Box>
                 </Box>
 

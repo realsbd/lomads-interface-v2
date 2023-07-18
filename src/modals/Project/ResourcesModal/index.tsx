@@ -26,6 +26,7 @@ import theme from "theme";
 import { useAppSelector } from "helpers/useAppSelector";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { editProjectLinksAction } from "store/actions/project";
+import useTerminology from "hooks/useTerminology";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -127,6 +128,8 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
     const [accessControl, setAccessControl] = useState(false);
     const [accessControlError, setAccessControlError] = useState<string>('');
     const [resourceList, setResourceList] = useState<any[]>(list);
+
+    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'));
 
     useEffect(() => {
         try {
@@ -308,7 +311,7 @@ export default ({ open, hideBackdrop, closeModal, list, getResources, editResour
                 </IconButton>
                 <Box display="flex" flexDirection="column" alignItems="center">
                     <img src={ProjectResourceSVG} alt="project-resource" />
-                    <Typography className={classes.modalTitle}>Project Resources</Typography>
+                    <Typography className={classes.modalTitle}>{ transformWorkspace().label } Resources</Typography>
                     <Typography className={classes.modalSubtitle}>Add links for online ressources </Typography>
                 </Box>
                 <Box display="flex"flexDirection="column" sx={{ width: '80%' }}>

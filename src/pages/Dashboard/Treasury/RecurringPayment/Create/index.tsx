@@ -419,7 +419,7 @@ export default ({ open, onClose, transaction }: any) => {
                             id="outlined-select-currency"
                             select
                             displayEmpty
-                            disabled={transaction}
+                            disabled={transaction || eligibleSafes.length < 2}
                             error={errors?.safeAddress} helperText={errors?.safeAddress}
                             fullWidth
                             label="Treasury"
@@ -498,65 +498,60 @@ export default ({ open, onClose, transaction }: any) => {
                     </Box>    
                     <Box py={2}>
                         <FormLabel style={{ marginBottom: "10px" }} component="legend">Ends</FormLabel>
-                        <TableContainer>
-                            <Table>
-                                <TableBody>
-                                    <TableRow>
-                                        <Box sx={{ display: 'flex', flexDirection: "row", alignItems: 'center' }}>
-                                            <Checkbox onChange={() => setState((prev:any) => { return {
-                                                ...prev,
-                                                ends: { ...prev?.ends, value: "NEVER", occurances: undefined, endOn: undefined }
-                                            } })} checked={state?.ends?.value === 'NEVER'} />
-                                            <Typography>When it is cancelled</Typography>
-                                        </Box>
-                                        <TableCell></TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell  sx={{ display: 'flex', flexDirection: "row", alignItems: 'center' }}>
-                                            <Checkbox onChange={() => setState((prev:any) => { return {
-                                                ...prev,
-                                                ends: { ...prev?.ends, value: "ON", occurances: undefined, endOn: undefined  }
-                                            } })} checked={state?.ends?.value === 'ON'} />
-                                            <Typography>On</Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                        <TextInput
-                                            date
-                                            size="small"
-                                            fullWidth
-                                            disabled={state?.ends?.value !== 'ON'}
-                                            defaultValue={state?.ends?.endOn ? moment(state?.ends?.endOn, 'YYYY-MM-DD') : undefined}
-                                            value={state?.ends?.endOn ? moment(state?.ends?.endOn, 'YYYY-MM-DD') : undefined}
-                                            onChange={(e: any) => {
-                                                setState((prev:any) => { return {
+                        <Box display="flex" flexDirection="row" alignItems="center" sx={{ my: 2 }}>
+                            <Box>
+                                <Checkbox onChange={() => setState((prev:any) => { return {
+                                    ...prev,
+                                    ends: { ...prev?.ends, value: "NEVER", occurances: undefined, endOn: undefined }
+                                } })} checked={state?.ends?.value === 'NEVER'} />
+                            </Box>
+                            <Box>
+                                <Typography>When it is cancelled</Typography>
+                            </Box>
+                        </Box>
+                        <Box display="flex" flexDirection="row" alignItems="center" sx={{ my: 2 }} justifyContent="space-between">
+                            <Box display="flex" flexDirection="row" alignItems="center">
+                                <Checkbox onChange={() => setState((prev:any) => { return {
                                                     ...prev,
-                                                    ends: { ...prev?.ends, endOn: moment(e).format('YYYY-MM-DD') },
-                                                } })
-                                            }}
-                                        />
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell  sx={{ display: 'flex', flexDirection: "row", alignItems: 'center' }}>
-                                            <Checkbox onChange={() => setState((prev:any) => { return {
-                                                ...prev,
-                                                ends: { ...prev?.ends, value: "AFTER", occurances: undefined, endOn: undefined  }
-                                            } })} checked={state?.ends?.value === 'AFTER'} />
-                                            <Typography>After</Typography>
-                                        </TableCell>
-                                        <TableCell >
-                                            <AmountInput disabled={state?.ends?.value !== 'AFTER'} height={50} width={150} 
+                                                    ends: { ...prev?.ends, value: "ON", occurances: undefined, endOn: undefined  }
+                                                } })} checked={state?.ends?.value === 'ON'} />
+                                                <Typography>On</Typography>
+                            </Box>
+                            <Box width={200}>
+                                <TextInput
+                                    date
+                                    size="small"
+                                    fullWidth
+                                    disabled={state?.ends?.value !== 'ON'}
+                                    defaultValue={state?.ends?.endOn ? moment(state?.ends?.endOn, 'YYYY-MM-DD') : undefined}
+                                    value={state?.ends?.endOn ? moment(state?.ends?.endOn, 'YYYY-MM-DD') : undefined}
+                                    onChange={(e: any) => {
+                                        setState((prev:any) => { return {
+                                            ...prev,
+                                            ends: { ...prev?.ends, endOn: moment(e).format('YYYY-MM-DD') },
+                                        } })
+                                    }}
+                                />
+                            </Box>
+                        </Box>
+                        <Box display="flex" flexDirection="row" alignItems="center" sx={{ my: 2 }} justifyContent="space-between">
+                            <Box display="flex" flexDirection="row" alignItems="center">
+                                <Checkbox onChange={() => setState((prev:any) => { return {
+                                    ...prev,
+                                    ends: { ...prev?.ends, value: "AFTER", occurances: undefined, endOn: undefined  }
+                                } })} checked={state?.ends?.value === 'AFTER'} />
+                                <Typography>After</Typography>
+                            </Box>
+                            <Box width={200}>
+                                <AmountInput disabled={state?.ends?.value !== 'AFTER'} height={50} width={150} 
                                                 onChange={(e:any) => setState((prev:any) => { return {
                                                     ...prev,
                                                     ends: { ...prev?.ends, occurances: parse(e) }
                                                 } })}
                                                 value={format(state?.ends?.occurances)}
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                                />
+                            </Box>
+                        </Box>
                     </Box> 
                         { transaction && 
                             <Box sx={{ pb: 3, mt: 5 }}>
@@ -566,7 +561,7 @@ export default ({ open, onClose, transaction }: any) => {
                                 </Box>
                             </Box> 
                         }
-                </Box>
+                    </Box>
             </Box>
             <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 430, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
                     <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">

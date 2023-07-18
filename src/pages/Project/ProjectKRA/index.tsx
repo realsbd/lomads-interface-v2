@@ -37,12 +37,15 @@ export default () => {
     }
 
     const renderAverage = (arr: any) => {
-        let sum = 0;
-        for (let i = 0; i < arr.length; i++) {
-            sum += arr[i].progress;
+        if(arr) {
+            let sum = 0;
+            for (let i = 0; i < arr.length; i++) {
+                sum += arr[i].progress;
+            }
+    
+            return (sum / arr.length).toFixed(2);
         }
-
-        return (sum / arr.length).toFixed(2);
+        return 0
     }
 
     return (
@@ -62,7 +65,7 @@ export default () => {
             <div className="archive-body" style={{ overflow: 'hidden', height: '80vh', marginTop: 80, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ overflow: 'hidden', overflowY: 'auto', height: '100%' }}>
                     {
-                        _get(Project, 'kra.tracker', []).map((item: any, index: number) => {
+                        _get(Project, 'kra.tracker', []) && _get(Project, 'kra.tracker', []).map((item: any, index: number) => {
                             return (
                                 <div className="accordion-wrapper" key={index}>
                                     <button className="accordion" onClick={() => handleAccordion(index)}>

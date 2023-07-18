@@ -101,7 +101,7 @@ export default ({ hideBackdrop, open, closeModal, list, freq, getResults, editKR
     // @ts-ignore
     const { Project, editProjectKraLoading } = useAppSelector(store => store.project);
 
-    const [frequency, setFrequency] = useState<string>(freq ? freq : 'Daily');
+    const [frequency, setFrequency] = useState<string>(freq ? freq : 'daily');
     const [resultCount, setResultCount] = useState<number>(list.length > 0 ? list.length : 1);
     const [results, setResults] = useState<any[]>(list.length > 0 ? list : [{ _id: nanoid(16), color: '#FFCC18', name: '', progress: 0 }]);
 
@@ -210,7 +210,7 @@ export default ({ hideBackdrop, open, closeModal, list, freq, getResults, editKR
                     <Box display="flex" flexDirection="column" sx={{ width: 310, marginBottom: '35px' }}>
                         <Typography className={classes.label}>Review Frequency</Typography>
                         <Dropdown
-                            options={['Daily', 'Weekly', 'Monthly']}
+                            options={['daily', 'weekly', 'monthly']}
                             defaultValue={frequency}
                             onChange={(value: string) => setFrequency(value)}
                         />

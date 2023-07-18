@@ -434,6 +434,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
                             sx={{ my: 1 }} placeholder="LMDS" fullWidth
                         />
                     </Box>
+                    <Typography style={{ fontSize: 14, marginLeft: 48 }}>Deployed on { _get(CHAIN_INFO, chainId)?.label }</Typography>
                     {/* <Box display="flex" flexDirection="row" alignItems="center">
                         {contract?.tokenSupply && <Typography className={classes.tokenSupply}>{`X ${contract?.tokenSupply}`}</Typography>}
                     </Box> */}

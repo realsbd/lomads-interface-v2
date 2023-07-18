@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { Grid, Typography, Box, Tab, Tabs, Menu, MenuItem, Chip } from "@mui/material";
 import { makeStyles } from '@mui/styles';
-
+import { BsCalendarCheck } from 'react-icons/bs';
+import compensationStar from 'assets/svg/compensationStar.svg';
 import { IoIosArrowBack } from 'react-icons/io';
 
 import copyIcon from "assets/svg/copyIcon.svg";
@@ -250,6 +251,15 @@ export default () => {
         }
     }
 
+    const nextMilestone = useMemo(() => {
+        if(Project && Project.milestones) {
+            let mts = Project.milestones.filter((m:any) => !m.complete)
+            if(mts && mts.length > 0)
+                return mts[0]
+        }
+        return null
+    }, [Project])
+
     const NameAndAvatar = (props: any) => {
         const [show, setShow] = useState(false);
         let roles: any = [];
@@ -335,6 +345,17 @@ export default () => {
         }
         else return null;
     };
+
+    const getDeadline = (deadline: any) => {
+        if(moment(deadline, 'YYYY-MM-DD').isSame(moment(), 'day')) { 
+            return { color: 'red', value: 'Today' }
+        } else if(moment(deadline, 'YYYY-MM-DD').isBefore(moment().startOf('day'), 'days')) { 
+            return { color: 'red', value: 'Passed' }
+        } else if(moment(deadline, 'YYYY-MM-DD').diff(moment().startOf('day'), 'days') <= 2) { 
+            return { color: 'red', value: `in ${moment(deadline, 'YYYY-MM-DD').diff(moment().startOf('day'), 'days')} day${moment(deadline, 'YYYY-MM-DD').diff(moment().startOf('day'), 'days') > 1 ? 's':''}` }
+        } 
+        return { color: '#4BA1DB', value:  moment(_get(nextMilestone, 'deadline', ''), 'YYYY-MM-DD').format('L') }
+    }
 
 
     if (!Project || setProjectLoading || (projectId && (Project && Project._id !== projectId))) {
@@ -507,7 +528,22 @@ export default () => {
                                 {
                                     value === 0 &&
                                     <Box display={"flex"} alignItems={"center"}>
-                                        <div style={{ width: '300px' }}>
+                                        <Box display="flex" flexDirection="row" alignItems="center">
+                                            <Typography sx={{ color: '#76808D', fontSize: '16px' }}>Compensation</Typography>
+                                            <Box display="flex" alignItems="center" justifyContent={"center"} sx={{ width: '127px', height: '35px', }}>
+                                                <img src={compensationStar} alt="compensation-star" style={{ marginRight: '7px' }} />
+                                                <Typography>{_get(Project, 'compensation.amount', '')} {_get(Project, 'compensation.symbol', '')}</Typography>
+                                            </Box>
+                                        </Box>
+                                       { nextMilestone && <Box display="flex" alignItems="center" style={{ borderLeft: '1px solid rgba(118, 128, 141, 0.5)', paddingLeft: '20px' }}>
+                                            <Typography sx={{ color: getDeadline(nextMilestone?.deadline)?.color, marginRight: '10px', fontSize: '16px' }}>Deadline</Typography>
+                                            <BsCalendarCheck color={getDeadline(nextMilestone?.deadline)?.color} />
+                                            { 
+                                                //@ts-ignore 
+                                            }
+                                            <Typography sx={{ fontWeight: '700', color: getDeadline(nextMilestone?.deadline)?.color, marginLeft: '6px', marginRight: '10px' }}>{ getDeadline(nextMilestone?.deadline)?.value }</Typography>
+                                        </Box> }
+                                        {/* <div style={{ width: '300px' }}>
                                             <StepperProgress variant="secondary" milestones={_get(Project, 'milestones', [])} />
                                         </div>
                                         {
@@ -518,7 +554,7 @@ export default () => {
                                                 </Typography>
                                                 :
                                                 <Typography sx={{ marginLeft: '16px', fontWeight: 700, color: '#188C7C' }}>0%</Typography>
-                                        }
+                                        } */}
 
                                     </Box>
                                 }
@@ -527,7 +563,7 @@ export default () => {
                                     value === 1 &&
                                     <Box display={"flex"} alignItems={"center"}>
                                         <Typography sx={{ marginLeft: '14px', fontWeight: 400, color: '#76808D', marginRight: '100px' }}>Review frequency : {_get(Project, 'kra.frequency', [])}</Typography>
-                                        <IconButton sx={{ marginRight: '20px' }} onClick={() => navigate(`/${daoURL}/project/${projectId}/archivedKra`)}>
+                                        <IconButton disabled={!Project.kra.tracker || Project.kra.tracker.length == 0} sx={{ marginRight: '20px' }} onClick={() => navigate(`/${daoURL}/project/${projectId}/archivedKra`)}>
                                             <img src={archiveIcon} alt="archiveIcon" />
                                         </IconButton>
                                         { canMyrole('project.review') && <Button size="small" variant="contained" onClick={() => setOpenKraReview(true)}>

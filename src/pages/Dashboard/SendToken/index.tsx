@@ -156,6 +156,7 @@ export default ({ open, onClose }: any) => {
                         select
                         fullWidth
                         label="Treasury"
+                        disabled={activeSafes.length < 2}
                         value={state?.safeAddress}
                         onChange={(e: any) => setState((prev: any) => { return { ...prev, safeAddress: e.target.value } })}
                     >
@@ -318,6 +319,7 @@ export default ({ open, onClose }: any) => {
                             select
                             fullWidth
                             label="Treasury"
+                            disabled={activeSafes.length < 2}
                             value={state?.safeAddress}
                             onChange={(e: any) => setState((prev: any) => { return { ...prev, safeAddress: e.target.value } })}
                         >

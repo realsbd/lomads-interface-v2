@@ -19,6 +19,8 @@ import ProjectMembersModal from "../ProjectMembersModal";
 
 import { useAppSelector } from "helpers/useAppSelector";
 import theme from "theme";
+import useTerminology from "hooks/useTerminology";
+import { useDAO } from "context/dao";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -83,6 +85,7 @@ interface Props {
 
 export default ({ open, closeModal }: Props) => {
     const classes = useStyles();
+    const { DAO } = useDAO()
     // @ts-ignore
     const { Project } = useAppSelector(store => store.project);
     const [openCloseModal, setOpenCloseModal] = useState<boolean>(false);
@@ -93,6 +96,8 @@ export default ({ open, closeModal }: Props) => {
     const [openResource, setOpenResource] = useState<boolean>(false);
     const [openMilestone, setOpenMilestone] = useState<boolean>(false);
     const [openKRA, setOpenKRA] = useState<boolean>(false);
+
+    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'));
 
     return (
         <Drawer
@@ -158,18 +163,18 @@ export default ({ open, closeModal }: Props) => {
                 <Box sx={{ width: '100%', padding: '0 27px', marginTop: '60px' }} display={"flex"} flexDirection={"column"}>
                     <Box display="flex" flexDirection="column" alignItems="center" sx={{ marginBottom: '35px' }}>
                         <img src={settingSvg} alt="project-resource" />
-                        <Typography className={classes.modalTitle}>Project Settings</Typography>
+                        <Typography className={classes.modalTitle}>{ transformWorkspace().label } Settings</Typography>
                     </Box>
 
                     <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} className={classes.editCard}>
-                        <Typography className={classes.cardTitle}>Workspace details</Typography>
+                        <Typography className={classes.cardTitle}>{ transformWorkspace().label } details</Typography>
                         <Box sx={{ cursor: 'pointer' }} onClick={() => setOpenDetails(true)}>
                             <img src={editSvg} alt="edit-svg" />
                         </Box>
                     </Box>
 
                     <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} className={classes.editCard}>
-                        <Typography className={classes.cardTitle}>Workspace members</Typography>
+                        <Typography className={classes.cardTitle}>{ transformWorkspace().label } members</Typography>
                         <Box sx={{ cursor: 'pointer' }} onClick={() => setOpenMembers(true)}>
                             <img src={editSvg} alt="edit-svg" />
                         </Box>
@@ -177,7 +182,7 @@ export default ({ open, closeModal }: Props) => {
 
                     <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} className={classes.editCard}>
                         <Box>
-                            <Typography className={classes.cardTitle}>Workspace resources</Typography>
+                            <Typography className={classes.cardTitle}>{ transformWorkspace().label } resources</Typography>
                             <Typography sx={{ fontStyle: 'italic', fontSize: 14 }}>Add links for your team to access</Typography>
                         </Box>
                         <Box onClick={() => setOpenResource(true)} sx={{ cursor: 'pointer' }}>
@@ -207,8 +212,8 @@ export default ({ open, closeModal }: Props) => {
 
                     <Box display={"flex"} flexDirection={"column"} className={classes.editCloseCard}>
                         <Box>
-                            <Typography className={classes.cardTitle}>Close Workspace</Typography>
-                            <Typography sx={{ fontStyle: 'italic', fontSize: 14 }}>The workspace will appear in archives</Typography>
+                            <Typography className={classes.cardTitle}>Close { transformWorkspace().label }</Typography>
+                            <Typography sx={{ fontStyle: 'italic', fontSize: 14 }}>The { transformWorkspace().label } will appear in archives</Typography>
                         </Box>
                         <Button
                             fullWidth
@@ -217,14 +222,14 @@ export default ({ open, closeModal }: Props) => {
                             sx={{ height: 40, color: '#C94B32', fontSize: 16, marginTop: '10px' }}
                             onClick={() => setOpenCloseModal(true)}
                         >
-                            CLOSE WORKSPACE
+                            CLOSE { transformWorkspace().label.toUpperCase() }
                         </Button>
                     </Box>
 
                     <Box display={"flex"} flexDirection={"column"} className={classes.editCloseCard}>
                         <Box>
                             <Typography className={classes.cardTitle}>Delete Workspace</Typography>
-                            <Typography sx={{ fontStyle: 'italic', fontSize: 14 }}>The workspace will not appear in archives</Typography>
+                            <Typography sx={{ fontStyle: 'italic', fontSize: 14 }}>The { transformWorkspace().label } will not appear in archives</Typography>
                         </Box>
                         <Button
                             fullWidth
@@ -233,7 +238,7 @@ export default ({ open, closeModal }: Props) => {
                             sx={{ height: 40, fontSize: 16, marginTop: '10px' }}
                             onClick={() => setOpenDeleteModal(true)}
                         >
-                            DELETE WORKSPACE
+                            DELETE { transformWorkspace().label.toUpperCase() }
                         </Button>
                     </Box>
 

@@ -78,6 +78,12 @@ const XPPoints = ({ open, onClose }: any) => {
             setEnabled(DAO?.sweatPoints)
         }
     }, [DAO?.url])
+    
+    useEffect(() => {
+        if(DAO?.safes && DAO?.safes?.length > 0) {
+            setState((prev:any) => { return { ...prev, safeAddress: DAO?.safes[0].address } })
+        }
+    }, [DAO?.safes])
 
     const handleCreateTransaction = async () => {
         if(+safe?.chainId !== +chainId) {
@@ -187,7 +193,7 @@ const XPPoints = ({ open, onClose }: any) => {
                 </Box>
                 <Box>
                     <Box sx={{ my: 4 }} component="form" noValidate autoComplete="off">
-                        <TextInput id="outlined-select-currency" select fullWidth label="Treasury" value={state?.safeAddress} 
+                        <TextInput id="outlined-select-currency" select disabled={DAO?.safes.length < 2} fullWidth label="Treasury" value={state?.safeAddress} 
                             onChange={(e:any) =>  setState((prev:any) => {
                                  return { ...prev, safeAddress: e.target.value, currency: _get(_get(safeTokens, e.target.value, ''), '[0].tokenAddress', null) } 
                             })}

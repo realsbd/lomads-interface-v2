@@ -752,7 +752,7 @@ export default () => {
                     }
 
                     <Box display="flex" alignItems="center">
-                        <Typography sx={{ fontSize: 16, opacity: '0.5' }}>Created At {moment(Task.createdAt).format('L')} {moment(Task.createdAt).format('LT')}</Typography>
+                        <Typography sx={{ fontSize: 16, opacity: '0.5' }}>Created on {moment(Task.createdAt).format('L')} {moment(Task.createdAt).format('LT')}</Typography>
                     </Box>
                 </Box>
 

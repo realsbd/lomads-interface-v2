@@ -166,6 +166,7 @@ export default ({ isHelpIconOpen, showWalkThrough }: any) => {
                 "incomingToken": "Incoming token",
                 "outgoingAmount": "Outgoing amount",
                 "outgoingToken": "Outgoing token",
+                "fiatUSD": "Fiat (USD)",
                 "description": "Description",
                 "recipientWallet": "Recipient Wallet",
                 "executionDate": "Execution Date"
@@ -184,10 +185,12 @@ export default ({ isHelpIconOpen, showWalkThrough }: any) => {
                 console.log("DUMP", dump)
                 for (let index = 0; index < dump.length; index++) {
                     const txn: any = dump[index];
-                    const metadata = _find(treasury, (tx: any) => tx?.safeAddress === safe?.address && (tx?.rawTx?.safeTxHash === txn?.safeTxHash || tx?.rawTx?.txHash === txn?.txHash))
                     const transformedTxn = transformTx(txn, [], safe?.address)
                     for (let index = 0; index < transformedTxn.length; index++) {
                         const ttxn = transformedTxn[index];
+                        const metadata = _get(_find(treasury, (tx: any) => tx?.safeAddress === safe?.address && (tx?.rawTx?.safeTxHash === ttxn?.safeTxHash || tx?.rawTx?.txHash === ttxn?.txHash || tx?.rawTx?.transactionHash === ttxn?.transactionHash)), 'metadata', null)
+                        const fiat = ttxn?.executionDate ? _get(metadata, `${ttxn?.to}.fiatConversion`, '') : _get(ttxn, 'fiatConversion', '')
+                        const txnlabel =_get(metadata, `${ttxn?.to}.label`, '')
                         if (ttxn?.to !== '0x') {
                             csvData.push({
                                 safeAddress: safe?.address,
@@ -196,7 +199,8 @@ export default ({ isHelpIconOpen, showWalkThrough }: any) => {
                                 incomingToken: ttxn?.isCredit ? ttxn?.symbol : '',
                                 outgoingAmount: !ttxn?.isCredit ? ttxn?.formattedValue : '',
                                 outgoingToken: !ttxn?.isCredit ? ttxn?.symbol : '',
-                                description: metadata ? metadata[ttxn?.to]?.label || '' : '',
+                                fiatUSD: !ttxn?.isCredit && +fiat ? (fiat * (+ttxn?.formattedValue || 0)).toFixed(3) : '',
+                                description: txnlabel,
                                 recipientWallet: ttxn?.to,
                                 executionDate: ttxn?.executionDate ? ttxn?.executionDate : 'pending'
                             })

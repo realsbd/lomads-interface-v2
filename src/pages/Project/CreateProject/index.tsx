@@ -329,10 +329,12 @@ export default () => {
         project['links'] = resourceList;
         project['milestones'] = milestones;
         project['compensation'] = compensation;
-        project['kra'] = {
-            frequency,
-            results
-        };
+        if(frequency !== '') {
+            project['kra'] = {
+                frequency,
+                results
+            };
+        }
         project['daoId'] = DAO?._id;
         project['members'] = [];
         project['validRoles'] = [];

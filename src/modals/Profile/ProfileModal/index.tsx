@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy, groupBy as _groupBy } from 'lodash';
+import { get as _get, find as _find, uniqBy as _uniqBy, orderBy as _orderBy, groupBy as _groupBy } from 'lodash';
 import { Paper, Typography, Box, Drawer } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
@@ -73,7 +73,7 @@ export default ({ open, closeModal }: Props) => {
     const [name, setName] = useState<string>('');
     const [errorName, setErrorName] = useState('');
 
-    const [chain, setChain] = useState<any>(137);
+    const [chain, setChain] = useState<any>('all');
     const [nftData, setNftData] = useState<any>({})
 
     useEffect(() => {
@@ -84,9 +84,15 @@ export default ({ open, closeModal }: Props) => {
 
     const computedTxns = useMemo(() => {
         if (transactions && chain) {
-            let txns = transactions.filter((transaction: any) => (transaction?.chainId === chain || _get(transaction, `metadata.${account}.parsedTxValue.symbol`) === 'SWEAT') && _get(transaction, `metadata.${account}.parsedTxValue.formattedValue`) && _get(transaction, `metadata.${account}.parsedTxValue.symbol`) && _get(transaction, `metadata.${account}.parsedTxValue.formattedValue`) !== "" && _get(transaction, `metadata.${account}.parsedTxValue.symbol`) !== "")
-            txns = _sortBy(txns, [(tx: any) => tx?.rawTx?.isExecuted, (tx: any) => tx?.rawTx?.executionDate], ['desc', 'desc'])
-            return txns
+            if(chain !== 'all') {
+                let txns = transactions.filter((transaction: any) => ((transaction?.chainId === chain || _get(transaction, `metadata.${account}.parsedTxValue.symbol`) === 'SWEAT')) && _get(transaction, `metadata.${account}.parsedTxValue.formattedValue`) && _get(transaction, `metadata.${account}.parsedTxValue.symbol`) && _get(transaction, `metadata.${account}.parsedTxValue.formattedValue`) !== "" && _get(transaction, `metadata.${account}.parsedTxValue.symbol`) !== "")
+                txns = _orderBy(txns, [(tx: any) => tx?.rawTx?.executionDate, (tx: any) => tx?.rawTx?.isExecuted], ['desc', 'desc'])
+                return txns
+            } else {
+                let txns = transactions.filter((transaction: any) => _get(transaction, `metadata.${account}.parsedTxValue.formattedValue`) && _get(transaction, `metadata.${account}.parsedTxValue.symbol`) && _get(transaction, `metadata.${account}.parsedTxValue.formattedValue`) !== "" && _get(transaction, `metadata.${account}.parsedTxValue.symbol`) !== "")
+                txns = _orderBy(txns, [(tx: any) => tx?.rawTx?.executionDate, (tx: any) => tx?.rawTx?.isExecuted], ['desc', 'desc'])
+                return txns 
+            }
         }
         return []
     }, [transactions, chain])
@@ -216,7 +222,7 @@ export default ({ open, closeModal }: Props) => {
                                 <Typography sx={{ marginRight: '30px', fontSize: 16, fontWeight: 700, color: '#76808D' }}>My Earnings</Typography>
                                 <Box sx={{ width: '175px' }}>
                                     <MuiSelect
-                                        options={SUPPORTED_CHAIN_IDS.map((c: any) => { return { label: CHAIN_INFO[c].label, value: c } })}
+                                        options={[ { label: 'All', value: 'all', }, ... SUPPORTED_CHAIN_IDS.map((c: any) => { return { label: CHAIN_INFO[c].label, value: c } }) ]}
                                         selected={chain}
                                         setSelectedValue={(value) => setChain(value)}
                                     />
