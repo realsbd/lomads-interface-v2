@@ -276,7 +276,7 @@ export default ({ children }: any) => {
             {
               DAO ?
               <HeaderLogo onClick={() => { window.location.href = `/${DAO?.url}` }} dao={DAO} onMouseLeave={hideDrawer} onMouseEnter={showDrawer} /> : 
-              <Skeleton variant="rectangular" animation="wave" width={116} height={107} sx={{ borderBottomRightRadius: 30 }} />
+              token && <Skeleton variant="rectangular" animation="wave" width={116} height={107} sx={{ borderBottomRightRadius: 30 }} />
             }
             { DAO ?
             <Box sx={{ mt: 0 }} style={{ padding: 0, height: '100%', flex: 1 }}>
@@ -293,9 +293,10 @@ export default ({ children }: any) => {
                         </Box>
                         <Typography className={classes.subtitle}>{_get(DAO, 'description', '')}</Typography> */}
                     </Box>
-                    <Account />
+                    { token && <Account /> }
                 </Box>
             </Box> : 
+            token &&
             <Box sx={{ mt: 0 }} style={{ padding: 0, height: '100%', flex: 1 }}>
                 <Box display="flex" minHeight={107} sx={{ pb: 2, pt: 3, pr: 4 }} flexDirection="row" alignItems="flex-start">
                     <Box sx={{ flexGrow: 1, ml: 4 }}>

@@ -30,7 +30,8 @@ const interceptor = axiosConfig.interceptors.response.use(
 				if (_get(error, 'response.status', 500) == 401) {
 					localStorage.clear()
 					store.dispatch({ type: actionTypes.SET_TOKEN_ACTION, payload: null })
-					window.location.href = '/login'
+					if(window.location.pathname.indexOf('preview') === -1)
+						window.location.href = '/login'
 				} 
 				axiosConfig.interceptors.response.eject(interceptor);
                 return;

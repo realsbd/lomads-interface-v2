@@ -201,7 +201,7 @@ useEffect(() => {
         } else {
           console.log("window.ethereum", window?.ethereum)
           console.log("web3AuthInstance", "Need to login")
-          if(window?.location?.pathname.indexOf('/login') === -1)
+          if(window?.location?.pathname.indexOf('/login') === -1 && window.location.pathname.indexOf('preview') === -1)
             window.location.href = '/login'
         }
       } catch (error) {

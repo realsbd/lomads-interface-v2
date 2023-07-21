@@ -50,7 +50,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }
 
   useEffect(() => {
-    if (!token && window.location.pathname !== '/login') {
+    if (!token && window.location.pathname !== '/login' && window.location.pathname.indexOf('preview') === -1) {
       if (window.location.pathname !== '/')
         window.location.href = `/login?from=${window.location.pathname}`
       else
