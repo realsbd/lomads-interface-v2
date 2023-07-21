@@ -137,7 +137,7 @@ export default [
 	{
 		path: '/:daoURL/mint/:contractId',
 		exact: true,
-		layout: DashboardNoHeaderLayout,
+		layout: DashboardLayout,
 		private: true,
 		component: MintPage
 	},
@@ -173,7 +173,7 @@ export default [
 		path: '/share/:daoURL/project/:projectId/preview',
 		exact: true,
 		layout: DefaultLayout,
-		private: true,
+		private: false,
 		component: ProjectPreviewPage
 	},
 	{
@@ -236,7 +236,7 @@ export default [
 		path: '/share/:daoURL/task/:taskId/preview',
 		exact: true,
 		layout: DefaultLayout,
-		private: true,
+		private: false,
 		component: TaskPreviewPage
 	},
 	{

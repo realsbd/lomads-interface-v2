@@ -419,7 +419,7 @@ export default () => {
                                 >
                                     <img src={settingIcon} alt="setting-icon" />
                                 </Box> }
-                                { canMyrole('project.share') && false &&
+                                { canMyrole('project.share') &&
                                 <Box
                                     className={classes.iconContainer}
                                     display="flex"
@@ -529,7 +529,7 @@ export default () => {
                                     value === 0 &&
                                     <Box display={"flex"} alignItems={"center"}>
                                         <Box display="flex" flexDirection="row" alignItems="center">
-                                            <Typography sx={{ color: '#76808D', fontSize: '16px' }}>Compensation</Typography>
+                                            <Typography sx={{ color: '#76808D', fontSize: '16px' }}>Project value</Typography>
                                             <Box display="flex" alignItems="center" justifyContent={"center"} sx={{ width: '127px', height: '35px', }}>
                                                 <img src={compensationStar} alt="compensation-star" style={{ marginRight: '7px' }} />
                                                 <Typography>{_get(Project, 'compensation.amount', '')} {_get(Project, 'compensation.symbol', '')}</Typography>

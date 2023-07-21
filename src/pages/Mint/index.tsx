@@ -934,13 +934,12 @@ export default () => {
             <Box>
                 <Grid container className={classes.root}>
                     <Grid item sm={12} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-                        <Box display="flex" alignItems="flex-start" justifyContent={"flex-start"} style={{ width: '100%', height: '100px' }}>
-                            {/* <HeaderLogo sx={{ mt: 1  }} plain dao={DAO} /> */}
+                        {/* <Box display="flex" alignItems="flex-start" justifyContent={"flex-start"} style={{ width: '100%', height: '100px' }}>
                             <Box>
                                 <Typography sx={{ marginLeft: "20px" }} className={classes.title}>{DAO ? DAO.name : ''}</Typography>
                                 <Typography sx={{ marginLeft: "20px", maxWidth: 800 }} className={classes.subtitle}>{DAO ? DAO.description : ''}</Typography>
                             </Box>
-                        </Box>
+                        </Box> */}
                         <Typography className={classes.title}>Mint your membership token to join { DAO?.name }.</Typography>
                         <Typography sx={{ mb: 2, mt: 1 }} className={classes.subtitle}>Your contact details are securely encrypted on the membership token.</Typography>
                         <Box mt={0} style={{ width: '100%', minHeight: '568px', display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>

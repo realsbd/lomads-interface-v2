@@ -572,8 +572,8 @@ export default ({ open, closeModal, selectedProject }: Props) => {
 
                             <Box className={classes.modalRow} id="error-name">
                                 <TextInput
-                                    label="Name of the project"
-                                    placeholder="Super project"
+                                    label="Name of the task"
+                                    placeholder="Super task"
                                     fullWidth
                                     value={name}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setName(e.target.value); setErrorName('') }}
