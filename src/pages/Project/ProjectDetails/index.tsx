@@ -461,6 +461,7 @@ export default () => {
                                     </MenuItem>
                                     <MenuItem onClick={() => {
                                         navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`)
+                                        handleClose()
                                     }} style={{ marginLeft: 0, height: 40 }}>
                                         <div style={{}}>
                                             <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
