@@ -170,7 +170,7 @@ export default [
 		component: ProjectDetailsPage
 	},
 	{
-		path: '/share/:daoURL/project/:projectId/preview',
+		path: '/:daoURL/project/:projectId/preview',
 		exact: true,
 		layout: DefaultLayout,
 		private: false,
@@ -233,7 +233,7 @@ export default [
 		component: TaskDetailsPage
 	},
 	{
-		path: '/share/:daoURL/task/:taskId/preview',
+		path: '/:daoURL/task/:taskId/preview',
 		exact: true,
 		layout: DefaultLayout,
 		private: false,
