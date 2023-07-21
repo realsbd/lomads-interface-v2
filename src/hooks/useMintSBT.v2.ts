@@ -28,7 +28,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
 
     const { safeMintGasless } = useBiconomyGasless(chainId)
     
-    const mintContract = useContract(contractAddress, require('abis/SBT.v2.json'), true);
+    const mintContract = useContract(contractAddress, require(+version >=3 ? 'abis/SBT.v3.json' : 'abis/SBT.v2.json'), true);
 
 
     const weth = (price: string, token: string): any => {
@@ -73,7 +73,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
           args: [account],
         },
       ]
-      const [, res] = await multicall.multiCall(require('abis/SBT.v2.json'), calls);
+      const [, res] = await multicall.multiCall(require(+version >=3 ? 'abis/SBT.v3.json' : 'abis/SBT.v2.json'), calls);
       return res[0]
     } catch (e) {
       throw e
@@ -209,7 +209,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
             let tx: any = null;
             if(+version >= 1) {
               if(gasless) {
-                tx = await safeMintGasless({ contract : contractAddress, apiKey: dappApiKey,  mintParams : {tokenURI, tokenId, payment, signature }} )
+                tx = await safeMintGasless({ contract : contractAddress, version: +version, apiKey: dappApiKey,  mintParams : {tokenURI, tokenId, payment, signature, ...( +version >= 3 ? { tranaction_type: "meta" } : {} ) }} )
                 if(tx?.transactionId) {
                   await retry(
                       () => getTxnStatus(),
@@ -220,12 +220,22 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
                   throw tx?.data?.error || "Error while minting"
                 }
               } else {
-                tx = await mintContract?.safeMint(
-                  tokenURI,
-                  tokenId,
-                  payment,
-                  signature
-                );
+                if(+version >= 3) {
+                  tx = await mintContract?.safeMint(
+                    tokenURI,
+                    tokenId,
+                    payment,
+                    signature,
+                    "sender"
+                  );
+                } else {
+                  tx = await mintContract?.safeMint(
+                    tokenURI,
+                    tokenId,
+                    payment,
+                    signature
+                  );
+                }
               }
             } else {
               if(mintContract?.signer) {

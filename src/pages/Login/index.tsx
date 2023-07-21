@@ -5,8 +5,11 @@ import { Container, Grid, Typography, Box, Paper, Menu, Link } from "@mui/materi
 import MenuItem from '@mui/material/MenuItem';
 import { makeStyles } from '@mui/styles';
 import CHEERS from 'assets/svg/cheers.svg'
-import LOMADS_LOGO from 'assets/svg/lomadsfulllogo.svg'
+//import LOMADS_LOGO from 'assets/svg/lomadsfulllogo.svg'
+import LOMADS_LOGO from 'assets/svg/Group 773.svg'
+import LOMADS_LOGO_TEXT from 'assets/svg/Group 772.svg'
 import METAMASK from 'assets/svg/metamask.svg'
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import GMAIL from 'assets/images/gmail.png'
 import APPLE from 'assets/images/apple.png'
 import { KeyboardArrowDown } from '@mui/icons-material';
@@ -191,18 +194,19 @@ export default () => {
                 <Container style={{ position: 'absolute', top: 0 }} maxWidth="lg">
                     <Box sx={{ mt: 3 }} display="flex" flexDirection="row" alignItems="center" style={{ float: 'right' }}>
                         <Link rel="noopener noreferrer" target="_blank" href="https://lomads.medium.com/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer' }}>BLOG</Link>
-                        <Link rel="noopener noreferrer" target="_blank" href="https://lomads-1.gitbook.io/lomads/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer' }}>DOCS</Link>
+                        <Link rel="noopener noreferrer" target="_blank" href="https://lomads-1.gitbook.io/lomads/" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer' }}>DOCS</Link>
+                        <Button onClick={() => window.open(`https://calendly.com/lomads-nishant/nishant-lomads-reg`, '_blank')} size="small" variant="contained" endIcon={<ArrowRightAltIcon />}>Request Demo</Button>
                     </Box>
                 </Container>
                 <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
                     <Box zIndex={0} position="absolute" bottom={0}>
                         <img src={CHEERS} style={{ marginBottom: '-5px' }} />
                     </Box>
-                    <Box mb={12} mt={3}>
+                    <Box mb={8} mt={6} display="flex" alignItems="center" justifyContent="center" flexDirection="column">
                         <img src={LOMADS_LOGO} />
+                        <img style={{ height: 30, width: 147, objectFit: 'contain', marginTop: '15px' }} src={LOMADS_LOGO_TEXT} />
                     </Box>
-
-                    <Box sx={{ height: '362px', borderRadius: '10px', boxShadow: '-3px -3px 8px 0px rgba(201, 75, 50, 0.10), 3px 5px 4px 0px rgba(27, 43, 65, 0.05)', overflow: 'hidden' }} display={"flex"} alignItems={"center"} justifyContent={"center"}>
+                    <Box sx={{ zIndex: 999, height: '362px', borderRadius: '10px', boxShadow: '-3px -3px 8px 0px rgba(201, 75, 50, 0.10), 3px 5px 4px 0px rgba(27, 43, 65, 0.05)', overflow: 'hidden' }} display={"flex"} alignItems={"center"} justifyContent={"center"}>
 
                         <Box>
                             <img src={screenshot} />

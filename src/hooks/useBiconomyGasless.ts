@@ -1,7 +1,8 @@
 import React from "react"
 import { find as _find } from 'lodash';
 import axios from "axios"
-import ABI from 'abis/SBT.json';
+import ABIV2 from 'abis/SBT.v2.json';
+import ABIV3 from 'abis/SBT.v3.json';
 import { BICONOMY_GAS_TANK_ADDRESSES } from "constants/addresses";
 import { ethers } from "ethers";
 import GASTANK_ABI from 'abis/BiconomyGasStation.json'
@@ -37,11 +38,11 @@ export default (chain: number | undefined) => {
         })
     }
 
-    const addContract = async ({ apiKey, name, contract }: { apiKey: string, name: string, contract: string }) => {
-        console.log(ABI)
+    const addContract = async ({ apiKey, name, contract, version = 2 }: { apiKey: string, name: string, contract: string, version: number }) => {
+
         return axios.post(`${BICONOMY_ENDPOINT}/api/v1/smart-contract/public-api/addContract`, 
         {
-            contractName: name, contractAddress: contract, abi: JSON.stringify(ABI), contractType: "SC", walletType: "", metaTransactionType: "TRUSTED_FORWARDER"
+            contractName: name, contractAddress: contract, abi: JSON.stringify(version >= 3 ? ABIV3 : ABIV2), contractType: "SC", walletType: "", metaTransactionType: "TRUSTED_FORWARDER"
         },
         {
             headers: { ...HEADERS, apiKey }
@@ -58,13 +59,13 @@ export default (chain: number | undefined) => {
         }).then(res => res.data)
     }
 
-    const initBiconomyGasless = async ({ dappName, chainId, contract }: { dappName: string, chainId: number, contract: string }) => {
+    const initBiconomyGasless = async ({ dappName, chainId, contract, version = 2 }: { dappName: string, chainId: number, contract: string, version: number }) => {
         try {
             const dappResp = await createDapp({ name: dappName, chainId })
             if(dappResp) {
-                const addContractResp  = await addContract({ apiKey: dappResp?.data?.apiKey, name: dappName, contract })
+                const addContractResp  = await addContract({ apiKey: dappResp?.data?.apiKey, name: dappName, contract, version })
                 if(addContractResp) {
-                    const methodResp = await addMethod({ apiKey: dappResp?.data?.apiKey, contract, method: 'safeMintMeta' })
+                    const methodResp = await addMethod({ apiKey: dappResp?.data?.apiKey, contract, method: version >=3 ? 'safeMint' : 'safeMintMeta' })
                     const response = {
                         apiKey: dappResp?.data?.apiKey,
                         fundingKey: dappResp?.data?.fundingKey,
@@ -102,7 +103,7 @@ export default (chain: number | undefined) => {
         }
     }
 
-    const safeMintGasless = async ({ contract, apiKey, mintParams }: { contract: string | undefined, apiKey: string | undefined, mintParams: any } ) => {
+    const safeMintGasless = async ({ contract, version = 2, apiKey, mintParams }: { contract: string | undefined, version: number | undefined, apiKey: string | undefined, mintParams: any } ) => {
         if(!contract || !apiKey || !provider) return;
         try {
             const biconomy = new Biconomy(provider.provider, {
@@ -114,19 +115,30 @@ export default (chain: number | undefined) => {
         
               const contractInstance = new ethers.Contract(
                 contract,
-                require('../abis/SBT.v2.json'),
+                require(version >= 3 ? '../abis/SBT.v3.json' : '../abis/SBT.v2.json'),
                 biconomy.ethersProvider
               );
               await biconomy.init();
-              const { data } = await contractInstance.populateTransaction.safeMintMeta(
-                mintParams.tokenURI,
-                mintParams.tokenId,
-                mintParams.payment,
-                mintParams.signature,
-              );
+              let data: any = null
+              if(version >= 3) {
+                data = await contractInstance.populateTransaction.safeMint(
+                    mintParams.tokenURI,
+                    mintParams.tokenId,
+                    mintParams.payment,
+                    mintParams.signature,
+                    mintParams.tranaction_type
+                  ); 
+              } else {
+                data = await contractInstance.populateTransaction.safeMintMeta(
+                    mintParams.tokenURI,
+                    mintParams.tokenId,
+                    mintParams.payment,
+                    mintParams.signature,
+                  );
+              }
         
               let txParams = {
-                data: data,
+                data: data?.data,
                 to: contract,
                 from: account,
                 signatureType: "EIP712_SIGN",

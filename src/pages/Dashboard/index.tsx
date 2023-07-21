@@ -32,6 +32,7 @@ import useGnosisTxnTransform from "hooks/useGnosisTxnTransform";
 import Proposals from "./Proposals";
 import { updateUserOnboardingCountAction } from "store/actions/dao";
 import { useAppDispatch } from "helpers/useAppDispatch";
+import useDeployer from "hooks/useDeployer";
 
 type WalkThroughObjType = {
     step: number;
@@ -114,6 +115,7 @@ export default () => {
     const anchorRef = useRef<any>();
     const questionMarkRef = useRef<any>();
     const { account } = useWeb3Auth();
+    const { deploy } = useDeployer();
     const { myRole, can } = useRole(DAO, account, undefined)
     const { transformTx } = useGnosisTxnTransform()
     // @ts-ignore

@@ -42,6 +42,7 @@ import useSafe from "hooks/useSafe"
 import usePopupWindow from "hooks/usePopupWindow"
 import useStripeRedirect from "hooks/useStripeRedirect"
 import Checkbox from "components/Checkbox"
+import useDeployer from "hooks/useDeployer"
 
 ///   0xD123b939B5022608241b08c41ece044059bE00f5
 
@@ -296,7 +297,7 @@ export default () => {
         }
     }, [stateX?.selectedChainId])
 
-    const { deploy, deployLoading } = useContractDeployer(SBT_DEPLOYER_ADDRESSES[stateX?.selectedChainId])
+    const { deploy, deployLoading } = useDeployer()
 
 
     const handleContactChange = (key: string) => {
@@ -375,7 +376,7 @@ export default () => {
                         image: stateX?.logo,
                         address: contractAddr,
                         admin: account,
-                        version: 2,
+                        version: 3,
                         stripeAccount: stateX.stripeAccount,
                         master: _get(SBT_DEPLOYER_ADDRESSES, chainId, null),
                         treasury: stateX?.treasury && stateX?.treasury === 'other' ? stateX?.treasuryOther : stateX?.treasury,

@@ -941,7 +941,7 @@ export default () => {
                                 <Typography sx={{ marginLeft: "20px", maxWidth: 800 }} className={classes.subtitle}>{DAO ? DAO.description : ''}</Typography>
                             </Box>
                         </Box>
-                        <Typography sx={{ mt: 1 }} className={classes.title}>Mint your membership token to join { DAO?.name }.</Typography>
+                        <Typography className={classes.title}>Mint your membership token to join { DAO?.name }.</Typography>
                         <Typography sx={{ mb: 2, mt: 1 }} className={classes.subtitle}>Your contact details are securely encrypted on the membership token.</Typography>
                         <Box mt={0} style={{ width: '100%', minHeight: '568px', display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
                             <Grid container style={{ boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)', height: '100%' }}>

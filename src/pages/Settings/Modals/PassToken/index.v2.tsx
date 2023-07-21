@@ -172,7 +172,8 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
             axiosHttp.post(`utility/estimate-mint-gas`, {
                 chainId,
                 address: contract?.address,
-                abi: require('abis/SBT.v2.json')
+                abi: require(+contract.version >= 3 ? 'abis/SBT.v3.json' : 'abis/SBT.v2.json'),
+                version: +contract.version
             })
             .then((res: any) => {
                 setMintEstimate(res.data)
@@ -256,7 +257,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
                 if(!contract?.gasConfig) {
                     setGaslessConfigLoading(true)
                     try {
-                        const response  = await initBiconomyGasless({ dappName: contract?.name, chainId, contract: contract?.address })
+                        const response  = await initBiconomyGasless({ dappName: contract?.name, chainId, contract: contract?.address, version: +contract?.version })
                         await axiosHttp.patch(`contract/${contract?.address}`, { gasless: true, gasConfig: response })
                         loadDAO(_get(DAO, 'url'))
                         setGaslessConfigLoading(false)
