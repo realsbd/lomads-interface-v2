@@ -62,6 +62,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
   }
 
   const balanceOf = async () => {
+    console.log(+version >=3 ? 'abis/SBT.v3.json' : 'abis/SBT.v2.json')
     try {
       const rpcUrl = getRpcUrls(contractChainId)
       let provider = new ethers.providers.JsonRpcProvider(rpcUrl[0])
@@ -76,6 +77,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
       const [, res] = await multicall.multiCall(require(+version >=3 ? 'abis/SBT.v3.json' : 'abis/SBT.v2.json'), calls);
       return res[0]
     } catch (e) {
+      console.log(e)
       throw e
     }
 
@@ -193,6 +195,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
   }
 
     const getTxnStatus = async () => { 
+      console.log(+version >=3 ? 'abis/SBT.v3.json' : 'abis/SBT.v2.json')
       console.log("Checking balance...")
       const res = await balanceOf();
       if(parseInt(res._hex, 16) === 1)
@@ -221,6 +224,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
                 }
               } else {
                 if(+version >= 3) {
+                  console.log("MINTING HERE", tokenURI, tokenId, payment, signature, "sender")
                   tx = await mintContract?.safeMint(
                     tokenURI,
                     tokenId,

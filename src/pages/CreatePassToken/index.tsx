@@ -297,7 +297,7 @@ export default () => {
         }
     }, [stateX?.selectedChainId])
 
-    const { deploy, deployLoading } = useDeployer()
+    const { deploy,  deployLoading } = useContractDeployer(SBT_DEPLOYER_ADDRESSES[stateX?.selectedChainId])
 
 
     const handleContactChange = (key: string) => {
@@ -376,7 +376,7 @@ export default () => {
                         image: stateX?.logo,
                         address: contractAddr,
                         admin: account,
-                        version: 3,
+                        version: 2,
                         stripeAccount: stateX.stripeAccount,
                         master: _get(SBT_DEPLOYER_ADDRESSES, chainId, null),
                         treasury: stateX?.treasury && stateX?.treasury === 'other' ? stateX?.treasuryOther : stateX?.treasury,

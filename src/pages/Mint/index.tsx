@@ -172,6 +172,8 @@ export default () => {
     const { encryptMessage, decryptMessage } = useEncryptDecrypt()
     const tokenContract = useTokenContract(contract?.mintPriceToken || undefined)
 
+    console.log("tokenContract", tokenContract)
+
     const [showStripePayment, setShowStripePayment] = useState<any>(null)
 
     // const [orgData, setOrgData] = useState<any>(null);
@@ -736,41 +738,42 @@ export default () => {
             const gasPrice = await provider?.getGasPrice();
             let balance = await provider?.getBalance(account)
             const accBalance = ethers.utils.formatEther(balance.toString())
-            if (contract?.mintPriceToken === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {
-                const tokenTransferGas = await payByCryptoEstimate(tokenContract, price?.mintPrice)
-                const transferGas = ethers.utils.formatEther((parseFloat(gasPrice.toString()) * tokenTransferGas).toString())
-                let total = ((+gp.gas) + (+transferGas) * 2) + (+gp.mintPrice)
-                if (total > parseFloat(accBalance)) {
-                    setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network. Estimated gas ~${total.toFixed(3)} ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol}`)
-                    setMintLoading(false)
-                    return;
-                }
-            } else {
-                const tokbalance = await tokenContract?.balanceOf(account);
-                if (!tokbalance) return;
-                const tokenBalance = parseFloat(tokbalance.toString()) / 10 ** _get(USDC, `[${chainId}].decimals`, 6)
-                if (+price?.mintPrice > tokenBalance) {
-                    setNetworkError(`You do not have enough USDC in your account.`)
-                    setMintLoading(false)
-                    return;
-                }
-                let tokenTransferGas2 = null;
-                try {
-                    tokenTransferGas2 = await payByCryptoEstimate(tokenContract, price?.mintPrice)
-                } catch (e) {
-                    setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network.`)
-                    setMintLoading(false)
-                    return;
-                }
-                const tokgas = ethers.utils.formatEther((parseFloat(gasPrice.toString()) * parseFloat(tokenTransferGas2.toString())).toString())
-                let totalTransferGas = ((+gp.gas) + (+tokgas) * 1.2)
-    
-                if (totalTransferGas > parseFloat(accBalance)) {
-                    setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network.`)
-                    setMintLoading(false)
-                    return;
-                }
+            console.log(contract?.mintPriceToken)
+            // if (contract?.mintPriceToken === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {
+            const tokenTransferGas = await payByCryptoEstimate(tokenContract, price?.mintPrice)
+            const transferGas = ethers.utils.formatEther((parseFloat(gasPrice.toString()) * tokenTransferGas).toString())
+            let total = ((+gp.gas) + (+transferGas) * 2) + (+gp.mintPrice)
+            if (total > parseFloat(accBalance)) {
+                setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network. Estimated gas ~${total.toFixed(3)} ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol}`)
+                setMintLoading(false)
+                return;
             }
+            // } else {
+            //     const tokbalance = await tokenContract?.balanceOf(account);
+            //     if (!tokbalance) return;
+            //     const tokenBalance = parseFloat(tokbalance.toString()) / 10 ** _get(USDC, `[${chainId}].decimals`, 6)
+            //     if (+price?.mintPrice > tokenBalance) {
+            //         setNetworkError(`You do not have enough USDC in your account.`)
+            //         setMintLoading(false)
+            //         return;
+            //     }
+            //     let tokenTransferGas2 = null;
+            //     try {
+            //         tokenTransferGas2 = await payByCryptoEstimate(tokenContract, price?.mintPrice)
+            //     } catch (e) {
+            //         setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network.`)
+            //         setMintLoading(false)
+            //         return;
+            //     }
+            //     const tokgas = ethers.utils.formatEther((parseFloat(gasPrice.toString()) * parseFloat(tokenTransferGas2.toString())).toString())
+            //     let totalTransferGas = ((+gp.gas) + (+tokgas) * 1.2)
+    
+            //     if (totalTransferGas > parseFloat(accBalance)) {
+            //         setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network.`)
+            //         setMintLoading(false)
+            //         return;
+            //     }
+            // }
         }
 
         await axiosHttp.post(`contract/whitelist-signature`, {

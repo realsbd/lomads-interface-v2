@@ -115,7 +115,6 @@ export default () => {
     const anchorRef = useRef<any>();
     const questionMarkRef = useRef<any>();
     const { account } = useWeb3Auth();
-    const { deploy } = useDeployer();
     const { myRole, can } = useRole(DAO, account, undefined)
     const { transformTx } = useGnosisTxnTransform()
     // @ts-ignore
