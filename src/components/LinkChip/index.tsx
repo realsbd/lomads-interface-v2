@@ -53,7 +53,11 @@ export default ({
     const classes = useStyles();
 
     const image = useMemo(() => {
-        const link = new URL(url);
+        let u = url;
+        if(u.indexOf('http') === -1) {
+            u = `https://${u}`
+        }
+        const link = new URL(u);
         if (link.hostname.indexOf('notion.') > -1) {
             return NotionSVG
         }
@@ -75,7 +79,13 @@ export default ({
     }, [url])
 
     return (
-     <Box onClick={() => window.open(url, '_blank')}  className={classes.root}>
+     <Box onClick={() => {
+        let u = url;
+        if(u.indexOf('http') === -1) {
+            u = `https://${u}`
+        }
+        window.open(u, '_blank')
+     }}  className={classes.root}>
         <img className={classes.image} src={image} />
         <Typography className={classes.text}>{ name }</Typography>
      </Box>

@@ -134,7 +134,7 @@ const Organisation = ({ open, onClose }: any) => {
         setState((prev: any) => {
             return {
                 ...prev, 
-                links: [...prev.links, { title: linkPlaceholder?.name, link: linkPlaceholder?.link }]
+                links: [...prev.links, { title: linkPlaceholder?.name, link: linkPlaceholder?.link.indexOf('http') === -1 ? `https://${linkPlaceholder?.link}` : linkPlaceholder?.link }]
             }
         })
         setLinkPlaceholder({ name: "", link: "" })
