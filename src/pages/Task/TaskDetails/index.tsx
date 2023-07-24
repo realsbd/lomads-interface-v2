@@ -707,6 +707,7 @@ export default () => {
                                             </WhatsappShareButton>
                                         </MenuItem>
                                         <MenuItem onClick={() => {
+                                            handleClose()
                                             navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`)
                                         }} style={{ marginLeft: 0, height: 40 }}>
                                             <div style={{}}>
