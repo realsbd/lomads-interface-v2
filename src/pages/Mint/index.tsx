@@ -172,8 +172,6 @@ export default () => {
     const { encryptMessage, decryptMessage } = useEncryptDecrypt()
     const tokenContract = useTokenContract(contract?.mintPriceToken || undefined)
 
-    console.log("tokenContract", tokenContract)
-
     const [showStripePayment, setShowStripePayment] = useState<any>(null)
 
     // const [orgData, setOrgData] = useState<any>(null);
@@ -365,8 +363,8 @@ export default () => {
     }
 
     const isNativeToken = useMemo(() => {
-        const tokenId = contract?.mintPriceToken;
-        if (tokenId === USDC_GOERLI.address || tokenId === USDC_POLYGON.address)
+        const tokenId = contract?.mintPriceToken.toLowerCase();
+        if (tokenId === USDC_GOERLI.address.toLowerCase() || tokenId === USDC_POLYGON.address.toLowerCase())
             return false;
         return true;
     }, [contract, account, token])
@@ -539,7 +537,7 @@ export default () => {
             let balance = await provider?.getBalance(account)
             const accBalance = ethers.utils.formatEther(balance.toString())
             if (contract?.mintPriceToken === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {
-                const tokenTransferGas = await payByCryptoEstimate(tokenContract, price?.mintPrice)
+                const tokenTransferGas = await payByCryptoEstimate(tokenContract, price?.mintPrice, contract?.mintPriceToken)
                 const transferGas = ethers.utils.formatEther((parseFloat(gasPrice.toString()) * tokenTransferGas).toString())
                 let total = ((contract?.gasless ? 0 : +gp.gas) + (+transferGas) * 2) + (+price.mintPrice)
                 if (total > parseFloat(accBalance)) {
@@ -558,8 +556,9 @@ export default () => {
                 }
                 let tokenTransferGas2 = null;
                 try {
-                    tokenTransferGas2 = await payByCryptoEstimate(tokenContract, price?.mintPrice)
+                    tokenTransferGas2 = await payByCryptoEstimate(tokenContract, price?.mintPrice, contract?.mintPriceToken)
                 } catch (e) {
+                    console.log(e)
                     setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network.`)
                     setMintLoading(false)
                     return;
@@ -576,7 +575,7 @@ export default () => {
 
             
 
-            const response = await payByCrypto(tokenContract, price?.mintPrice);
+            const response = await payByCrypto(tokenContract, price?.mintPrice, contract?.mintPriceToken);
             await axiosHttp.post(`mint-payment/verify`, {
                 chainId: contract?.chainId,
                 contract: contract?.address,
@@ -631,10 +630,10 @@ export default () => {
         }
 
         if(!payment) {
-            let token = contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : 'MATIC'
+            let token = contract?.mintPriceToken.toLowerCase() === USDC_POLYGON.address.toLowerCase() || contract?.mintPriceToken.toLowerCase() === USDC_GOERLI.address.toLowerCase() ? 'USDC' : 'MATIC'
             let amount: any = +_get(price, 'mintPrice', 0)
             if (token === 'MATIC') {
-                const tokenTransferGas = await payByCryptoEstimate(tokenContract, price?.mintPrice)
+                const tokenTransferGas = await payByCryptoEstimate(tokenContract, price?.mintPrice, contract?.mintPriceToken)
                 const gasPrice = await provider?.getGasPrice();
                 const transferGas = ethers.utils.formatEther((parseFloat(gasPrice.toString()) * tokenTransferGas).toString())
                 const total = ((+gp.gas) + (+transferGas) * 2) + (+gp.mintPrice)
@@ -738,42 +737,41 @@ export default () => {
             const gasPrice = await provider?.getGasPrice();
             let balance = await provider?.getBalance(account)
             const accBalance = ethers.utils.formatEther(balance.toString())
-            console.log(contract?.mintPriceToken)
-            // if (contract?.mintPriceToken === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {
-            const tokenTransferGas = await payByCryptoEstimate(tokenContract, price?.mintPrice)
-            const transferGas = ethers.utils.formatEther((parseFloat(gasPrice.toString()) * tokenTransferGas).toString())
-            let total = ((+gp.gas) + (+transferGas) * 2) + (+gp.mintPrice)
-            if (total > parseFloat(accBalance)) {
-                setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network. Estimated gas ~${total.toFixed(3)} ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol}`)
-                setMintLoading(false)
-                return;
-            }
-            // } else {
-            //     const tokbalance = await tokenContract?.balanceOf(account);
-            //     if (!tokbalance) return;
-            //     const tokenBalance = parseFloat(tokbalance.toString()) / 10 ** _get(USDC, `[${chainId}].decimals`, 6)
-            //     if (+price?.mintPrice > tokenBalance) {
-            //         setNetworkError(`You do not have enough USDC in your account.`)
-            //         setMintLoading(false)
-            //         return;
-            //     }
-            //     let tokenTransferGas2 = null;
-            //     try {
-            //         tokenTransferGas2 = await payByCryptoEstimate(tokenContract, price?.mintPrice)
-            //     } catch (e) {
-            //         setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network.`)
-            //         setMintLoading(false)
-            //         return;
-            //     }
-            //     const tokgas = ethers.utils.formatEther((parseFloat(gasPrice.toString()) * parseFloat(tokenTransferGas2.toString())).toString())
-            //     let totalTransferGas = ((+gp.gas) + (+tokgas) * 1.2)
+            if (contract?.mintPriceToken === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {
+                const tokenTransferGas = await payByCryptoEstimate(tokenContract, price?.mintPrice, contract?.mintPriceToken)
+                const transferGas = ethers.utils.formatEther((parseFloat(gasPrice.toString()) * tokenTransferGas).toString())
+                let total = ((+gp.gas) + (+transferGas) * 2) + (+gp.mintPrice)
+                if (total > parseFloat(accBalance)) {
+                    setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network. Estimated gas ~${total.toFixed(3)} ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol}`)
+                    setMintLoading(false)
+                    return;
+                }
+            } else {
+                // const tokbalance = await tokenContract?.balanceOf(account);
+                // if (!tokbalance) return;
+                // const tokenBalance = parseFloat(tokbalance.toString()) / 10 ** _get(USDC, `[${chainId}].decimals`, 6)
+                // if (+price?.mintPrice > tokenBalance) {
+                //     setNetworkError(`You do not have enough USDC in your account.`)
+                //     setMintLoading(false)
+                //     return;
+                // }
+                // let tokenTransferGas2 = null;
+                // try {
+                //     tokenTransferGas2 = await payByCryptoEstimate(tokenContract, price?.mintPrice, contract?.mintPriceToken)
+                // } catch (e) {
+                //     setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network.`)
+                //     setMintLoading(false)
+                //     return;
+                // }
+                // const tokgas = ethers.utils.formatEther((parseFloat(gasPrice.toString()) * parseFloat(tokenTransferGas2.toString())).toString())
+                let totalTransferGas = (+gp.gas)
     
-            //     if (totalTransferGas > parseFloat(accBalance)) {
-            //         setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network.`)
-            //         setMintLoading(false)
-            //         return;
-            //     }
-            // }
+                if (totalTransferGas > parseFloat(accBalance)) {
+                    setNetworkError(`You do not have enough ${CHAIN_INFO[chainId]?.nativeCurrency?.symbol} in your account to pay for transaction fees on network.`)
+                    setMintLoading(false)
+                    return;
+                }
+            }
         }
 
         await axiosHttp.post(`contract/whitelist-signature`, {
@@ -782,6 +780,7 @@ export default () => {
             contract: contract?.address,
             chainId: contract?.chainId,
         }).then(res => {
+            console.log("res?.data?.signature", res?.data?.signature)
             handleMint("--", res?.data?.signature)
         })
         .catch(e => {
@@ -966,8 +965,8 @@ export default () => {
                                             <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                                 <Typography style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>${ canMintFree ?  "0.00" : parseFloat(_get(price, 'originalPriceinUsd', 0)).toFixed(2)} /</Typography>
                                                 { canMintFree ? 
-                                                    <Typography ml={2} style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{"0.00"} {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography> :
-                                                    <Typography ml={2} style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{parseFloat(_get(contract, 'mintPrice', 0)).toFixed(2)} {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography>
+                                                    <Typography ml={2} style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{"0.00"} {contract?.mintPriceToken.toLowerCase() === USDC_GOERLI.address.toLowerCase() || contract?.mintPriceToken .toLowerCase()=== USDC_POLYGON.address.toLowerCase() ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography> :
+                                                    <Typography ml={2} style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{parseFloat(_get(contract, 'mintPrice', 0)).toFixed(2)} {contract?.mintPriceToken.toLowerCase() === USDC_GOERLI.address.toLowerCase() || contract?.mintPriceToken.toLowerCase() === USDC_POLYGON.address.toLowerCase() ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography>
                                                 }
                                             </Box>
                                         </Box>
@@ -980,8 +979,8 @@ export default () => {
                                             <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                                 <Typography style={{ fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>${ canMintFree ?  "0.00" : parseFloat(_get(price, 'mintPriceinUsd', 0)).toFixed(2)} /</Typography>
                                                 { canMintFree ? 
-                                                    <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{"0.00"} {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography> :
-                                                    <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{parseFloat(_get(price, 'mintPrice', 0)).toFixed(2)} {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography>
+                                                    <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{"0.00"} {contract?.mintPriceToken.toLowerCase() === USDC_GOERLI.address.toLowerCase() || contract?.mintPriceToken.toLowerCase() === USDC_POLYGON.address.toLowerCase() ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography> :
+                                                    <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{parseFloat(_get(price, 'mintPrice', 0)).toFixed(2)} {contract?.mintPriceToken.toLowerCase() === USDC_GOERLI.address.toLowerCase() || contract?.mintPriceToken.toLowerCase() === USDC_POLYGON.address.toLowerCase() ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography>
                                                 }
                                             </Box>
                                         </Box>

@@ -13,6 +13,7 @@ import useBiconomyGasless from './useBiconomyGasless';
 import { useWeb3Auth } from 'context/web3Auth';
 import { getRpcUrls } from 'constants/rpcUrl';
 import { SupportedChainId } from 'constants/chains';
+const { toChecksumAddress } = require('ethereum-checksum-address')
 
 
 export type SBTParams = {
@@ -32,20 +33,20 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
 
 
     const weth = (price: string, token: string): any => {
-      if(!chainId) return;
+      if(!contractChainId) return;
       const tokens = [
         {
-          label: CHAIN_INFO[chainId]?.nativeCurrency?.symbol,
+          label: CHAIN_INFO[contractChainId]?.nativeCurrency?.symbol,
           value: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
-          decimals: CHAIN_INFO[chainId]?.nativeCurrency?.decimals
+          decimals: CHAIN_INFO[contractChainId]?.nativeCurrency?.decimals
         },
         {
-            label: _get(USDC, `[${chainId}].symbol`),
-            value: _get(USDC, `[${chainId}].address`),
-            decimals: _get(USDC, `[${chainId}].decimals`),
+            label: _get(USDC, `[${contractChainId}].symbol`),
+            value: _get(USDC, `[${contractChainId}].address`),
+            decimals: _get(USDC, `[${contractChainId}].decimals`),
         }
       ]
-      const payToken = _find(tokens, (t:any) => t.value === token)
+      const payToken = _find(tokens, (t:any) => toChecksumAddress(t.value) === toChecksumAddress(token))
       return ethers.utils.parseUnits(price, payToken?.decimals)
   }
 
@@ -62,7 +63,6 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
   }
 
   const balanceOf = async () => {
-    console.log(+version >=3 ? 'abis/SBT.v3.json' : 'abis/SBT.v2.json')
     try {
       const rpcUrl = getRpcUrls(contractChainId)
       let provider = new ethers.providers.JsonRpcProvider(rpcUrl[0])
@@ -77,7 +77,6 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
       const [, res] = await multicall.multiCall(require(+version >=3 ? 'abis/SBT.v3.json' : 'abis/SBT.v2.json'), calls);
       return res[0]
     } catch (e) {
-      console.log(e)
       throw e
     }
 
@@ -108,10 +107,11 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
     }, [provider, account, chainId, contractAddress, version])
     
 
-    const payByCryptoEstimate = async (tokenContract: any, price: any) => {
+    const payByCryptoEstimate = async (tokenContract: any, price: any, mt: any) => {
+      console.log("tokenContract", tokenContract)
       try {
         const treasury = await getTreasury();
-        const mt = await getMintToken();
+        //const mt = await getMintToken();
         const mp = await getMintPrice();
         const mintToken = (mt ? mt : process.env.REACT_APP_NATIVE_TOKEN_ADDRESS).toString()
         let mintPrice = null;
@@ -120,7 +120,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
         } else {
           mintPrice = weth(price, mintToken)
         }
-
+        console.log(mintPrice.toString())
         if(mintToken === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {
           const gas = await axiosHttp.post('utility/estimate-gas', { chainId, to: treasury, value: '0x' + (+mintPrice).toString(16) }).then(res => res.data)
           return BigInt(gas).toString()
@@ -134,9 +134,9 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
       }
   }
 
-    const payByCrypto = async (tokenContract: any, price: string | undefined) => {
+    const payByCrypto = async (tokenContract: any, price: string | undefined,  mt: any) => {
         const treasury = await getTreasury();
-        const mt = await getMintToken();
+        //const mt = await getMintToken();
         const mp = await getMintPrice();
         const mintToken = (mt ? mt : process.env.REACT_APP_NATIVE_TOKEN_ADDRESS).toString()
         let mintPrice = null;
@@ -195,7 +195,6 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
   }
 
     const getTxnStatus = async () => { 
-      console.log(+version >=3 ? 'abis/SBT.v3.json' : 'abis/SBT.v2.json')
       console.log("Checking balance...")
       const res = await balanceOf();
       if(parseInt(res._hex, 16) === 1)
@@ -224,7 +223,6 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
                 }
               } else {
                 if(+version >= 3) {
-                  console.log("MINTING HERE", tokenURI, tokenId, payment, signature, "sender")
                   tx = await mintContract?.safeMint(
                     tokenURI,
                     tokenId,

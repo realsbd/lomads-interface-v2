@@ -25,7 +25,7 @@ export const USDC_RINKEBY = new Token(
 )
 export const USDC_GOERLI = new Token(
   SupportedChainId.GOERLI,
-  '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
+  '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
   6,
   'USDC',
   'USD//C'
@@ -67,7 +67,7 @@ export const USDC_ARBITRUM_RINKEBY = new Token(
 )
 export const USDC_POLYGON = new Token(
   SupportedChainId.POLYGON,
-  '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
+  '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
   6,
   'USDC',
   'USD//C'

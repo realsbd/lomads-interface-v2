@@ -7,6 +7,7 @@ import { useState } from "react";
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { BICONOMY_FORWARDER_ADDRESS } from 'constants/addresses';
 import { useWeb3Auth } from 'context/web3Auth';
+const { toChecksumAddress } = require('ethereum-checksum-address')
 
 export type SBTParams = {
     name: string,
@@ -65,7 +66,7 @@ const useContractDeployer = (deployerAddress: any) => {
                 decimals: _get(USDC, `[${chainId}].decimals`),
             }
         ]
-        const payToken = _find(tokens, (t:any) => t.value === token)
+        const payToken = _find(tokens, (t:any) => toChecksumAddress(t.value) === toChecksumAddress(token))
         return ethers.utils.parseUnits(price, payToken?.decimals)
     }
 

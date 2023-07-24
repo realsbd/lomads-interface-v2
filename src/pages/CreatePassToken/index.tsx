@@ -251,6 +251,10 @@ export default () => {
     }, [DAO])
 
     useEffect(() => {
+        
+    }, [stateX.selectedChainId])
+
+    useEffect(() => {
         if(stateX?.stripeAccount) {
             setStateX((prev: any) => {
                 return {
@@ -294,10 +298,20 @@ export default () => {
                     decimals: _get(USDC, `[${stateX?.selectedChainId}].decimals`),
                 }
             ])
+            setStateX((prev: any) => {
+                return {
+                    ...prev,
+                    price: {
+                        ...prev.price,
+                        token: _get(USDC, `[${stateX?.selectedChainId}].address`)
+                    }
+                }
+            })
         }
     }, [stateX?.selectedChainId])
 
-    const { deploy,  deployLoading } = useContractDeployer(SBT_DEPLOYER_ADDRESSES[stateX?.selectedChainId])
+    //const { deploy,  deployLoading } = useContractDeployer(SBT_DEPLOYER_ADDRESSES[stateX?.selectedChainId])
+    const { deploy, deployLoading } = useDeployer();
 
 
     const handleContactChange = (key: string) => {
@@ -376,7 +390,7 @@ export default () => {
                         image: stateX?.logo,
                         address: contractAddr,
                         admin: account,
-                        version: 2,
+                        version: 3,
                         stripeAccount: stateX.stripeAccount,
                         master: _get(SBT_DEPLOYER_ADDRESSES, chainId, null),
                         treasury: stateX?.treasury && stateX?.treasury === 'other' ? stateX?.treasuryOther : stateX?.treasury,
