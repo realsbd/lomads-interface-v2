@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
+import { utils, BigNumber } from 'ethers';
 import { get as _get, find as _find, pick as _pick } from 'lodash'
-import { ethers } from 'ethers';
 import { CHAIN_INFO } from 'constants/chainInfo';
 import moment from 'moment';
 import { useSafeTokens } from 'context/safeTokens';
@@ -122,7 +122,7 @@ export default () => {
                                     offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
                                     nonce: _get(transaction, 'nonce', "0"),
                                     value: _get(decoded, 'value', 0),
-                                    formattedValue: (+_get(decoded, 'value', 0) / ( 10 ** nativeToken?.decimals )),
+                                    formattedValue: utils.formatUnits(BigNumber.from(_get(decoded, 'value', 0)), nativeToken?.decimals), // (+_get(decoded, 'value', 0) / ( 10 ** nativeToken?.decimals )),
                                     symbol: nativeToken?.symbol,
                                     tokenAddress: nativeToken?.tokenAddress || transaction?.token?.tokenAddress,
                                     decimals: nativeToken?.decimals,
@@ -145,8 +145,7 @@ export default () => {
                                 const erc20Token: any = getERC20Token(_get(decoded, 'to', '0x'), safeAddress);
                                 const parameters = _get(decoded, 'dataDecoded.parameters');
                                 const to = _get(_find(parameters, p => p.name === 'to'), 'value', '0x')
-                                const value = _get(_find(parameters, p => p.name === 'value'), 'value', '0x')
-                        
+                                const value = _get(_find(parameters, p => p.name === 'value'), 'value', '0')
                                 op.push({
                                     txHash: _get(transaction, 'txHash', ''),
                                     transactionHash: _get(transaction, 'transactionHash', ''),
@@ -155,7 +154,7 @@ export default () => {
                                     offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
                                     nonce: _get(transaction, 'nonce', "0"),
                                     value: value,
-                                    formattedValue: (+value / ( 10 ** erc20Token?.token?.decimals )),
+                                    formattedValue: utils.formatUnits(BigNumber.from(value), erc20Token?.token?.decimals),
                                     symbol: erc20Token?.token?.symbol || transaction?.token?.symbol,
                                     tokenAddress: erc20Token?.tokenAddress || transaction?.token?.tokenAddress,
                                     decimals: erc20Token?.token?.decimals,
@@ -192,7 +191,7 @@ export default () => {
                         offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
                         nonce: _get(transaction, 'nonce', "0"),
                         value: value,
-                        formattedValue: (+value / ( 10 ** (allowanceToken?.token?.decimal || allowanceToken?.token?.decimals) )),
+                        formattedValue: utils.formatUnits(BigNumber.from(value), allowanceToken?.token?.decimals),
                         symbol: allowanceToken?.token?.symbol,
                         tokenAddress: allowanceToken?.tokenAddress || transaction?.token?.tokenAddress,
                         decimals: (allowanceToken?.token?.decimal || allowanceToken?.token?.decimals),

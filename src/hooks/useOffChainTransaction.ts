@@ -107,7 +107,7 @@ export default () => {
                     ...a, [v.recipient]: {
                         parsedTxValue: {
                             // value: BigInt(parseFloat(v.amount) * 10 ** (token?.token?.decimals || 18)),
-                            value: BigInt((parseFloat(v.amount) * 10 ** (token?.token?.decimals || 18)).toFixed(0)).toString(),
+                            value: `${BigInt(parseFloat(v.amount) * 10 ** (token?.token?.decimals || 18)).toString()}`.split(".")[0],
                             formattedValue: v?.amount.toString(),
                             symbol: token ? token?.token?.symbol : 'SWEAT',
                             decimals: token ? token?.token?.decimals : 18,
