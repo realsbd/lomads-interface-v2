@@ -85,6 +85,12 @@ const XPPoints = ({ open, onClose }: any) => {
         }
     }, [DAO?.safes])
 
+    useEffect(() => {
+        if(state?.safeAddress) {
+            setState((prev:any) => { return { ...prev, currency: _get(_get(safeTokens, state?.safeAddress, ''), '[0].tokenAddress', null) } })
+        }
+    }, [state?.safeAddress])
+
     const handleCreateTransaction = async () => {
         if(+safe?.chainId !== +chainId) {
             toast.custom(t => <SwitchChain t={t} nextChainId={+safe?.chainId}/>)
