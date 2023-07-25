@@ -155,10 +155,10 @@ export default () => {
                                     offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
                                     nonce: _get(transaction, 'nonce', "0"),
                                     value: value,
-                                    formattedValue: (+value / ( 10 ** (erc20Token?.token?.decimals || erc20Token?.token?.decimal || 18) )),
+                                    formattedValue: (+value / ( 10 ** erc20Token?.token?.decimals )),
                                     symbol: erc20Token?.token?.symbol || transaction?.token?.symbol,
                                     tokenAddress: erc20Token?.tokenAddress || transaction?.token?.tokenAddress,
-                                    decimals: erc20Token?.token?.decimal || erc20Token?.token?.decimals || 18,
+                                    decimals: erc20Token?.token?.decimals,
                                     fiatConversion: erc20Token?.fiatConversion,
                                     to: to,
                                     confimationsRequired: _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)),
@@ -183,7 +183,7 @@ export default () => {
                     const to = _get(_find(setAllowanceTxn?.dataDecoded?.parameters, p => p?.name === 'delegate'), 'value', 0)
                     let am = _get(_find(labels, (l:any) => l?.recipient?.toLowerCase() === to?.toLowerCase() && l.safeTxHash === transaction?.safeTxHash), "recurringPaymentAmount", null)
                     if(am)
-                        value = (+am * ( 10 ** (allowanceToken?.token?.decimal || allowanceToken?.token?.decimals) ));
+                        value = (+am * ( 10 ** allowanceToken?.token?.decimals ));
                     op.push({
                         txHash: _get(transaction, 'txHash', ''),
                         transactionHash: _get(transaction, 'transactionHash', ''),
@@ -270,9 +270,9 @@ export default () => {
             offChain: transaction?.offChain || transaction?.safeTxHash?.indexOf('0x') === -1,
             nonce: _get(transaction, 'nonce', "0"),
             value: value,
-            formattedValue: (+value / ( 10 ** ( erc20Token?.token?.decimals || erc20Token?.token?.decimal || 18 ) )),
+            formattedValue: (+value / ( 10 ** erc20Token?.token?.decimals)),
             symbol: erc20Token?.token?.symbol || transaction?.token?.symbol,
-            decimals: erc20Token?.token?.decimal || erc20Token?.token?.decimals,
+            decimals: erc20Token?.token?.decimals,
             tokenAddress: erc20Token?.tokenAddress || transaction?.token?.tokenAddress,
             fiatConversion: erc20Token?.fiatConversion,
             to: to,
@@ -335,7 +335,7 @@ export default () => {
         const erc20Token: any = getERC20Token(tokenAddress, safeAddress);
         if(!erc20Token)
             return [];
-        const decimals = _get(transaction, 'transfers[0].tokenInfo.decimals', null) ? _get(transaction, 'transfers[0].tokenInfo.decimals', null) : (erc20Token?.token?.decimals ||  erc20Token?.token?.decimal)
+        const decimals = _get(transaction, 'transfers[0].tokenInfo.decimals', null) ? _get(transaction, 'transfers[0].tokenInfo.decimals', null) : erc20Token?.token?.decimals
         const value = _get(transaction, 'transfers[0].value', '0x')
         return [{
             txHash: _get(transaction, 'txHash', ''),

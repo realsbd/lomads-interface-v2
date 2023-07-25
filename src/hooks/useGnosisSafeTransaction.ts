@@ -111,6 +111,7 @@ export default () => {
             let total = send.reduce((pv: any, cv: any) => pv + (+cv.amount), 0);
             if (total == 0) throw 'Cannot send 0'
             const balance = tokenBalance(tokenAddress, safeAddress);
+            console.log(balance)
             if (balance < total)
                 throw `Low token balance. Available balance in safe ${beautifyHexToken(safeAddress)} is ${balance} ${safeToken?.token?.symbol}`
             let safeTransactionData: any = null;

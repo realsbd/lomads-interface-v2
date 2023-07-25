@@ -114,7 +114,7 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
     useEffect(() => {
         if (Project)
             setMembers(Project?.members)
-    }, [Project])
+    }, [Project, open])
 
     console.log("selectedMilestone", selectedMilestone)
 
@@ -213,9 +213,9 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
                 <Box>
                     <Box sx={{ mb: 3 }} display="flex" flexDirection="row" alignItems="center">
                         <Typography sx={{ color: '#76808D', fontSize: '16px' }}>Compensation</Typography>
-                        <Box display="flex" alignItems="center" justifyContent={"center"} sx={{ width: '127px', height: '35px', }}>
+                        <Box display="flex" alignItems="center" justifyContent={"center"} sx={{ ml: 2, height: '35px', }}>
                             <img src={compensationStar} alt="compensation-star" style={{ marginRight: '7px' }} />
-                            <Typography>{ +Project?.compensation?.amount * (+selectedMilestone?.amount / 100) } {_get(Project, 'compensation.symbol', '')}</Typography>
+                            <Typography noWrap sx={{ width: 150 }}>{ (+Project?.compensation?.amount * (+selectedMilestone?.amount / 100)).toFixed(3) } {_get(Project, 'compensation.symbol', '')}</Typography>
                         </Box>
                     </Box>
                 </Box>
@@ -280,7 +280,7 @@ export default ({ open, selectedMilestone, closeModal }: Props) => {
                                                 sx={{ width: 100 }} />
                                         </Box>
                                         <Box>
-                                            <Typography>= {!(item?.percentage || 0) ? 0 : (((item?.percentage) / 100) * ((+Project?.compensation?.amount * (selectedMilestone?.amount / 100)))).toFixed(3)} {Project?.compensation?.symbol}</Typography>
+                                            <Typography noWrap sx={{ width: 80 }}>= {!(item?.percentage || 0) ? 0 : (((item?.percentage) / 100) * ((+Project?.compensation?.amount * (selectedMilestone?.amount / 100)))).toFixed(3)} {Project?.compensation?.symbol}</Typography>
                                         </Box>
                                     </Box>
                                 )

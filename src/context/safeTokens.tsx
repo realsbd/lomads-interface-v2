@@ -31,8 +31,9 @@ export const SafeTokensProvider = ({ children }: any) => {
         console.log(safeTokens)
         if (safeTokens) {
             let selToken = _find(_get(safeTokens, safeAddress, []), t => _get(t, 'tokenAddress', null) === token)
+            console.log("selToken", selToken, 10 ** selToken?.token?.decimals)
             if (!selToken) return 0;
-            return _get(selToken, 'balance', 0) / 10 ** (selToken?.token?.decimals || selToken?.token?.decimal || 18)
+            return _get(selToken, 'balance', 0) / ( 10 ** selToken?.token?.decimals)
         }
         return 0
     }

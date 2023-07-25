@@ -123,7 +123,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
     const [errorNames, setErrorNames] = useState<number[]>([]);
     const [errorAmount, setErrorAmount] = useState<number[]>([]);
     const [errorDeadline, setErrorDeadline] = useState<number[]>([]);
-    const [errorCurrency, setErrorCurrency] = useState<boolean>(false);
+    const [errorCurrency, setErrorCurrency] = useState<any>(false);
     const [errorProjectValue, setErrorProjectValue] = useState<boolean>(false);
 
     useEffect(() => {
@@ -133,6 +133,13 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
             setCurrency(Project?.compensation?.currency)
         }
     }, [editMilestones && Project?._id])
+
+    useEffect(() => {
+            const safeAddress = _get(DAO, 'safes[0].address', '')
+            let options = _get(safeTokens, safeAddress, []).map((tok: any) => { return { label: tok?.token?.symbol, value: tok?.tokenAddress } })
+            setSafeAddress(safeAddress)
+            setCurrency(options[0]?.value)
+    }, [open, DAO.url])
 
     useEffect(() => {
         if (editProjectMilestonesLoading === false) {
@@ -258,28 +265,29 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
 
     const handleChangeCompensationAmount = (e: any) => {
         setAmount(e);
-        setErrorProjectValue(false);
+        setErrorCurrency(null);
     }
 
     const handleChangeCurrency = (e: any) => {
         setCurrency(e);
-        setErrorCurrency(false);
+        setErrorCurrency(null);
     }
 
     const handleSubmit = () => {
+        console.log(currency, amount)
         let flag = 0;
         let total = 0;
         if (currency === '') {
-            setErrorCurrency(true);
+            setErrorCurrency(`Enter valid ${transformWorkspace().label} value`);
             let e = document.getElementById('currency-amt');
             if (e) {
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
                 return;
             }
         }
-        if (amount === 0) {
-            setErrorProjectValue(true);
-            let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress === currency);
+        if (!amount || amount === 0) {
+            setErrorCurrency(`Enter valid ${transformWorkspace().label} value`);
+            let symbol = _find(safeTokens[safeAddress], tkn => tkn.tokenAddress.toLowerCase() === currency.toLowerCase());
             symbol = _get(symbol, 'token.symbol', null);
             if (!symbol)
                 symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
@@ -416,8 +424,7 @@ export default ({ hideBackdrop, open, closeModal, list, getMilestones, editMiles
                                 handleChangeCurrency(value)
                             }}
                             variant="primary"
-                            errorCurrency={errorCurrency}
-                            errorProjectValue={errorProjectValue}
+                            error={errorCurrency}
                         />
                     </Box>
 

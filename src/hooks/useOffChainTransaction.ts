@@ -63,7 +63,7 @@ export default () => {
                                         method: 'transfer',
                                         parameters: [
                                             { name: 'to', type: "address", value: r.recipient },
-                                            { name: 'value', type: "uint256", value: `${BigInt((parseFloat(send[0].amount) * 10 ** 18).toFixed(0)).toString()}` },
+                                            { name: 'value', type: "uint256", value: `${BigInt((parseFloat(r.amount) * 10 ** (token ? token?.token?.decimals : 18))).toString()}`.split(".")[0] },
                                         ]
                                     }
                                 }
@@ -95,7 +95,7 @@ export default () => {
                         method: 'transfer',
                         parameters: [
                             { name: 'to', type: "address", value: send[0].recipient },
-                            { name: 'value', type: "uint256", value: `${BigInt((parseFloat(send[0].amount) * 10 ** 18).toFixed(0)).toString()}` },
+                            { name: 'value', type: "uint256", value: `${BigInt((parseFloat(send[0].amount) * 10 ** (token ? token?.token?.decimals : 18))).toString()}`.split(".")[0] },
                         ]
                     }
                 }

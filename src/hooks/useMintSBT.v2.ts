@@ -27,7 +27,7 @@ export type SBTParams = {
 const useMintSBT = (contractAddress: string | undefined, version: string | undefined = "0", contractChainId: SupportedChainId) => {
     const { account, provider, chainId } = useWeb3Auth();
 
-    const { safeMintGasless } = useBiconomyGasless(chainId)
+    const { safeMintGasless } = useBiconomyGasless(contractChainId)
     
     const mintContract = useContract(contractAddress, require(+version >=3 ? 'abis/SBT.v3.json' : 'abis/SBT.v2.json'), true);
 
@@ -273,12 +273,23 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
             payment
           }).then(res => res.data.signature)
           try {
-            const tx = await mintContract?.estimateGas.safeMint(
-              "",
-              tokenId,
-              payment,
-              signature
-            );
+            let tx = null;
+            if(+version>=3) {
+              tx = await mintContract?.estimateGas.safeMint(
+                  "",
+                  tokenId,
+                  payment,
+                  signature,
+                  "sender"
+              );
+            } else {
+              tx = await mintContract?.estimateGas.safeMint(
+                "",
+                tokenId,
+                payment,
+                signature,
+              );
+            }
             return tx
           } catch (e) {
             console.log(e)
