@@ -154,17 +154,21 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
     };
 
     useEffect(() => {
-        if (initialLoad) {
-            let activeTab: number = 0;
-            if (parsedTasks) {
-                if ((parsedTasks?.myTask || []).length == 0) {
-                    activeTab = 1
-                    if ((parsedTasks?.manage || []).length == 0)
-                        activeTab = 3
+        if(isPreview) {
+            setValue(3)
+        } else {
+            if (initialLoad) {
+                let activeTab: number = 0;
+                if (parsedTasks) {
+                    if ((parsedTasks?.myTask || []).length == 0) {
+                        activeTab = 1
+                        if ((parsedTasks?.manage || []).length == 0)
+                            activeTab = 3
+                    }
                 }
+                setValue(activeTab)
+                setInitialLoad(false)
             }
-            setValue(activeTab)
-            setInitialLoad(false)
         }
     }, [parsedTasks, initialLoad]);
 
@@ -221,8 +225,8 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                         '& button.Mui-selected': { color: 'rgba(118, 128, 141,1)' },
                     }}
                 >
-                    <Tab label={`My ${transformTask().labelPlural}`} {...a11yProps(0)} />
-                    { can(myRole, 'task.tabs.manage') && 
+                    { !isPreview && <Tab label={`My ${transformTask().labelPlural}`} {...a11yProps(0)} /> }
+                    { (can(myRole, 'task.tabs.manage') && !isPreview) && 
                     <Tab
                         label="Manage"
                         {...a11yProps(1)}
@@ -243,7 +247,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                                 <></>
                         }
                     /> }
-                    { can(myRole, 'task.tabs.manage') && 
+                    { (can(myRole, 'task.tabs.manage') && !isPreview) && 
                     <Tab
                         label="Drafts"
                         {...a11yProps(2)}
@@ -265,7 +269,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                         }
                     />
                      }
-                    {  can(myRole, 'task.tabs.all') && <Tab label={`All ${transformTask().labelPlural}`} {...a11yProps(3)} /> }
+                    {  (can(myRole, 'task.tabs.all') || isPreview) && <Tab label={`All ${transformTask().labelPlural}`} {...a11yProps(3)} /> }
                 </Tabs>
                 {
                  !isPreview &&
@@ -295,7 +299,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                             </IconButton>
                         </span>
                     </BootstrapTooltip>
-                    { can(myRole, 'task.create') &&
+                    { (can(myRole, 'task.create') || isPreview) &&
                     <BootstrapTooltip arrow open={isHelpIconOpen}
                         placement="top-start"
                         title="Create Task">
@@ -304,7 +308,9 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                                     style={{
                                         ...(isHelpIconOpen ? { zIndex: 1400, boxShadow: '0px 0px 20px rgba(181, 28, 72, 0.6)' } : {})
                                     }}
-                                    size="small" variant="contained" className={classes.createBtn} color="secondary" onClick={() => setOpenCreateTask(true)}>
+                                    size="small" variant="contained" className={classes.createBtn} color="secondary" onClick={() => { 
+                                        setOpenCreateTask(true) 
+                                    }}>
                                     <AddIcon sx={{ fontSize: 18 }} /> CREATE
                                 </Button>
                             </span>

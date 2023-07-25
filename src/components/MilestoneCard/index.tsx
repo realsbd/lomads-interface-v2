@@ -81,7 +81,13 @@ export default ({ index, milestone, editable = true, openModal }: MilestoneCardP
                         <Typography sx={{ color: '#76808D' }}>{milestone.deadline}</Typography>
                     </Box>
                    { editable && <Box
-                        onClick={() => openModal(milestone, index)}
+                        onClick={() => { 
+                            if(window.location.pathname.indexOf('preview') > -1) {
+                                window.location.href = window.location.pathname.replace('preview', '')
+                                return
+                            }
+                            openModal(milestone, index) 
+                        }}
                         display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ height: 28, width: 28, borderRadius: 28, border: '1px solid rgba(118, 128, 141, 0.5)', cursor: "pointer" }}
                     >
                         <FiCheck size={20} />

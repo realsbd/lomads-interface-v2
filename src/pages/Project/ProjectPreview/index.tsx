@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { Grid, Typography, Box, Tab, Tabs, Menu, MenuItem, Chip } from "@mui/material";
 import { makeStyles } from '@mui/styles';
-
+import { BsCalendarCheck } from 'react-icons/bs';
+import compensationStar from 'assets/svg/compensationStar.svg';
 import { IoIosArrowBack } from 'react-icons/io';
 
 import copyIcon from "assets/svg/copyIcon.svg";
@@ -52,9 +53,7 @@ import editSvg from 'assets/svg/editToken.svg';
 import AddIcon from '@mui/icons-material/Add';
 
 import moment from "moment";
-import MilestoneDetailModal from "modals/Project/MilestoneDetailModal";
-//@ts-ignore
-import { Helmet } from "react-helmet";
+import MilestoneDetailModal from "modals/Project/MilestoneDetailModal"
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -209,6 +208,24 @@ export default () => {
         }
     }, [projectId])
 
+    const isPreview = useMemo(() => {
+        return window.location.pathname.indexOf('preview') > -1
+    }, [])
+
+    const canMyrole = useCallback((permission: any) => {
+        if (!Project) return false;
+        if(window.location.pathname.indexOf('preview') > -1) return true;
+        let creator = _get(Project, 'creator', '').toLowerCase() === account?.toLowerCase();
+        let inProject = _find(_uniqBy(Project?.members, '_id'), (m:any) => m.wallet.toLowerCase() === account?.toLowerCase())
+        let p = permission;
+        if (inProject)
+            p = `${permission}.inproject`
+        if (creator)
+            p = `${permission}.creator`
+        console.log("can(myRole, p) || can(myRole, permission)", can(myRole, p) || can(myRole, permission))
+        return (can(myRole, p) || can(myRole, permission))
+    }, [Project, myRole]);
+
     useEffect(() => {
         if (Project) {
             if (_get(Project, 'milestones', []).length > 0) {
@@ -238,6 +255,15 @@ export default () => {
             setOpenMilestoneModal(true);
         }
     }
+
+    const nextMilestone = useMemo(() => {
+        if(Project && Project.milestones) {
+            let mts = Project.milestones.filter((m:any) => !m.complete)
+            if(mts && mts.length > 0)
+                return mts[0]
+        }
+        return null
+    }, [Project])
 
     const NameAndAvatar = (props: any) => {
         const [show, setShow] = useState(false);
@@ -325,6 +351,28 @@ export default () => {
         else return null;
     };
 
+    const editableMilestone = useMemo(() => {
+        if(_get(Project, 'milestones', []).length > 0) {
+            for (let index = 0; index < _get(Project, 'milestones', []).length; index++) {
+                const milestone = _get(Project, 'milestones', [])[index];
+                if(!milestone.complete)
+                    return index;
+            }
+        }
+        return -1
+    }, [Project])
+
+    const getDeadline = (deadline: any) => {
+        if(moment(deadline, 'YYYY-MM-DD').isSame(moment(), 'day')) { 
+            return { color: 'red', value: 'Today' }
+        } else if(moment(deadline, 'YYYY-MM-DD').isBefore(moment().startOf('day'), 'days')) { 
+            return { color: 'red', value: 'Passed' }
+        } else if(moment(deadline, 'YYYY-MM-DD').diff(moment().startOf('day'), 'days') <= 2) { 
+            return { color: 'red', value: `in ${moment(deadline, 'YYYY-MM-DD').diff(moment().startOf('day'), 'days')} day${moment(deadline, 'YYYY-MM-DD').diff(moment().startOf('day'), 'days') > 1 ? 's':''}` }
+        } 
+        return { color: '#4BA1DB', value:  moment(_get(nextMilestone, 'deadline', ''), 'YYYY-MM-DD').format('L') }
+    }
+
 
     if (!Project || setProjectLoading || (projectId && (Project && Project._id !== projectId))) {
         return (
@@ -334,13 +382,6 @@ export default () => {
 
     return (
         <>
-            <Helmet>
-                <meta charSet="utf-8" />
-                <title>{_get(Project, 'name')}</title>
-                <meta property="og:title" content={_get(Project, 'name')} />
-                <meta property="og:description" content={_get(Project, 'description')} />
-                <meta property="og:type" content="article" />
-            </Helmet>
             <Grid container className={classes.root}>
                 <Grid xs={12} item display="flex" flexDirection="column">
 
@@ -382,67 +423,6 @@ export default () => {
                                 <img src={createProjectSvg} alt="project-icon" style={{ marginRight: '18px', width: 50, height: 40, objectFit: 'cover' }} />
                                 <Typography className={classes.nameText}>{_get(Project, 'name', '')}</Typography>
                             </Box>
-                            <Box display="flex" alignItems="center">
-                                {/* <Box
-                                className={classes.iconContainer}
-                                display="flex"
-                                alignItems="center"
-                                justifyContent={"center"}
-                                sx={{ marginRight: '12px' }}
-                                onClick={() => { setShowEdit(true) }}
-                            >
-                                <img src={settingIcon} alt="setting-icon" />
-                            </Box> */}
-                                {/* <Box
-                                className={classes.iconContainer}
-                                display="flex"
-                                alignItems="center"
-                                justifyContent={"center"}
-                                onClick={handleClick}
-                            >
-                                <img src={shareIcon} alt="share-icon" style={{ width: 18, height: 18 }} />
-                            </Box> */}
-                                <Menu
-                                    anchorEl={anchorEl}
-                                    open={open}
-                                    onClose={handleClose}
-                                >
-                                    <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                        <TwitterShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
-                                            <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                                <TwitterIcon size={32} />
-                                                <div style={{ marginLeft: 16 }}>Twitter</div>
-                                            </div>
-                                        </TwitterShareButton>
-                                    </MenuItem>
-                                    <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                        <TelegramShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
-                                            <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                                <TelegramIcon size={32} />
-                                                <div style={{ marginLeft: 16 }}>Telegram</div>
-                                            </div>
-                                        </TelegramShareButton>
-                                    </MenuItem>
-                                    <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                        <WhatsappShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
-                                            <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                                <WhatsappIcon size={32} />
-                                                <div style={{ marginLeft: 16 }}>Whatsapp</div>
-                                            </div>
-                                        </WhatsappShareButton>
-                                    </MenuItem>
-                                    <MenuItem onClick={() => {
-                                        navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`)
-                                    }} style={{ marginLeft: 0, height: 40 }}>
-                                        <div style={{}}>
-                                            <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                                <img style={{ marginLeft: 8 }} src={copyIcon} />
-                                                <div style={{ marginLeft: 24 }}>Copy to clipboard</div>
-                                            </div>
-                                        </div>
-                                    </MenuItem>
-                                </Menu>
-                            </Box>
                         </Box>
                     </Box>
 
@@ -459,21 +439,21 @@ export default () => {
                     </Box>
 
                     {/* Links */}
-                    {/* {
-                    _get(Project, 'links', []).length > 0 &&
-                    <Box display={"flex"} flexWrap={"wrap"} sx={{ width: '100%', marginBottom: '20px' }}>
-                        {
-                            _get(Project, 'links', []).map((item: any, index: number) => {
-                                return (
-                                    <ProjectLinkCard key={index} link={item} />
-                                )
-                            })
-                        }
-                    </Box>
-                } */}
+                    {
+                        canMyrole('project.links.view') && _get(Project, 'links', []).length > 0 &&
+                        <Box display={"flex"} flexWrap={"wrap"} sx={{ width: '100%', marginBottom: '20px' }}>
+                            {
+                                _get(Project, 'links', []).map((item: any, index: number) => {
+                                    return (
+                                        <ProjectLinkCard key={index} link={item} />
+                                    )
+                                })
+                            }
+                        </Box>
+                    }
 
                     {/* Milestones and KRA */}
-                    {
+                    {canMyrole('project.milestone.view') &&
                         (_get(Project, 'milestones', []).length > 0 || _get(Project, 'kra.results', []).length > 0) &&
                         <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
                             <Box sx={{ width: '100%', background: '#FFF', padding: '10px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
@@ -500,7 +480,22 @@ export default () => {
                                 {
                                     value === 0 &&
                                     <Box display={"flex"} alignItems={"center"}>
-                                        <div style={{ width: '300px' }}>
+                                        <Box display="flex" flexDirection="row" alignItems="center">
+                                            <Typography sx={{ color: '#76808D', fontSize: '16px' }}>Project value</Typography>
+                                            <Box display="flex" alignItems="center" justifyContent={"center"} sx={{ width: '127px', height: '35px', }}>
+                                                <img src={compensationStar} alt="compensation-star" style={{ marginRight: '7px' }} />
+                                                <Typography>{_get(Project, 'compensation.amount', '')} {_get(Project, 'compensation.symbol', '')}</Typography>
+                                            </Box>
+                                        </Box>
+                                       { nextMilestone && <Box display="flex" alignItems="center" style={{ borderLeft: '1px solid rgba(118, 128, 141, 0.5)', paddingLeft: '20px' }}>
+                                            <Typography sx={{ color: getDeadline(nextMilestone?.deadline)?.color, marginRight: '10px', fontSize: '16px' }}>Deadline</Typography>
+                                            <BsCalendarCheck color={getDeadline(nextMilestone?.deadline)?.color} />
+                                            { 
+                                                //@ts-ignore 
+                                            }
+                                            <Typography sx={{ fontWeight: '700', color: getDeadline(nextMilestone?.deadline)?.color, marginLeft: '6px', marginRight: '10px' }}>{ getDeadline(nextMilestone?.deadline)?.value }</Typography>
+                                        </Box> }
+                                        {/* <div style={{ width: '300px' }}>
                                             <StepperProgress variant="secondary" milestones={_get(Project, 'milestones', [])} />
                                         </div>
                                         {
@@ -511,7 +506,7 @@ export default () => {
                                                 </Typography>
                                                 :
                                                 <Typography sx={{ marginLeft: '16px', fontWeight: 700, color: '#188C7C' }}>0%</Typography>
-                                        }
+                                        } */}
 
                                     </Box>
                                 }
@@ -520,12 +515,9 @@ export default () => {
                                     value === 1 &&
                                     <Box display={"flex"} alignItems={"center"}>
                                         <Typography sx={{ marginLeft: '14px', fontWeight: 400, color: '#76808D', marginRight: '100px' }}>Review frequency : {_get(Project, 'kra.frequency', [])}</Typography>
-                                        {/* <IconButton sx={{ marginRight: '20px' }} onClick={() => navigate(`/${daoURL}/project/${projectId}/archivedKra`)}>
-                                        <img src={archiveIcon} alt="archiveIcon" />
-                                    </IconButton>
-                                    <Button size="small" variant="contained" onClick={() => setOpenKraReview(true)}>
-                                        REVIEW
-                                    </Button> */}
+                                        { canMyrole('project.review') && <Button size="small" variant="contained" onClick={() => { window.location.href = window.location.pathname.replace('preview', '') }}>
+                                            REVIEW
+                                        </Button> }
                                     </Box>
                                 }
                             </Box>
@@ -536,7 +528,7 @@ export default () => {
                                     {
                                         _get(Project, 'milestones', []).map((item: any, index: number) => {
                                             return (
-                                                <MilestoneCard editable={false} index={index} milestone={item} openModal={(value1: any, value2: number) => selectMilestone(value1, value2)} />
+                                                <MilestoneCard editable={canMyrole('project.milestone.update') && editableMilestone === index} index={index} milestone={item} openModal={(value1: any, value2: number) => selectMilestone(value1, value2)} />
                                             )
                                         })
                                     }
@@ -556,50 +548,39 @@ export default () => {
                             </TabPanel>
                         </Box>
                     }
+                    {
+                        (canMyrole('project.task.view') || isPreview) &&
+                        <TaskSection isPreview={window.location.pathname.indexOf('preview') > -1} isHelpIconOpen={false} onlyProjects={true} />
+                    }
 
-                    <TaskSection isHelpIconOpen={false} onlyProjects={true} isPreview={true} />
+                    { canMyrole('members.view') &&
+                        <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
 
-                    {/* <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
+                            <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px', borderRadius: '5px', marginTop: '0.2rem' }} display={"flex"} flexDirection={"column"}>
 
-                    <Box sx={{ width: '100%', background: '#FFF', padding: '20px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-                        <Typography sx={{ fontSize: '22px', fontWeight: '400', color: '#76808D' }}>Members</Typography>
-                        <Box display={"flex"} alignItems={"center"}>
-                            <img src={membersGroup} alt="membersGroup" />
-                            <Typography sx={{ marginLeft: '15px', fontSize: '16px' }}>{Project?.members.length} {Project?.members.length > 1 ? 'members' : 'member'}</Typography>
-                            <Button size="small" variant="contained" color="secondary" className={classes.addMemberBtn}
-                                onClick={() => setOpenInviteModal(true)}
-                            >
-                                <AddIcon sx={{ fontSize: 18 }} /> MEMBER
-                            </Button>
-                        </Box>
-                    </Box>
+                                <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"}>
+                                    <Box sx={{ width: '250px' }}>
+                                        <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5' }}>Name</Typography>
+                                    </Box>
+                                    <Box sx={{ width: '250px' }}>
+                                        <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5', marginLeft: '22px' }}>Joined</Typography>
+                                    </Box>
+                                </Box>
 
-                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px', borderRadius: '5px', marginTop: '0.2rem' }} display={"flex"} flexDirection={"column"}>
-
-                        <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"}>
-                            <Box sx={{ width: '250px' }}>
-                                <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5' }}>Name</Typography>
+                                <Box sx={{ width: '100%', maxHeight: '220px', overflow: 'auto' }}>
+                                    {_sortBy(_uniqBy(Project?.members, (m: any) => m.wallet.toLowerCase()), (m: any) => _get(m, 'name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
+                                        return (
+                                            <NameAndAvatar
+                                                index={index}
+                                                address={_get(result, 'wallet', '')}
+                                                position={index}
+                                            />
+                                        );
+                                    })}
+                                </Box>
                             </Box>
-                            <Box sx={{ width: '250px' }}>
-                                <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5', marginLeft: '22px' }}>Joined</Typography>
-                            </Box>
-                        </Box>
-
-                        <Box sx={{ width: '100%', maxHeight: '220px', overflow: 'auto' }}>
-                            {_sortBy(_uniqBy(Project?.members, (m: any) => m.wallet.toLowerCase()), (m: any) => _get(m, 'name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
-                                return (
-                                    <NameAndAvatar
-                                        index={index}
-                                        address={_get(result, 'wallet', '')}
-                                        position={index}
-                                    />
-                                );
-                            })}
-                        </Box>
-                    </Box>
-                </Box> */}
-
-
+                        </Box> 
+                    }
                 </Grid>
             </Grid>
         </>

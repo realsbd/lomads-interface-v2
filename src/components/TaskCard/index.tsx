@@ -104,13 +104,22 @@ export default ({ task, daoUrl }: CardProps) => {
             return transformTask(task)
     }, [task]);
 
+    const isPreview = useMemo(() => {
+        return window.location.pathname.indexOf('preview') > -1
+    }, [])
+
     const handleCardClick = () => {
-        navigate(`/${daoUrl}/task/${task._id}`, { state: { task } })
+        if(isPreview) {
+            window.location.href = `/${daoUrl}/task/${task._id}`
+        } else {
+            navigate(`/${daoUrl}/task/${task._id}`, { state: { task } })
+        }
     }
 
     const handleDeleteTask = () => {
         dispatch(deleteTaskAction({ taskId: _get(task, '_id', ''), daoUrl: _get(DAO, 'url', '') }));
     }
+
 
     const diff = useMemo(() => {
         let currentDate = moment();
@@ -130,7 +139,7 @@ export default ({ task, daoUrl }: CardProps) => {
                 }}
                 onClick={handleCardClick}
             >
-                {Task?.isDummy ? <Chip style={{ position: 'absolute', top: 8, right: 8 }} clickable onClick={e => {
+                {Task?.isDummy && !isPreview ? <Chip style={{ position: 'absolute', top: 8, right: 8 }} clickable onClick={e => {
                     e.stopPropagation();
                     handleDeleteTask()
                 }} size="small" sx={{ color: 'rgba(118, 128, 141, 0.5)', fontWeight: '700' }} label="Dismiss" /> : null}

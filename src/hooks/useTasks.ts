@@ -91,8 +91,8 @@ export default (rawTasks: Array<any>) => {
     }
 
     const parsedTasks = useMemo(() => {
+        let tasks = _filter(rawTasks, rt => !rt.deletedAt && !rt.archivedAt && !rt.draftedAt);
         if (account && user) {
-            let tasks = _filter(rawTasks, rt => !rt.deletedAt && !rt.archivedAt && !rt.draftedAt);
             let manage = _filter(tasks, tsk => tsk.reviewer === user._id)
 
             manage = manage.map(t => {
@@ -124,7 +124,7 @@ export default (rawTasks: Array<any>) => {
             let allTasks = _orderBy(_uniqBy([...manage, ...(tasks.filter(tsk => (!isDeadlinePassed(tsk) || amIApproved(tsk))))], t => t._id), t => t.createdAt, ['desc'])
             return { tasks, manage, myTask, drafts, allTasks }
         }
-        return { tasks: [], manage: [], myTask: [], drafts: [], allTasks: [] }
+        return { tasks: [], manage: [], myTask: [], drafts: [], allTasks: tasks }
     }, [rawTasks, account, user])
 
     return { parsedTasks, canApply }

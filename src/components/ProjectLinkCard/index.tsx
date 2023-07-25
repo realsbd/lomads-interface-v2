@@ -261,6 +261,10 @@ export default ({ link, key }: ProjectLinkCardProps) => {
             justifyContent={"space-between"}
             sx={link.accessControl && !_find(_get(link, 'unlocked', []), (l:any) => toChecksumAddress(l) === account) ? { background: '#C94B32' } : { background: '#FFFFFF' }}
             onClick={() => {
+                if(window.location.pathname.indexOf('preview') > -1) {
+                    window.location.href = window.location.pathname.replace('/preview', '')
+                    return;
+                }
                 if (!link.accessControl) {
                     window.open(link.link, '_blank')
                 }
@@ -270,9 +274,10 @@ export default ({ link, key }: ProjectLinkCardProps) => {
                 }
             }}
         >
+            { account &&
             <Box sx={{ height: 30, width: 30 }} display="flex" alignItems={"center"} justifyContent={"center"}>
-                {handleParseUrl(link.link, link.accessControl, _get(link, 'unlocked', []).map((a: any) => a.toLowerCase()).indexOf(account.toLowerCase()) == -1)}
-            </Box>
+                {  handleParseUrl(link.link, link.accessControl, _get(link, 'unlocked', []).map((a: any) => a.toLowerCase()).indexOf(account.toLowerCase()) == -1)}
+            </Box> }
             <Typography
                 sx={link.accessControl && !_find(_get(link, 'unlocked', []), (l:any) => toChecksumAddress(l) === account) ? { margin: '0 15px', color: '#FFF' } : { margin: '0 15px', color: '#B12F15' }}
             >

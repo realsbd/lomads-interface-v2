@@ -113,7 +113,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   }, [DAO?.url, provider, account])
 
   useEffect(() => {
-    if (DAOList && account && token && daoURL && (!DAO || DAO.url !== daoURL))
+    if (((DAOList && account && token) || window.location.pathname.indexOf('preview') > -1) && daoURL && (!DAO || DAO.url !== daoURL))
       loadDAO(daoURL)
   }, [account, token, daoURL, console, DAOList])
 

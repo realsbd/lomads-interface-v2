@@ -275,7 +275,12 @@ export default ({ children }: any) => {
           >
             {
               DAO ?
-              <HeaderLogo onClick={() => { window.location.href = `/${DAO?.url}` }} dao={DAO} onMouseLeave={hideDrawer} onMouseEnter={showDrawer} /> : 
+              <HeaderLogo onClick={() => { 
+                if(window.location.pathname.indexOf('preview') === -1)
+                  window.location.href = `/${DAO?.url}`
+                else
+                  window.location.href = window.location.pathname.replace('/preview', '')
+               }} dao={DAO} onMouseLeave={hideDrawer} onMouseEnter={showDrawer} /> : 
               token && <Skeleton variant="rectangular" animation="wave" width={116} height={107} sx={{ borderBottomRightRadius: 30 }} />
             }
             { DAO ?
