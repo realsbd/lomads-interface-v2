@@ -685,7 +685,7 @@ export default () => {
                                     placeholder="Multi-sig Wallet address" sx={{ my: 1 }} fullWidth /> }
                             </Box>
                             }
-                            {
+                            {/* {
                               stateX['priced'] &&
                               <Box sx={{ my: 2 }}>
                                     <FormLabel>Stripe account</FormLabel>
@@ -720,7 +720,7 @@ export default () => {
                                     })}
                                     </List>
                               </Box>
-                            }
+                            } */}
                             <Button sx={{ mt: 2 }} onClick={() => handleSetPreview()} fullWidth size="small" variant='contained'>Next</Button>
                         </Paper>
                         :
