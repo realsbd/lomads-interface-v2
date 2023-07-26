@@ -11,6 +11,7 @@ import { Box } from '@mui/material';
 import axiosHttp from 'api'
 import { toast } from 'react-hot-toast';
 import usePopupWindow from 'hooks/usePopupWindow';
+import { USDC_POLYGON } from 'constants/tokens';
 
 
 
@@ -21,6 +22,11 @@ export default ({ open, onClose, onSuccess } : { open: any, onClose: any, onSucc
     const [paymentResponse, setPaymentResponse] = useState<any>(null);
 
     const [options, setOptions] = useState<any>(null)
+
+    useEffect(() => {
+        if(!open) 
+            setOptions(null)
+    }, [open])
 
     const waitFor = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -84,20 +90,21 @@ export default ({ open, onClose, onSuccess } : { open: any, onClose: any, onSucc
                     }
                     onOpen(`${open?.paymentLink}${getQueryString(options)}`)
                 } else if (open?.provider === 'on-ramper') {
+                    console.log("OPENNN", open)
                     options = {
                         apiKey: process?.env?.REACT_APP_ONRAMPER_KEY,
                         supportSell: false,
                         isAmountEditable: false,
                         isAddressEditable: false,
-                        defaultCrypto: 'MATIC_POLYGON',
+                        defaultCrypto: `${open?.token}_POLYGON`,
                         onlyCryptoNetworks: "POLYGON",
                         defaultFiat: 'USD',
-                        onlyCryptos: 'MATIC_POLYGON',
+                        onlyCryptos: `${open?.token}_POLYGON`,
                         onlyFiat: 'USD',
-                        defaultAmount: 40,
+                        defaultAmount: open?.amount,
                         onlyPaymentMethods: "CREDITCARD",
                         networkWallets: `POLYGON:${_get(open, 'treasury')}`,
-                        onlyGateways: 'ITEZ',
+                        // onlyGateways: 'ITEZ',
                         partnerContext: res?.data?._id,
                         primaryColor: "c94b32ff"
                     }

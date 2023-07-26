@@ -90,7 +90,7 @@ export default ({ label,
   return (
     <FormControlLabel
       sx={{ margin: '0' }}
-      control={<MaterialUISwitch unidirectional={unidirectional} checkedSVG={checkedSVG === 'lock' ? LOCK : CHECKMARK} sx={{ mr: 1 }} />}
+      control={<MaterialUISwitch unidirectional={unidirectional} checkedSVG={checkedSVG === 'none' ? undefined : checkedSVG === 'lock' ? LOCK : CHECKMARK} sx={{ mr: 1 }} />}
       label={label}
       {...props}
       checked={checked}

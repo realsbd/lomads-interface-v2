@@ -605,7 +605,7 @@ export default () => {
                                         <Box sx={{ marginBottom: '20px' }}><Typography sx={{ color: '#76808D', fontWeight: '700', fontSize: '16px' }}>CONTRIBUTORS:</Typography></Box>
                                         <Box display={"flex"} alignItems={"center"} sx={{ marginBottom: '1rem' }}>
                                             <Box sx={{ marginRight: '11px' }}><Typography sx={{ color: !toggle ? '#C94B32' : '#76808D' }}>OPEN FOR ALL</Typography></Box>
-                                            <Box><Switch unidirectional={false} checkedSVG="lock" onChange={() => setToggle(!toggle)} /></Box>
+                                            <Box><Switch unidirectional={false} checkedSVG="none" onChange={() => setToggle(!toggle)} /></Box>
                                             <Box sx={{ marginLeft: '3px' }}><Typography sx={{ color: toggle ? '#C94B32' : '#76808D' }}>FILTER BY</Typography></Box>
                                         </Box>
                                         {
@@ -687,9 +687,9 @@ export default () => {
                                                                     return (
                                                                         <Box display={"flex"} sx={{ marginBottom: '0.5rem' }} key={index}>
                                                                             <Avatar name={item.name} wallet={item.address} />
-                                                                            <Box sx={{ cursor: 'pointer', marginLeft: '1rem' }} onClick={() => handleRemoveInvitation(item)}>
+                                                                            { account !== item.address && <Box sx={{ cursor: 'pointer', marginLeft: '1rem' }} onClick={() => handleRemoveInvitation(item)}>
                                                                                 <IoIosClose color="#76808D" size={24} />
-                                                                            </Box>
+                                                                            </Box> }
                                                                         </Box>
 
                                                                     )

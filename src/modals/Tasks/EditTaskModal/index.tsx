@@ -278,9 +278,10 @@ export default ({ open, closeModal, task }: Props) => {
             .map((item: any) => { return { label: item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet), value: item.member._id } });
     }, [DAO, selectedUser, reviewer]);
 
+
     const eligibleReviewers = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: any) => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && (m.role === 'role1' || m.role === 'role2'))
-            .map((item: any) => { return { label: item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet), value: item.member._id } });
+        return _get(DAO, 'members', []).filter((m: any) => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && (m.role === 'role1' || m.role === 'role2') && m.deletedAt === null)
+            .map((item: any) => { return { label: { name: item.member.name, wallet: item.member.wallet }, value: item.member._id } });
 
     }, [DAO, reviewer, selectedUser]);
 
@@ -748,6 +749,7 @@ export default ({ open, closeModal, task }: Props) => {
                                 <Box sx={{ width: '100%' }}>
                                     <MuiSelect
                                         options={eligibleReviewers}
+                                        type={"members"}
                                         selected={reviewer}
                                         setSelectedValue={(value) => { setReviewer(value); setErrorReviewer('') }}
                                         errorSelect={errorReviewer}

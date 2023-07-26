@@ -7,6 +7,8 @@ import axiosHttp from '../api';
 import { useDAO } from "context/dao";
 import { useWeb3Auth } from "context/web3Auth";
 import { useAppSelector } from "helpers/useAppSelector";
+import { setDAOAction } from "store/actions/dao";
+import { useAppDispatch } from "helpers/useAppDispatch";
 
 export const SafeTokensContext = createContext<any>({
     safeTokens: null
@@ -20,6 +22,8 @@ export const SafeTokensProvider = ({ children }: any) => {
     //@ts-ignore
     const { DAO } = useAppSelector(store => store?.dao)
     const [safeTokens, setSafeTokens] = useState<any>();
+
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         if (!DAO) {
@@ -97,7 +101,8 @@ export const SafeTokensProvider = ({ children }: any) => {
                         owners = owners.concat(element['owners'])
                     }
                     setSafeTokens(tokens)
-                    await axiosHttp.patch(`dao/${DAO.url}/sync-safe-owners`, _uniq(owners))
+                    const { data } = await axiosHttp.patch(`dao/${DAO.url}/sync-safe-owners`, _uniq(owners))
+                    dispatch(setDAOAction(data))
                 })
                 .catch(e => console.log(e))
         }

@@ -247,17 +247,17 @@ export default () => {
 					</Box>
 					<Box className={classes.centerCard}>
 						<Box>
-							<Box>
-								<Box className={classes.inputFieldTitle}>Name Your Organisation</Box>
+							<Box sx={{ mt: 2 }}>
 								<TextInput
 									sx={{
 										width: 350,
-										height: 50
 									}}
+									label="Name Your Organisation"
 									placeholder="Epic Organisation"
 									fullWidth
 									value={state?.daoName}
 									onChange={(event: any) => {
+										setErrors({})
 										//checkAvailabilityAsync(event)
                                         const name = event.target.value.replace(/[^a-z0-9 ]/gi, "");
                                         setState((prev: any) => { return { ...prev, daoName: name.toString() } })
@@ -266,21 +266,21 @@ export default () => {
 									helperText={errors.daoName}
 								/>
 							</Box>
-							<Box>
-								<Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+							<Box sx={{ mt: 2 }}>
+								{/* <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
 									<Box 
 										className={classes.inputFieldTitle}
 										style={{ marginRight: '16px' }}>
 												Organisation address
 									</Box>
 									{urlCheckLoading && <LeapFrog size={20} color="#C94B32" />}
-								</Box>
+								</Box> */}
 								<TextInput
 									sx={{
-										width: 350,
-										height: 50,
+										width: 350
 									}}
 									fullWidth
+									label="Organisation address"
 									disabled
 									value={state?.url}
 									placeholder="https://app.lomads.xyz/Name_of_the_Organisation"

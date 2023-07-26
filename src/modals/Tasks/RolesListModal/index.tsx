@@ -149,7 +149,14 @@ export default ({ open, closeModal, hideBackdrop, validRoles, roleType, handleVa
                     </>
                 }
 
-                <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%', marginTop: '20px' }}>
+                <Box style={{ margin: "0 auto", background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 500, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
+                    <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                        <Button sx={{ mr: 1 }} onClick={closeModal} fullWidth variant='outlined' size="small">CANCEL</Button>
+                        <Button sx={{ ml: 1 }} onClick={() => { handleValidRoles(roles); closeModal(); }} fullWidth variant='contained' size="small">SELECT</Button>
+                    </Box>
+                </Box>
+
+                {/* <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%', marginTop: '20px' }}>
                     <Button variant="outlined" sx={{ marginRight: '20px', width: '169px' }} onClick={closeModal}>CANCEL</Button>
                     <Button
                         variant="contained"
@@ -158,7 +165,7 @@ export default ({ open, closeModal, hideBackdrop, validRoles, roleType, handleVa
                     >
                         SELECT
                     </Button>
-                </Box>
+                </Box> */}
 
             </Box>
         </Drawer>

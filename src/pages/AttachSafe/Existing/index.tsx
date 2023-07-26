@@ -626,7 +626,7 @@ export default () => {
 							</Box>
 						</Box>
 						: <Box style={{ margin: 25, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-							<Button loading={safeListLoading} onClick={loadSafes} variant='contained'>FIND MY SAFE</Button>
+							<Button disabled={!state.selectedChainId} loading={safeListLoading} onClick={loadSafes} variant='contained'>FIND MY SAFE</Button>
 							<Typography color="error" style={{ margin: '12px 0' }}>{ state?.selectedChainId && noSafeError && `You have no safe on ${CHAIN_INFO[state?.selectedChainId]?.chainName}` }</Typography>
 						</Box>
 					}

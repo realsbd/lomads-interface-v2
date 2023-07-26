@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react"
 import clsx from "clsx"
 import { get as _get, find as _find } from 'lodash'
-import { Drawer, Box, Grid, Typography, Stack, Avatar, List, ListItem, ListItemButton } from "@mui/material"
+import { Drawer, Box, Grid, Typography, Stack, List, ListItem, ListItemButton } from "@mui/material"
 import LomadsAvatar from "components/Avatar"
+import Avatar from "boring-avatars";
 import IconButton from "components/IconButton"
 import CloseSVG from 'assets/svg/close-new.svg'
 import EditSVG from 'assets/svg/edit.svg'
@@ -155,30 +156,30 @@ const SafeModal = ({ open, onClose }: any) => {
     // console.log("newOwnerCount", newOwnerCount)
 
     const handleUpdateOwnersWithThreshold = async () => {
-        if (active?.chainId !== chainId) {
-            toast.custom(t => <SwitchChain t={t} nextChainId={active?.chainId} />)
-        } else {
-            try {
-                setUpdateLoading(true)
-                if(newOwners.map((o: any) => o.wallet).length > 0 || removeOwners.map((o: any) => o.wallet).length > 0 || loadSafe(active?.address).threshold !== active?.threshold) {
-                    await updateOwnersWithThreshold({
-                        safeAddress: active?.address,
-                        chainId: active?.chainId,
-                        newOwners: newOwners.map((o: any) => o.wallet),
-                        removeOwners: removeOwners.map((o: any) => o.wallet),
-                        threshold: active?.threshold,
-                        ownerCount: DAOMemberList.filter((mem: any) => mem.owner).length,
-                        thresholdChanged: loadSafe(active?.address).threshold !== active?.threshold
-                    })
-                }
-                await axiosHttp.patch(`safe/${active?.address}`, { name: safeName })
-                loadDAO(DAO?.url)
-                setUpdateLoading(false)
-                setEditMode(false)
-            } catch (e) {
-                setUpdateLoading(false)
-                console.log(e)
+        try {
+            setUpdateLoading(true)
+            if(newOwners.map((o: any) => o.wallet).length > 0 || removeOwners.map((o: any) => o.wallet).length > 0 || loadSafe(active?.address).threshold !== active?.threshold) {
+                if (active?.chainId !== chainId) {
+                    toast.custom(t => <SwitchChain t={t} nextChainId={active?.chainId} />)
+                    return;
+                } 
+                await updateOwnersWithThreshold({
+                    safeAddress: active?.address,
+                    chainId: active?.chainId,
+                    newOwners: newOwners.map((o: any) => o.wallet),
+                    removeOwners: removeOwners.map((o: any) => o.wallet),
+                    threshold: active?.threshold,
+                    ownerCount: DAOMemberList.filter((mem: any) => mem.owner).length,
+                    thresholdChanged: loadSafe(active?.address).threshold !== active?.threshold
+                })
             }
+            await axiosHttp.patch(`safe/${active?.address}`, { name: safeName })
+            loadDAO(DAO?.url)
+            setUpdateLoading(false)
+            setEditMode(false)
+        } catch (e) {
+            setUpdateLoading(false)
+            console.log(e)
         }
     }
 
@@ -269,7 +270,7 @@ const SafeModal = ({ open, onClose }: any) => {
                                     DAO?.safes?.map((safe: any) => {
                                         console.log("SAFESAFE", safe)
                                         return (
-                                            <Accordion key={safe.address} elevation={0} onChange={() => setActive((prev: any) => {
+                                            <Accordion TransitionProps={{ unmountOnExit: true }} key={safe.address} elevation={0} onChange={() => setActive((prev: any) => {
                                                 if (prev && prev._id === safe._id) {
                                                     return null
                                                 }
@@ -311,7 +312,10 @@ const SafeModal = ({ open, onClose }: any) => {
                                                                 })
                                                                 setSafeName(safe?.name)
                                                                 setDAOMemberList(DAO?.members?.map((member: any) => member?.member).map((member: any) => { return { ...member, owner: safe?.owners?.map((o: any) => toChecksumAddress(o.wallet)).indexOf(toChecksumAddress(member?.wallet)) > -1 } }))
-                                                                setEditMode((prev: any) => !prev)
+                                                                setTimeout(() => {
+                                                                    setEditMode((prev: any) => !prev)
+                                                                }, 250)
+    
                                                             }}>
                                                                 <img src={EditSVG} />
                                                         </IconButton>
@@ -342,7 +346,7 @@ const SafeModal = ({ open, onClose }: any) => {
                                                             {
                                                                 active?.owners?.map((owner: any) => (
                                                                     <Box key={`${safe.address}-${owner?.wallet}`} sx={{ my: 2, zIndex: '999' }}>
-                                                                        <LomadsAvatar name={owner.name} wallet={owner.wallet} />
+                                                                        { active && <LomadsAvatar name={owner.name} wallet={owner.wallet} /> }
                                                                     </Box>
                                                                 ))
                                                             }

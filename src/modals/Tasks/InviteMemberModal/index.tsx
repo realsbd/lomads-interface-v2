@@ -83,17 +83,21 @@ export default ({ open, closeModal, hideBackdrop, selectedApplicants, reviewer, 
         >
             <Box className={classes.modalConatiner}>
 
-                <Box display="flex" flexDirection="column" sx={{ width: '100%', marginBottom: '20px' }}>
+                <Box display="flex" flexDirection="column" sx={{ paddingBottom: '80px', width: '100%', marginBottom: '20px' }}>
                     <Typography sx={{ color: '#76808D', fontSize: '16px', fontWeight: '700', marginBottom: '20px' }}>Invite members</Typography>
                     <List>
                         {
                             _sortBy(_get(DAO, 'members', []).filter((m: any) => (reviewer || "").toLowerCase() !== m.member._id && m.deletedAt === null), m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item: any, index: number) => {
                                 const labelId = `checkbox-list-label-${item.member.wallet}`;
                                 return (
-                                    <ListItem disablePadding key={item.member.wallet}>
-                                        <Box width={"100%"} display={"flex"} alignItems={"center"} justifyContent={"space-between"} onClick={() => handleAddMember(item.member)}>
+                                    <ListItem disabled={item.member.wallet === account} disablePadding key={item.member.wallet}>
+                                        <Box width={"100%"} display={"flex"} alignItems={"center"} justifyContent={"space-between"} onClick={() => { 
+                                            if(item.member.wallet !== account)
+                                                handleAddMember(item.member) 
+                                        }}>
                                             <Avatar name={_get(item.member, 'name', '')} wallet={_get(item.member, 'wallet', '')} />
                                             <Checkbox
+                                                disabled={item.member.wallet === account}
                                                 edge="center"
                                                 tabIndex={-1}
                                                 inputProps={{ 'aria-labelledby': labelId }}
@@ -107,7 +111,7 @@ export default ({ open, closeModal, hideBackdrop, selectedApplicants, reviewer, 
                     </List>
                 </Box>
 
-                <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%', marginTop: '20px' }}>
+                {/* <Box display={"flex"} alignItems={"center"} justifyContent={"center"} style={{ width: '100%', marginTop: '20px' }}>
                     <Button variant="outlined" sx={{ marginRight: '20px', width: '169px' }} onClick={closeModal}>CANCEL</Button>
                     <Button
                         variant="contained"
@@ -116,6 +120,13 @@ export default ({ open, closeModal, hideBackdrop, selectedApplicants, reviewer, 
                     >
                         SELECT
                     </Button>
+                </Box> */}
+
+            <Box style={{ margin: "0 auto", background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 575, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
+                    <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                        <Button sx={{ mr: 1 }} onClick={closeModal} fullWidth variant='outlined' size="small">CANCEL</Button>
+                        <Button sx={{ ml: 1 }} onClick={() => { handleInvitations(selectedMembers); closeModal(); }} fullWidth variant='contained' size="small">SELECT</Button>
+                    </Box>
                 </Box>
 
             </Box>
