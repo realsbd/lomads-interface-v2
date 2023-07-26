@@ -34,7 +34,7 @@ export default ({ transaction, onRecurringEdit }: any) => {
     const renderNextSection = (nextQueue: any, transaction: any) => {
         if(nextQueue && nextQueue.nonce > moment().utc().endOf('day').unix())
             return (
-                <Tooltip placement='top-start' title={`Payment for ${moment.unix(nextQueue.nonce).format(`MM/DD/YYYY`)}`}>
+                <Tooltip placement='top-start' title={`Payment for ${moment.unix(nextQueue.nonce).local().format(`MM/DD/YYYY`)}`}>
                         <Typography className="text">Next: { `${ moment.unix(nextQueue.nonce).local().format('MM/DD/YYYY') }` }</Typography> 
                         {/* { account !== toChecksumAddress(transaction.receiver.wallet) ?
                         <div className="text">Next: { `${ moment.unix(nextQueue.nonce).local().format('MM/DD/YYYY') }` }</div> 

@@ -81,7 +81,7 @@ const RecurringTxnTreasury = ({ transaction, onExecute }: any) => {
                     <TableCell></TableCell>
                     <TableCell></TableCell>
                     <TableCell style={{ width: 120 }} align="right">
-                        <Tooltip placement='top' title={`Recurring payment for ${moment.unix(nextQueue.nonce).format(`MM/DD/YYYY`)}`}>
+                        <Tooltip placement='top' title={`Recurring payment for ${moment.unix(nextQueue.nonce).local().format(`MM/DD/YYYY`)}`}>
                             <span>
                                 <Button loading={loading} disabled={loading} onClick={() => handleCreateAllowanceTxn(nextQueue, transaction)} sx={{ height: 30, padding: 0, minWidth: 120, width: 120, fontSize: 14 }} size="small" variant="contained" color="primary">Execute</Button>
                             </span>
