@@ -685,7 +685,7 @@ export default () => {
                                     placeholder="Multi-sig Wallet address" sx={{ my: 1 }} fullWidth /> }
                             </Box>
                             }
-                            {
+                            {/* {
                               stateX['priced'] &&
                               <Box sx={{ my: 2 }}>
                                     <FormLabel>Stripe account</FormLabel>
@@ -719,37 +719,8 @@ export default () => {
                                         );
                                     })}
                                     </List>
-                                    {
-                                    // <TextInput fullWidth label="Stripe account" select style={{  minWidth: 200 }} value={stateX?.treasury}
-                                    //     onChange={(e:any) => {
-                                    //         if(e.target.value === 'CREATE') {
-                                    //             handleLinkStripeAccount()
-                                    //         } else {
-                                    //             let stripeAcc = _find(stripeAccounts, (str:any) => str?._id === e.target.value)
-                                    //             if(!(stripeAcc?.account.details_submitted && _get(stripeAcc?.account, 'capabilities.card_payments', 'inactive') === 'active' && _get(stripeAcc?.account, 'capabilities.transfers', 'inactive') === 'active')) {
-                                    //                 handleLinkStripeAccount(stripeAcc?.account?.id)
-                                    //             } else {
-
-                                    //             }
-                                    //         }
-                                    //     }}>
-                                    //     {
-                                    //         stripeAccounts?.map((_o:any) => {
-                                    //             return (
-                                    //                 <MenuItem key={_o._id} value={_o._id}>
-                                    //                     <Box>
-                                    //                         <Typography>{_o._id}</Typography>
-                                    //                         <Typography>{ _o?.account.details_submitted && _get(_o?.account, 'capabilities.card_payments', 'inactive') === 'active' && _get(_o?.account, 'capabilities.transfers', 'inactive') === 'active' ? '' : 'Onboarding pending' }</Typography>
-                                    //                     </Box>
-                                    //                 </MenuItem>
-                                    //             )
-                                    //         })
-                                    //     }
-                                    //     <MenuItem key='other' value='CREATE'>Create</MenuItem>
-                                    // </TextInput>
-                                }
                               </Box>
-                            }
+                            } */}
                             <Button sx={{ mt: 2 }} onClick={() => handleSetPreview()} fullWidth size="small" variant='contained'>Next</Button>
                         </Paper>
                         :
