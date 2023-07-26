@@ -287,10 +287,13 @@ export default ({ open, hideBackdrop, closeModal }: Props) => {
     }, [Task]);
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: { member: any; }) => Task.reviewer !== m.member._id && m.member._id !== user._id &&
+        if(user){
+            return _get(DAO, 'members', []).filter((m: { member: any; }) => Task.reviewer !== m.member._id && m.member._id !== user._id &&
             (!assignedUser ||
                 (assignedUser && m.member._id !==
                     assignedUser?._id))).map((item: any) => { return { label: item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet), value: item.member._id } });
+        } 
+        return []
     }, [DAO, selectedUser, Task]);
 
     const handleSetApplicant = (value: any) => {

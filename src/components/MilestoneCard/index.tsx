@@ -83,7 +83,7 @@ export default ({ index, milestone, editable = true, openModal }: MilestoneCardP
                    { editable && <Box
                         onClick={() => { 
                             if(window.location.pathname.indexOf('preview') > -1) {
-                                window.location.href = window.location.pathname.replace('preview', '')
+                                window.location.href = window.location.pathname.replace('/preview', '')
                                 return
                             }
                             openModal(milestone, index) 

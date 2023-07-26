@@ -271,10 +271,13 @@ export default ({ open, closeModal, selectedProject }: Props) => {
     }, [DAO, reviewer, selectedUser]);
 
     const eligibleProjects = useMemo(() => {
-        if (selectedProject) {
-            return [{ label: selectedProject?.name, value: selectedProject?._id }]
+        if(user) {
+            if (selectedProject) {
+                return [{ label: selectedProject?.name, value: selectedProject?._id }]
+            }
+            return _get(DAO, 'projects', []).filter((p: any) => _find(p.members, m => m._id === user._id)).map((item: any) => { return { label: item.name, value: item._id } })
         }
-        return _get(DAO, 'projects', []).filter((p: any) => _find(p.members, m => m._id === user._id)).map((item: any) => { return { label: item.name, value: item._id } })
+        return []
     }, [DAO, reviewer, selectedUser, selectedProject]);
 
     const getrolename = (roleId: any) => {

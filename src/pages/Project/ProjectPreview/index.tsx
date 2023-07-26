@@ -515,7 +515,7 @@ export default () => {
                                     value === 1 &&
                                     <Box display={"flex"} alignItems={"center"}>
                                         <Typography sx={{ marginLeft: '14px', fontWeight: 400, color: '#76808D', marginRight: '100px' }}>Review frequency : {_get(Project, 'kra.frequency', [])}</Typography>
-                                        { canMyrole('project.review') && <Button size="small" variant="contained" onClick={() => { window.location.href = window.location.pathname.replace('preview', '') }}>
+                                        { canMyrole('project.review') && <Button size="small" variant="contained" onClick={() => { window.location.href = window.location.pathname.replace('/preview', '') }}>
                                             REVIEW
                                         </Button> }
                                     </Box>

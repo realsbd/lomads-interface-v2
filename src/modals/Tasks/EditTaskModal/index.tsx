@@ -286,7 +286,10 @@ export default ({ open, closeModal, task }: Props) => {
     }, [DAO, reviewer, selectedUser]);
 
     const eligibleProjects = useMemo(() => {
-        return _get(DAO, 'projects', []).filter((p: any) => _find(p.members, m => m._id === user._id)).map((item: any) => { return { label: item.name, value: item._id } })
+        if(user) {
+            return _get(DAO, 'projects', []).filter((p: any) => _find(p.members, m => m._id === user._id)).map((item: any) => { return { label: item.name, value: item._id } })
+        }
+        return []
     }, [DAO, reviewer, selectedUser]);
 
     const handleChangeCompensationAmount = (e: any) => {

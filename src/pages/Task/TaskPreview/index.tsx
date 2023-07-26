@@ -344,14 +344,9 @@ export default () => {
     const showFitRoleApply = () => {
         return (
             <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"}>
-                <Typography sx={{ fontSize: 30, color: '#FFF', margin: '15px 0', lineHeight: '33px', textAlign: 'center' }}>This task<br />fits your role.</Typography>
-                {
-                    moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt && !Task.isDummy
-                        ?
-                        null
-                        :
-                        <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => setOpenApplyModal(true)}>APPLY</Button>
-                }
+                <Button sx={{ color: '#C94B32' }} size="small" variant="contained" color="secondary" onClick={() => {
+                    window.location.href = window.location.pathname.replace('/preview', '')
+                }}>APPLY</Button>
             </Box>
         )
     }
@@ -457,9 +452,12 @@ export default () => {
         )
     }
 
-    const renderBody = (body: string) => {
+    const renderBody = (body: string = "SHOW_PREVIEW") => {
         console.log("SHOW_SUBMISSIONS", body)
         switch (body) {
+            case 'SHOW_PREVIEW':
+                return showFitRoleApply();
+
             case 'SHOW_SUBMISSIONS':
                 return showSubmissions();
 
@@ -566,7 +564,7 @@ export default () => {
                 </Box>
 
                 <Box sx={{ width: '100%', marginBottom: '0.2rem' }} display="flex" alignItems="center">
-                    <Box className={classes.arrowContainer} display="flex" alignItems="center" justifyContent={"center"} onClick={() => navigate(-1)}>
+                    <Box className={classes.arrowContainer} display="flex" alignItems="center" justifyContent={"center"} onClick={() => { window.location.href = window.location.pathname.replace('/preview', '') }}>
                         <IoIosArrowBack size={20} color="#C94B32" />
                     </Box>
                     <Box className={classes.nameContainer} display="flex" alignItems="center" justifyContent={"space-between"}>
@@ -574,7 +572,7 @@ export default () => {
                             <Typography className={classes.nameText}>{_get(Task, 'name', '')}</Typography>
                         </Box>
                         <Box display="flex" alignItems="center">
-                            {
+                            {/* {
                                 Task?.draftedAt
                                     ?
                                     <Box style={{ border: '1px solid #C94B32', borderRadius: 16, padding: '4px 16px' }}>
@@ -585,7 +583,7 @@ export default () => {
                                         <img src={Task?.visual?.icon} alt="submitted-icon" />
                                         <Typography sx={{ fontSize: '14px', marginLeft: '5px', textWrap: 'nowrap', color: Task?.visual?.color }}>{Task?.visual?.status}</Typography>
                                     </Box>
-                            }
+                            } */}
                             {/* {
                                 amICreator || can(myRole, 'task.edit') || can(myRole, 'task.delete') || can(myRole, 'task.close')
                                     ?
@@ -676,7 +674,9 @@ export default () => {
                         {
                             Task.discussionChannel && Task.discussionChannel !== ''
                                 ?
-                                <button className={classes.otherBtn} onClick={() => window.open(Task.discussionChannel, '_blank', 'noopener,noreferrer')}>
+                                <button className={classes.otherBtn} onClick={() => {
+                                    window.location.href = window.location.pathname.replace('/preview', '')
+                                }}>
                                     {handleParseUrl(Task.discussionChannel)}
                                     CHAT
                                 </button>
@@ -686,7 +686,9 @@ export default () => {
                         {
                             Task.submissionLink && Task.submissionLink.length > 0
                                 ?
-                                <button className={classes.otherBtn} onClick={() => window.open(Task.submissionLink, '_blank', 'noopener,noreferrer')}>
+                                <button className={classes.otherBtn} onClick={() => { 
+                                    window.location.href = window.location.pathname.replace('/preview', '')
+                                 }}>
                                     <img src={folder} />
                                 </button>
                                 :
@@ -723,7 +725,7 @@ export default () => {
                             sx={{ paddingTop: '16px', fontSize: '14px', color: '#1B2B41' }}></Typography>
                     </Box>
                     <Box className={classes.detailsContainer} display="flex" flexWrap={"wrap"} alignItems="center" justifyContent={"center"}>
-                        {/* {renderBody(Task?.visual?.renderBody)} */}
+                        {renderBody("SHOW_PREVIEW")}
                     </Box>
                 </Box>
 
