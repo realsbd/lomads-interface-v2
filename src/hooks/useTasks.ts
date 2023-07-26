@@ -34,7 +34,7 @@ export default (rawTasks: Array<any>) => {
                     // return index > -1 ? true : false
                     if (index > -1) return true;
                 }
-                else if (task?.invitations.length > 0) {
+                else if (task?.invitations && task?.invitations?.length > 0) {
                     let index = task?.invitations.findIndex((item: any) => item.address.toLowerCase() === account.toLowerCase());
                     // return index > -1 ? true : false
                     if (index > -1) return true;
