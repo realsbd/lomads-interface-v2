@@ -107,7 +107,8 @@ export default ({ transaction, executableNonce }: any) => {
                         const metadata = _get(transaction, `metadata.${tx.to === '0x' ? transaction?.safeAddress : tx.to}`, null)
                         if(metadata){
                             let lab = metadata?.label?.split('|');
-                            amount = lab[lab.length - 1].replace(tx?.symbol, '')
+                            if(lab && lab.length > 0)
+                                amount = lab[lab.length - 1].replace(tx?.symbol, '')
                         }
                     }
                     return (
