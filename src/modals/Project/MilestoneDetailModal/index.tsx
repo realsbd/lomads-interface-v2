@@ -3,6 +3,7 @@ import { uniqBy as _uniqBy, get as _get, find as _find } from 'lodash'
 import { Typography, Box, Drawer, } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import IconButton from 'components/IconButton';
+import Button from 'components/Button';
 import { FiCheck } from "react-icons/fi";
 
 import CloseSVG from 'assets/svg/closeNew.svg'
@@ -42,17 +43,29 @@ const useStyles = makeStyles((theme: any) => ({
         fontSize: '16px !important',
         fontWeight: '700 !important',
         lineHeight: '18px !important',
+    },
+    specialButton: {
+        width: '100% !important',
+        fontSize: '15px !important',
+        backgroundColor: "#188C7C !important",
+        color: '#FFF !important',
+    },
+    specialButtonDisabled: {
+        width: '100% !important',
+        fontSize: '15px !important',
+        backgroundColor: "grey !important",
     }
 }));
 
 interface Props {
-    open: boolean;
+    open: boolean,
+    editable?: boolean,
     selectedMilestone: any,
     closeModal(): any;
     openAssignContribution(): any;
 }
 
-export default ({ open, selectedMilestone, closeModal, openAssignContribution }: Props) => {
+export default ({ open, editable = true, selectedMilestone, closeModal, openAssignContribution }: Props) => {
 
     const classes = useStyles();
 
@@ -104,12 +117,15 @@ export default ({ open, selectedMilestone, closeModal, openAssignContribution }:
                                     <Typography dangerouslySetInnerHTML={{ __html: selectedMilestone?.deliverables }}></Typography>
                                 </Box>
                             }
-                            <button onClick={() => { openAssignContribution(); closeModal() }} style={{ width: '100%', height: '50px', borderRadius: '5px', marginTop: '50px', border: 'none', backgroundColor: '#188C7C', boxShadow: '2px 1px 8px rgba(27, 43, 65, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '20px', color: '#FFF' }}>
+                            {/* <button disabled={!editable} onClick={() => { console.log(selectedMilestone); openAssignContribution(); closeModal() }} style={{ width: '100%', height: '50px', borderRadius: '5px', marginTop: '50px', border: 'none', backgroundColor: '#188C7C', boxShadow: '2px 1px 8px rgba(27, 43, 65, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '20px', color: '#FFF' }}>
                                 <Box display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ height: 30, width: 30, borderRadius: 30, border: '1.5px solid #FFF', marginRight: '13px' }}>
                                     <FiCheck size={20} color="#FFF" />
                                 </Box>
                                 MARK AS COMPLETE
-                            </button>
+                            </button> */}
+                            <Button onClick={() => { console.log(selectedMilestone); openAssignContribution(); closeModal() }} startIcon={<FiCheck size={20} color="#FFF" />} disabled={!editable} className={editable ? classes.specialButton : classes.specialButtonDisabled}>
+                                MARK AS COMPLETE
+                            </Button>
                         </Box>
                 }
             </Box>

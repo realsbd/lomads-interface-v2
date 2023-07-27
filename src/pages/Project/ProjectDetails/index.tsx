@@ -195,7 +195,7 @@ export default () => {
     const [openMilestoneModal, setOpenMilestoneModal] = useState<boolean>(false);
     const [openKraReview, setOpenKraReview] = useState<boolean>(false);
 
-    const [selectedMilestone, setSelectedMilestone] = useState(null);
+    const [selectedMilestone, setSelectedMilestone] = useState<any>(null);
 
     // useEffect(() => {
     //     if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -236,18 +236,27 @@ export default () => {
         setValue(newValue);
     };
 
+    const editableMilestone = useMemo(() => {
+        if(_get(Project, 'milestones', []).length > 0) {
+            for (let index = 0; index < _get(Project, 'milestones', []).length; index++) {
+                const milestone = _get(Project, 'milestones', [])[index];
+                if(!milestone.complete)
+                    return index;
+            }
+        }
+        return -1
+    }, [Project])
+
     const selectMilestone = (item: any, index: number) => {
         if (index === 0) {
-            let e = { ...item };
-            e.pos = index;
+            let e = { ...item, pos: index };
             setSelectedMilestone(e);
-            setOpenMilestoneModal(true);
+            setTimeout(() => setOpenMilestoneModal(true), 500)
         }
         else if (index > 0) {
-            let e = { ...item };
-            e.pos = index;
+            let e = { ...item, pos: index };
             setSelectedMilestone(e);
-            setOpenMilestoneModal(true);
+            setTimeout(() => setOpenMilestoneModal(true), 500)
         }
     }
 
@@ -346,17 +355,6 @@ export default () => {
         else return null;
     };
 
-    const editableMilestone = useMemo(() => {
-        if(_get(Project, 'milestones', []).length > 0) {
-            for (let index = 0; index < _get(Project, 'milestones', []).length; index++) {
-                const milestone = _get(Project, 'milestones', [])[index];
-                if(!milestone.complete)
-                    return index;
-            }
-        }
-        return -1
-    }, [Project])
-
     const getDeadline = (deadline: any) => {
         if(moment(deadline, 'YYYY-MM-DD').isSame(moment(), 'day')) { 
             return { color: 'red', value: 'Today' }
@@ -387,6 +385,7 @@ export default () => {
 
                     <MilestoneDetailModal
                         selectedMilestone={selectedMilestone}
+                        editable={editableMilestone == selectedMilestone?.pos}
                         open={openMilestoneModal}
                         closeModal={() => setOpenMilestoneModal(false)}
                         openAssignContribution={() => setOpenAssignContribution(true)}
@@ -591,7 +590,7 @@ export default () => {
                                     {
                                         _get(Project, 'milestones', []).map((item: any, index: number) => {
                                             return (
-                                                <MilestoneCard editable={canMyrole('project.milestone.update') && editableMilestone === index} index={index} milestone={item} openModal={(value1: any, value2: number) => selectMilestone(value1, value2)} />
+                                                <MilestoneCard editable={canMyrole('project.milestone.update')} index={index} milestone={item} openModal={(value1: any, value2: number) => selectMilestone(value1, value2)} />
                                             )
                                         })
                                     }

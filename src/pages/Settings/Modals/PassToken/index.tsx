@@ -183,13 +183,12 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
         //     })  
         // }
 
-        if(currentChainId !== chainId) {
-            return toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
-        }
-
         try {
             setUpdateContractLoading(true)
             if(+contract?.version >= 1 && (state?.price?.token !== prevState?.price?.token) || (state?.price?.value !== prevState?.price?.value)) {
+                if(currentChainId !== chainId) {
+                    return toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
+                }
                 //await updateContract(state?.price?.value, state?.price?.token)
             }
             return await axiosHttp.patch(`contract/${contract?.address}`, {

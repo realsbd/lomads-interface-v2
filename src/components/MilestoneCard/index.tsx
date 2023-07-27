@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
+import { get as _get } from 'lodash'
 import { Typography, Box, Card, CardContent } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 
 import { FiCheck } from "react-icons/fi";
+import { useAppSelector } from "helpers/useAppSelector";
 
 interface MilestoneCardProps {
     index: number,
@@ -40,6 +42,18 @@ const useStyles = makeStyles((theme: any) => ({
 
 export default ({ index, milestone, editable = true, openModal }: MilestoneCardProps) => {
     const classes = useStyles();
+    const { Project } = useAppSelector(store => store.project);
+
+    const editableMilestone = useMemo(() => {
+        if(_get(Project, 'milestones', []).length > 0) {
+            for (let index = 0; index < _get(Project, 'milestones', []).length; index++) {
+                const milestone = _get(Project, 'milestones', [])[index];
+                if(!milestone.complete)
+                    return index;
+            }
+        }
+        return -1
+    }, [Project])
 
     if (milestone.complete) {
         return (
@@ -81,11 +95,7 @@ export default ({ index, milestone, editable = true, openModal }: MilestoneCardP
                         <Typography sx={{ color: '#76808D' }}>{milestone.deadline}</Typography>
                     </Box>
                    { editable && <Box
-                        onClick={() => { 
-                            if(window.location.pathname.indexOf('preview') > -1) {
-                                window.location.href = window.location.pathname.replace('/preview', '')
-                                return
-                            }
+                        onClick={() => {     
                             openModal(milestone, index) 
                         }}
                         display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ height: 28, width: 28, borderRadius: 28, border: '1px solid rgba(118, 128, 141, 0.5)', cursor: "pointer" }}

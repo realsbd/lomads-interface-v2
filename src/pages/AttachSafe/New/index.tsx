@@ -732,9 +732,6 @@ export default () => {
 				<Typography className={classes.safeFooter}>
 					By continuing you consent to the <span onClick={() => window.open('https://safe.global/terms', '_blank')} style={{ textDecoration: 'underline', cursor: 'pointer' }}>Terms of Use</span> and <span onClick={() => window.open('https://safe.global/privacy', '_blank')} style={{ textDecoration: 'underline', cursor: 'pointer' }}>Privacy Policy</span> of Gnosis Safe
 				</Typography>
-				{ isLoading && <Typography className={classes.safeFooter} style={{ fontStyle: 'italic', opacity: 0.8, fontSize: 14 }}>
-					{DAO?.name} treasury is being deployed on { CHAIN_INFO[state.selectedChainId].label }. This might take several minutes. Please do not refresh the page
-				</Typography> }
 				{/* <Box className={classes.safeFooter}>
 					You’re about to create a new safe and will have to confirm a
 					transaction with your curently connected wallet.
@@ -744,6 +741,9 @@ export default () => {
 					The exact amount will be determinated by your wallet.
 				</Box> */}
 				<Button loading={isLoading} disabled={isLoading} onClick={deployNewSafeDelayed} variant='contained'>CREATE</Button>
+				{ isLoading && <Typography className={classes.safeFooter} style={{ fontStyle: 'italic', opacity: 0.8, fontSize: 14 }}>
+					{DAO?.name} treasury is being deployed on { CHAIN_INFO[state.selectedChainId].label }. This might take several minutes. Please do not refresh the page
+				</Typography> }
 			</>
 		);
 	};

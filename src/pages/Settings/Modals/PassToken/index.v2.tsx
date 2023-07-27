@@ -391,6 +391,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
             await axiosHttp.patch(`contract/${contract?.address}`, { ...res, contactDetail: state?.contact, image:  state?.logo, gasless: state?.gasless, token: state?.symbol, name: `${state?.symbol} SBT`, discountCodes: state?.discountCodes })
                 .then(result => {
                     loadDAO(_get(DAO,'url'))
+                    onClose()
                 })
                 .finally(() => setUpdateContractLoading(false))
         } catch (e) {
