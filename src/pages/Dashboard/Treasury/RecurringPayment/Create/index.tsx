@@ -29,8 +29,8 @@ import { createRecurringPaymentAction, loadRecurringPaymentsAction } from "store
 
 const FREQUENCY = [{ label: "Weekly", value: "weekly" }, { label: "Monthly", value: "monthly" }]
 
-const format = (val:any) => (val || '0') + ` occurance`
-const parse = (val:any) => (val || '0').replace(/^\occurance/, '')
+const format = (val:any) => (val || '0') + ` occurrences`
+const parse = (val:any) => (val || '0').replace(/^\occurrences/, '')
 
 const useStyles = makeStyles((theme: any) => ({
     root: {

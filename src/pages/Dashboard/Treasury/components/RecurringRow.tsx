@@ -64,11 +64,11 @@ const RecurringTxnTreasury = ({ transaction, onExecute }: any) => {
             transaction.ends && transaction.ends.key === 'ON' ?
             `Recurring Payment | ${_get(transaction, 'frequency', '')} | from ${ moment(transaction.startDate).local().format('MM/DD/YYYY') } to ${ moment(transaction.ends.value).local().format('MM/DD/YYYY') }` : 
             transaction.ends && transaction.ends.key === 'AFTER' && !transaction.active ?
-            `Recurring Payment | ${_get(transaction, 'frequency', '')} | ${transaction.ends.value} occurances` :
+            `Recurring Payment | ${_get(transaction, 'frequency', '')} | ${transaction.ends.value} occurrences` :
             transaction.ends && transaction.ends.key === 'AFTER' && transaction.active && transaction.queue.filter((t:any) => t.moduleTxnHash).length > 0 ?
-            `Recurring Payment | ${_get(transaction, 'frequency', '')} | ${transaction.queue.filter((t:any) => t.moduleTxnHash).length}/${transaction.ends.value} occurances completed` :
+            `Recurring Payment | ${_get(transaction, 'frequency', '')} | ${transaction.queue.filter((t:any) => t.moduleTxnHash).length}/${transaction.ends.value} occurrences completed` :
             transaction.ends && transaction.ends.key === 'AFTER' && transaction.active && transaction.queue.filter((t:any) => t.moduleTxnHash).length == 0 ?
-            `Recurring Payment | ${_get(transaction, 'frequency', '')} | ${transaction.ends.value} occurances` :
+            `Recurring Payment | ${_get(transaction, 'frequency', '')} | ${transaction.ends.value} occurrences` :
             `Recurring Payment | ${_get(transaction, 'frequency', '')} | from ${ moment(transaction.startDate).local().format('MM/DD/YYYY') }`
     , [transaction])
 

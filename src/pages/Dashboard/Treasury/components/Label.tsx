@@ -6,7 +6,7 @@ import { useAppDispatch } from "helpers/useAppDispatch";
 import { updateTxLabelAction } from "store/actions/treasury";
 
 export default ({ transaction, recipient, defaultLabel }: any) => {
-    console.log("transaction", transaction, recipient)
+    console.log("transaction transaction, rec", transaction, recipient)
     const textfieldRef = useRef<any>()
     const dispatch = useAppDispatch()
     const [editable, setEditable] = useState(false)

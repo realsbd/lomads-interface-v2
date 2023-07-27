@@ -378,6 +378,7 @@ export default ({ isHelpIconOpen, showWalkThrough }: any) => {
                                         <TableBody>
                                             {
                                                 DAO && recurringPayments && recurringTreasuryTxns && recurringTreasuryTxns.map((txn: any) => {
+                                                    console.log("recurringPaymentsrecurringPayments", txn)
                                                     return <RecurringRow transaction={txn} />
                                                 })
                                             }

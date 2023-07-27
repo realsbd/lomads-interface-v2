@@ -66,6 +66,7 @@ export default () => {
         const canExecuteTxn = _get(transaction, 'confirmationsRequired', _get(safe, 'threshold', 0)) === (_get(transaction, 'confirmations', [])?.length || 0)
         const canRejectTxn = transaction?.rejectedTxn && _get(transaction, 'rejectedTxn.confirmationsRequired', _get(safe, 'threshold', 0)) === _get(transaction, 'rejectedTxn.confirmations', [])?.length
         return [{
+            allowanceTxn: false,
             txHash: _get(transaction, 'txHash', ''),
             transactionHash: _get(transaction, 'transactionHash', ''),
             safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
@@ -115,6 +116,7 @@ export default () => {
                             const decoded = parameters.valueDecoded[index];
                             if(!decoded.dataDecoded) {
                                 op.push({
+                                    allowanceTxn: false,
                                     txHash: _get(transaction, 'txHash', ''),
                                     transactionHash: _get(transaction, 'transactionHash', ''),
                                     safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
@@ -147,6 +149,7 @@ export default () => {
                                 const to = _get(_find(parameters, p => p.name === 'to'), 'value', '0x')
                                 const value = _get(_find(parameters, p => p.name === 'value'), 'value', '0')
                                 op.push({
+                                    allowanceTxn: false,
                                     txHash: _get(transaction, 'txHash', ''),
                                     transactionHash: _get(transaction, 'transactionHash', ''),
                                     safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
@@ -184,6 +187,7 @@ export default () => {
                     if(am)
                         value = (+am * ( 10 ** allowanceToken?.token?.decimals ));
                     op.push({
+                        allowanceTxn: true,
                         txHash: _get(transaction, 'txHash', ''),
                         transactionHash: _get(transaction, 'transactionHash', ''),
                         safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
@@ -217,6 +221,7 @@ export default () => {
             const value = _get(_find(_get(transaction, 'dataDecoded.parameters'), p => p.name === 'value'), 'value',  '0x')
             const token: any = getERC20Token(transaction?.token?.tokenAddress, safeAddress)
             return [{
+                allowanceTxn: false,
                 txHash: _get(transaction, 'txHash', ''),
                 transactionHash: _get(transaction, 'transactionHash', ''),
                 safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
@@ -262,6 +267,7 @@ export default () => {
         const value = _get(_find(parameters, p => p.name === 'value'), 'value', '0x')
         let op = [];
         op.push({
+            allowanceTxn: false,
             txHash: _get(transaction, 'txHash', ''),
             transactionHash: _get(transaction, 'transactionHash', ''),
             safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
@@ -299,6 +305,7 @@ export default () => {
         const canRejectTxn = transaction?.rejectedTxn && _get(transaction, 'rejectedTxn.confirmationsRequired', _get(safe, 'threshold', 0)) === (_get(transaction, 'rejectedTxn.confirmations', [])?.length || 0)
         let op = [];
         op.push({
+            allowanceTxn: false,
             txHash: _get(transaction, 'txHash', ''),
             transactionHash: _get(transaction, 'transactionHash', ''),
             safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
@@ -337,6 +344,7 @@ export default () => {
         const decimals = _get(transaction, 'transfers[0].tokenInfo.decimals', null) ? _get(transaction, 'transfers[0].tokenInfo.decimals', null) : erc20Token?.token?.decimals
         const value = _get(transaction, 'transfers[0].value', '0x')
         return [{
+            allowanceTxn: false,
             txHash: _get(transaction, 'txHash', ''),
             transactionHash: _get(transaction, 'transactionHash', ''),
             safeTxHash: _get(transaction, 'txHash', "0"),

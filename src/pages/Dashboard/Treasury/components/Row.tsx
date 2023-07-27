@@ -101,16 +101,26 @@ export default ({ transaction, executableNonce }: any) => {
     return (
         <>
             {
-                txn.map((tx: any, _i: number) => (
-                    <TableRow>
-                        <CreditDebit credit={tx?.isCredit} fiatConversion={tx?.executionDate ? _get(transaction, `metadata.${tx?.to}.fiatConversion`, undefined) : _get(tx, 'fiatConversion', undefined)} executed={tx?.executionDate} amount={tx?.formattedValue} token={tx?.symbol} />
-                        <Label transaction={transaction} recipient={tx?.to} />
-                        <Recipient safeAddress={transaction?.safeAddress} credit={tx?.isCredit} recipient={tx?.to} token={tx?.symbol} />
-                        <Tag transaction={transaction} recipient={tx?.to} />
-                        <Sign transaction={tx} index={_i} />
-                        <Action txnGroup={txn} amount={tx?.formattedValue} onPostExecution={handlePostExecution} token={tx?.symbol} tokenAddress={tx?.tokenAddress} executableNonce={executableNonce} safeAddress={transaction?.safeAddress} transaction={tx} txnCount={txn.length} chainId={loadSafe(transaction?.safeAddress)?.chainId} index={_i} />
-                    </TableRow>
-                ))
+                txn.map((tx: any, _i: number) => {
+                    let amount = null
+                    if(tx.allowanceTxn) {
+                        const metadata = _get(transaction, `metadata.${tx.to === '0x' ? transaction?.safeAddress : tx.to}`, null)
+                        if(metadata){
+                            let lab = metadata?.label.split('|');
+                            amount = lab[lab.length - 1].replace(tx?.symbol, '')
+                        }
+                    }
+                    return (
+                        <TableRow>
+                            <CreditDebit credit={tx?.isCredit} fiatConversion={tx?.executionDate ? _get(transaction, `metadata.${tx?.to}.fiatConversion`, undefined) : _get(tx, 'fiatConversion', undefined)} executed={tx?.executionDate} amount={amount ? amount : tx?.formattedValue} token={tx?.symbol} />
+                            <Label transaction={transaction} recipient={tx?.to} />
+                            <Recipient safeAddress={transaction?.safeAddress} credit={tx?.isCredit} recipient={tx?.to} token={tx?.symbol} />
+                            <Tag transaction={transaction} recipient={tx?.to} />
+                            <Sign transaction={tx} index={_i} />
+                            <Action txnGroup={txn} amount={tx?.formattedValue} onPostExecution={handlePostExecution} token={tx?.symbol} tokenAddress={tx?.tokenAddress} executableNonce={executableNonce} safeAddress={transaction?.safeAddress} transaction={tx} txnCount={txn.length} chainId={loadSafe(transaction?.safeAddress)?.chainId} index={_i} />
+                        </TableRow>
+                    )
+                })
             }
         </>
     )
