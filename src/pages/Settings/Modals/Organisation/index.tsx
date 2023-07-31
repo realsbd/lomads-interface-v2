@@ -215,9 +215,9 @@ const Organisation = ({ open, onClose }: any) => {
                             <AddIcon/>
                         </MuiIconButton>
                     </Box>
-                    { state?.links?.length > 0 && <Box className={classes.linkContainer}>
+                    { state?.links?.filter((link:any) => !link.noPreview).length > 0 && <Box className={classes.linkContainer}>
                         {
-                            state?.links?.map((link: any, _i: number) => {
+                            state?.links?.filter((link:any) => !link.noPreview).map((link: any, _i: number) => {
                                 return (
                                     <Box key={link.title + link.link} sx={{ my: 1 }} display="flex" flexDirection="row" alignItems="center">
                                         <Typography className={classes.linkTitle}>{ link.title }</Typography>

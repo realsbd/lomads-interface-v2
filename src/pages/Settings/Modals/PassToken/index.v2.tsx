@@ -103,6 +103,7 @@ const useStyles = makeStyles((theme: any) => ({
 const PassTokenModalV2 =  ({ open, onClose }: any) => {
     const classes = useStyles();
     const { chainId } = useWeb3Auth()
+    //@ts-ignore
     const dispatch = useAppDispatch()
     const { DAO, loadDAO } = useDAO()
     //@ts-ignore

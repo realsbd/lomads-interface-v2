@@ -67,8 +67,8 @@ export default ({ highlightSettings, isHelpIconOpen }: { highlightSettings: bool
             <Box className={classes.stack} flexGrow={1}>
                 <Stack padding={"6px"} height={80} alignItems="center" spacing={2} direction="row">
                     {
-                        _get(DAO, 'links', []).length > 0 ?
-                            _get(DAO, 'links', []).map((link: any) => <LinkChip url={_get(link, 'link')} name={_get(link, 'title')} />) :
+                        _get(DAO, 'links', []).filter((link:any) => !link.noPreview).length > 0 ?
+                            _get(DAO, 'links', []).filter((link:any) => !link.noPreview).map((link: any) => <LinkChip url={_get(link, 'link')} name={_get(link, 'title')} />) :
                             <Box className={classes.empty} onClick={() => navigate(`/${DAO?.url}/settings`, { state: { openDefault: Organisation.name } })}>
                                 <Typography className={classes.emptyText} >ADD USEFUL LINKS HERE</Typography>
                             </Box>
