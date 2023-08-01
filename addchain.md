@@ -103,6 +103,8 @@ Go to to file [src/constants/chainInfo.ts](src/constants/chainInfo.ts) and make 
           }
         }
 
+
+
 ### Step 3:
 
 Go to to file [src/constants/infura.ts](src/constants/infura.ts) and make the following additions
@@ -150,3 +152,67 @@ Go to to file [src/constants/tokens.ts](src/constants/tokens.ts) and make the fo
         'USDC',
         'USD//C'
       )
+
+### Step 5: Configure the new chain
+
+Go to to file [src/constants/rpcUrl.ts](src/constants/rpcUrl.ts) and add the chain rpc url
+
+        export function getRpcUrls(chainId: SupportedChainId): [string] {
+            switch (chainId) {
+              ....
+              case SupportedChainId.GOERLI:
+                return [INFURA_NETWORK_URLS[chainId]]
+              ....
+              case SupportedChainId.POLYGON:
+                return ['https://polygon-rpc.com/']
+              case SupportedChainId.POLYGON_MUMBAI:
+                return ['https://rpc-mumbai.matic.today']
+              case SupportedChainId.New_Chain_Name:
+                return ['URL']
+              default:
+            }
+
+
+Go to to file [src/constants/chainConfig.ts](src/constants/chainConfig.ts) and add the chain configuration 
+
+        export const CHAIN_CONFIG = {
+          mainnet: {
+            displayName: "Ethereum Mainnet",
+            chainNamespace: CHAIN_NAMESPACES.EIP155,
+            chainId: "0x1",
+            rpcTarget: INFURA_NETWORK_URLS[SupportedChainId.MAINNET],
+            blockExplorer: "https://etherscan.io/",
+            ticker: "ETH",
+            tickerName: "Ethereum",
+          } as CustomChainConfig,
+          
+          chainName: {
+            displayName: "Name",
+            chainNamespace: CHAIN_NAMESPACES.EIP155,
+            chainId: "",
+            rpcTarget: INFURA_NETWORK_URLS[SupportedChainId.New_Chain_Name],
+            blockExplorer: "",
+            ticker: "",
+            tickerName: "",
+          } as CustomChainConfig,
+
+### Step 6: Configure new chain for gasless SBT minting using Biconomy
+
+Go to to file [src/constants/addresses.ts](src/constants/addresses.ts) and add forwarder contract address of the new chain.
+
+Refer: [Biconomy Docs](https://docs-gasless.biconomy.io/misc/contract-addresses)
+
+
+        export const BICONOMY_FORWARDER_ADDRESS: AddressMap = {
+          [SupportedChainId.GOERLI]: '0xE041608922d06a4F26C0d4c27d8bCD01daf1f792',
+          [SupportedChainId.POLYGON]: '0xf0511f123164602042ab2bCF02111fA5D3Fe97CD',
+          [SupportedChainId.New_Chain_Name]: 'contract address',
+        }
+        
+        export const BICONOMY_GAS_TANK_ADDRESSES: AddressMap = {
+          [SupportedChainId.GOERLI]: '0x6781dbfdbd6a2803e1698c6e705659d3b597f643',
+          [SupportedChainId.POLYGON]: '0xeb808ba857a080d35554fe5830dc61df1ba53e0c',
+          [SupportedChainId.New_Chain_Name]: 'contract address',
+        }
+
+### Step 7: Check the Backend repos and make the necessary changes
