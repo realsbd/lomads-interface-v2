@@ -117,3 +117,36 @@ Go to to file [src/constants/infura.ts](src/constants/infura.ts) and make the fo
         [SupportedChainId.New_Chain_Name]: `URL/${INFURA_KEY}`,
   
       }
+
+
+### Step 4: Add USDC Token
+
+Go to to file [src/constants/tokens.ts](src/constants/tokens.ts) and make the following additions
+
+- Add new chain to the USDC list
+  
+      export const USDC: { [chainId in SupportedChainId]: Token } = {
+        [SupportedChainId.MAINNET]: USDC_MAINNET,
+        ....
+        [SupportedChainId.POLYGON]: USDC_POLYGON,
+        ....
+        [SupportedChainId.New_Chain_Name]: USDC_NewChain,
+      }
+
+- Create USDC info for the new chain
+
+      export const USDC_POLYGON = new Token(
+        SupportedChainId.POLYGON,
+        '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+        6,
+        'USDC',
+        'USD//C'
+      )
+      
+      export const USDC_NewChain = new Token(
+        SupportedChainId.New_Chain_Name,
+        'USDC contract address',
+        decimals,
+        'USDC',
+        'USD//C'
+      )
