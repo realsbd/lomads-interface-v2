@@ -305,7 +305,7 @@ export default () => {
                                             }}
                                         />
 									</Box>
-									<p className={classes.text}>Accepted formats:<br />jpg, svg or png</p>
+									<p className={classes.text}>Accepted formats:<br />jpg, png</p>
 								</Box>
 							</Box>
 						</Box>

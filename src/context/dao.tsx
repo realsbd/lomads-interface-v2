@@ -12,6 +12,7 @@ import { loadDAOAction, loadDAOListAction, resetDAOAction, updateDAOAction } fro
 import useMintSBT from 'hooks/useMintSBT.v2';
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { createAccountAction, logoutAction, setTokenAction, setUserAction } from 'store/actions/session';
+import useRole from 'hooks/useRole';
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 export const DAOContext = createContext<any>({
@@ -34,6 +35,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
   const { daoURL } = useParams();
   //@ts-ignore
   const { DAO, DAOList } = useAppSelector(store => store?.dao)
+  const { myRole } = useRole(DAO, account, undefined)
 
   const { balanceOf, isNFTMinted } = useMintSBT(DAO?.sbt?.address, DAO?.sbt?.version, +DAO?.sbt?.chainId)
 
@@ -119,7 +121,8 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
 
   useEffect(() => {
     if (window.location.pathname.indexOf('attach-safe/new') == -1 && DAO && (!DAO.safes || (DAO.safes && DAO.safes.length == 0))) {
-      navigate(`/${DAO?.url}/attach-safe/new`, { state: { createFlow: true } })
+      if(DAO?.members && myRole === 'role1')
+        navigate(`/${DAO?.url}/attach-safe/new`, { state: { createFlow: true } })
     }
   }, [DAO?.safes])
 
