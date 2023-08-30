@@ -12,7 +12,15 @@ export default ({ disabled = false, value, info = true, onUpload }) => {
     const [droppedfiles, setDroppedfiles] = useState([])
     const [uploadLoading, setUploadLoading] = useState(null)
     const onDrop = useCallback(acceptedFiles => setDroppedfiles(acceptedFiles), [])
-    const { getRootProps, getInputProps } = useDropzone({ onDrop, multiple: false })
+    const { getRootProps, getInputProps } = useDropzone({ 
+        accept: {
+            'image/png': ['.png', '.PNG'],
+            'image/jpg': ['.jpg', '.jpeg', '.JPG', '.JPEG'],
+            'image/jpeg': ['.jpg', '.jpeg', '.JPG', '.JPEG']
+        },
+        onDrop, 
+        multiple: false 
+    })
 
     useEffect(() => {
         setUrl(value)
