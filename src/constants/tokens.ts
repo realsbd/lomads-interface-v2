@@ -108,6 +108,13 @@ export const DAI_OPTIMISM = new Token(
   'DAI',
   'Dai stable coin'
 )
+export const USDC_BASE = new Token(
+  SupportedChainId.BASE,
+  '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134',
+  6,
+  'USDC',
+  'USD//C'
+)
 export const USDC: { [chainId in SupportedChainId]: Token } = {
   [SupportedChainId.MAINNET]: USDC_MAINNET,
   [SupportedChainId.ARBITRUM_ONE]: USDC_ARBITRUM,
@@ -120,6 +127,7 @@ export const USDC: { [chainId in SupportedChainId]: Token } = {
   [SupportedChainId.RINKEBY]: USDC_RINKEBY,
   [SupportedChainId.KOVAN]: USDC_KOVAN,
   [SupportedChainId.ROPSTEN]: USDC_ROPSTEN,
+  [SupportedChainId.BASE]: USDC_BASE,
 }
 export const DAI_POLYGON = new Token(
   SupportedChainId.POLYGON,

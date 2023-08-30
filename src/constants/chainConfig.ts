@@ -39,6 +39,15 @@ export const CHAIN_CONFIG = {
     ticker: "MATIC",
     tickerName: "Matic",
   } as CustomChainConfig,
+  base: {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    rpcTarget: 'https://mainnet.base.org',
+    blockExplorer: "https://basescan.org/",
+    chainId: "0x89",
+    displayName: "Base Chain",
+    ticker: "ETH",
+    tickerName: "ETHEREUM",
+  } as CustomChainConfig,
 } as const;
 
 export type CHAIN_CONFIG_TYPE = keyof typeof CHAIN_CONFIG;

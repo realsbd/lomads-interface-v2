@@ -12,7 +12,8 @@ export enum SupportedChainId {
   OPTIMISM = 10,
   OPTIMISTIC_KOVAN = 69,
   POLYGON = 137,
-  POLYGON_MUMBAI = 80001
+  POLYGON_MUMBAI = 80001,
+  BASE = 8453
 }
 
 export const CHAIN_IDS_TO_NAMES = {
@@ -26,7 +27,8 @@ export const CHAIN_IDS_TO_NAMES = {
   [`${SupportedChainId.ARBITRUM_ONE}`]: 'arbitrum',
   [`${SupportedChainId.ARBITRUM_RINKEBY}`]: 'arbitrum_rinkeby',
   [`${SupportedChainId.OPTIMISM}`]: 'optimism',
-  [`${SupportedChainId.OPTIMISTIC_KOVAN}`]: 'optimistic_kovan'
+  [`${SupportedChainId.OPTIMISTIC_KOVAN}`]: 'optimistic_kovan',
+  [`${SupportedChainId.BASE}`]: 'Base'
 }
 
 /**
@@ -40,6 +42,7 @@ export const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
   SupportedChainId.MAINNET,
   SupportedChainId.POLYGON,
   SupportedChainId.GOERLI,
+  SupportedChainId.BASE
 ]
 
 export const SUPPORTED_GAS_ESTIMATE_CHAIN_IDS = [
@@ -89,13 +92,15 @@ export type SupportedL2ChainId = typeof L2_CHAIN_IDS[number]
 export const GNOSIS_SAFE_BASE_URLS:any = {
   [SupportedChainId.MAINNET]: 'https://safe-transaction-mainnet.safe.global',
   [SupportedChainId.GOERLI]: 'https://safe-transaction-goerli.safe.global',
-  [SupportedChainId.POLYGON]: 'https://safe-transaction-polygon.safe.global'
+  [SupportedChainId.POLYGON]: 'https://safe-transaction-polygon.safe.global',
+  [SupportedChainId.BASE]: 'https://safe-transaction-base.safe.global/'
 }
 
 export const GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT :any = {
   [SupportedChainId.GOERLI]: '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134',
   [SupportedChainId.POLYGON]: '0x1Fb403834C911eB98d56E74F5182b0d64C3b3b4D',
-  [SupportedChainId.MAINNET]: '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134'
+  [SupportedChainId.MAINNET]: '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134',
+  [SupportedChainId.BASE]: '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134'
 }
 
 export const CHAIN_GAS_STATION :any = {
@@ -115,6 +120,10 @@ export const SUPPORTED_ASSETS = {
     id: "wmatic",
     symbol: "MATIC",
   },
+  [`${SupportedChainId.BASE}`]: {
+    id: "ethereum",
+    symbol: "ETH"
+  }
 };
 
 

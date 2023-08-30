@@ -21,6 +21,8 @@ export function getRpcUrls(chainId: SupportedChainId): [string] {
         return ['https://polygon-rpc.com/']
       case SupportedChainId.POLYGON_MUMBAI:
         return ['https://rpc-mumbai.matic.today']
+        case SupportedChainId.BASE:
+          return['https://mainnet.base.org']
       default:
     }
     // Our API-keyed URLs will fail security checks when used with external wallets.

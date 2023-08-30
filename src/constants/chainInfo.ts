@@ -2,6 +2,7 @@ import ethereumLogoUrl from 'assets/images/ethereum-logo.png'
 import arbitrumLogoUrl from 'assets/svg/arbitrum_logo.svg'
 import optimismLogoUrl from 'assets/svg/optimistic_ethereum.svg'
 import polygonMaticLogo from 'assets/svg/polygon-matic-logo.svg'
+import baseLogo from 'assets/svg/base-logo.webp'
 
 import { SupportedChainId, SupportedL1ChainId, SupportedL2ChainId } from './chains'
 
@@ -84,5 +85,20 @@ export const CHAIN_INFO: any = {
     chainId: '0x89',
     network: 'cyan',
     chainName: 'polygon'
+  },
+  [SupportedChainId.BASE]: {
+    networkType: NetworkType.L1,
+    blockWaitMsBeforeWarning: `10m`,
+    bridge: 'https://bridge.base.org/',
+    docs: 'https://docs.base.org/',
+    explorer: 'https://basescan.org/',
+    opensea: '',
+    infoLink: 'https://info.uniswap.org/#/base/',
+    label: 'Base',
+    logoUrl: baseLogo,
+    nativeCurrency: { name: 'Ethereum', symbol: 'ETH', decimals: 18 },
+    chainId: '8453',
+    network: 'mainnet',
+    chainName: 'base'
   }
 }
