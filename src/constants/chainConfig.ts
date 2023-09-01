@@ -42,11 +42,11 @@ export const CHAIN_CONFIG = {
   base: {
     chainNamespace: CHAIN_NAMESPACES.EIP155,
     rpcTarget: 'https://mainnet.base.org',
-    blockExplorer: "https://basescan.org/",
-    chainId: "0x89",
-    displayName: "Base Chain",
-    ticker: "ETH",
-    tickerName: "ETHEREUM",
+    blockExplorer: "https://basescan.org",
+    chainId: '0x2105',
+    displayName: "Base Mainnet",
+    ticker: "BASE",
+    tickerName: "Base",
   } as CustomChainConfig,
 } as const;
 

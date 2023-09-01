@@ -92,13 +92,13 @@ export const CHAIN_INFO: any = {
     bridge: 'https://bridge.base.org/',
     docs: 'https://docs.base.org/',
     explorer: 'https://basescan.org/',
-    opensea: '',
+    opensea: 'https://opensea.io/assets/base/',
     infoLink: 'https://info.uniswap.org/#/base/',
     label: 'Base',
     logoUrl: baseLogo,
-    nativeCurrency: { name: 'Ethereum', symbol: 'ETH', decimals: 18 },
-    chainId: '8453',
-    network: 'mainnet',
-    chainName: 'base'
+    nativeCurrency: { name: 'Base Chain', symbol: 'ETH', decimals: 18 },
+    chainId: '0x2105',
+    network: 'cyan',
+    chainName: 'Base'
   }
 }
