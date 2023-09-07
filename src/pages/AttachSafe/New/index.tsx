@@ -27,7 +27,6 @@ import { useWeb3Auth } from "context/web3Auth";
 import { isAddressValid, isRightAddress } from 'utils'
 import SwitchChain from "components/SwitchChain";
 import { useDAO } from "context/dao";
-import { ContractNetworksConfig } from '@safe-global/protocol-kit'
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -439,17 +438,6 @@ export default () => {
 	const [validSafeDetails, setValidSafeDetails] = useState<boolean>(false);
 	const [state, setState] = useState<any>({})
 	const [isLoading, setisLoading] = useState<boolean>(false)
-	const contractNetworks: ContractNetworksConfig = {
-		[8453]: {
-		  safeMasterCopyAddress: '0x69f4D1788e39c87893C980c06EdF4b7f686e2938',
-		  safeProxyFactoryAddress: '0xC22834581EbC8527d974F8a1c97E1bEA4EF910BC',
-		  multiSendAddress: '0x998739BFdAAdde7C933B942a68053933098f9EDa',
-		  multiSendCallOnlyAddress: '0xA1dabEF33b3B82c7814B6D82A79e50F4AC44102B',
-		  fallbackHandlerAddress: '0x017062a1dE2FE6b99BE3d9d37841FeD19F573804',
-		  signMessageLibAddress: '0x98FFBBF51bb33A056B08ddf711f289936AafF717',
-		  createCallAddress: '0xB19D6FFc2182150F8Eb585b79D4ABcd7C5640A9d',
-		}
-	  }
 
 	useEffect(() => {
 		setState((prev: any) => {
@@ -627,11 +615,9 @@ export default () => {
 
 	const deployNewSafe = async () => {
 		if (!chainId) return;
-
 		if (+state?.selectedChainId !== +chainId) {
 			toast.custom(t => <SwitchChain t={t} nextChainId={+state?.selectedChainId} />)
 		} else {
-			
 			try {
 				setisLoading(true);
 				const safeOwner = provider?.getSigner(0);
@@ -639,19 +625,7 @@ export default () => {
 					ethers,
 					signerOrProvider: safeOwner as any,
 				});
-
-			
-				const props = {
-						ethAdapter:ethAdapter,
-						contractNetworks:contractNetworks
-						}
-			
-
-		
-				const safeFactory = await SafeFactory.create({...props });
-				//const safeFactory = await SafeFactory.create({ ethAdapter });
-
-
+				const safeFactory = await SafeFactory.create({ ethAdapter });
 				const owners: any = state?.members?.map((result: any) => result.address);
 				const threshold: number = state?.threshold;
 				const safeAccountConfig: SafeAccountConfig = { owners, threshold };
@@ -935,4 +909,3 @@ export default () => {
 		</Container>
 	);
 };
-
