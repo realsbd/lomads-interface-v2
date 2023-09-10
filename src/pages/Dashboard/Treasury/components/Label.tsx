@@ -13,6 +13,7 @@ export default ({ transaction, recipient, defaultLabel }: any) => {
     const [labelPlaceholder, setLabelPlaceholder] = useState(null)
     
     const label = useMemo(() => {
+        console.log("transaction transaction, rec", transaction, recipient)
         if(transaction && recipient) {
             const metadata = _get(transaction, `metadata.${recipient === '0x' ? transaction?.safeAddress : recipient}`, null)
             if(metadata){
@@ -37,7 +38,11 @@ export default ({ transaction, recipient, defaultLabel }: any) => {
                 //@ts-ignore
                 document?.activeElement?.blur()
         }, 0);
-       dispatch(updateTxLabelAction({ recipient, safeAddress: transaction?.safeAddress, label: labelPlaceholder, safeTxHash: transaction?.rawTx?.safeTxHash }))
+       let txHash = transaction?.rawTx?.safeTxHash
+       if(!txHash || txHash && txHash === "0x") {
+        txHash = transaction?.rawTx?.transactionHash || transaction?.rawTx?.txHash
+       }
+       dispatch(updateTxLabelAction({ recipient: recipient === "0x" ? transaction?.safeAddress : recipient, safeAddress: transaction?.safeAddress, label: labelPlaceholder, safeTxHash: txHash }))
     }
 
     return (

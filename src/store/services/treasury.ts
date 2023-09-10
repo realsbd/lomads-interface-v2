@@ -72,6 +72,7 @@ export const loadTreasuryService = (payload: any) => {
     //     return ptx.concat(pTxn)
     // })
     .then(ptx => _orderBy(ptx, [p => p?.rawTx?.isExecuted, p => p?.rawTx?.offChain, p => p?.rawTx?.executionDate, p => p?.rawTx?.nonce], ['asc', 'asc', 'desc','asc']))
+    .then(ptx =>  ptx.filter(p => p.rawTx.type !== 'ETHER_TRANSFER'))
     .then(ptx => { console.log("FINAL", ptx); return { data: ptx } })
 }
 

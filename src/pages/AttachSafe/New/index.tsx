@@ -495,14 +495,19 @@ export default () => {
 			}
 			if (isRightAddress(member.address)) {
 				const newMembers = [...state?.members, member];
-				setState((prev: any) => { return { ...prev, members: newMembers } })
-				setMemberPlaceholder({ name: '', address: '' })
+				if (_find(state?.members, (m: any) => m.address === member.address)) {
+					setErrors({ ownerAddress: " * address already exists." });
+				} else {
+					setState((prev: any) => { return { ...prev, members: newMembers } })
+					setMemberPlaceholder({ name: '', address: '' })
+				}
 			}
 			resolve(true);
 		})
 	};
 
 	const handleAddNewMember = ({ address, name }: any) => {
+		setErrors({})
 		let terrors: any = {};
 		if (!isAddressValid(address)) {
 			terrors.ownerAddress = " * address is not correct.";
@@ -777,7 +782,7 @@ export default () => {
 									sx={{ height: 50, width: 144 }}
 									placeholder="Name"
 									value={memberPlaceholder.name}
-									onChange={(e: any) => setMemberPlaceholder((prev: any) => { return { ...prev, name: e.target.value } })}
+									onChange={(e: any) => { setErrors({}); setMemberPlaceholder((prev: any) => { return { ...prev, name: e.target.value } }) }}
 								/>
 							</Box>
 							<Box sx={{ marginRight: '10px' }}>
@@ -785,7 +790,7 @@ export default () => {
 									sx={{ height: 50, width: 251 }}
 									placeholder="ENS Domain and Wallet Address"
 									value={memberPlaceholder.address}
-									onChange={(e: any) => setMemberPlaceholder((prev: any) => { return { ...prev, address: e.target.value } })}
+									onChange={(e: any) => { setErrors({}); setMemberPlaceholder((prev: any) => { return { ...prev, address: e.target.value } }) }}
 									error={!!errors.ownerAddress}
 									helperText={errors.ownerAddress}
 								/>

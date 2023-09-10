@@ -374,7 +374,7 @@ export default () => {
     }
 
     const transformTx = (transaction: any, labels: any, safeAddress: string) => {
-        if (transaction.txType === "ETHEREUM_TRANSACTION") {
+        if (transaction.txType === "ETHEREUM_TRANSACTION" ) {
             const data = transformEthTxn(transaction, safeAddress)
             return data
         } else {

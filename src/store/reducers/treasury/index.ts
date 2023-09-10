@@ -99,7 +99,10 @@ const TreasuryReducer = (state: any = getInitialState(), action: any) =>
         }
         case actionTypes.SET_TX_LABEL: {
           draft.treasury = state.treasury.map((txn:any) => {
-            if(txn.safeAddress === payload.safeAddress && txn.rawTx.safeTxHash === payload.rawTx.safeTxHash){
+            // if(txn.safeAddress === payload.safeAddress && txn.rawTx.safeTxHash === payload.rawTx.safeTxHash){
+            //   return { ...txn, metadata: action?.payload?.metadata }
+            // }
+            if(txn._id === payload._id){
               return { ...txn, metadata: action?.payload?.metadata }
             }
             return txn

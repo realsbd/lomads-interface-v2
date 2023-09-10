@@ -102,6 +102,9 @@ export default ({ transaction, executableNonce }: any) => {
         <>
             {
                 txn.map((tx: any, _i: number) => {
+                    if(tx.safeTxHash === '0x27a1c3f94c4806d81daa3bc2efdb722cf573d88371b9399dfd502d51c4a8f015') {
+                        console.log("tx.to === '0x'", _i, txn, transaction)
+                    }
                     let amount = null
                     if(tx.allowanceTxn) {
                         const metadata = _get(transaction, `metadata.${tx.to === '0x' ? transaction?.safeAddress : tx.to}`, null)
@@ -112,7 +115,7 @@ export default ({ transaction, executableNonce }: any) => {
                         }
                     }
                     return (
-                        <TableRow>
+                        <TableRow key={tx.safeTxHash}>
                             <CreditDebit credit={tx?.isCredit} fiatConversion={tx?.executionDate ? _get(transaction, `metadata.${tx?.to}.fiatConversion`, undefined) : _get(tx, 'fiatConversion', undefined)} executed={tx?.executionDate} amount={amount ? amount : tx?.formattedValue} token={tx?.symbol} />
                             <Label transaction={transaction} recipient={tx?.to} />
                             <Recipient safeAddress={transaction?.safeAddress} credit={tx?.isCredit} recipient={tx?.to} token={tx?.symbol} />

@@ -184,6 +184,7 @@ const SafeModal = ({ open, onClose }: any) => {
     }
 
     const renderEditMode = () => {
+        if(!active) return null
         return (
             <Box style={{ paddingTop: 60, paddingBottom: 80 }}>
                 <TextInput
@@ -305,17 +306,16 @@ const SafeModal = ({ open, onClose }: any) => {
                                                         <IconButton onClick={(e:any) => {
                                                                 e.stopPropagation()
                                                                 setActive((prev: any) => {
-                                                                    if (prev && prev._id === safe._id) {
-                                                                        return null
-                                                                    }
+                                                                    // if (prev && prev._id === safe._id) {
+                                                                    //     return null
+                                                                    // }
                                                                     return safe
                                                                 })
                                                                 setSafeName(safe?.name)
                                                                 setDAOMemberList(DAO?.members?.map((member: any) => member?.member).map((member: any) => { return { ...member, owner: safe?.owners?.map((o: any) => toChecksumAddress(o.wallet)).indexOf(toChecksumAddress(member?.wallet)) > -1 } }))
                                                                 setTimeout(() => {
                                                                     setEditMode((prev: any) => !prev)
-                                                                }, 250)
-    
+                                                                }, 100)
                                                             }}>
                                                                 <img src={EditSVG} />
                                                         </IconButton>
