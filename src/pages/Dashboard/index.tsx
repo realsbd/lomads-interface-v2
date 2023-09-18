@@ -6,7 +6,7 @@ import axios from 'axios'
 import { makeStyles } from '@mui/styles';
 import axiosHttp from 'api'
 import { useNavigate, useParams } from "react-router-dom"
-import { Grid } from "@mui/material";
+import { Grid, useMediaQuery,Typography } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close'
 import WalkThroughPopover from 'components/WalkThroughPopover'
 import WalkThroughModal from "components/WalkThroughModal";
@@ -20,6 +20,8 @@ import Treasury from "./Treasury";
 import Steps from 'constants/walkthroughsteps';
 import questionMarkDark from "assets/svg/question-mark-dark.svg";
 import questionMarkLight from "assets/svg/question-mark-light.svg";
+import LOMADLOGO from "../../assets/svg/lomadsLogoRed.svg";
+import MOBILEDEVICE from "../../assets/svg/mobile_device.svg";
 import { useWeb3Auth } from "context/web3Auth";
 import useRole from "hooks/useRole";
 import Button from "components/Button";
@@ -97,7 +99,21 @@ const useStyles = makeStyles((theme: any) => {
             zIndex: theme.zIndex.appBar + 1,
             background: '#1B2B41',
             opacity: 0.2
-        }
+        },    
+        subtitle1: {
+            fontSize: '25px !important',
+            fontWeight: '400 !important',
+            lineHeight: '30px !important',
+            textAlign: 'center',
+            color: '#B12F15',
+            margin: '30px 0 !important'
+        },
+        subtitle2: {
+            fontSize: '38px !important',
+            lineHeight: '42px !important',
+            textTransform: 'uppercase',
+            color: '#1B2B41',
+        },
     }
 });
 
@@ -117,6 +133,8 @@ export default () => {
     const { account } = useWeb3Auth();
     const { myRole, can } = useRole(DAO, account, undefined)
     const { transformTx } = useGnosisTxnTransform()
+
+    const matches = useMediaQuery('(min-width:992px)');
     // @ts-ignore
     const { setProjectLoading, Project } = useAppSelector(store => store.project);
 
@@ -305,7 +323,7 @@ export default () => {
         }
         alert("COMPLETED")
     }
-
+if (matches) {
     return (
         <Grid container>
             <Grid item sm={12}>
@@ -441,4 +459,24 @@ export default () => {
             />
         </Grid>
     )
+}
+else{
+    return (
+        <Grid container className={classes.root}>
+            <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
+                <Box position="absolute" top={0} left={0} sx={{ padding: '30px' }}>
+                    <img src={LOMADLOGO} />
+                </Box>
+                <Box>
+                    <img src={MOBILEDEVICE} />
+                </Box>
+                <Box sx={{ padding: '0 30px' }}>
+                    <Typography className={classes.subtitle1}>Lomads app needs a PC<br />for now.</Typography>
+                    <Typography className={classes.subtitle2} sx={{ fontWeight: '800' }}>CATCH YOU ON<br />THE <span style={{ fontWeight: '300', fontStyle: 'italic', color: '#C94B32' }}>BIG SCREEN</span></Typography>
+                </Box>
+            </Grid>
+        </Grid>
+    )
+}
+
 }
