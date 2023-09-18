@@ -52,6 +52,11 @@ const useStyles = makeStyles((theme: any) => {
         root: {
             display: 'flex',
             background: `linear-gradient(169.22deg,#fdf7f7 12.19%,#efefef 92%)`,
+            minHeight: '100vh',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden !important'
         },
         helpOption: {
             bottom: "44px",
