@@ -1,11 +1,13 @@
 import React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { throttle as _throttle, debounce as _debounce, get as _get, find as _find } from 'lodash'
-import { Container, Grid, Typography, Box, Paper, Menu, Link } from "@mui/material"
+import { Container, Grid, Typography, Box, Paper, Menu, Link, useMediaQuery } from "@mui/material"
 import MenuItem from '@mui/material/MenuItem';
 import { makeStyles } from '@mui/styles';
 import CHEERS from 'assets/svg/cheers.svg'
 //import LOMADS_LOGO from 'assets/svg/lomadsfulllogo.svg'
+import LOMADLOGO from "../../assets/svg/lomadsLogoRed.svg";
+import MOBILEDEVICE from "../../assets/svg/mobile_device.svg";
 import LOMADS_LOGO from 'assets/svg/Group 773.svg'
 import LOMADS_LOGO_TEXT from 'assets/svg/Group 772.svg'
 import METAMASK from 'assets/svg/metamask.svg'
@@ -67,7 +69,21 @@ const useStyles = makeStyles((theme: any) => ({
         fontSize: '16px !important',
         minWidth: 'inherit !importnt',
         padding: '0px !important'
-    }
+    },    
+    subtitle1: {
+        fontSize: '25px !important',
+        fontWeight: '400 !important',
+        lineHeight: '30px !important',
+        textAlign: 'center',
+        color: '#B12F15',
+        margin: '30px 0 !important'
+    },
+    subtitle2: {
+        fontSize: '38px !important',
+        lineHeight: '42px !important',
+        textTransform: 'uppercase',
+        color: '#1B2B41',
+    },
 }));
 
 export default () => {
@@ -86,6 +102,7 @@ export default () => {
     const handleClose = () => setAnchorEl(null);
 
     const { provider, login, account, chainId, logout, web3Auth } = useWeb3Auth();
+    const matches = useMediaQuery('(min-width:992px)');
 
     console.log("provider", provider)
 
@@ -187,7 +204,7 @@ export default () => {
         }
         //}, 1000)
     }
-
+    if (matches) {
     return (
         <>
             <Grid container className={classes.root}>
@@ -272,5 +289,24 @@ export default () => {
                 </Grid>
             </Grid>
         </>
+    );
+}
+else {
+    return (
+        <Grid container className={classes.root}>
+            <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
+                <Box position="absolute" top={0} left={0} sx={{ padding: '30px' }}>
+                    <img src={LOMADLOGO} />
+                </Box>
+                <Box>
+                    <img src={MOBILEDEVICE} />
+                </Box>
+                <Box sx={{ padding: '0 30px' }}>
+                    <Typography className={classes.subtitle1}>Lomads app needs a PC<br />for now.</Typography>
+                    <Typography className={classes.subtitle2} sx={{ fontWeight: '800' }}>CATCH YOU ON<br />THE <span style={{ fontWeight: '300', fontStyle: 'italic', color: '#C94B32' }}>BIG SCREEN</span></Typography>
+                </Box>
+            </Grid>
+        </Grid>
     )
 }
+};
