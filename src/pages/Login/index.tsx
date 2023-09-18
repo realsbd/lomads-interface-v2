@@ -30,13 +30,12 @@ import screenshot from 'assets/svg/screenshot 1.svg'
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
-        height: "100vh",
-        maxHeight: 'fit-content',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden !important'
+        minHeight: '100vh',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+		overflow: 'hidden !important'
     },
     logo: {
         width: 138,
