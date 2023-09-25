@@ -55,7 +55,7 @@ export const CHAIN_CONFIG = {
     blockExplorer: "https://basescan.org",
     chainId: '0x2105',
     displayName: "Base Mainnet",
-    ticker: "BASE",
+    ticker: "ETH",
     tickerName: "Base",
   } as CustomChainConfig,
   gnosis: {

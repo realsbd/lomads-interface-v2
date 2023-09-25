@@ -80,7 +80,7 @@ export const SUPPORTED_ASSETS = {
   },
   [`${SupportedChainId.BASE}`]: {
     id: "base",
-    symbol: "BASE",
+    symbol: "ETH",
   },
   [`${SupportedChainId.GNOSIS}`]: {
     id: "xDAI",
