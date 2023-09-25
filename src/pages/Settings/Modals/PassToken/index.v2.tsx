@@ -599,7 +599,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
                         </Box>
                     }
                 </Box>
-                { +contract?.version >= 2 &&
+                { +contract?.version >= 2 && contract?.chainId !=42220 && contract?.chainId != 8453 &&
                 <Box my={4} mx={1}>
                     <Typography
                         style={{
