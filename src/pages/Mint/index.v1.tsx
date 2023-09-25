@@ -42,7 +42,7 @@ import { beautifyHexToken } from "utils"
 import { Container } from "@mui/system"
 import useEncryptDecrypt from "hooks/useEncryptDecrypt";
 import useRole from "hooks/useRole"
-import { USDC_GOERLI, USDC_POLYGON } from 'constants/tokens'
+import { USDC } from 'constants/tokens'
 import { useTokenContract } from 'hooks/useContract'
 import mime from 'mime'
 import moment from 'moment'
@@ -112,6 +112,12 @@ export default () => {
     const { encryptMessage, decryptMessage } = useEncryptDecrypt()
     // const { initTransak } = useTransak();
     const tokenContract = useTokenContract(contract?.mintPriceToken || undefined)
+
+
+    const isUSDC = (address: string) => {
+        let usdcs = Object.values(USDC).map((t:any) => t.address.toLowerCase())
+        return usdcs.indexOf(address?.toLowerCase()) > -1
+    }
 
     useEffect(() => {
         if(DAO && DAO?.sbt)
@@ -223,6 +229,8 @@ export default () => {
         }
     }, [user])
 
+    
+
     // useEffect(() => {
     //     setContractLoading(true)
     //     axiosHttp.get(`contract/${contractId}`)
@@ -232,7 +240,7 @@ export default () => {
 
     const isNativeToken = useMemo(() => {
         const tokenId = contract?.mintPriceToken;
-        if(tokenId === USDC_GOERLI.address || tokenId === USDC_POLYGON.address)
+        if(isUSDC(tokenId))
             return false;
         return true;
     }, [contract])
@@ -434,7 +442,7 @@ export default () => {
         const treasury = stats[5];
 
         if(!payment) {
-            let token = contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : 'MATIC'
+            let token = isUSDC(contract?.mintPriceToken) ? 'USDC' : 'MATIC'
             let amount: any = +_get(price, 'mintPrice', 0)
             if(token === 'MATIC'){
                 amount = (parseFloat(_get(price, 'mintPrice', 0)) + (parseFloat(_get(price, 'gas', 0))) * 2).toFixed(5)
@@ -631,7 +639,7 @@ export default () => {
                                         <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dotted rgba(27, 43, 65, 0.2)' }}></Box>
                                         <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                             <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>${ parseFloat(_get(price, 'mintPriceinUsd', 0)).toFixed(2) } /</Typography>
-                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'mintPrice', 0)).toFixed(5) } { contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[chainId]?.nativeCurrency?.symbol }</Typography>
+                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'mintPrice', 0)).toFixed(5) } { isUSDC(contract?.mintPriceToken) ? 'USDC' : CHAIN_INFO[chainId]?.nativeCurrency?.symbol }</Typography>
                                         </Box>
                                     </Box>
                                     { isNativeToken ?
@@ -681,7 +689,7 @@ export default () => {
                                             </Box>
                                             <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                                 <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>${ (parseFloat(_get(price, 'mintPriceinUsd', 0)) + parseFloat(_get(price, 'estimateinUsd', 0))).toFixed(2) } /</Typography>
-                                                <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ (parseFloat(_get(price, 'mintPrice', 0)) + parseFloat(_get(price, 'gas', 0))).toFixed(5) } {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[chainId]?.nativeCurrency?.symbol}</Typography>
+                                                <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ (parseFloat(_get(price, 'mintPrice', 0)) + parseFloat(_get(price, 'gas', 0))).toFixed(5) } { isUSDC(contract?.mintPriceToken) ? 'USDC' : CHAIN_INFO[chainId]?.nativeCurrency?.symbol}</Typography>
                                             </Box>
                                         </Box>
                                     }

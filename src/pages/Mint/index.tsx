@@ -52,7 +52,7 @@ import { beautifyHexToken } from "utils"
 import { Container } from "@mui/system"
 // import useEncryptDecrypt from "hooks/useEncryptDecrypt";
 import useRole from "hooks/useRole"
-import { USDC, USDC_GOERLI, USDC_POLYGON } from 'constants/tokens'
+import { USDC } from 'constants/tokens'
 // import { useTokenContract } from 'hooks/useContract'
 import mime from 'mime'
 import moment from 'moment'
@@ -173,6 +173,11 @@ export default () => {
     const tokenContract = useTokenContract(contract?.mintPriceToken || undefined)
 
     const [showStripePayment, setShowStripePayment] = useState<any>(null)
+
+    const isUSDC = (address: string) => {
+        let usdcs = Object.values(USDC).map((t:any) => t.address.toLowerCase())
+        return usdcs.indexOf(address?.toLowerCase()) > -1
+    }
 
     // const [orgData, setOrgData] = useState<any>(null);
 
@@ -364,7 +369,7 @@ export default () => {
 
     const isNativeToken = useMemo(() => {
         const tokenId = contract?.mintPriceToken.toLowerCase();
-        if (tokenId === USDC_GOERLI.address.toLowerCase() || tokenId === USDC_POLYGON.address.toLowerCase())
+        if (isUSDC(tokenId))
             return false;
         return true;
     }, [contract, account, token])
@@ -630,7 +635,7 @@ export default () => {
         }
 
         if(!payment) {
-            let token = contract?.mintPriceToken.toLowerCase() === USDC_POLYGON.address.toLowerCase() || contract?.mintPriceToken.toLowerCase() === USDC_GOERLI.address.toLowerCase() ? 'USDC' : 'MATIC'
+            let token = isUSDC(contract?.mintPriceToken.toLowerCase()) ? 'USDC' : 'MATIC'
             let amount: any = +_get(price, 'mintPrice', 0)
             if (token === 'MATIC') {
                 const tokenTransferGas = await payByCryptoEstimate(tokenContract, price?.mintPrice, contract?.mintPriceToken)
@@ -965,8 +970,8 @@ export default () => {
                                             <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                                 <Typography style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>${ canMintFree ?  "0.00" : parseFloat(_get(price, 'originalPriceinUsd', 0)).toFixed(2)} /</Typography>
                                                 { canMintFree ? 
-                                                    <Typography ml={2} style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{"0.00"} {contract?.mintPriceToken.toLowerCase() === USDC_GOERLI.address.toLowerCase() || contract?.mintPriceToken .toLowerCase()=== USDC_POLYGON.address.toLowerCase() ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography> :
-                                                    <Typography ml={2} style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{parseFloat(_get(contract, 'mintPrice', 0)).toFixed(2)} {contract?.mintPriceToken.toLowerCase() === USDC_GOERLI.address.toLowerCase() || contract?.mintPriceToken.toLowerCase() === USDC_POLYGON.address.toLowerCase() ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography>
+                                                    <Typography ml={2} style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{"0.00"} {isUSDC(contract?.mintPriceToken.toLowerCase()) ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography> :
+                                                    <Typography ml={2} style={{ textDecoration: discountMessage ? 'line-through' : 'none', fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{parseFloat(_get(contract, 'mintPrice', 0)).toFixed(2)} { isUSDC(contract?.mintPriceToken.toLowerCase()) ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography>
                                                 }
                                             </Box>
                                         </Box>
@@ -979,8 +984,8 @@ export default () => {
                                             <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                                 <Typography style={{ fontSize: 14, fontWeight: 700, color: "rgba(234, 100, 71, 0.7)" }}>${ canMintFree ?  "0.00" : parseFloat(_get(price, 'mintPriceinUsd', 0)).toFixed(2)} /</Typography>
                                                 { canMintFree ? 
-                                                    <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{"0.00"} {contract?.mintPriceToken.toLowerCase() === USDC_GOERLI.address.toLowerCase() || contract?.mintPriceToken.toLowerCase() === USDC_POLYGON.address.toLowerCase() ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography> :
-                                                    <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{parseFloat(_get(price, 'mintPrice', 0)).toFixed(2)} {contract?.mintPriceToken.toLowerCase() === USDC_GOERLI.address.toLowerCase() || contract?.mintPriceToken.toLowerCase() === USDC_POLYGON.address.toLowerCase() ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography>
+                                                    <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{"0.00"} { isUSDC(contract?.mintPriceToken.toLowerCase()) ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography> :
+                                                    <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, color: '#EA6447' }}>{parseFloat(_get(price, 'mintPrice', 0)).toFixed(2)} { isUSDC(contract?.mintPriceToken.toLowerCase()) ? 'USDC' : CHAIN_INFO[contract?.chainId]?.nativeCurrency?.symbol} { contract?.gasless ? '' : '+ Gas'}</Typography>
                                                 }
                                             </Box>
                                         </Box>
@@ -1142,7 +1147,7 @@ export default () => {
                                                 {   mintLoading ? 
                                                      <Box sx={{width: isMobile ? '300px' : '400px', margin: '25px 0' }} flexDirection={"column"} display={"flex"} alignItems="center" justifyContent={"center"}>
                                                         <LeapFrog size={50} color="#C94B32" />
-                                                        { paymentSuccess && <Typography style={{  lineHeight: '24px', fontFamily: `'Inter', sans-serif`, textAlign: 'center', fontSize: 16, opacity: 0.7 }}>{ `Hold on while we make your ${ contract?.token } Official! 
+                                                        { <Typography style={{  lineHeight: '24px', fontFamily: `'Inter', sans-serif`, textAlign: 'center', fontSize: 16, opacity: 0.7 }}>{ `Hold on while we make your ${ contract?.token } Official! 
                                                         This may take a few minutes. Please don’t close this page or refresh your browser` }</Typography> }
                                                     </Box>
                                                     :

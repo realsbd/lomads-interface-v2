@@ -88,7 +88,7 @@ export default [
 	{
 		path: '/:daoURL/attach-safe/new',
 		exact: true,
-		layout: DefaultLayout,
+		layout: DashboardNoHeaderLayout,
 		private: true,
 		component: AttachNewSafePage
 	},
@@ -109,7 +109,7 @@ export default [
 	{
 		path: '/:daoURL/attach-safe/existing',
 		exact: true,
-		layout: DefaultLayout,
+		layout: DashboardNoHeaderLayout,
 		private: true,
 		component: AttachExistingSafePage
 	},

@@ -103,7 +103,6 @@ const useStyles = makeStyles((theme: any) => ({
 const PassTokenModalV2 =  ({ open, onClose }: any) => {
     const classes = useStyles();
     const { chainId } = useWeb3Auth()
-    //@ts-ignore
     const dispatch = useAppDispatch()
     const { DAO, loadDAO } = useDAO()
     //@ts-ignore
@@ -291,7 +290,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
         try {
             console.log(+refillPrice?.value)
             if(+refillPrice?.value < 5){
-                setFillGasError("Minimum Deposit Amount: 5 MATIC")
+                setFillGasError(`Minimum Deposit Amount: 5 ${CHAIN_INFO[contract?.chainId].nativeCurrency.symbol}`)
                 setTimeout(() => setFillGasError(null), 3000)
                 return;
             }
@@ -626,7 +625,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
                             marginBottom: '10px'
                         }}
                         >Gas Balance:</Typography>
-                        <Typography>{ parseFloat(gasDeposit).toFixed(4) } MATIC</Typography>
+                        <Typography>{ parseFloat(gasDeposit).toFixed(4) } {CHAIN_INFO[contract?.chainId].nativeCurrency.symbol}</Typography>
                     </Box>
                     }
                     { state?.gasless && state?.gasConfig &&
@@ -645,13 +644,13 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
                             onChange={(value: any) => {
                                 setRefillPrice((prev: any) => { return { ...prev.price, value: value  } })
                             }}
-                            options={tokens}
+                            options={tokens.filter((t:any) => t.value === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS)}
                             dropDownvalue={_get(refillPrice, 'token')}
                             onDropDownChange={(value: string) => {
                                 setRefillPrice((prev: any) => { return { ...prev.price, token: value  } })
                             }}
                         />
-                        <Typography sx={{ mt: 2, mb: 1, opacity: 0.6 }}>Minimum Deposit Amount: 5 MATIC</Typography>
+                        <Typography sx={{ mt: 2, mb: 1, opacity: 0.6 }}>Minimum Deposit Amount: 5 {CHAIN_INFO[contract?.chainId].nativeCurrency.symbol}</Typography>
                         <Button sx={{ mt: 1 }} onClick={() => handleFillGas()} disabled={fillGasLoading} loading={fillGasLoading} variant="outlined" size="small">Fill gas</Button>
                         {fillGasError && <Typography style={{
                             marginTop: 8,
