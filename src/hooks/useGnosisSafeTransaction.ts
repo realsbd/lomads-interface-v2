@@ -116,6 +116,7 @@ export default () => {
                 throw `Low token balance. Available balance in safe ${beautifyHexToken(safeAddress)} is ${balance} ${safeToken?.token?.symbol}`
             let safeTransactionData: any = null;
             const safeSDK = await ImportSafe(provider, safeAddress);
+        
             if (tokenAddress === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {
                 if(send.length === 1)
                     safeTransactionData = await createNativeSingleTxn(send, safeToken)

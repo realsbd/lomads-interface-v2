@@ -70,7 +70,7 @@ const useStyles = makeStyles((theme: any) => ({
         padding: '0px !important'
     },    
     subtitle1: {
-        fontSize: '25px !important',
+        fontSize: '24px !important',
         fontWeight: '400 !important',
         lineHeight: '30px !important',
         textAlign: 'center',
@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme: any) => ({
         lineHeight: '42px !important',
         textTransform: 'uppercase',
         color: '#1B2B41',
-	textAlign: 'center',
+        textAlign: 'center',
     },
 }));
 
@@ -303,7 +303,7 @@ else {
                 </Box>
                 <Box sx={{ padding: '0 30px' }}>
                     <Typography className={classes.subtitle1}>Lomads app needs a PC<br />for now.</Typography>
-                    <Typography className={classes.subtitle2} sx={{ fontWeight: '800' }}>CATCH YOU<br /> ON THE <span style={{ fontWeight: '300', fontStyle: 'italic', color: '#C94B32' }}><br />BIG SCREEN</span></Typography>
+                    <Typography className={classes.subtitle2} sx={{ fontWeight: '800' }}>CATCH YOU ON <br />THE <span style={{ fontWeight: '300', fontStyle: 'italic', color: '#C94B32' }}>BIG SCREEN</span></Typography>
                 </Box>
             </Grid>
         </Grid>
