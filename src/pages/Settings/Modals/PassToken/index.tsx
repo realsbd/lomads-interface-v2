@@ -264,9 +264,9 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                     <img style={{ width: 20, borderRadius: 10, marginLeft: 8, height: 20 }} src={_get(CHAIN_INFO, chainId).logoUrl} />
                                 </Box> }
                             </Box>
-                            { chainId &&
+                            {/*  chainId &&
                                 <Typography style={{ fontSize: 12 }}>Deployed on { _get(CHAIN_INFO, chainId).label }</Typography>
-                            }
+ */                            }
                             {/* <Box display="flex" flexDirection="row" alignItems="center">
                                { contract?.tokenSupply && <Typography className={classes.tokenSupply}>{ `X ${ contract?.tokenSupply }` }</Typography> }
                             </Box> */}

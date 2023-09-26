@@ -2,6 +2,7 @@ import { CHAIN_NAMESPACES, CustomChainConfig } from "@web3auth/base";
 import { SupportedChainId } from "./chains";
 import { INFURA_NETWORK_URLS } from 'constants/infura';
 
+
 export const CHAIN_CONFIG = {
   mainnet: {
     displayName: "Ethereum Mainnet",
@@ -38,6 +39,33 @@ export const CHAIN_CONFIG = {
     displayName: "Polygon Mainnet",
     ticker: "MATIC",
     tickerName: "Matic",
+  } as CustomChainConfig,
+  celo: {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    rpcTarget: 'https://forno.celo.org',
+    blockExplorer: "https://celoscan.io/",
+    chainId: '0xA4EC',
+    displayName: "Celo Mainnet",
+    ticker: "CELO",
+    tickerName: "Celo",
+  } as CustomChainConfig,
+  base: {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    rpcTarget: 'https://mainnet.base.org',
+    blockExplorer: "https://basescan.org",
+    chainId: '0x2105',
+    displayName: "Base Mainnet",
+    ticker: "ETH",
+    tickerName: "Base",
+  } as CustomChainConfig,
+  gnosis: {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    rpcTarget: 'https://rpc.gnosischain.com',
+    blockExplorer: "https://gnosisscan.io",
+    chainId: '0x64',
+    displayName: "Gnosis",
+    ticker: "xDAI",
+    tickerName: "xDAI",
   } as CustomChainConfig,
 } as const;
 

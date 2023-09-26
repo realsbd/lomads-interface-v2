@@ -9,20 +9,6 @@ export const USDC_MAINNET = new Token(
   'USDC',
   'USD//C'
 )
-export const USDC_ROPSTEN = new Token(
-  SupportedChainId.ROPSTEN,
-  '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
-  6,
-  'USDC',
-  'USD//C'
-)
-export const USDC_RINKEBY = new Token(
-  SupportedChainId.RINKEBY,
-  '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
-  6,
-  'tUSDC',
-  'test USD//C'
-)
 export const USDC_GOERLI = new Token(
   SupportedChainId.GOERLI,
   '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
@@ -30,41 +16,7 @@ export const USDC_GOERLI = new Token(
   'USDC',
   'USD//C'
 )
-export const USDC_KOVAN = new Token(
-  SupportedChainId.KOVAN,
-  '0x31eeb2d0f9b6fd8642914ab10f4dd473677d80df',
-  6,
-  'USDC',
-  'USD//C'
-)
-export const USDC_OPTIMISM = new Token(
-  SupportedChainId.OPTIMISM,
-  '0x7F5c764cBc14f9669B88837ca1490cCa17c31607',
-  6,
-  'USDC',
-  'USD//C'
-)
-export const USDC_OPTIMISTIC_KOVAN = new Token(
-  SupportedChainId.OPTIMISTIC_KOVAN,
-  '0x3b8e53b3ab8e01fb57d0c9e893bc4d655aa67d84',
-  6,
-  'USDC',
-  'USD//C'
-)
-export const USDC_ARBITRUM = new Token(
-  SupportedChainId.ARBITRUM_ONE,
-  '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
-  6,
-  'USDC',
-  'USD//C'
-)
-export const USDC_ARBITRUM_RINKEBY = new Token(
-  SupportedChainId.ARBITRUM_RINKEBY,
-  '0x09b98f8b2395d076514037ff7d39a091a536206c',
-  6,
-  'USDC',
-  'USD//C'
-)
+
 export const USDC_POLYGON = new Token(
   SupportedChainId.POLYGON,
   '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
@@ -72,9 +24,50 @@ export const USDC_POLYGON = new Token(
   'USDC',
   'USD//C'
 )
-export const USDC_POLYGON_MUMBAI = new Token(
-  SupportedChainId.POLYGON_MUMBAI,
-  '0xe11a86849d99f524cac3e7a0ec1241828e332c62',
+
+export const USDC_CELO = new Token(
+  SupportedChainId.CELO,
+  '0xcc82628f6a8defa1e2b0ad7ed448bef3647f7941',
+  6,
+  'USDC',
+  'USD//C'
+)
+
+export const USDC_BASE = new Token(
+  SupportedChainId.BASE,
+  '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+  6,
+  'USDC',
+  'USD//C'
+)
+
+export const USDC_OPT = new Token(
+  SupportedChainId.BASE,
+  '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
+  6,
+  'USDC',
+  'USD//C'
+)
+
+export const USDC_ARB = new Token(
+  SupportedChainId.BASE,
+  '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+  6,
+  'USDC',
+  'USD//C'
+)
+
+export const USDC_AVAX = new Token(
+  SupportedChainId.BASE,
+  '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E',
+  6,
+  'USDC',
+  'USD//C'
+)
+
+export const USDC_GNOSIS = new Token(
+  SupportedChainId.BASE,
+  '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83',
   6,
   'USDC',
   'USD//C'
@@ -94,32 +87,14 @@ export const DAI = new Token(
   'DAI',
   'Dai Stablecoin'
 )
-export const DAI_ARBITRUM_ONE = new Token(
-  SupportedChainId.ARBITRUM_ONE,
-  '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1',
-  18,
-  'DAI',
-  'Dai stable coin'
-)
-export const DAI_OPTIMISM = new Token(
-  SupportedChainId.OPTIMISM,
-  '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1',
-  18,
-  'DAI',
-  'Dai stable coin'
-)
+
 export const USDC: { [chainId in SupportedChainId]: Token } = {
   [SupportedChainId.MAINNET]: USDC_MAINNET,
-  [SupportedChainId.ARBITRUM_ONE]: USDC_ARBITRUM,
-  [SupportedChainId.OPTIMISM]: USDC_OPTIMISM,
-  [SupportedChainId.ARBITRUM_RINKEBY]: USDC_ARBITRUM_RINKEBY,
-  [SupportedChainId.OPTIMISTIC_KOVAN]: USDC_OPTIMISTIC_KOVAN,
   [SupportedChainId.POLYGON]: USDC_POLYGON,
-  [SupportedChainId.POLYGON_MUMBAI]: USDC_POLYGON_MUMBAI,
   [SupportedChainId.GOERLI]: USDC_GOERLI,
-  [SupportedChainId.RINKEBY]: USDC_RINKEBY,
-  [SupportedChainId.KOVAN]: USDC_KOVAN,
-  [SupportedChainId.ROPSTEN]: USDC_ROPSTEN,
+  [SupportedChainId.CELO]: USDC_CELO,
+  [SupportedChainId.BASE]: USDC_BASE,
+  [SupportedChainId.GNOSIS]: USDC_GNOSIS,
 }
 export const DAI_POLYGON = new Token(
   SupportedChainId.POLYGON,
@@ -149,37 +124,10 @@ export const USDT = new Token(
   'USDT',
   'Tether USD'
 )
-export const USDT_ARBITRUM_ONE = new Token(
-  SupportedChainId.ARBITRUM_ONE,
-  '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',
-  6,
-  'USDT',
-  'Tether USD'
-)
-export const USDT_OPTIMISM = new Token(
-  SupportedChainId.OPTIMISM,
-  '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58',
-  6,
-  'USDT',
-  'Tether USD'
-)
+
 export const WBTC = new Token(
   SupportedChainId.MAINNET,
   '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
-  8,
-  'WBTC',
-  'Wrapped BTC'
-)
-export const WBTC_ARBITRUM_ONE = new Token(
-  SupportedChainId.ARBITRUM_ONE,
-  '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
-  8,
-  'WBTC',
-  'Wrapped BTC'
-)
-export const WBTC_OPTIMISM = new Token(
-  SupportedChainId.OPTIMISM,
-  '0x68f180fcCe6836688e9084f035309E29Bf0A2095',
   8,
   'WBTC',
   'Wrapped BTC'
@@ -247,13 +195,6 @@ export const SWISE = new Token(
   'SWISE',
   'StakeWise'
 )
-export const WETH_POLYGON_MUMBAI = new Token(
-  SupportedChainId.POLYGON_MUMBAI,
-  '0xa6fa4fb5f76172d178d61b04b0ecd319c5d1c0aa',
-  18,
-  'WETH',
-  'Wrapped Ether'
-)
 
 export const WETH_POLYGON = new Token(
   SupportedChainId.POLYGON,
@@ -265,34 +206,6 @@ export const WETH_POLYGON = new Token(
 
 export const WRAPPED_NATIVE_CURRENCY: { [chainId: number]: Token | undefined } = {
   ...(WETH9 as Record<SupportedChainId, Token>),
-  [SupportedChainId.OPTIMISM]: new Token(
-    SupportedChainId.OPTIMISM,
-    '0x4200000000000000000000000000000000000006',
-    18,
-    'WETH',
-    'Wrapped Ether'
-  ),
-  [SupportedChainId.OPTIMISTIC_KOVAN]: new Token(
-    SupportedChainId.OPTIMISTIC_KOVAN,
-    '0x4200000000000000000000000000000000000006',
-    18,
-    'WETH',
-    'Wrapped Ether'
-  ),
-  [SupportedChainId.ARBITRUM_ONE]: new Token(
-    SupportedChainId.ARBITRUM_ONE,
-    '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
-    18,
-    'WETH',
-    'Wrapped Ether'
-  ),
-  [SupportedChainId.ARBITRUM_RINKEBY]: new Token(
-    SupportedChainId.ARBITRUM_RINKEBY,
-    '0xB47e6A5f8b33b3F17603C83a0535A9dcD7E32681',
-    18,
-    'WETH',
-    'Wrapped Ether'
-  ),
   [SupportedChainId.POLYGON]: new Token(
     SupportedChainId.POLYGON,
     '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
@@ -300,17 +213,10 @@ export const WRAPPED_NATIVE_CURRENCY: { [chainId: number]: Token | undefined } =
     'WMATIC',
     'Wrapped MATIC'
   ),
-  [SupportedChainId.POLYGON_MUMBAI]: new Token(
-    SupportedChainId.POLYGON_MUMBAI,
-    '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
-    18,
-    'WMATIC',
-    'Wrapped MATIC'
-  ),
 }
 
-function isMatic(chainId: number): chainId is SupportedChainId.POLYGON | SupportedChainId.POLYGON_MUMBAI {
-  return chainId === SupportedChainId.POLYGON_MUMBAI || chainId === SupportedChainId.POLYGON
+function isMatic(chainId: number): chainId is SupportedChainId.POLYGON {
+  return chainId === SupportedChainId.POLYGON
 }
 
 class MaticNativeCurrency extends NativeCurrency {
@@ -353,20 +259,4 @@ export function nativeOnChain(chainId: number): NativeCurrency {
       ? new MaticNativeCurrency(chainId)
       : ExtendedEther.onChain(chainId))
   )
-}
-
-export const TOKEN_SHORTHANDS: { [shorthand: string]: { [chainId in SupportedChainId]?: string } } = {
-  USDC: {
-    [SupportedChainId.MAINNET]: USDC_MAINNET.address,
-    [SupportedChainId.ARBITRUM_ONE]: USDC_ARBITRUM.address,
-    [SupportedChainId.OPTIMISM]: USDC_OPTIMISM.address,
-    [SupportedChainId.ARBITRUM_RINKEBY]: USDC_ARBITRUM_RINKEBY.address,
-    [SupportedChainId.OPTIMISTIC_KOVAN]: USDC_OPTIMISTIC_KOVAN.address,
-    [SupportedChainId.POLYGON]: USDC_POLYGON.address,
-    [SupportedChainId.POLYGON_MUMBAI]: USDC_POLYGON_MUMBAI.address,
-    [SupportedChainId.GOERLI]: USDC_GOERLI.address,
-    [SupportedChainId.RINKEBY]: USDC_RINKEBY.address,
-    [SupportedChainId.KOVAN]: USDC_KOVAN.address,
-    [SupportedChainId.ROPSTEN]: USDC_ROPSTEN.address,
-  },
 }

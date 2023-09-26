@@ -43,6 +43,7 @@ import usePopupWindow from "hooks/usePopupWindow"
 import useStripeRedirect from "hooks/useStripeRedirect"
 import Checkbox from "components/Checkbox"
 import useDeployer from "hooks/useDeployer"
+import safeUserIcon from 'assets/svg/safeUserIcon.svg'
 
 ///   0xD123b939B5022608241b08c41ece044059bE00f5
 
@@ -336,8 +337,8 @@ export default () => {
             err['chain'] = "Select valid chain"
         if (!stateX?.symbol || stateX?.symbol === '')
             err['symbol'] = "Enter valid symbol"
-        if (!stateX?.logo || stateX?.logo === '')
-            err['logo'] = "Please upload image"
+        //if (!stateX?.logo || stateX?.logo === '')
+           // err['logo'] = "Please upload image"
         
         if(stateX.priced) {
             if(stateX?.treasury !== 'other') {
@@ -387,7 +388,7 @@ export default () => {
                         chainId: stateX?.selectedChainId,
                         name: `${stateX?.symbol} SBT`,
                         token: stateX.symbol,
-                        image: stateX?.logo,
+                        image: "",
                         address: contractAddr,
                         admin: account,
                         version: 3,
@@ -549,7 +550,7 @@ export default () => {
                                 <Box mt={2}>
                                     <Select
                                         selected={stateX?.selectedChainId}
-                                        options={ SUPPORTED_CHAIN_IDS.filter(i => i !== SupportedChainId.MAINNET).map((item : any) => ({ label: CHAIN_INFO[item].label, value: item }))}
+                                        options={ SUPPORTED_CHAIN_IDS.map((item : any) => ({ label: CHAIN_INFO[item].label, value: item }))}
                                         setSelectedValue={(value) => {
                                             setStateX((prev: any) => { return {
                                                 ...prev, 
