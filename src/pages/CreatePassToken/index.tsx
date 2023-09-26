@@ -388,7 +388,7 @@ export default () => {
                         chainId: stateX?.selectedChainId,
                         name: `${stateX?.symbol} SBT`,
                         token: stateX.symbol,
-                        image: "",
+                        image: stateX?.logo,
                         address: contractAddr,
                         admin: account,
                         version: 3,
