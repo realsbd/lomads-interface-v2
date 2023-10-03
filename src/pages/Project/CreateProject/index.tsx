@@ -758,6 +758,7 @@ export default () => {
                                         placeholder="Super project"
                                         fullWidth
                                         value={name}
+                                        inputProps={{ maxLength: 50 }}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
 
                                     />

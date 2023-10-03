@@ -563,6 +563,7 @@ export default () => {
                             <TextInput value={stateX?.symbol}
                                 error={errors['symbol']}
                                 helperText={errors['symbol']}
+                                inputProps={{ maxLength: 50 }}
                                 onChange={(e: any) => {
                                     setErrors({})
                                     setStateX((prev: any) => { return { ...prev, symbol: e.target.value } })

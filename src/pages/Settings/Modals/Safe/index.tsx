@@ -190,6 +190,7 @@ const SafeModal = ({ open, onClose }: any) => {
                 <TextInput
                     label="Name"
                     value={safeName}
+                    inputProps={{ maxLength: 50 }}
                     onChange={(e:any) => setSafeName(e.target.value)}
                     fullWidth
                 />
