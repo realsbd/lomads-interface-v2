@@ -19,4 +19,7 @@ export const INFURA_NETWORK_URLS: { [key in SupportedChainId]: string } = {
   [SupportedChainId.CELO]: `https://celo-mainnet.infura.io/v3/${INFURA_KEY}`,
   [SupportedChainId.BASE]: `https://base-mainnet.infura.io/v3/${INFURA_KEY}`,
   [SupportedChainId.GNOSIS]: `https://gnosis-mainnet.infura.io/v3/${INFURA_KEY}`,
+  [SupportedChainId.OPTIMISM]: `https://optimism-mainnet.infura.io/v3/${INFURA_KEY}`,
+  [SupportedChainId.ARBITRUM]: `https://arbitrum-mainnet.infura.io/v3/${INFURA_KEY}`,
+  [SupportedChainId.AVALANCHE]: `https://avalanche-mainnet.infura.io/v3/${INFURA_KEY}`,
 }

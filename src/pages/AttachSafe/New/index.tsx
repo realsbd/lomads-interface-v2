@@ -9,6 +9,7 @@ import Button from "components/Button";
 import plusIcon from 'assets/svg/plusIcon.svg';
 import closeOrange from 'assets/svg/closeOrange.svg';
 import GreyAddIcon from 'assets/svg/ADD.svg';
+import safeIcon from 'assets/images/GnosisSafe.png';
 import useENS from "hooks/useENS";
 import { useAppSelector } from "helpers/useAppSelector";
 import { useAppDispatch } from "helpers/useAppDispatch";
@@ -28,6 +29,8 @@ import { isAddressValid, isRightAddress } from 'utils'
 import SwitchChain from "components/SwitchChain";
 import { useDAO } from "context/dao";
 import { ContractNetworksConfig } from '@safe-global/protocol-kit'
+import Overlay from "components/Overlay"
+import palette from 'theme/palette';
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -451,6 +454,11 @@ export default () => {
 		}
 	  }
 
+	const [isOpen, setIsOpen] = useState(false); 
+	const toggleOverlay = () => {
+		setIsOpen(!isOpen);
+	  };
+
 	useEffect(() => {
 		setState((prev: any) => {
 			return {
@@ -639,6 +647,7 @@ export default () => {
 			
 			try {
 				setisLoading(true);
+				toggleOverlay();
 				const safeOwner = provider?.getSigner(0);
 				const ethAdapter = new EthersAdapter({
 					ethers,
@@ -664,6 +673,7 @@ export default () => {
 				let currentSafes: Array<string> = []
 				// if (chainId === SupportedChainId.POLYGON)
 				currentSafes = await axios.get(`${GNOSIS_SAFE_BASE_URLS[state?.selectedChainId]}/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+				
 				await safeFactory
 					.deploySafe({ safeAccountConfig })
 					.then(async (tx) => {
@@ -711,10 +721,12 @@ export default () => {
 							checkNewSafe(currentSafes, owners)
 						} else {
 							setisLoading(false);
+							setIsOpen(false);
 						}
 					});
 			} catch (e) {
 				setisLoading(false);
+				setIsOpen(false);
 				console.log(e)
 			}
 		}
@@ -773,9 +785,27 @@ export default () => {
 					The exact amount will be determinated by your wallet.
 				</Box> */}
 				<Button loading={isLoading} disabled={isLoading} onClick={deployNewSafeDelayed} variant='contained'>CREATE</Button>
-				{ isLoading && <Typography className={classes.safeFooter} style={{ fontStyle: 'italic', opacity: 0.8, fontSize: 14 }}>
-					{DAO?.name} treasury is being deployed on { CHAIN_INFO[state.selectedChainId].label }. This might take several minutes. Please do not refresh the page
-				</Typography> }
+
+				<Overlay isOpen={isOpen} onClose={toggleOverlay}>
+				<div style={{ display: 'flex', justifyContent: 'center'}}>
+					<img src={safeIcon} height={50} alt="safe-icon" />
+				</div>
+				
+				<div style={{ display: 'flex', justifyContent: 'center'}}>
+        			<h1 className={classes.inputTitle}>Waiting for Transaction Confirmation</h1>
+				</div>
+
+				<div>
+				<Typography className={classes.safeFooter} style={{ fontStyle: 'italic', opacity: 0.8, fontSize: 14, padding: '10px' }}>
+					{DAO?.name} treasury is being deployed on { CHAIN_INFO[state.selectedChainId].label }. This might take several minutes. <span style={{ textDecoration: 'underline'}}><b>Please do not refresh the page</b></span>
+				</Typography>				
+				</div>	
+      			</Overlay>
+
+
+				{ isLoading && <Typography className={classes.safeFooter} style={{ color:'#C94B32',fontStyle: 'italic', opacity: 0.8, fontSize: 14 }}>
+				Please confirm the transaction with your connected wallet
+					</Typography> }
 			</>
 		);
 	};
