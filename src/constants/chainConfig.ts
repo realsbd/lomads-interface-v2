@@ -55,7 +55,7 @@ export const CHAIN_CONFIG = {
     blockExplorer: "https://basescan.org",
     chainId: '0x2105',
     displayName: "Base Mainnet",
-    ticker: "BASE",
+    ticker: "ETH",
     tickerName: "Base",
   } as CustomChainConfig,
   gnosis: {
@@ -73,7 +73,7 @@ export const CHAIN_CONFIG = {
     blockExplorer: "https://optimistic.etherscan.io",
     chainId: '0xa',
     displayName: "Optimism",
-    ticker: "OPT",
+    ticker: "ETH",
     tickerName: "Optimism",
   } as CustomChainConfig,
   arb: {
@@ -82,7 +82,7 @@ export const CHAIN_CONFIG = {
     blockExplorer: "https://arbiscan.io",
     chainId: '0xA4B1',
     displayName: "Arbitrum",
-    ticker: "ARB",
+    ticker: "ETH",
     tickerName: "Arbitrum",
   } as CustomChainConfig,
   avax: {
