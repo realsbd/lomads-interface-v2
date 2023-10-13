@@ -429,6 +429,7 @@ const PassTokenModalV2 =  ({ open, onClose }: any) => {
                         <TextInput value={state?.symbol}
                             error={errors['symbol']}
                             helperText={errors['symbol']}
+                            inputProps={{ maxLength: 50 }}
                             onChange={(e: any) => {
                                 setErrors({})
                                 setState((prev: any) => { return { ...prev, symbol: e.target.value } })

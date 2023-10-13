@@ -54,7 +54,8 @@ export default ({ transaction, recipient, defaultLabel }: any) => {
                         autoFocus={editable}
                         value={labelPlaceholder} 
                         onChange={(e:any) => setLabelPlaceholder(e?.target?.value)} 
-                        placeholder="Reason for transaction" 
+                        placeholder="Reason for transaction"
+                        inputProps={{ maxLength: 150 }} 
                         fullWidth 
                         size="small"
                         onBlur={(e:any) => {

@@ -756,6 +756,7 @@ export default () => {
 						<TextInput
 							fullWidth
 							placeholder="Pied Piper"
+							inputProps={{ maxLength: 50 }}
 							onChange={(e: any) => { setState((prev: any) => { return { ...prev, safeName: e.target.value } }) }}
 						/>
 					</Box>
@@ -807,6 +808,7 @@ export default () => {
 								<TextInput
 									sx={{ height: 50, width: 144 }}
 									placeholder="Name"
+									inputProps={{ maxLength: 50 }}
 									value={memberPlaceholder.name}
 									onChange={(e: any) => { setErrors({}); setMemberPlaceholder((prev: any) => { return { ...prev, name: e.target.value } }) }}
 								/>

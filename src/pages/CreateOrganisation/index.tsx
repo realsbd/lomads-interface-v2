@@ -255,6 +255,7 @@ export default () => {
 									label="Name Your Organisation"
 									placeholder="Epic Organisation"
 									fullWidth
+									inputProps={{ maxLength: 50 }}
 									value={state?.daoName}
 									onChange={(event: any) => {
 										setErrors({})

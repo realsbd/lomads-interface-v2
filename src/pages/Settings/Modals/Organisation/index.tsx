@@ -162,6 +162,7 @@ const Organisation = ({ open, onClose }: any) => {
             <Box>
                 <Box sx={{ my: 2 }}>
                     <TextInput value={state?.name}
+                        inputProps={{ maxLength: 50 }}
                         error={error?.name}
                         helperText={error?.name}
                         onChange={(evt: any) => setState((prev: any) => { return { ...prev, name: evt.target.value } })}
@@ -169,6 +170,7 @@ const Organisation = ({ open, onClose }: any) => {
                 </Box>
                 <Box sx={{ my: 2 }}>
                     <TextInput value={state?.description}
+                        inputProps={{ maxLength: 250 }}
                         onChange={(evt: any) => setState((prev: any) => { return { ...prev, description: evt.target.value } })}
                         multiline
                         rows={4}

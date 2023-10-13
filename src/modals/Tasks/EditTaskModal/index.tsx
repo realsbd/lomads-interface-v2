@@ -677,6 +677,7 @@ export default ({ open, closeModal, task }: Props) => {
                                     placeholder="Super task"
                                     fullWidth
                                     value={name}
+                                    inputProps={{ maxLength: 150 }}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setName(e.target.value); setErrorName('') }}
                                     error={errorName !== ''}
                                     id={errorName !== '' ? "outlined-error-helper-text" : ""}

@@ -493,6 +493,7 @@ export default () => {
 											<TextInput
 												placeholder="Name"
 												type="text"
+												inputProps={{ maxLength: 50 }}
 												sx={{
 													marginTop: 1,
 													width: 141,
