@@ -125,5 +125,47 @@ export const CHAIN_INFO: any = {
     chainId: '0x64',
     network: 'cyan',
     chainName: 'gnosis'
+  },
+  [SupportedChainId.OPTIMISM]: {
+    networkType: NetworkType.L1,
+    blockWaitMsBeforeWarning: `10m`,
+    docs: '	https://mainnet.base.org',
+    explorer: '	https://mainnet.base.org',
+    opensea: 'https://opensea.io/assets/optimism/',
+    infoLink: 'https://info.uniswap.org/#/optimism/',
+    label: 'Optimism',
+    logoUrl: optLogo,
+    nativeCurrency: { name: 'Optimism Native Asset', symbol: 'ETH', decimals: 18 },
+    chainId: '0xa',
+    network: 'cyan',
+    chainName: 'opt'
+  },
+  [SupportedChainId.ARBITRUM]: {
+    networkType: NetworkType.L1,
+    blockWaitMsBeforeWarning: `10m`,
+    docs: '	https://mainnet.base.org',
+    explorer: '	https://mainnet.base.org',
+    opensea: 'https://opensea.io/assets/arbitrum/',
+    infoLink: 'https://info.uniswap.org/#/arbitrum/',
+    label: 'Arbitrum',
+    logoUrl: arbLogo,
+    nativeCurrency: { name: 'Arbitrum Native Asset', symbol: 'ETH', decimals: 18 },
+    chainId: '0xA4B1',
+    network: 'cyan',
+    chainName: 'arb'
+  },
+  [SupportedChainId.AVALANCHE]: {
+    networkType: NetworkType.L1,
+    blockWaitMsBeforeWarning: `10m`,
+    docs: '	https://mainnet.base.org',
+    explorer: '	https://mainnet.base.org',
+    opensea: 'https://opensea.io/assets/avalanche/',
+    infoLink: 'https://info.uniswap.org/#/avalanche/',
+    label: 'Avax',
+    logoUrl: avaxLogo,
+    nativeCurrency: { name: 'Avalanche Native Asset', symbol: 'AVAX', decimals: 18 },
+    chainId: '0xA86A',
+    network: 'cyan',
+    chainName: 'avax'
   }
 }

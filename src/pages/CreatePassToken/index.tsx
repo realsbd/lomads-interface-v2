@@ -247,6 +247,14 @@ export default () => {
     })
 
     useEffect(() => {
+        if (!stateX?.priced) {
+            setStateX((prev: any)=> { return { ...prev, price : { ...prev.price, value: 0 } } })
+            setStateX((prev: any)=> { return { ...prev, price : { ...prev.price, token: "0x0000000000000000000000000000000000000000" } } }) 
+          
+        }
+      }, [stateX?.priced]);
+
+    useEffect(() => {
         if(DAO)
             setStateX((prev: any) => { return { ...prev, price: { ...prev.price, token: _get(USDC, `[${+(_get(DAO, 'activeSafes[0].chainId', _get(DAO, 'chainId', chainId)))}].address`) }, selectedChainId: +(_get(DAO, 'activeSafes[0].chainId', _get(DAO, 'chainId', chainId))) } })
     }, [DAO])
@@ -337,8 +345,8 @@ export default () => {
             err['chain'] = "Select valid chain"
         if (!stateX?.symbol || stateX?.symbol === '')
             err['symbol'] = "Enter valid symbol"
-        //if (!stateX?.logo || stateX?.logo === '')
-           // err['logo'] = "Please upload image"
+        if (!stateX?.logo || stateX?.logo === '')
+            err['logo'] = "Please upload image"
         
         if(stateX.priced) {
             if(stateX?.treasury !== 'other') {

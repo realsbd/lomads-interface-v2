@@ -55,7 +55,7 @@ export const CHAIN_CONFIG = {
     blockExplorer: "https://basescan.org",
     chainId: '0x2105',
     displayName: "Base Mainnet",
-    ticker: "ETH",
+    ticker: "BASE",
     tickerName: "Base",
   } as CustomChainConfig,
   gnosis: {
@@ -66,6 +66,33 @@ export const CHAIN_CONFIG = {
     displayName: "Gnosis",
     ticker: "xDAI",
     tickerName: "xDAI",
+  } as CustomChainConfig,
+  opt: {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    rpcTarget: 'https://mainnet.optimism.io',
+    blockExplorer: "https://optimistic.etherscan.io",
+    chainId: '0xa',
+    displayName: "Optimism",
+    ticker: "OPT",
+    tickerName: "Optimism",
+  } as CustomChainConfig,
+  arb: {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    rpcTarget: 'https://arb1.arbitrum.io/rpc',
+    blockExplorer: "https://arbiscan.io",
+    chainId: '0xA4B1',
+    displayName: "Arbitrum",
+    ticker: "ARB",
+    tickerName: "Arbitrum",
+  } as CustomChainConfig,
+  avax: {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    rpcTarget: 'https://api.avax.network/ext/bc/C/rpc',
+    blockExplorer: "https://snowtrace.io",
+    chainId: '0xA86A',
+    displayName: "Avalanche",
+    ticker: "AVAX",
+    tickerName: "Avax",
   } as CustomChainConfig,
 } as const;
 

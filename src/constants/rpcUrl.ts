@@ -14,6 +14,12 @@ export function getRpcUrls(chainId: SupportedChainId): [string] {
         return ['https://mainnet.base.org']
       case SupportedChainId.GNOSIS:
         return ['https://rpc.gnosischain.com']
+      case SupportedChainId.OPTIMISM:
+        return ['https://mainnet.optimism.io']
+      case SupportedChainId.ARBITRUM:
+        return ['https://arb1.arbitrum.io/rpc']
+      case SupportedChainId.AVALANCHE:
+        return ['https://api.avax.network/ext/bc/C/rpc']
       default:
     }
     // Our API-keyed URLs will fail security checks when used with external wallets.

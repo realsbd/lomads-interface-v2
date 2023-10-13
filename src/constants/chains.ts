@@ -8,6 +8,9 @@ export enum SupportedChainId {
   CELO = 42220,
   BASE = 8453,
   GNOSIS = 100,
+  OPTIMISM = 10,
+  ARBITRUM = 42161,
+  AVALANCHE = 43114
 }
 
 export const CHAIN_IDS_TO_NAMES = {
@@ -16,7 +19,10 @@ export const CHAIN_IDS_TO_NAMES = {
   [`${SupportedChainId.POLYGON}`]: 'polygon',
   [`${SupportedChainId.CELO}`]: 'celo',
   [`${SupportedChainId.BASE}`]: 'base',
-  [`${SupportedChainId.GNOSIS}`]:'gnosis'
+  [`${SupportedChainId.GNOSIS}`]:'gnosis',
+  [`${SupportedChainId.OPTIMISM}`]:'opt',
+  [`${SupportedChainId.ARBITRUM}`]:'arb',
+  [`${SupportedChainId.AVALANCHE}`]:'avax'
 }
 
 /**
@@ -32,7 +38,10 @@ export const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
   SupportedChainId.GOERLI,
   SupportedChainId.CELO,
   SupportedChainId.BASE,
-  SupportedChainId.GNOSIS
+  SupportedChainId.GNOSIS,
+  SupportedChainId.OPTIMISM,
+  SupportedChainId.ARBITRUM,
+  SupportedChainId.AVALANCHE,
 ]
 
 export const GNOSIS_SAFE_BASE_URLS:any = {
@@ -41,7 +50,10 @@ export const GNOSIS_SAFE_BASE_URLS:any = {
   [SupportedChainId.POLYGON]: 'https://safe-transaction-polygon.safe.global',
   [SupportedChainId.CELO]: 'https://safe-transaction-celo.safe.global',
   [SupportedChainId.BASE]: 'https://safe-transaction-base.safe.global',
-  [SupportedChainId.GNOSIS]:'https://safe-transaction-gnosis-chain.safe.global/'
+  [SupportedChainId.GNOSIS]:'https://safe-transaction-gnosis-chain.safe.global/',
+  [SupportedChainId.OPTIMISM]:'https://safe-transaction-optimism.safe.global',
+  [SupportedChainId.ARBITRUM]:'https://safe-transaction-arbitrum.safe.global',
+  [SupportedChainId.AVALANCHE]:'https://safe-transaction-avalanche.safe.global',
 }
 
 export const GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT :any = {
@@ -50,7 +62,10 @@ export const GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT :any = {
   [SupportedChainId.MAINNET]: '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134',
   [SupportedChainId.CELO]: '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134',
   [SupportedChainId.BASE]: '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134',
-  [SupportedChainId.GNOSIS]:'0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134'
+  [SupportedChainId.GNOSIS]:'0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134',
+  [SupportedChainId.OPTIMISM]:'0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134',
+  [SupportedChainId.ARBITRUM]:'0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134',
+  [SupportedChainId.AVALANCHE]:'0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134',
 }
 
 export const CHAIN_GAS_STATION :any = {
@@ -80,11 +95,23 @@ export const SUPPORTED_ASSETS = {
   },
   [`${SupportedChainId.BASE}`]: {
     id: "base",
-    symbol: "ETH",
+    symbol: "BASE",
   },
   [`${SupportedChainId.GNOSIS}`]: {
     id: "xDAI",
     symbol: "xDAI",
+  },
+  [`${SupportedChainId.OPTIMISM}`]: {
+    id: "opt",
+    symbol: "ETH",
+  },
+  [`${SupportedChainId.ARBITRUM}`]: {
+    id: "arb",
+    symbol: "ETH",
+  },
+  [`${SupportedChainId.AVALANCHE}`]: {
+    id: "avax",
+    symbol: "AVAX",
   },
 
 };

@@ -95,7 +95,11 @@ export const USDC: { [chainId in SupportedChainId]: Token } = {
   [SupportedChainId.CELO]: USDC_CELO,
   [SupportedChainId.BASE]: USDC_BASE,
   [SupportedChainId.GNOSIS]: USDC_GNOSIS,
+  [SupportedChainId.OPTIMISM]: USDC_OPT,
+  [SupportedChainId.ARBITRUM]: USDC_ARB,
+  [SupportedChainId.AVALANCHE]: USDC_AVAX,
 }
+
 export const DAI_POLYGON = new Token(
   SupportedChainId.POLYGON,
   '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
