@@ -10,6 +10,7 @@ import img2 from 'assets/svg/img2.svg'
 import img3 from 'assets/svg/img3.svg'
 import img4 from 'assets/svg/img4.svg'
 import Footer from "components/Footer";
+import { useWeb3Auth } from "context/web3Auth";
 
 const useStyles = makeStyles((theme: any) => ({
     DAOsuccess: {
@@ -61,7 +62,7 @@ const useStyles = makeStyles((theme: any) => ({
 export default () => {
     const navigate = useNavigate();
     const classes = useStyles()
-
+	const { account } = useWeb3Auth()
 
     return (
         <>

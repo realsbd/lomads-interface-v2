@@ -1,10 +1,11 @@
+//@ts-nocheck
 import React from 'react';
 import {  get as _get, find as _find } from 'lodash'
 import { ADAPTER_EVENTS, getChainConfig, SafeEventEmitterProvider, WALLET_ADAPTERS, WALLET_ADAPTER_TYPE } from "@web3auth/base";
-import type { LOGIN_PROVIDER_TYPE } from "@toruslabs/openlogin";
 import { ethers } from "ethers";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
+import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import Web3Token from 'web3-token';
 // import { NetworkSwitch } from "@web3auth/ui";
 import { createContext, FunctionComponent, ReactNode, useCallback, useContext, useEffect, useState } from "react";
@@ -30,7 +31,7 @@ export const Web3AuthContext = createContext<any>({
   chainId: null,
   account: null,
   isLoading: false,
-  login: async (adapter: WALLET_ADAPTER_TYPE, provider?: LOGIN_PROVIDER_TYPE, login_hint?: string) => {},
+  login: async (adapter: WALLET_ADAPTER_TYPE, provider?: any, login_hint?: string) => {},
   logout: async () => {},
   switchChain: async (chainId: string) => {},
 });
@@ -144,6 +145,10 @@ useEffect(() => {
       });
     };
 
+    const privateKeyProvider = new EthereumPrivateKeyProvider({
+      config: { chainConfig: _get(CHAIN_CONFIG, chain, 'polygon') },
+    });
+
     async function init() {
       try {
         setIsLoading(true);
@@ -169,18 +174,7 @@ useEffect(() => {
           },
         });
       await web3AuthInstance.addPlugin(torusPlugin);
-        const adapter = new OpenloginAdapter({ adapterSettings: {
-          whiteLabel,
-          // loginConfig: {
-          //   google: {
-          //     name: "Google Login",
-          //      /* @ts-ignore */
-          //     verifier: 'lomads-google-auth',
-          //     typeOfLogin: "google",
-          //     clientId: _get(WEB3AUTH_NETWORK, `${web3AuthNetwork}.googleClientId`)
-          //   },
-          // },
-        } });
+        const adapter = new OpenloginAdapter({ privateKeyProvider, adapterSettings: { whiteLabel } });
         web3AuthInstance.configureAdapter(adapter);
         const metamaskAdapter = new MetamaskAdapter({
           clientId,
@@ -214,7 +208,7 @@ useEffect(() => {
   }, [chain, web3AuthNetwork]);
 
 
-  const login = async (adapter: WALLET_ADAPTER_TYPE, loginProvider: LOGIN_PROVIDER_TYPE, login_hint?: string) => {
+  const login = async (adapter: WALLET_ADAPTER_TYPE, loginProvider: any, login_hint?: string) => {
 
     try {
       console.log("web3Auth", web3Auth)

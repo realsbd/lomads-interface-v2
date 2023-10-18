@@ -358,7 +358,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                                         )
                                     }
                                     else {
-                                        if (item.creator === user._id || _find(_get(item, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted')?.member.wallet === user.wallet) {
+                                        if (item.creator === user?._id || _find(_get(item, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted')?.member?.wallet === user?.wallet) {
                                             return (
                                                 <Box key={index}>
                                                     <TaskCard
@@ -413,7 +413,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                                         )
                                     }
                                     else {
-                                        if (item.creator === user._id || _find(_get(item, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted')?.member.wallet === user.wallet) {
+                                        if (item.creator === user?._id || _find(_get(item, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted')?.member?.wallet === user?.wallet) {
                                             return (
                                                 <Box key={index}>
                                                     <TaskCard
@@ -505,7 +505,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                                         )
                                     }
                                     else {
-                                        if (item.creator === user._id || _find(_get(item, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted')?.member.wallet === user.wallet) {
+                                        if (item.creator === user?._id || _find(_get(item, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted')?.member?.wallet === user?.wallet) {
                                             return (
                                                 <Box key={index}>
                                                     <TaskCard
