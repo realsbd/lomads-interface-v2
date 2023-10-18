@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { get as _get, find as _find } from 'lodash'
 import { createContext, useContext } from "react";
-<<<<<<< Updated upstream
 import { useParams, useSearchParams } from 'react-router-dom';
 import axiosHttp from 'api'
-=======
-import { useParams } from 'react-router-dom';
->>>>>>> Stashed changes
 import { useWeb3Auth } from './web3Auth';
 import { useAppSelector } from 'helpers/useAppSelector';
 import { useNavigate } from 'react-router-dom';
