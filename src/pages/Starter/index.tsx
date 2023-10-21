@@ -218,8 +218,11 @@ export default () => {
 			terrors.name = " *  Name is required.";
 		}
 		if (!state?.email) {
-			terrors.url = " * Email is required.";
+			terrors.email = " * Email is required.";
 		}
+		if (!isValidEmail(state?.email)) {
+			terrors.email ='Email is invalid';
+		  }
 		if (_.isEmpty(terrors)) {
             const data = {
                 
@@ -234,8 +237,14 @@ export default () => {
             })
 		} else {
 			setErrors(terrors);
+			console.log(errors)
+			
 		}
 	};
+
+	const isValidEmail= (email: string) => {
+		return /\S+@\S+\.\S+/.test(email);
+	  }
 
     return (
         <>
@@ -285,6 +294,8 @@ export default () => {
                                         const value = event.target.value;
                                         setState((prev: any) => { return { ...prev, name: value.toString()} })
 									}}
+									error={errors.name}
+									helperText={errors.name}
 								/>
                                 
 							</Box>
@@ -299,9 +310,12 @@ export default () => {
 									fullWidth
 									value={state?.email}
 									onChange={(event: any) => {
+										setErrors({})
                                         const value = event.target.value;
                                         setState((prev: any) => { return { ...prev, email: value.toString()} })
 									}}
+									error={errors.email}
+									helperText={errors.email}
 								/>
 							</Box>
 							</Box>
