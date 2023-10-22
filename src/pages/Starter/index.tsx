@@ -5,6 +5,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Box, Typography, Link, Container, Grid } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import Button from "components/Button";
+import { get as _get, set as _set } from 'lodash';
 
 import axios from "axios";
 import TextInput from 'components/TextInput'
@@ -12,6 +13,7 @@ import logo from 'assets/svg/logo.svg'
 
 import { useAppSelector } from "helpers/useAppSelector";
 import { useAppDispatch } from "helpers/useAppDispatch";
+import { updateCurrentUser } from "store/actions/session";
 
 import img1 from 'assets/svg/img1.svg'
 import img2 from 'assets/svg/img2.svg'
@@ -208,7 +210,12 @@ export default () => {
     const [createDAOLoading, setCreateDAOLoading] = useState<boolean>(false)
 	const [DAOListLoading, setDAOListLoading] = useState<boolean>(false);
 	const [errors, setErrors] = useState<any>({});
+	const [registered, setRegistered] = useState<boolean>(false);
+
+
 	const [urlCheckLoading, setUrlCheckLoading] = useState<any>(false);
+
+	const [editableName, setEditableName] = useState('default');
 
     const [state, setState] = useState<any>({})
 
@@ -230,42 +237,59 @@ export default () => {
                 Email: state?.email,
                 Wallet: account,
             }
-			console.log(data)
-            axios.post('https://sheet.best/api/sheets/3cecfdc6-4ac0-4306-8fc6-8f550f957fa9', data)
+			handleSubmit()
+/*             axios.post('https://sheet.best/api/sheets/3cecfdc6-4ac0-4306-8fc6-8f550f957fa9', data)
             .then((result) => {
+
                 navigate(`/organisation/create`)
-            })
+            }) */
 		} else {
 			setErrors(terrors);
-			console.log(errors)
-			
+			console.log(user)
+				
 		}
 	};
+
+/*     useEffect(() => {
+        if (user)
+            setEditableName(_get(user,'name'))
+    }, []); */
+
+	const handleSubmit = () => {
+            dispatch(updateCurrentUser({ name: state?.name }))
+			dispatch(updateCurrentUser({ registered: true }))
+
+    }
 
 	const isValidEmail= (email: string) => {
 		return /\S+@\S+\.\S+/.test(email);
 	  }
 
+	if (!user?.registered){
     return (
         <>
+		
             <Box className={classes.DAOsuccess}>
-			<Container style={{ position: 'absolute', top: 0 }} maxWidth="xl">
-                    <Box sx={{ mt: 3 }} display="flex" flexDirection="row" alignItems="center" style={{ float: 'left' }}>
-                    <div style={{ display: "flex", alignItems: "center" }}>
+			
+							<Container style={{ position: 'absolute', top: 0 }} maxWidth="xl">
+							<Box sx={{ mt: 3 }} display="flex" flexDirection="row" alignItems="center" style={{ float: 'left' }}>
+							<div style={{ display: "flex", alignItems: "center" }}>
+		
+							<img style={{ width:'200px', marginRight:'60px', marginBottom: '5px',marginLeft:'16px'}} src={logo} alt="logo" />
+							<Link rel="noopener noreferrer" target="_blank" href="https://www.notion.so/lomads/Lomads-Key-Features-Roadmap-0f0fbc49d063436f95c97f26c57479d8" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>FEATURES</Link>
+							<Link rel="noopener noreferrer" target="_blank" href="https://www.lomads.xyz/blog" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>BLOG</Link>
+							<Link rel="noopener noreferrer" target="_blank" href="https://lomads-1.gitbook.io/lomads/" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>DOCS</Link>
+							<Link rel="noopener noreferrer" target="_blank" href="https://lomads.notion.site/Join-Lomads-as-a-Contributor-9678cce3e06744568cf722a09891a5cd" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>CONTRIBUTE</Link>
+		
+							
+							</div>
+							</Box>
+		
+						</Container>
+			
 
-                    <img style={{ width:'200px', marginRight:'60px', marginBottom: '5px',marginLeft:'16px'}} src={logo} alt="logo" />
-                    <Link rel="noopener noreferrer" target="_blank" href="https://www.notion.so/lomads/Lomads-Key-Features-Roadmap-0f0fbc49d063436f95c97f26c57479d8" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>FEATURES</Link>
-                    <Link rel="noopener noreferrer" target="_blank" href="https://www.lomads.xyz/blog" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>BLOG</Link>
-                    <Link rel="noopener noreferrer" target="_blank" href="https://lomads-1.gitbook.io/lomads/" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>DOCS</Link>
-                    <Link rel="noopener noreferrer" target="_blank" href="https://lomads.notion.site/Join-Lomads-as-a-Contributor-9678cce3e06744568cf722a09891a5cd" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>CONTRIBUTE</Link>
-
-                    
-                    </div>
-                    </Box>
-
-                </Container>
-            
-                <Box sx={{ marginTop: '100px', marginBottom: '100px' }}>
+    
+                <Box sx={{ marginTop: '100px', marginBottom: '20px' }}>
                     <Typography className={classes.italicHeader}>Let's Get Started!</Typography>
 
                     <Typography className={classes.subTitle} sx={{ mt: 4 }}>While you sign in with your wallet, we'd love to get to know you a bit more. </Typography>
@@ -293,6 +317,7 @@ export default () => {
                                         setErrors({})
                                         const value = event.target.value;
                                         setState((prev: any) => { return { ...prev, name: value.toString()} })
+										setEditableName(value);
 									}}
 									error={errors.name}
 									helperText={errors.name}
@@ -313,6 +338,7 @@ export default () => {
 										setErrors({})
                                         const value = event.target.value;
                                         setState((prev: any) => { return { ...prev, email: value.toString()} })
+										
 									}}
 									error={errors.email}
 									helperText={errors.email}
@@ -375,4 +401,93 @@ export default () => {
             </Box>
         </>
     );
-};
+}else {
+	return (
+        <>
+		
+            <Box className={classes.DAOsuccess}>
+			
+							<Container style={{ position: 'absolute', top: 0 }} maxWidth="xl">
+							<Box sx={{ mt: 3 }} display="flex" flexDirection="row" alignItems="center" style={{ float: 'left' }}>
+							<div style={{ display: "flex", alignItems: "center" }}>
+		
+							<img style={{ width:'200px', marginRight:'60px', marginBottom: '5px',marginLeft:'16px'}} src={logo} alt="logo" />
+							<Link rel="noopener noreferrer" target="_blank" href="https://www.notion.so/lomads/Lomads-Key-Features-Roadmap-0f0fbc49d063436f95c97f26c57479d8" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>FEATURES</Link>
+							<Link rel="noopener noreferrer" target="_blank" href="https://www.lomads.xyz/blog" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>BLOG</Link>
+							<Link rel="noopener noreferrer" target="_blank" href="https://lomads-1.gitbook.io/lomads/" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>DOCS</Link>
+							<Link rel="noopener noreferrer" target="_blank" href="https://lomads.notion.site/Join-Lomads-as-a-Contributor-9678cce3e06744568cf722a09891a5cd" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>CONTRIBUTE</Link>
+		
+							
+							</div>
+							</Box>
+		
+						</Container>
+			
+
+    
+                <Box sx={{ marginTop: '100px', marginBottom: '20px' }}>
+                    <Typography className={classes.italicHeader}>Let's Get Started!</Typography>
+
+                    <Typography className={classes.subTitle} sx={{ mt: 4 }}>Thanks for registering on Lomads platform. </Typography>
+                    <Typography className={classes.subTitle}>You are now all set to create your organisation.</Typography>
+                <Container>
+		
+				
+			
+		</Container>
+                    <Box display="flex" flexDirection="row" justifyContent="center">
+                        <Button variant='contained' sx={{ marginTop: '41px' }} onClick={() => navigate(`/organisation/create`)}>CREATE</Button>
+                    </Box>
+                </Box>
+                <Box sx={{ margin: '58px 0' }} display="flex" flexDirection="row" justifyContent="center">
+                    <Typography sx={{ fontSize: '36px', fontWeight: '700', color: '#B12F15', lineHeight: '40px', marginBottom: '58px' }}>See what's inside</Typography>
+                </Box>
+
+                <Box className={classes.row} display={"flex"} alignItems={"center"}>
+                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ height: '100%', width: '60%', background: '#FDF7F5' }}>
+                        <img src={img4} />
+                    </Box>
+                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} flexDirection={"column"} sx={{ width: '40%' }}>
+                        <Typography className={classes.rowText} sx={{ marginBottom: '25px' }}>Streamlined <span style={{ fontWeight: '700' }}>multi-treasury transaction</span><br />management</Typography>
+                        <Typography className={classes.rowText}>Hassle-free <span style={{ fontWeight: '700' }}>financial reporting</span> with<br /><span style={{ fontWeight: '700' }}>automated labeling</span></Typography>
+                    </Box>
+                </Box>
+
+                <Box className={classes.row} display={"flex"} alignItems={"center"}>
+                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} flexDirection={"column"} sx={{ width: '40%' }}>
+                        <Typography className={classes.rowText}>Versatile <span style={{ fontWeight: '700' }}>token based memberships</span><br />sell, whitelist, and beyond</Typography>
+                    </Box>
+                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ height: '100%', width: '60%', background: '#FDF7F5' }}>
+                        <img src={img3} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </Box>
+
+                </Box>
+
+                <Box className={classes.row} sx={{ height: '192px' }} display={"flex"} alignItems={"center"}>
+                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ height: '100%', width: '60%', background: '#F5F5F5;' }}>
+                        <img src={img2} />
+                    </Box>
+                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} flexDirection={"column"} sx={{ width: '40%' }}>
+
+                        <Typography className={classes.rowText}><span style={{ fontWeight: '700' }}>Effortless integrations</span><br />and <span style={{ fontWeight: '700' }}>auto-permissions</span> with Notion, Discord,<br />Github via membership tokens</Typography>
+                    </Box>
+                </Box>
+
+                <Box className={classes.row} display={"flex"} alignItems={"center"}>
+                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} flexDirection={"column"} sx={{ width: '40%' }}>
+                        <Typography className={classes.rowText}>Record-keeping of validated contributions on<br /><span style={{ fontWeight: '700' }}>self-owned identity tokens</span></Typography>
+                    </Box>
+                    <Box display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ height: '100%', width: '60%', background: '#F5F5F5;' }}>
+                        <img src={img1} />
+                    </Box>
+
+                </Box>
+
+                <Footer theme="light" />
+            </Box>
+        </>
+    );
+
+} 
+
+}
