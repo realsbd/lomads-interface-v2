@@ -5,6 +5,7 @@ import { Container, Grid, Typography, Box, Paper, Menu, Link, useMediaQuery } fr
 import MenuItem from '@mui/material/MenuItem';
 import { makeStyles } from '@mui/styles';
 import CHEERS from 'assets/svg/cheers.svg'
+import logo from 'assets/svg/logo.svg'
 //import LOMADS_LOGO from 'assets/svg/lomadsfulllogo.svg'
 import LOMADLOGO from "../../assets/svg/lomadsLogoRed.svg";
 import MOBILEDEVICE from "../../assets/svg/mobile_device.svg";
@@ -84,6 +85,24 @@ const useStyles = makeStyles((theme: any) => ({
         color: '#1B2B41',
         textAlign: 'center',
     },
+    menup:{
+        fontStyle: 'normal',
+        fontWeight: '400',
+        fontSize: '18px',
+        lineHeight: '18px',
+        /* or 112% */
+    
+        display: 'flex',
+        alignitems: 'center',
+        textalign: 'center',
+        letterSpacing: '-0.011em',
+        textTransform: 'uppercase',
+    
+        /* RED */
+    
+        color: '#C94B32',
+        marginRight: '30px',
+    }
 }));
 
 export default () => {
@@ -208,21 +227,26 @@ export default () => {
     return (
         <>
             <Grid container className={classes.root}>
-                <Container style={{ position: 'absolute', top: 0 }} maxWidth="lg">
-                    <Box sx={{ mt: 3 }} display="flex" flexDirection="row" alignItems="center" style={{ float: 'right' }}>
-                        <Link rel="noopener noreferrer" target="_blank" href="https://lomads.medium.com/" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer' }}>BLOG</Link>
-                        <Link rel="noopener noreferrer" target="_blank" href="https://lomads-1.gitbook.io/lomads/" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer' }}>DOCS</Link>
-                        <Button onClick={() => window.open(`https://calendly.com/lomads-nishant/nishant-lomads-reg`, '_blank')} size="small" variant="contained" endIcon={<ArrowRightAltIcon />}>Request Demo</Button>
+            <Container style={{ position: 'absolute', top: 0 }} maxWidth="xl">
+                    <Box sx={{ mt: 3 }} display="flex" flexDirection="row" alignItems="center" style={{ float: 'left' }}>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+
+                    <img style={{ width:'200px', marginRight:'60px', marginBottom: '5px',marginLeft:'40px'}} src={logo} alt="logo" />
+                    <Link rel="noopener noreferrer" target="_blank" href="https://www.notion.so/lomads/Lomads-Key-Features-Roadmap-0f0fbc49d063436f95c97f26c57479d8" sx={{ mx: 2 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>FEATURES</Link>
+                    <Link rel="noopener noreferrer" target="_blank" href="https://www.lomads.xyz/blog" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>BLOG</Link>
+                    <Link rel="noopener noreferrer" target="_blank" href="https://lomads-1.gitbook.io/lomads/" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>DOCS</Link>
+                    <Link rel="noopener noreferrer" target="_blank" href="https://lomads.notion.site/Join-Lomads-as-a-Contributor-9678cce3e06744568cf722a09891a5cd" sx={{ ml: 2, mr: 3 }} color="primary" style={{ textDecoration: 'none', cursor: 'pointer', fontSize:'18px' }}>CONTRIBUTE</Link>
+
+                    
+                    </div>
                     </Box>
+
                 </Container>
-                <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
+                <Grid sx={{ mt: 25 }} xs={12} item display="flex" flexDirection="column" alignItems="center">
                     <Box zIndex={0} position="absolute" bottom={0}>
                         <img src={CHEERS} style={{ marginBottom: '-5px' }} />
                     </Box>
-                    <Box mb={8} mt={6} display="flex" alignItems="center" justifyContent="center" flexDirection="column">
-                        <img src={LOMADS_LOGO} />
-                        <img style={{ height: 30, width: 147, objectFit: 'contain', marginTop: '15px' }} src={LOMADS_LOGO_TEXT} />
-                    </Box>
+
                     <Box sx={{ zIndex: 999, height: '362px', borderRadius: '10px', boxShadow: '-3px -3px 8px 0px rgba(201, 75, 50, 0.10), 3px 5px 4px 0px rgba(27, 43, 65, 0.05)', overflow: 'hidden' }} display={"flex"} alignItems={"center"} justifyContent={"center"}>
 
                         <Box>
