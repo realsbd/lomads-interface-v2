@@ -76,7 +76,7 @@ export const CHAIN_GAS_STATION :any = {
   [SupportedChainId.GOERLI]: ''
 }
 
-export const SUPPORTED_ASSETS = {
+export const SUPPORTED_ASSETS: any = {
   [`${SupportedChainId.MAINNET}`]: {
     id: "ethereum",
     symbol: "ETH",

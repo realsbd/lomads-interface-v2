@@ -5,7 +5,8 @@ export const loadDAOListService = () => {
 }
 
 export const loadDAOService = (daoURL: string) => {
-    return axiosHttp.get(`dao/${daoURL}`)
+    const mint = window.location.href.includes('mint')
+    return axiosHttp.get(`dao/${daoURL}?mint=${mint}`)
 }
 
 export const updateDAOService = (params: any) => {

@@ -182,6 +182,10 @@ export default () => {
     // const [orgData, setOrgData] = useState<any>(null);
 
     useEffect(() => {
+        loadDAO(daoURL);
+    }, [])
+
+    useEffect(() => {
         console.log("_____ACCOUNT_____", account)
     }, [account])
 

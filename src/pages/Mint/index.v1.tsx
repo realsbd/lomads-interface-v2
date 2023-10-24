@@ -84,7 +84,7 @@ export default () => {
     const classes = useStyles()
     const dispatch = useAppDispatch()
     const { user } = useSelector((store:any) => store.session)
-    const { DAO } = useDAO()
+    const { DAO, loadDAO } = useDAO()
     const { myRole } = useRole(DAO, account, undefined)
     const { contractId = undefined } = useParams()
     const [contractLoading, setContractLoading] = useState<boolean|null>(null)
@@ -116,8 +116,12 @@ export default () => {
 
     const isUSDC = (address: string) => {
         let usdcs = Object.values(USDC).map((t:any) => t.address.toLowerCase())
-        return usdcs.indexOf(address?.toLowerCase()) > -1
+        return usdcs?.indexOf(address?.toLowerCase()) > -1
     }
+
+    useEffect(() => {
+        loadDAO(daoURL)
+    }, [])
 
     useEffect(() => {
         if(DAO && DAO?.sbt)
@@ -145,10 +149,10 @@ export default () => {
             setState((prev: any) => {
                 return {
                     ...prev,
-                    email: contract?.contactDetail.indexOf('email') > -1 ? _get(decryptMsg, 'email', null) : null,
-                    discord: contract?.contactDetail.indexOf('discord') > -1 ? _get(decryptMsg, 'discord', null) : null,
-                    telegram: contract?.contactDetail.indexOf('telegram') > -1 ? _get(decryptMsg, 'telegram', null) : null,
-                    github: contract?.contactDetail.indexOf('github') > -1 ? _get(decryptMsg, 'github', null) : null,
+                    email: contract?.contactDetail?.indexOf('email') > -1 ? _get(decryptMsg, 'email', null) : null,
+                    discord: contract?.contactDetail?.indexOf('discord') > -1 ? _get(decryptMsg, 'discord', null) : null,
+                    telegram: contract?.contactDetail?.indexOf('telegram') > -1 ? _get(decryptMsg, 'telegram', null) : null,
+                    github: contract?.contactDetail?.indexOf('github') > -1 ? _get(decryptMsg, 'github', null) : null,
                 }
             })
             setShowDrawer(true)
@@ -308,10 +312,10 @@ export default () => {
         let err: any = {}
         setErrors({})
         if(state?.name == null || state?.name == "") { err['name'] = 'Enter valid name' }
-        if(contract?.contactDetail.indexOf('email') > -1 && ( state?.email == null || state?.email == "")) { err['email'] = 'Enter valid email' }
-        if(contract?.contactDetail.indexOf('discord') > -1 && ( state?.discord == null || state?.discord == "")) { err['discord'] = 'Enter valid discord' }
-        if(contract?.contactDetail.indexOf('github') > -1 && ( state?.github == null || state?.github == "")) { err['github'] = 'Enter valid github' }
-        if(contract?.contactDetail.indexOf('telegram') > -1 && ( state?.telegram == null || state?.telegram == "")) { err['telegram'] = 'Enter valid telegram' }
+        if(contract?.contactDetail?.indexOf('email') > -1 && ( state?.email == null || state?.email == "")) { err['email'] = 'Enter valid email' }
+        if(contract?.contactDetail?.indexOf('discord') > -1 && ( state?.discord == null || state?.discord == "")) { err['discord'] = 'Enter valid discord' }
+        if(contract?.contactDetail?.indexOf('github') > -1 && ( state?.github == null || state?.github == "")) { err['github'] = 'Enter valid github' }
+        if(contract?.contactDetail?.indexOf('telegram') > -1 && ( state?.telegram == null || state?.telegram == "")) { err['telegram'] = 'Enter valid telegram' }
         if(Object.keys(err).length > 0)
             return setErrors(err)
         const msg = await encryptMessage(JSON.stringify({ email: _get(state, 'email', ''), discord: _get(state, 'discord', ''), telegram: _get(state, 'telegram', ''), github: _get(state, 'github', '') }))
@@ -333,25 +337,25 @@ export default () => {
                     if(attr?.trait_type === 'Email') {
                          return {
                             trait_type: "Email",
-                            value: contract?.contactDetail.indexOf('email') > -1 && state?.email && state?.email.length > 0 ? true : null
+                            value: contract?.contactDetail?.indexOf('email') > -1 && state?.email && state?.email.length > 0 ? true : null
                          }
                     }
                     if(attr?.trait_type === 'Discord') {
                         return {
                            trait_type: "Discord",
-                           value: contract?.contactDetail.indexOf('discord') > -1 && state?.discord && state?.discord.length > 0 ? true : null
+                           value: contract?.contactDetail?.indexOf('discord') > -1 && state?.discord && state?.discord.length > 0 ? true : null
                         }
                     }
                    if(attr?.trait_type === 'Telegram') {
                         return {
                         trait_type: "Telegram",
-                        value: contract?.contactDetail.indexOf('telegram') > -1 && state?.telegram && state?.telegram.length > 0 ? true : null
+                        value: contract?.contactDetail?.indexOf('telegram') > -1 && state?.telegram && state?.telegram.length > 0 ? true : null
                         }
                     }
                     if(attr?.trait_type === 'Github') {
                         return {
                         trait_type: "Github",
-                        value: contract?.contactDetail.indexOf('github') > -1 && state?.github && state?.github.length > 0 ? true : null
+                        value: contract?.contactDetail?.indexOf('github') > -1 && state?.github && state?.github.length > 0 ? true : null
                         }
                     }
                     if(attr?.trait_type === 'Personal Details') {
@@ -386,10 +390,10 @@ export default () => {
         let err: any = {}
         setErrors({})
         if(state?.name == null || state?.name == "") { err['name'] = 'Enter valid name' }
-        if(contract?.contactDetail.indexOf('email') > -1 && ( state?.email == null || state?.email == "")) { err['email'] = 'Enter valid email' }
-        if(contract?.contactDetail.indexOf('discord') > -1 && ( state?.discord == null || state?.discord == "")) { err['discord'] = 'Enter valid discord' }
-        if(contract?.contactDetail.indexOf('github') > -1 && ( state?.github == null || state?.github == "")) { err['github'] = 'Enter valid github' }
-        if(contract?.contactDetail.indexOf('telegram') > -1 && ( state?.telegram == null || state?.telegram == "")) { err['telegram'] = 'Enter valid telegram' }
+        if(contract?.contactDetail?.indexOf('email') > -1 && ( state?.email == null || state?.email == "")) { err['email'] = 'Enter valid email' }
+        if(contract?.contactDetail?.indexOf('discord') > -1 && ( state?.discord == null || state?.discord == "")) { err['discord'] = 'Enter valid discord' }
+        if(contract?.contactDetail?.indexOf('github') > -1 && ( state?.github == null || state?.github == "")) { err['github'] = 'Enter valid github' }
+        if(contract?.contactDetail?.indexOf('telegram') > -1 && ( state?.telegram == null || state?.telegram == "")) { err['telegram'] = 'Enter valid telegram' }
         if(Object.keys(err).length > 0) {
             setErrors(err)
             return false
@@ -531,19 +535,19 @@ export default () => {
                   },
                   {
                     trait_type: "Email",
-                    value: contract?.contactDetail.indexOf('email') > -1 && state?.email && state?.email.length > 0 ? true : null
+                    value: contract?.contactDetail?.indexOf('email') > -1 && state?.email && state?.email.length > 0 ? true : null
                   },
                   {
                     trait_type: "Discord",
-                    value: contract?.contactDetail.indexOf('discord') > -1 && state?.discord && state?.discord.length > 0 ? true : null
+                    value: contract?.contactDetail?.indexOf('discord') > -1 && state?.discord && state?.discord.length > 0 ? true : null
                   },
                   {
                     trait_type: "Telegram",
-                    value: contract?.contactDetail.indexOf('telegram') > -1 && state?.telegram && state?.telegram.length > 0 ? true : null
+                    value: contract?.contactDetail?.indexOf('telegram') > -1 && state?.telegram && state?.telegram.length > 0 ? true : null
                   },
                   {
                     trait_type: "Github",
-                    value: contract?.contactDetail.indexOf('github') > -1 && state?.github && state?.github.length > 0 ? true : null
+                    value: contract?.contactDetail?.indexOf('github') > -1 && state?.github && state?.github.length > 0 ? true : null
                   },
                 ],
                 contract: contract?.address,
@@ -802,7 +806,7 @@ export default () => {
                             <Box mt={4}>
                                { contract?.contactDetail && contract?.contactDetail.length > 0 && <Typography style={{ fontWeight: 700, fontSize: 16 }}>Contact details</Typography> }
                                 {
-                                    contract?.contactDetail.indexOf('email') > -1 &&
+                                    contract?.contactDetail && contract?.contactDetail.indexOf('email') > -1 &&
                                     <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
                                         <img style={{ width: 36, marginRight: 12 }} src={state['email'] ? EmailGreenSVG : EmailSVG} />
                                         <TextInput 
@@ -813,7 +817,7 @@ export default () => {
                                             placeholder="Enter your email" sx={{ my: 1 }} fullWidth />
                                     </Box>
                                 }
-                                {   contract?.contactDetail.indexOf('discord') > -1 &&
+                                {   contract?.contactDetail && contract?.contactDetail.indexOf('discord') > -1 &&
                                     <>
                                         { state['discord'] ? 
                                         <>
@@ -835,7 +839,7 @@ export default () => {
                                         </> }
                                     </>
                                 }
-                                {   contract?.contactDetail.indexOf('github') > -1 &&
+                                {   contract?.contactDetail && contract?.contactDetail.indexOf('github') > -1 &&
                                     // <>
                                     //     <Box mt={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
                                     //         <img style={{ width: 36, marginRight: 12 }} src={GithubSVG} />
@@ -855,7 +859,7 @@ export default () => {
                                             placeholder="Enter your github" sx={{ my: 1 }} fullWidth />
                                     </Box>
                                 }
-                                {   contract?.contactDetail.indexOf('telegram') > -1 &&
+                                {   contract?.contactDetail && contract?.contactDetail.indexOf('telegram') > -1 &&
                                     <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
                                         <img style={{ width: 36, marginRight: 12 }} src={state["telegram"] ? TelegramGreenSVG : TelegramSVG} />
                                         <TextInput 
