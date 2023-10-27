@@ -237,12 +237,11 @@ export default () => {
                 Email: state?.email,
                 Wallet: account,
             }
-			handleSubmit()
-/*             axios.post('https://sheet.best/api/sheets/3cecfdc6-4ac0-4306-8fc6-8f550f957fa9', data)
-            .then((result) => {
-
-                navigate(`/organisation/create`)
-            }) */
+	   axios.post('https://sheet.best/api/sheets/4016caa6-e34c-4fe1-9bc5-6a993d032d94', data)
+			.then((result) => {
+				handleSubmit()
+				console.log('data saved')
+            })
 		} else {
 			setErrors(terrors);
 			console.log(user)
