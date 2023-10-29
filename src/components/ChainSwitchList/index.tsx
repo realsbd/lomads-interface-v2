@@ -27,7 +27,7 @@ export default ({ chainId, onselect = () => {}, buttonClass }: { chainId: number
     const handleClose = () => setAnchorEl(null);
     return (
         <Box>
-            <Button id="chain-switch-button" onClick={handleClick} sx={{ height: 36, backgroundColor: "hsla(214,9%,51%,.05)" }} aria-controls={open ? 'fade-menu' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined} className={clsx([classes.root, buttonClass])} variant="contained" color="secondary" disableElevation startIcon={<img style={{ width: 18, height: 18 }} src={ _get(CHAIN_INFO, `${chainId}.logoUrl`)}/>} endIcon={<KeyboardArrowDown />}>
+            <Button id="chain-switch-button" onClick={handleClick} sx={{ height: 36}} aria-controls={open ? 'fade-menu' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined} className={clsx([classes.root, buttonClass])} variant="contained" color="secondary" disableElevation startIcon={<img style={{ width: 18, height: 18 }} src={ _get(CHAIN_INFO, `${chainId}.logoUrl`)}/>} endIcon={<KeyboardArrowDown />}>
                 { _get(CHAIN_INFO, `${chainId}.label`) }
             </Button>
             <Menu
