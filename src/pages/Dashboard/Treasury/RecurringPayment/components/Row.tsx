@@ -50,8 +50,8 @@ export default ({ transaction, onRecurringEdit }: any) => {
 
     return (
     <TableRow sx={{ my: 1 }} className='recurringtxn-row' key={_get(transaction, '_id', '')} onMouseEnter={() => setShowEdit(true)} onMouseLeave={() => setShowEdit(false)} >
-        <TableCell>
-            <Typography className="receiver">
+        <TableCell style={{width:'200px',height:'70px'}}>
+            <Typography>
                 {/* <img className="img" src={Bigmember} alt="" />
                 <div className="name">
                     { _get(transaction, 'receiver.name', '') === '' ? beautifyHexToken(_get(transaction, 'receiver.wallet', '')) :  _get(transaction, 'receiver.name', '')}
@@ -59,15 +59,15 @@ export default ({ transaction, onRecurringEdit }: any) => {
                 <Avatar name={_get(transaction, 'receiver.name', '')} wallet={_get(transaction, 'receiver.wallet', '')} />
             </Typography>
         </TableCell>
-        <TableCell className='recurringtxn-row-item'>
+        <TableCell style={{width:'125px',height:'70px'}}>
             <div className="frequency">
                 <Typography className="text">
                     { _get(transaction, 'frequency', '') }
                 </Typography>
             </div>
         </TableCell>
-        <TableCell className='recurringtxn-row-item'>
-            <div className="info">
+        <TableCell style={{width:'175px',height:'70px'}}>
+            <div className="info" >
                 <Typography className="text">{
                     transaction.ends && transaction.ends.key === 'NEVER' ?
                     `from ${ moment(transaction.startDate).local().format('MM/DD/YYYY') }` : 
@@ -83,7 +83,7 @@ export default ({ transaction, onRecurringEdit }: any) => {
                 }</Typography>
             </div>
         </TableCell>
-        <TableCell className='recurringtxn-row-item'>
+        <TableCell style={{width:'175px',height:'70px'}}>
             <div className="compensation">
                 <Typography className="text">To pay <span>{ `${ _get(transaction, 'compensation.amount') } ${ _get(transaction, 'compensation.symbol') }` }</span></Typography>
             </div>

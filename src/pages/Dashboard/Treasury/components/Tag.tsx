@@ -46,7 +46,7 @@ export default ({ transaction, recipient }: any) => {
     }
 
     return (
-        <TableCell>
+        <TableCell style={{width:'120px'}}>
             <Box>
                 { tag ?
                  <Chip onClick={(e:any) => handleClick(e)} aria-describedby={id} label={tag?.label} size="small" sx={{ minWidth: 80, maxWidth: 80, fontSize: 10, fontWeight: 700, color: tag?.color, backgroundColor: `${tag?.color}20` }} /> :

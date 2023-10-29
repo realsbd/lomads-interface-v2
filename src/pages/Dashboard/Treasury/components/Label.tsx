@@ -46,7 +46,7 @@ export default ({ transaction, recipient, defaultLabel }: any) => {
     }
 
     return (
-        <TableCell>
+        <TableCell style={{width:'232px'}}>
             <Box>
                 { (!defaultLabel && !label) || editable ? 
                     <TextInput 
