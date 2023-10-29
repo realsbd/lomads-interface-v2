@@ -21,7 +21,7 @@
     "noEmit": true,
     "jsx": "react",
     "noImplicitAny": true,
-    "noImplicitReturns": true,
+    "noImplicitReturns": false,
     "noImplicitThis": true,
     "alwaysStrict": true,
     "downlevelIteration": true,

@@ -71,3 +71,7 @@ export const capitalize = (text: string) => {
   }
   return text
 }
+
+export const sliceAddress = (address: String) => {
+  return address.slice(0, 6) + "..." + address.slice(-4);
+};

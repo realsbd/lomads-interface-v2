@@ -67,7 +67,7 @@ export default ({ transaction, recipient, defaultLabel }: any) => {
                             }
                         }}
                     /> : 
-                    <Typography onClick={() => transaction ? setEditable(true) : undefined}>{ defaultLabel ? defaultLabel : label }</Typography> 
+                    <Typography onClick={() => transaction ? setEditable(true) : undefined} style={{width:'200px'}}>{ defaultLabel ? defaultLabel : label }</Typography> 
                 }
             </Box>
         </TableCell>

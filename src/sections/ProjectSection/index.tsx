@@ -174,7 +174,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
 
     return (
         <Box sx={{ width: '100%', marginBottom: '20px' }} display="flex" flexDirection={"column"}>
-            <Box sx={{ width: '100%', background: '#FFF', height: '75px', padding: '0px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+            <Box sx={{ width: '100%', background: '#FFF', height: '75px', paddingRight: '16px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                 <Tabs
                     value={value}
                     onChange={handleChange}
