@@ -57,14 +57,14 @@ const useStyles = makeStyles((theme: any) => ({
 		position: 'absolute',
 		height: 60,
 		right: 30,
-		padding: "12px 42px 12px 11px",
+		padding: "12px 200px 12px 11px",
 		borderRadius: "30px 0 0 30px",
 		backgroundColor: 'hsla(214,9%,51%,.05)',
-		transition: '0.5s',
-		'&:hover': {
+/*		transition: '0.5s',
+ 		'&:hover': {
 			transition: '0.5s',
 			right: 200
-		}
+		} */
 	},
 	rolePill: {
 		color: '#76808d',
