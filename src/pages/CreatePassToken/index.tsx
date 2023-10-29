@@ -194,8 +194,8 @@ export default () => {
     const classes = useStyles()
     const dispatch = useAppDispatch()
     const navigate = useNavigate();
-    const { state } = useLocation();
-    const { DAO } = useDAO();
+    const { DAO, updateDAO } = useDAO()
+    const { updateDAOLoading } = useAppSelector((store:any) => store.dao)
     const { activeSafes } = useSafe()
     const { user } = useAppSelector((store: any) => store.session)
     const { chainId, account, provider } = useWeb3Auth()
@@ -245,6 +245,47 @@ export default () => {
             value: 0
         }
     })
+
+    const [state, setState] = useState<any>({})
+    const [error, setError] = useState<any>({})
+
+    useEffect(() => {
+        if(DAO?.url) {
+            setState((prev:any) => {
+                return {
+                    ...prev,
+                    name: _get(DAO, 'name', null),
+                    description: _get(DAO, 'description', null),
+                    links: _get(DAO, 'links', null),
+                    image: _get(DAO, 'image', null),
+                }
+            })
+        }
+    }, [DAO?.url])
+
+    const handleSave = () => {
+        updateDAO({ url: DAO?.url, payload: { ...state } })
+    }
+    const handleAddLink = (address:any) => {
+        console.log(stateX)
+        setError({})
+        let err = {}
+        if(!stateX?.symbol || stateX?.symbol === "")
+            err = { ...err, linkName: "Enter valid name" }
+        if(Object.keys(err).length > 0)
+            return setError(err)
+        setState((prev: any) => {
+            return {
+                ...prev, 
+                links: [...prev.links, { title: `Mint ${stateX?.symbol}`, link:`${process.env.REACT_APP_URL}/${DAO?.url}/mint/${address}` }]
+            }
+        })
+    }
+    useEffect(() => {
+        handleSave()
+      }, [state])
+
+
 
     useEffect(() => {
         if (!stateX?.priced) {
@@ -414,6 +455,7 @@ export default () => {
                     setNetworkError(null)
                     axiosHttp.post('contract', contractJSON)
                     .then(res => {
+                        handleAddLink(contractAddr)
                         setTimeout(() => { window.location.href = `/${_get(DAO, 'url', '')}` }, 500)
                     })
                     .finally(() =>  { 

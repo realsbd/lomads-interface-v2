@@ -85,7 +85,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
     }
   }, [DAOList, from])
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (provider && account && DAO?.url) {
       if (DAO?.sbt) {
         balanceOf().then(res => {
@@ -112,7 +112,7 @@ export const DAOProvider = ({ privateRoute = false, children }: any) => {
           navigate(`/${DAO?.url}/no-access`)
       }
     }
-  }, [DAO?.url, provider, account])
+  }, [DAO?.url, provider, account]) */
 
   useEffect(() => {
     if (((DAOList && account && token) || window.location.pathname.indexOf('preview') > -1) && daoURL && (!DAO || DAO.url !== daoURL))

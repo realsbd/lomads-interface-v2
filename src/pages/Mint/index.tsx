@@ -1058,8 +1058,8 @@ export default () => {
                                             <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" style={{ height: '100%', minHeight: isMobile ? 440 : '100%', width: '100%' }}>
                                                 <Box style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#B12F15' }}></Box>
                                                 <Typography style={{ fontSize: '24px', fontWeight: '600', lineHeight: '33px', textAlign: 'center', marginTop: '25px', marginBottom: '15px', color: '#1B2B41' }}>Thank you for minting<br />your pass token. </Typography>
-                                                <Typography style={{ fontSize: '12px', fontWeight: '400', lineHeight: '16px', textAlign: 'center', color: 'rgba(27, 43, 65, 0.5)' }}>you will be soon redirected to the dashboard in ... 3s</Typography>
-                                            </Box> :
+{/*                                                 <Typography style={{ fontSize: '12px', fontWeight: '400', lineHeight: '16px', textAlign: 'center', color: 'rgba(27, 43, 65, 0.5)' }}>you will be soon redirected to the dashboard in ... 3s</Typography>
+ */}                                            </Box> :
                                             <Box display="flex" flexDirection="column" alignItems="center" style={{ marginTop: '50px' }}>
                                                 <Box>
                                                     <TextInput
