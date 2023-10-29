@@ -54,7 +54,7 @@ export default ({ safeAddress, recipient, credit, token }: any) => {
     }, [DAO])
 
     return (
-        <TableCell>
+        <TableCell style={{width:'325px'}}>
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width:'290px'}}>
                 <Box display="flex" flexDirection="row" alignItems="center">
                     <Box className={classes.ChainLogo}>

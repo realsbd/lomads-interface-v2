@@ -341,7 +341,16 @@ export default ({ isHelpIconOpen, showWalkThrough }: any) => {
                                     </Button>
                                 </Box>
                             }
-                        </Box>
+                            {activeTab == 1 && adminSafes && adminSafes?.length > 0 ?
+                                <Box>
+                                    <Box className={classes.reccurHeader}>
+                                        <Box></Box>
+                                        <Box>
+                                            {adminSafes && adminSafes?.length > 0 && <Button onClick={() => { setActiveTransaction(null); setShowRecurringPayment(true) }} color="secondary" variant="contained" startIcon={<AddIcon color="primary" />} size="small" ><Typography color="primary">NEW RECURRING PAYMENT</Typography></Button>}
+                                        </Box>
+                                    </Box>
+                                </Box> : null}
+                                </Box>
                     </Box>}
             </Grid>
             <Grid style={{ position: "relative" }} mt={0.5} mb={1} item sm={12}>
@@ -355,19 +364,44 @@ export default ({ isHelpIconOpen, showWalkThrough }: any) => {
                         {(!DAO || !treasury) ?
                             <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={72} animation="wave" /> :
                             <div> 
-                  
+                            {
+                            DAO && recurringPayments && recurringTreasuryTxns && treasury &&                
                                 <div className={classes.labels}  > 
-                                    <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'190px'}}>Amount</div>
-                                    <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'227px'}}>Reason for Transaction</div>
-                                    <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5', width:'332px', textAlign:'center'}}>Recipient</div>
-                                    <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'118px'}}>Label</div>
-                                    <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5', width:'200px'}}>Approvals/Rejections</div>
-                                </div>
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'192px'}}>Amount</div>
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'232px'}}>Reason for Transaction</div>
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5', width:'325px', textAlign:'center'}}>Recipient</div>
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'120px'}}>Label</div>
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5', width:'200px'}}>Approvals/Rejections</div>
+                                </div> 
+                            }
+
                             </div>
 
                         }
                     </Box> : null}
-                {activeTab == 1 && adminSafes && adminSafes?.length > 0 ?
+                    {activeTab == 1 ?
+                    <Box>
+                        {(!DAO || !treasury) ?
+                            <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={72} animation="wave" /> :
+                            <div>
+                            {
+                                DAO && recurringPayments && recurringTreasuryTxns &&
+                                <div className={classes.labels}  > 
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'200px'}}>Recipient</div>
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'125px'}}>Frequency</div>
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5', width:'175px'}}>Ends</div>
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'175px'}}>Compensation</div>
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5', width:'200px'}}>Status</div>
+                            </div> 
+
+                            } 
+                  
+
+                            </div>
+
+                        }
+                    </Box> : null}
+{/*                 {activeTab == 1 && adminSafes && adminSafes?.length > 0 ?
                     <Box>
                         <Box className={classes.reccurHeader}>
                             <Box></Box>
@@ -375,7 +409,7 @@ export default ({ isHelpIconOpen, showWalkThrough }: any) => {
                                 {adminSafes && adminSafes?.length > 0 && <Button onClick={() => { setActiveTransaction(null); setShowRecurringPayment(true) }} color="secondary" variant="contained" startIcon={<AddIcon color="primary" />} size="small" ><Typography color="primary">NEW RECURRING PAYMENT</Typography></Button>}
                             </Box>
                         </Box>
-                    </Box> : null}
+                    </Box> : null} */}
                 {activeTab == 0 &&
                     <Box mt={0.5}>
                         {(!DAO || !treasury || !safeTokens) ?
