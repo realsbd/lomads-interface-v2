@@ -75,6 +75,7 @@ export default ({ open, closeModal }: Props) => {
 
     const [chain, setChain] = useState<any>('all');
     const [nftData, setNftData] = useState<any>({})
+    const [tokenData, setTokenData] = useState<any>({})
 
     useEffect(() => {
         if (open == true) {

@@ -227,12 +227,24 @@ export default ({ showProjects, list, isHelpIconOpen, highlightMembers }: any) =
                     <Box className={classes.helpCardContent}>This allows you to add new members and manage details and roles of existing members.</Box>
                 </Box>}
                 <Box sx={{ width: '100%', marginBottom: '25px' }} display={"flex"} alignItems={"center"}>
-                    <Box sx={{ width: '250px' }}>
+{/*                     <Box sx={{ width: '250px' }}>
                         <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5' }}>Name</Typography>
                     </Box>
                     <Box sx={{ width: '250px' }}>
                         <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5', marginLeft: '22px' }}>Joined</Typography>
                     </Box>
+                    <Box sx={{ width: '250px' }}>
+                        <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5' }}>Lomads Roles</Typography>
+                    </Box>
+                    <Box sx={{ width: '250px' }}>
+                        <Typography sx={{ fontSize: '16px', color: '#76808D', opacity: '0.5', marginLeft: '22px' }}>Discord Roles</Typography>
+                    </Box> */}
+                    <div className="grid grid-cols-12 w-full" > 
+                                    <div className="col-span-2 text-lg " style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5'}}>Name</div>
+                                    <div className="col-span-2 text-lg " style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',paddingLeft:'60px'}}>Joined</div>
+                                    <div className="col-span-2 text-lg " style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',paddingLeft:'25px'}}>Lomads Role</div>
+                                    <div className="col-span-2 text-lg " style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5'}}>Discord Roles</div>
+                                </div>
                 </Box>
 
                 <Box sx={{ width: '100%', maxHeight: '220px', overflow: 'auto', paddingTop: 2 }}>

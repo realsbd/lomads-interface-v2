@@ -6,6 +6,7 @@ import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import { Provider, useSelector } from 'react-redux';
 import configureStore, { persistor } from 'store'
 import { PersistGate } from 'redux-persist/lib/integration/react';
+import { SafeNFTsProvider } from "context/safeNFTs";
 import { Web3AuthProvider } from "context/web3Auth";
 import { DAOProvider } from 'context/dao';
 import { SafeTokensProvider } from "context/safeTokens";
@@ -43,16 +44,18 @@ const App = () => {
                                                 <Route
                                                     element={
                                                         <DAOProvider privateRoute={route.private}>
-                                                            <SafeTokensProvider>
-                                                                <PrivateRoute
-                                                                    orRender={
-                                                                        <route.layout>
-                                                                            <route.component />
-                                                                        </route.layout>
-                                                                    }
-                                                                    private={route.private}
-                                                                />
-                                                            </SafeTokensProvider>
+                                                            <SafeNFTsProvider>
+                                                                        <SafeTokensProvider>
+                                                                        <PrivateRoute
+                                                                            orRender={
+                                                                            <route.layout>
+                                                                                <route.component />
+                                                                            </route.layout>
+                                                                            }
+                                                                            private={route.private}
+                                                                        />
+                                                                        </SafeTokensProvider>
+                                                            </SafeNFTsProvider>
                                                         </DAOProvider>
                                                     }
                                                     path={route.path}

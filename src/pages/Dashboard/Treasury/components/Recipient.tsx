@@ -55,7 +55,7 @@ export default ({ safeAddress, recipient, credit, token }: any) => {
 
     return (
         <TableCell>
-            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width:'290px'}}>
                 <Box display="flex" flexDirection="row" alignItems="center">
                     <Box className={classes.ChainLogo}>
                         {

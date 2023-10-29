@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { find as _find, orderBy as _orderBy, get as _get, uniqBy as _uniqBy } from 'lodash'
 import { IconButton as MuiIconButton } from "@mui/material";
 import clsx from "clsx";
-import { Grid, Box, Typography, Tabs, Tab, Divider, Skeleton, TableContainer, Table, TableBody, Stack } from "@mui/material"
+import { Grid, Box, Typography, Tabs, Tab, Divider, Skeleton, TableContainer, Table, TableBody, Stack, TableRow } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import { useDAO } from "context/dao";
 import { LeapFrog } from "@uiball/loaders";
@@ -48,7 +48,20 @@ const useStyles = makeStyles((theme: any) => ({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: "space-between",
-        padding: 16
+        paddingRight: 16,
+        width: '100%',
+    },
+    labels: {
+        height: 72,
+        //filter: "drop-shadow(0px 2px 6px rgba(0, 0, 0, 0.09))",
+        backgroundColor: "#FFF",
+        borderRadius: 5,
+        display: "flex",
+        //flexDirection: 'row',
+        alignItems: 'center',
+        //justifyContent: "space-between",
+        padding: 16,
+        width: '100%',
     },
     stack: {
         flex: 1,
@@ -316,7 +329,7 @@ export default ({ isHelpIconOpen, showWalkThrough }: any) => {
                                 '& button.Mui-selected': { color: 'rgba(118, 128, 141,1)' },
                             }}
                         >
-                            <Tab label="Treasury" {...a11yProps(0)} />
+                            <Tab label="Transactions" {...a11yProps(0)} />
                             <Tab label="Recurring payments" {...a11yProps(1)} />
                         </Tabs>
                         <Box>
@@ -341,22 +354,17 @@ export default ({ isHelpIconOpen, showWalkThrough }: any) => {
                     <Box>
                         {(!DAO || !treasury) ?
                             <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={72} animation="wave" /> :
-                            <Box className={classes.tokenHeader}>
-                                <Box>
-                                    <Typography style={{ color: "#188C7C", fontWeight: "700", fontSize: 14 }}>{`$${(allTokens.reduce((a: any, b: any) => a + (+b.fiatBalance), 0)).toFixed(3)} Total Balance`}</Typography>
-                                </Box>
-                                <Box className={classes.stack} flexGrow={1}>
-                                    <Stack padding={"6px"} height={72} alignItems="center" justifyContent="flex-end" spacing={2} direction="row">
-                                        {
-                                            allTokens.map((token: any) => {
-                                                return (
-                                                    <Typography style={{ color: "#76808d", fontWeight: "700", fontSize: 14 }}>{`${(token.balance / 10 ** (token.token.decimal || token.token.decimals)).toFixed(3)}`}<span style={{ marginLeft: 6, color: "hsla(214,9%,51%,.5)", fontWeight: "700", fontSize: 14 }}>{token.token.symbol}</span></Typography>
-                                                )
-                                            })
-                                        }
-                                    </Stack>
-                                </Box>
-                            </Box>
+                            <div> 
+                  
+                                <div className={classes.labels}  > 
+                                    <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'190px'}}>Amount</div>
+                                    <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'227px'}}>Reason for Transaction</div>
+                                    <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5', width:'332px', textAlign:'center'}}>Recipient</div>
+                                    <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'118px'}}>Label</div>
+                                    <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5', width:'200px'}}>Approvals/Rejections</div>
+                                </div>
+                            </div>
+
                         }
                     </Box> : null}
                 {activeTab == 1 && adminSafes && adminSafes?.length > 0 ?

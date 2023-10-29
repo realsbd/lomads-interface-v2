@@ -8,7 +8,7 @@ export default ({ credit = false, executed = false, amount, token, fiatConversio
     console.log("token : ", token)
     return (
         <TableCell>
-            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center',width:'160px' }}>
                 {!(isNaN(amount) || !token) ? <img style={{ width: 24, height: 24 }} src={credit ? CreditSvg : executed ? DebitExecutedSvg : DebitSvg} /> : <Box sx={{ width: 24, height: 24 }}></Box>}
                 <Typography style={{ fontFamily: 'Inter,sans-serif', whiteSpace: 'nowrap', fontWeight: 700, fontSize: 14, color: '#76808d', }}  ml={1}>{isNaN(amount) || !token ? '-' : `${parseFloat(amount).toFixed(2)} ${token}`} <br/><span style={{ fontWeight: 400, fontSize: 10, color: "#76808D" }}>{ fiatConversion ? `${ (+amount * +fiatConversion).toFixed(3) } USD` : '' }</span></Typography>
             </Box>
