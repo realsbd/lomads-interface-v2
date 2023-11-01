@@ -18,9 +18,21 @@
       src: url("/Insignia.woff") format('woff');
     }
 
-    ::-webkit-scrollbar {
+/*     ::-webkit-scrollbar {
       display: none;
-    }
+    } */    
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 5px;
+  flex-shrink: 0;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  max-height: 100px;
+  background: var(--DISABLES-grey, rgba(27, 43, 65, 0.20));
+
+}
+
   </style>
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
   <!-- <link href="https://fonts.cdnfonts.com/css/insignia" rel="stylesheet"> -->

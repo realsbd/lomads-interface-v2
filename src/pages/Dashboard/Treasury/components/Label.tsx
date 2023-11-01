@@ -46,7 +46,7 @@ export default ({ transaction, recipient, defaultLabel }: any) => {
     }
 
     return (
-        <TableCell style={{width:'232px'}}>
+        <TableCell style={{width:'225px'}}>
             <Box>
                 { (!defaultLabel && !label) || editable ? 
                     <TextInput 
@@ -67,7 +67,7 @@ export default ({ transaction, recipient, defaultLabel }: any) => {
                             }
                         }}
                     /> : 
-                    <Typography onClick={() => transaction ? setEditable(true) : undefined} style={{width:'200px'}}>{ defaultLabel ? defaultLabel : label }</Typography> 
+                    <Typography onClick={() => transaction ? setEditable(true) : undefined}>{ defaultLabel ? defaultLabel : label }</Typography> 
                 }
             </Box>
         </TableCell>

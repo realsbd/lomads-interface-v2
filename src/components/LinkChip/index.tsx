@@ -8,11 +8,13 @@ import NotionSVG from 'assets/svg/Notion-logo.svg'
 import GithubSVG from 'assets/svg/githubicon.svg'
 import TwitterSVG from 'assets/svg/twitter.svg'
 import GlobeSVG from 'assets/svg/globe.svg'
+import GlobeSVGWhite from 'assets/images/Globe_white.png'
 import GoogleSVG from 'assets/svg/google.svg'
 
 type ChipType = {
     url: string,
-    name: string
+    name: string,
+    tag: string
 }
 
 const useStyles = makeStyles((theme: any) => ({
@@ -27,6 +29,8 @@ const useStyles = makeStyles((theme: any) => ({
       padding: '12px 15px',
       cursor: 'pointer'
     },
+    
+
     image: {
         width: 18, 
         height: 18,
@@ -42,13 +46,25 @@ const useStyles = makeStyles((theme: any) => ({
         whiteSpace: 'nowrap',
         clear: 'both',
         display: 'inline-block'
+    },
+    text_SBT: {
+		fontFamily: 'Inter, sans-serif',
+        color: '#FFF',
+        fontSize: '14px !important',
+        textTransform: 'uppercase',
+        fontWeight: '400 !important',
+        paddingLeft: '8px !important',
+        whiteSpace: 'nowrap',
+        clear: 'both',
+        display: 'inline-block'
     }
   }));
 
 
 export default ({
     url,
-    name
+    name,
+    tag
 }: ChipType) => {
     const classes = useStyles();
 
@@ -78,16 +94,34 @@ export default ({
         }
     }, [url])
 
-    return (
-     <Box onClick={() => {
-        let u = url;
-        if(u.indexOf('http') === -1) {
-            u = `https://${u}`
-        }
-        window.open(u, '_blank')
-     }}  className={classes.root}>
-        <img className={classes.image} src={image} />
-        <Typography className={classes.text}>{ name }</Typography>
-     </Box>
-    )
+    if (tag ==='SBT')
+    {    return (
+        <Box style={{backgroundColor:'#C94B32'}} onClick={() => {
+           let u = url;
+           if(u.indexOf('http') === -1) {
+               u = `https://${u}`
+           }
+           window.open(u, '_blank')
+        }}  
+        className={classes.root}>
+           <img className={classes.image} src={GlobeSVGWhite} />
+           <Typography className={classes.text_SBT}>{ name }</Typography>
+        </Box>
+       )}else{
+        return (
+            <Box onClick={() => {
+               let u = url;
+               if(u.indexOf('http') === -1) {
+                   u = `https://${u}`
+               }
+               window.open(u, '_blank')
+            }}  
+            className={classes.root}>
+               <img className={classes.image} src={image} />
+               <Typography className={classes.text}>{ name }</Typography>
+            </Box>
+           )
+       }
+ 
+
 }

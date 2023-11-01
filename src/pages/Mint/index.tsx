@@ -1169,7 +1169,7 @@ export default () => {
                                                                 } else {
                                                                     handleMint(undefined, undefined)
                                                                 }
-                                                            }} style={{ marginTop: 32 }} fullWidth variant="outlined" color="primary">{"MINT"}</Button>:
+                                                            }} style={{ marginTop: 32 }} fullWidth variant='contained' color="primary">{"MINT"}</Button>:
                                                             <Button className={classes.footerBtn} sx={{ width: isMobile ? '100%' : '190px', my: isMobile? 1 : 0 }}  loading={mintLoading} disabled={mintLoading} onClick={() => {
                                                                 if (+contract?.version >= 1) {
                                                                     if (price?.mintPrice && price?.mintPrice !== "0") {
@@ -1180,9 +1180,13 @@ export default () => {
                                                                 } else {
                                                                     handleMint(undefined, undefined)
                                                                 }
-                                                            }} style={{ marginTop: 32 }} fullWidth variant="outlined" color="primary">{
+                                                            }} style={{ marginTop: 32 }} fullWidth variant='contained'>{
                                                                     payment ? "MINT" : price?.mintPrice === "0" ? "MINT" : "PAY BY CRYPTO"}</Button>
                                                             }
+                                                            <Button className={classes.footerBtn} sx={{ width: isMobile ? '100%' : '190px', my: isMobile ? 1 : 0 }} loading={mintLoading} disabled={mintLoading} onClick={() => {
+                                                                navigate(`/${DAO?.url}}`)
+
+                                                            }} style={{ marginTop: 32 }} fullWidth variant="outlined" color="primary">{"MINT LATER"}</Button>:
                                                             </> :
                                                             <Button className={classes.footerBtn} sx={{ width: isMobile ? '100%' : '190px', my: isMobile? 1 : 0 }} loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
                                                         }

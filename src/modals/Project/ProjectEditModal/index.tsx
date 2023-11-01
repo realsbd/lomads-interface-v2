@@ -145,7 +145,7 @@ export default ({ open, closeModal }: Props) => {
                 hideBackdrop={true}
             />
 
-            <KraModal
+{/*             <KraModal
                 open={openKRA}
                 closeModal={() => setOpenKRA(false)}
                 list={_get(Project, 'kra.results', [])}
@@ -153,7 +153,7 @@ export default ({ open, closeModal }: Props) => {
                 getResults={(value1: any[], value2: string) => console.log("TEST")}
                 editKRA={true}
                 hideBackdrop={true}
-            />
+            /> */}
 
             <Box className={classes.modalContainer}>
                 <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={closeModal}>
@@ -200,7 +200,7 @@ export default ({ open, closeModal }: Props) => {
                         </Box>
                     </Box>
 
-                    <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} className={classes.editCard}>
+{/*                     <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"} className={classes.editCard}>
                         <Box>
                             <Typography className={classes.cardTitle}>Key results</Typography>
                             <Typography sx={{ fontStyle: 'italic', fontSize: 14 }}>Set objective for your team</Typography>
@@ -208,7 +208,7 @@ export default ({ open, closeModal }: Props) => {
                         <Box onClick={() => setOpenKRA(true)} sx={{ cursor: 'pointer' }}>
                             <img src={editSvg} alt="edit-svg" />
                         </Box>
-                    </Box>
+                    </Box> */}
 
                     <Box display={"flex"} flexDirection={"column"} className={classes.editCloseCard}>
                         <Box>

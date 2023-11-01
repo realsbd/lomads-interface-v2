@@ -285,7 +285,7 @@ export default ({ children }: any) => {
             }
             { DAO ?
             <Box sx={{ mt: 0 }} style={{ padding: 0, height: '100%', flex: 1 }}>
-                <Box display="flex" minHeight={107} sx={{ pb: 2, pt: 3, pr: 4 }} flexDirection="row" alignItems="flex-start">
+                <Box display="flex" minHeight={107} sx={{ pb: 2, pt: 3, pr: 4, background:"linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(251,244,242,1) 0%)" }} flexDirection="row" alignItems="flex-start">
                     <Box sx={{ flexGrow: 1, ml: 4 }}>
                         {/* <Box display="flex" flexDirection="row" alignItems="center">
                           <Typography sx={{ marginLeft: "20px" }} className={classes.title}>{_get(DAO, 'name', '')}</Typography>

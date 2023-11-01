@@ -333,7 +333,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
             </Box>
             <Box style={{ position: "relative" }}>
                 <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
-                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 26px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                         {
                             isHelpIconOpen &&
                             <Box className={classes.helpCard}>
@@ -389,7 +389,7 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
 
                 {/* Tab panel for manage tasks */}
                 <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
-                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 26px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                         {
                             isHelpIconOpen &&
                             <Box className={classes.helpCard}>
@@ -444,7 +444,9 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
 
                 {/* Tab panel for drafts tasks */}
                 <TabPanel value={value} index={2} style={{ marginTop: '0.2rem' }}>
-                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 26px 22px', borderRadius: '5px',overflow: 'auto' }}>
+                        
+                    <Box sx={{ width: '100%', background: '#FFF', borderRadius: '5px', maxHeight: '275px'}} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                         {
                             isHelpIconOpen &&
                             <Box className={classes.helpCard}>
@@ -477,11 +479,12 @@ export default ({ isHelpIconOpen, onlyProjects, isPreview }: any) => {
                             })
                         }
                     </Box>
+                    </Box>
                 </TabPanel>
 
                 {/* Tab panel for all tasks */}
                 <TabPanel value={value} index={3} style={{ marginTop: '0.2rem' }}>
-                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                    <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 26px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                         {
                             isHelpIconOpen &&
                             <Box className={classes.helpCard}>

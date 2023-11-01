@@ -277,7 +277,7 @@ export default () => {
         setState((prev: any) => {
             return {
                 ...prev, 
-                links: [...prev.links, { title: `Mint ${stateX?.symbol}`, link:`${process.env.REACT_APP_URL}/${DAO?.url}/mint/${address}` }]
+                links: [...prev.links, { title: `Mint ${stateX?.symbol}`, link:`${process.env.REACT_APP_URL}/${DAO?.url}/mint/${address}`,tag:'SBT' }]
             }
         })
     }

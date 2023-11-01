@@ -402,11 +402,11 @@ export default () => {
                         open={openAssignContribution}
                         closeModal={() => setOpenAssignContribution(false)}
                     />
-
+{/* 
                     <KraReviewModal
                         open={openKraReview}
                         closeModal={() => setOpenKraReview(false)}
-                    />
+                    /> */}
 
                     <InviteMemberModal
                         open={openInviteModal}
@@ -524,7 +524,7 @@ export default () => {
 
                             {/* Tab panel for milestones */}
                             <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
-                                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 26px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                                     {
                                         _get(Project, 'milestones', []).map((item: any, index: number) => {
                                             return (
@@ -535,8 +535,8 @@ export default () => {
                                 </Box>
                             </TabPanel>
                             {/* Tab panel for KRA */}
-                            <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
-                                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+{/*                             <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
+                                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 26px 22px', borderRadius: '5px' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                                     {
                                         _get(Project, 'kra.results', []).map((item: any, index: number) => {
                                             return (
@@ -545,7 +545,7 @@ export default () => {
                                         })
                                     }
                                 </Box>
-                            </TabPanel>
+                            </TabPanel> */}
                         </Box>
                     }
                     {

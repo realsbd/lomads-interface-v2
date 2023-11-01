@@ -37,7 +37,7 @@ const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
-
+        marginBottom: '20px'
     },
     header: {
         height: 72,
@@ -93,7 +93,8 @@ const useStyles = makeStyles((theme: any) => ({
     table: {
         //filter: "drop-shadow(0px 2px 6px rgba(0, 0, 0, 0.09))",
         backgroundColor: "#FFF",
-        borderRadius: 5
+        borderRadius: 5,
+        paddingBottom:'26px'
     },
     tabs: {
         display: "flex",
@@ -314,7 +315,7 @@ export default ({ isHelpIconOpen, showWalkThrough }: any) => {
 
 
     return (
-        <Grid container>
+        <Grid container className={classes.root}>
             <Grid item sm={12}>
                 {(!DAO || !treasury) ?
                     <Skeleton sx={{ borderRadius: 1 }} variant="rectangular" height={72} animation="wave" /> :
@@ -367,10 +368,10 @@ export default ({ isHelpIconOpen, showWalkThrough }: any) => {
                             {
                             DAO && recurringPayments && recurringTreasuryTxns && treasury &&                
                                 <div className={classes.labels}  > 
-                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'192px'}}>Amount</div>
-                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'232px'}}>Reason for Transaction</div>
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'185px'}}>Amount</div>
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'225px'}}>Reason for Transaction</div>
                                 <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5', width:'325px', textAlign:'center'}}>Recipient</div>
-                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'120px'}}>Label</div>
+                                <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5',width:'112px'}}>Label</div>
                                 <div  style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5', width:'200px'}}>Approvals/Rejections</div>
                                 </div> 
                             }
