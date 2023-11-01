@@ -60,8 +60,8 @@ const useStyles = makeStyles((theme: any) => ({
 		padding: "12px 200px 12px 11px",
 		borderRadius: "30px 0 0 30px",
 		backgroundColor: 'hsla(214,9%,51%,.05)',
-		transition: '0.5s',
-/* 		'&:hover': {
+/*		transition: '0.5s',
+ 		'&:hover': {
 			transition: '0.5s',
 			right: 200
 		} */
