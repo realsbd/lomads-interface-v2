@@ -248,7 +248,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
 
             {/* Tab panel for my workspace */}
             <TabPanel value={value} index={0} style={{ marginTop: '0.2rem' }}>
-                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', position: 'relative' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 26px 22px', borderRadius: '5px', position: 'relative' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                     {isHelpIconOpen && <Box className={classes.helpCard} sx={{ width: '100%', height: '100%' }}>
                         <Box className={classes.helpCardContent}>Here, you can create
                             <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> customized workspaces </Typography>
@@ -288,7 +288,7 @@ export default ({ isHelpIconOpen }: { isHelpIconOpen: boolean }) => {
 
             {/* Tab panel for all workspace */}
             <TabPanel value={value} index={1} style={{ marginTop: '0.2rem' }}>
-                <Box sx={{ width: '100%', background: '#FFF', borderRadius: '5px', padding: '26px 22px 7px 22px', position: 'relative' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                <Box sx={{ width: '100%', background: '#FFF', borderRadius: '5px', padding: '26px 22px 26px 22px', position: 'relative' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                     {isHelpIconOpen && <Box className={classes.helpCard} sx={{ width: '100%', height: '100%' }}>
                         <Box className={classes.helpCardContent}>Here, you can create
                             <Typography component="span" sx={{ fontWeight: 700, fontSize: 16 }}> customized workspaces </Typography>

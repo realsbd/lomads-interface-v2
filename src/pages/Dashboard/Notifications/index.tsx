@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme: any) => ({
     listContainer: {
         width: '100%',
         height: '100%',
-        overflowY: 'auto',
+        overflowY: 'scroll',
         padding: '8px 0',
         display: 'flex',
         flexDirection: 'column',
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme: any) => ({
     timelineListContainer: {
         width: '100%',
         height: '100%',
-        overflowY: 'auto',
+        overflowY: 'scroll',
         padding: '21px',
         display: 'flex',
         flexDirection: 'column'

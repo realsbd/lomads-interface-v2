@@ -52,9 +52,14 @@ export default function TokenSection() {
     <>
       {safeTokensInfo &&
         Object.keys(safeTokensInfo).map((address, index) => {
+          let safeBalance = 0.0;
+          safeTokensInfo[address]?.tokens.map((token: any) => {
+          safeBalance += parseFloat(token.fiatBalance)  
+          }
+          ) 
           return (
             <div key={index}>
-              <div className="border-b border-gray-200 w-full px-6 py-4">
+              <div className="border-b border-gray-200 w-full px-6 py-4 flex " style={{justifyContent:'space-between'}}>
                 <div className="flex gap-6">
                 <Box className={classes.ChainLogo}>
 {/*                   <img
@@ -75,6 +80,12 @@ export default function TokenSection() {
                     </span>
                   </div>
                 </div>
+                <div style={{marginRight:'300px'}}>
+                <Box>
+                  <Typography style={{ color: "#188C7C", fontWeight: "700", fontSize: 14 }}>{`$${safeBalance.toFixed(3)} Total Balance`}</Typography>
+                </Box>
+                </div>
+
               </div>
               <div className="px-7 pt-4 grid grid-cols-10"> 
                 <div className="col-span-2 text-lg " style={{fontSize:'16px', fontWeight:'normal', opacity:'0.5'}}>Asset</div>

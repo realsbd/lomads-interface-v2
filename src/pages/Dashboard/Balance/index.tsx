@@ -25,7 +25,7 @@ export default () => {
   }
 
   return (
-    <Grid container>
+    <Grid container className={classes.root}>
       <Grid item sm={12}>
           <Box className={classes.header}>
           <Tabs
@@ -53,20 +53,11 @@ export default () => {
 
 
       <Grid className="relative" mt={0.5} item sm={12}>
-        <Box className={classes.tokenHeader}>
+ {/*        <Box className={classes.tokenHeader}>
             <Box>
                 <Typography style={{ color: "#188C7C", fontWeight: "700", fontSize: 14 }}>{`$${totalBalance.toFixed(3)} Total Balance`}</Typography>
           </Box>
-{/*           <div className="flex gap-2">
-            <img src={balance_symbol} alt="balance" className="w-5 h-5" />
-            <p className="text-sm">
-              <span className="text-[#188C7C] font-semibold">
-                $ {totalBalance}{" "}
-              </span>
-              &nbsp;&nbsp;&nbsp; total balance
-            </p>
-          </div> */}
-        </Box>
+        </Box> */}
       </Grid>
 
       <Grid className="relative" mt={0.5} mb={1} item sm={12}>

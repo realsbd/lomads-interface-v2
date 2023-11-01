@@ -809,7 +809,7 @@ export default () => {
                     editMilestones={false}
                     hideBackdrop={false}
                 />
-                <KraModal
+{/*                 <KraModal
                     open={openKRA}
                     closeModal={() => setOpenKRA(false)}
                     list={results}
@@ -817,7 +817,7 @@ export default () => {
                     getResults={(value1: any[], value2: string) => { setResults(value1); setFrequency(value2) }}
                     editKRA={false}
                     hideBackdrop={false}
-                />
+                /> */}
                 <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
                     <img src={createProjectSvg} alt="frame-icon" />
                     <Typography color="primary" variant="subtitle1" className={classes.heading}>{transformWorkspace().label} Details</Typography>
@@ -914,8 +914,8 @@ export default () => {
 
                     <Box className={classes.divider}></Box>
 
-                    <Paper className={classes.paperContainer} sx={{ width: 453, display: 'flex', flexDirection: 'column' }}>
-                        <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
+                    {/*<Paper className={classes.paperContainer} sx={{ width: 453, display: 'flex', flexDirection: 'column' }}>
+                         <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                             <Box>
                                 <Typography sx={{ fontSize: 22, lineHeight: '25px', marginBottom: '9px' }}>Key results</Typography>
                                 <Typography sx={{ fontSize: 14, lineHeight: '18px', fontStyle: 'italic' }}>Set objective for your team</Typography>
@@ -934,8 +934,8 @@ export default () => {
                                         <AddIcon sx={{ fontSize: 18 }} /> ADD
                                     </Button>
                             }
-                        </Box>
-                        {/* Map all the results */}
+                        </Box> 
+                       
                         {
                             results.length > 0 &&
                             <Box>
@@ -952,7 +952,7 @@ export default () => {
                                 }
                             </Box>
                         }
-                    </Paper>
+                    </Paper> */}
                     <Button
                         loading={createProjectLoading}
                         variant='contained'

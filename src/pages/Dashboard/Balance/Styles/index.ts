@@ -1,6 +1,9 @@
 import { makeStyles } from "@mui/styles";
 
 export const useStyles = makeStyles(() => ({
+  root:{
+    marginBottom:'20px'
+  },
   header: {
     height: 72,
     backgroundColor: "#FFF",
@@ -41,6 +44,7 @@ export const useStyles = makeStyles(() => ({
   table: {
     backgroundColor: "#FFF",
     borderRadius: 5,
+    paddingBottom: '26px',
   },
   tabs: {
     display: "flex",

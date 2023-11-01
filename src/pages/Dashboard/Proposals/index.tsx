@@ -122,7 +122,7 @@ export default () => {
 
             {/* Tab panel for proposals */}
             <TabPanel value={0} index={0} style={{ marginTop: '0.2rem' }}>
-                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 7px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
+                <Box sx={{ width: '100%', background: '#FFF', padding: '26px 22px 26px 22px', borderRadius: '5px', maxHeight: '275px', overflow: 'hidden' }} display={"flex"} alignItems={"center"} flexWrap={"wrap"}>
                     {
                         data?.proposals?.filter((i: any, index: number) => index < 6).map((item: any, index: number) => {
                             if (index <= 4) {
