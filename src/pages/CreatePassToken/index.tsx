@@ -16,34 +16,19 @@ import useContractDeployer, { SBTParams } from "hooks/useContractDeployer"
 import { SUPPORTED_CHAIN_IDS, SupportedChainId } from "constants/chains"
 import axiosHttp from 'api'
 import CurrencyInput from "components/CurrencyInput"
-import { useLocation, useNavigate } from "react-router-dom"
 import XlsxUpload from "components/XlsxUpload"
 import toast from 'react-hot-toast';
 import { ethers } from "ethers"
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import { beautifyHexToken } from "utils"
 import { CHAIN_INFO } from "constants/chainInfo"
-import { useSelector } from "react-redux"
-import useENS from "hooks/useENS"
 import { SBT_DEPLOYER_ADDRESSES } from "constants/addresses"
-import { useAppDispatch } from "helpers/useAppDispatch"
-import { useAppSelector } from "helpers/useAppSelector"
 import { useWeb3Auth } from "context/web3Auth"
 import { Add } from "@mui/icons-material"
 import { useDAO } from "context/dao"
 import { USDC } from "constants/tokens"
 import SwitchChain from "components/SwitchChain"
-import useSafe from "hooks/useSafe"
-import usePopupWindow from "hooks/usePopupWindow"
 import useStripeRedirect from "hooks/useStripeRedirect"
-import Checkbox from "components/Checkbox"
 import useDeployer from "hooks/useDeployer"
-import safeUserIcon from 'assets/svg/safeUserIcon.svg'
 
 ///   0xD123b939B5022608241b08c41ece044059bE00f5
 
@@ -192,15 +177,8 @@ const useStyles = makeStyles((theme: any) => ({
 
 export default () => {
     const classes = useStyles()
-    const dispatch = useAppDispatch()
-    const navigate = useNavigate();
     const { DAO, updateDAO } = useDAO()
-    const { updateDAOLoading } = useAppSelector((store:any) => store.dao)
-    const { activeSafes } = useSafe()
-    const { user } = useAppSelector((store: any) => store.session)
     const { chainId, account, provider } = useWeb3Auth()
-    const { getENSAddress, getENSName } = useENS();
-
     const { onOpen, addedStripeAccount } = useStripeRedirect()
 
     const [deployContractLoading, setDeployContractLoading] = useState(false)

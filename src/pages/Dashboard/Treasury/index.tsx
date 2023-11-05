@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { find as _find, orderBy as _orderBy, get as _get, uniqBy as _uniqBy } from 'lodash'
-import { IconButton as MuiIconButton } from "@mui/material";
-import clsx from "clsx";
 import { Grid, Box, Typography, Tabs, Tab, Divider, Skeleton, TableContainer, Table, TableBody, Stack, TableRow } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import { useDAO } from "context/dao";
@@ -10,18 +8,13 @@ import { useParams } from "react-router-dom";
 import { useAppSelector } from "helpers/useAppSelector";
 import { useAppDispatch } from "helpers/useAppDispatch";
 import { loadRecurringPaymentsAction, loadTreasuryAction, syncSafeAction } from "store/actions/treasury";
-import SyncIcon from '@mui/icons-material/Sync';
 import Row from "./components/Row";
 import { useSafeTokens } from "context/safeTokens";
-import { values } from "lodash";
 import moment from "moment";
 import exportBtn from 'assets/svg/export.svg'
-import { usePrevious } from "hooks/usePrevious";
 import Button from "components/Button";
 import palette from "theme/palette";
-import CsvDownloadButton from 'react-json-to-csv'
 import SendToken from "../SendToken";
-import IconButton from "components/IconButton";
 import AddIcon from '@mui/icons-material/Add';
 import CreateRecurringPayment from "./RecurringPayment/Create";
 import RecurringPayment from "./RecurringPayment";

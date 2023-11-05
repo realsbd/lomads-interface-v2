@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme: any) => {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      
+      overflow: "hidden !important",
     },
     helpOption: {
       bottom: "44px",
@@ -359,7 +359,7 @@ export default () => {
 
   if (matches) {
     return (
-      <Grid container className={classes.root}>
+      <Grid container >
         <Grid item sm={12}>
           <Links
             highlightSettings={currWalkThroughObj.step === 6 || isHelpIconOpen}
