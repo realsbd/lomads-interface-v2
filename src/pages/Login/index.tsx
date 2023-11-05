@@ -126,31 +126,31 @@ export default () => {
     console.log("provider", provider)
 
 
-    // useEffect(() => {
-    //     if(window?.ethereum){
-    //         const chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', 5)]
-    //         dispatch(setNetworkConfig({ selectedChainId: +_get(window?.ethereum, 'networkVersion', 5), chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
-    //     }
-    // }, [window?.ethereum])
+    useEffect(() => {
+        if(window?.ethereum){
+            const chainInfo = CHAIN_INFO[+_get(window?.ethereum, 'networkVersion', 5)]
+            dispatch(setNetworkConfig({ selectedChainId: +_get(window?.ethereum, 'networkVersion', 5), chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+        }
+    }, [window?.ethereum])
 
-    // const handleOnMessage = (message: any) => {
-    //     if(message?.data?.data?.data?.method === "metamask_chainChanged" && message?.data?.data?.data?.params?.networkVersion !== "loading") {
-    //         console.log("+message?.data?.data?.data?.method?.params?.networkVersion", message?.data?.data?.data?.params?.networkVersion)
-    //         if(!isNaN(+message?.data?.data?.data?.params?.networkVersion)) {
-    //             const chainInfo = CHAIN_INFO[+message?.data?.data?.data?.params?.networkVersion]
-    //             if(chainInfo) {
-    //                 dispatch(setNetworkConfig({ selectedChainId: +message?.data?.data?.data?.params?.networkVersion, chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
-    //             }
-    //         }
-    //     }
-    // }
+    const handleOnMessage = (message: any) => {
+        if(message?.data?.data?.data?.method === "metamask_chainChanged" && message?.data?.data?.data?.params?.networkVersion !== "loading") {
+            console.log("+message?.data?.data?.data?.method?.params?.networkVersion", message?.data?.data?.data?.params?.networkVersion)
+            if(!isNaN(+message?.data?.data?.data?.params?.networkVersion)) {
+                const chainInfo = CHAIN_INFO[+message?.data?.data?.data?.params?.networkVersion]
+                if(chainInfo) {
+                    dispatch(setNetworkConfig({ selectedChainId: +message?.data?.data?.data?.params?.networkVersion, chain: chainInfo.chainName, web3AuthNetwork: chainInfo.network }))
+                }
+            }
+        }
+    }
 
-    // useEffect(() => {
-    //     window.addEventListener("message", handleOnMessage);
-    //     return () => {
-    //       window.removeEventListener("message", handleOnMessage);
-    //     };
-    //   }, []);
+    useEffect(() => {
+        window.addEventListener("message", handleOnMessage);
+        return () => {
+          window.removeEventListener("message", handleOnMessage);
+        };
+      }, []);
 
     useEffect(() => {
         setCurrentChain(selectedChainId)
