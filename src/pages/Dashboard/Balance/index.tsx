@@ -53,7 +53,7 @@ export default () => {
 
 
       <Grid className="relative" mt={0.5} item sm={12}>
- {/*        <Box className={classes.tokenHeader}>
+{/*         <Box className={classes.tokenHeader}>
             <Box>
                 <Typography style={{ color: "#188C7C", fontWeight: "700", fontSize: 14 }}>{`$${totalBalance.toFixed(3)} Total Balance`}</Typography>
           </Box>

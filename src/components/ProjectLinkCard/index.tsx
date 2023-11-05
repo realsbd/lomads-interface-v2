@@ -20,9 +20,6 @@ import { useParams } from "react-router-dom";
 import { updateProjectLinkAction } from "store/actions/project";
 import { toast } from "react-hot-toast";
 import { LeapFrog } from "@uiball/loaders";
-import LinkModal from "modals/Project/LinkModal";
-import CloseTaskModal from "modals/Tasks/CloseTaskModal";
-import { truncate } from "fs/promises";
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 interface ProjectLinkCardProps {
@@ -64,7 +61,6 @@ export default ({ link, key }: ProjectLinkCardProps) => {
     const { DAO } = useDAO()
     const { balanceOf } = useMintSBT(DAO?.sbt?.address, DAO?.sbt?.version, +DAO?.sbt?.chainId)
     const { Project, updateProjectDetailsLoading } = useAppSelector((store:any) => store.project);
-   
 
     const handleParseUrl = (url: string, accessControl: boolean, locked: any) => {
         try {
@@ -202,15 +198,16 @@ export default ({ link, key }: ProjectLinkCardProps) => {
                 return;
             }
             setUnlockLoading(link.id)
-                 
-            const balanceStats: any = await balanceOf();
-            if (parseInt(balanceStats._hex, 16) === 1) {
-
             try {
                 axiosHttp.get(`/project/notion/space-admin-status?domain=${link.spaceDomain}`)
                     .then(async res => {
                         if (res.data) {
-
+                            console.log(res.data)
+                            const balanceStats: any = await balanceOf();
+     
+                            console.log("BALANCEOF:", parseInt(balanceStats._hex, 16))
+                            console.log(parseInt(balanceStats._hex, 16))
+                                if (parseInt(balanceStats._hex, 16) === 1) {
                                     const metadata = await axiosHttp.get(`/metadata/${_get(DAO, 'sbt._id', '')}`)
                                     console.log("metadata", metadata)
                                     if (metadata && metadata.data) {
@@ -239,32 +236,21 @@ export default ({ link, key }: ProjectLinkCardProps) => {
                                             }
                                         }
                                     }
-
+                                }
+                            
                         }
                     })
                     .catch(e => {
-                      
                         setUnlockLoading(null)
-                        
                         console.log(e)
                     })
                     .finally(() => setUnlockLoading(null))
             } catch (e) {
                 console.log(e)
-               
                 setUnlockLoading(null)
-                
-                
             }
-        }else{
-            return setUnlockLoading(null)
-            console.log('You dont have a SBT')
-            
-        }
         }
     }, [ unlockLoading, Project, account, authorization])
-
-    const [openLinkModal, setOpenLinkModal] = useState<boolean>(false);
 
     return (
         <Box
@@ -280,16 +266,14 @@ export default ({ link, key }: ProjectLinkCardProps) => {
                     return;
                 }
                 if (!link.accessControl) {
-                    
                     window.open(link.link, '_blank')
                 }
-                else {    
+                else {
                     console.log("unlock link");
-                    unlock(link);               
+                    unlock(link);
                 }
             }}
         >
-
             { account &&
             <Box sx={{ height: 30, width: 30 }} display="flex" alignItems={"center"} justifyContent={"center"}>
                 {  handleParseUrl(link.link, link.accessControl, _get(link, 'unlocked', []).map((a: any) => a.toLowerCase()).indexOf(account.toLowerCase()) == -1)}
