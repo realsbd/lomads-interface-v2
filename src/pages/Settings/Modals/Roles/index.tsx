@@ -220,7 +220,7 @@ const Roles = ({ open, onClose }: { open: boolean, onClose: any }) => {
                 <Box display="flex" flexDirection="column" my={6} alignItems="center">
                     <img src={RP} />
                     <Typography my={2} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>Roles & Permissions</Typography>
-                    <Typography style={{ color: '#76808d' }}>Default member roles and permissions are set and ready, based<br /> on industry best practices. Customization options coming soon!</Typography>
+                    <Typography style={{ color: '#76808d' }}>Understand default roles, permissions, and their visibility within Lomads.</Typography>
                 </Box>
 
                 <Box className={classes.tableHead}>

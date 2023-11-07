@@ -174,7 +174,7 @@ const useStyles = makeStyles((theme: any) => ({
 		maxHeight: 'fit-content',
 		padding: 20,
 		margin: 35,
-		width: 385
+		width: 541
 	},
 	safeName: {
 		fontFamily: 'Inter, sans-serif',
@@ -537,7 +537,7 @@ export default () => {
 		<Container>
 			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
-					<Box className={classes.headerText}>{ !location?.state?.createFlow ? '' : '2/2'} Organisation Multi-sig Wallet</Box>
+					<Box className={classes.headerText}>{ !location?.state?.createFlow ? '' : '2/2'} Organisation's Safe Multi-sig Wallet</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
@@ -621,6 +621,16 @@ export default () => {
                                         {selectedSafeAddress === item ? <SafeDetails index={index} /> : ''}
 									</Box>
 								))}
+							</Box>
+							<Box style={{
+								width: '100%',
+								display: 'flex',
+								flexDirection: 'column',
+							}}>
+								<Box className={classes.inputFieldTitle} style ={{marginBottom: 8}} >Reminder:</Box>			
+								<Typography className={classes.inputFieldTitle} style ={{marginBottom: 8}}>All signers will have admin rights on the dashboard.</Typography>
+								<Typography className={classes.inputFieldTitle} style ={{marginBottom: 20}} >You can add/remove signers and Safe Multi-sig from Settings</Typography>
+
 							</Box>
 							<Box className={classes.addSafe}>
 								<Button disabled={isLoading || !selectedSafeAddress || !safe} loading={isLoading} onClick={handleClickDelayed} variant='contained'>ADD</Button>
