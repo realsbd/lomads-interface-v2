@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme: any) => ({
 		maxHeight: 'fit-content',
 		padding: 20,
 		margin: 35,
-		width: 385
+		width: 541
 	},
 	centerCardSkeleton: {
 		display: 'flex',
@@ -249,7 +249,6 @@ const useStyles = makeStyles((theme: any) => ({
 	},
 	inputArea: {
 		display: 'flex',
-		justifyContent: 'space-around',
 		alignItems: 'center',
 		width: '100%'
 	},
@@ -740,9 +739,9 @@ export default () => {
 				<Box className={classes.bottomLine} />
 				<Box className={classes.centerCard}>
 					<Box>
-						<Typography className={classes.thresholdText} sx={{ my: 1 }}>
-							Any transaction requires the confirmation of
-						</Typography>
+						<Box className={classes.inputFieldTitle} sx={{ my: 1 }}>
+						Specify the minimum number of approvals needed for transactions:
+						</Box>
 					</Box>
 					<Box className={classes.selectionArea}>
 						<Box style={{ width: 109 }}>
@@ -755,22 +754,8 @@ export default () => {
 							/>
 						</Box>
 						<Box sx={{ mx: 1 }} className={classes.thresholdCount}>
-							of {state?.members?.length} owner(s)
+							of {state?.members?.length} total signer(s)
 						</Box>
-					</Box>
-					<Box sx={{ mt: 3, width:'100%' }}>
-						<Box display="flex" flexDirection="row" alignItems="flex-start">
-							<Typography className={classes.thresholdText} sx={{ my: 1 }}>
-								What do you want to call the multi-sig wallet?
-							</Typography>
-							<Chip sx={{ mr: 1, opacity: 0.6 }} size="small" label="Optional" />
-						</Box>
-						<TextInput
-							fullWidth
-							placeholder="Pied Piper"
-							inputProps={{ maxLength: 50 }}
-							onChange={(e: any) => { setState((prev: any) => { return { ...prev, safeName: e.target.value } }) }}
-						/>
 					</Box>
 				</Box>
 				<Typography className={classes.safeFooter}>
@@ -823,16 +808,7 @@ export default () => {
 				<Box className={classes.bottomLine} />
 				<Box className={classes.InviteGang}>
 					<Box className={classes.centerInputCard}>
-						<Box style={{
-							width: '100%',
-							marginBottom: 8,
-							display: 'flex',
-							flexDirection: 'row',
-							alignItems: 'center',
-							justifyContent: 'space-between'
-						}}>
-							<Box className={classes.inputTitle}>Add Owner :</Box>
-						</Box>
+					<Box className={classes.inputFieldTitle}>Assign additional trusted signers:</Box>
 						<Box className={classes.inputArea}>
 							<Box style={{ marginRight: '10px' }}>
 								<TextInput
@@ -858,7 +834,19 @@ export default () => {
 									<img src={memberPlaceholder?.name && memberPlaceholder?.address ? plusIcon : GreyAddIcon} alt={"add plus"} />
 								</IconButton>
 							</Box>
+
 						</Box>
+							<Box style={{
+								width: '100%',
+								display: 'flex',
+								flexDirection: 'column',
+							}}>
+								<Box className={classes.inputFieldTitle} style ={{marginBottom: 8, marginTop: 20}} >Note:</Box>			
+								<Typography className={classes.inputFieldTitle} style ={{marginBottom: 8}} >As the creator, you’re automatically a signer.</Typography>
+								<Typography className={classes.inputFieldTitle} style ={{marginBottom: 8}}>All signers will have admin rights on the dashboard.</Typography>
+								<Typography className={classes.inputFieldTitle} style ={{marginBottom: 8}} >You can add/remove signers and Safe Multi-sig from Settings</Typography>
+
+							</Box>
 					</Box>
 					{state?.members?.length >= 1 && (
 						<>
@@ -910,7 +898,7 @@ export default () => {
 				<Box className={classes.StartSafe}>
 					{!DAO ?
 						<Skeleton variant="text" sx={{ mb: 2 }} className={classes.headerText} width={400} /> :
-						<Box className={classes.headerText}>{!location?.state?.createFlow ? '' : '2/2'} Organisation Multi-sig Wallet</Box>
+						<Box className={classes.headerText}>{!location?.state?.createFlow ? '' : '2/2'} Organisation's Safe Multi-sig Wallet</Box>
 					}
 					<Box className={classes.buttonArea}>
 						<Box>
@@ -962,6 +950,20 @@ export default () => {
 									setState((prev: any) => { return { ...prev, selectedChainId: value } })
 								}}
 							/>
+						<Box sx={{ mt: 3, width:'100%' }}>
+						<Box display="flex" flexDirection="row" alignItems="flex-start" justifyContent={'space-between'}>
+							<Box className={classes.inputFieldTitle} sx={{ my: 1 }}>
+								What do you want to call the multi-sig wallet?
+							</Box>
+							<Chip sx={{ mr: 1, opacity: 0.6 }} size="small" label="Optional" />
+						</Box>
+						<TextInput
+							fullWidth
+							placeholder="Pied Piper"
+							inputProps={{ maxLength: 50 }}
+							onChange={(e: any) => { setState((prev: any) => { return { ...prev, safeName: e.target.value } }) }}
+						/>
+					</Box>
 						</Box>}
 					{!validSafeDetails ?
 						!DAO ? <Skeleton width={184} height={50} variant="rounded" /> : <Button disabled={!state.selectedChainId} onClick={() => handleValidSafeDetails()} variant='contained'>CONTINUE</Button> :

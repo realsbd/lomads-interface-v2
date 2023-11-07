@@ -59,9 +59,10 @@ export default ({ theme = "light", ...props }: any) => {
                     <Grid item sm={5}>
                         <Box display="flex" flexDirection="row" alignItems="center">
                             <Typography sx={{ color: theme == 'light' ? '#76808D' : '#FFF' }} className={classes.poweredBy}>Powered by</Typography>
-                            <img className={classes.logo} src={icons.polygon} />
                             <img className={classes.logo} src={icons.safe} />
-                            <img className={classes.logo} src={icons.ipfs} />
+{/*                             <img className={classes.logo} src={icons.polygon} />
+                            
+                            <img className={classes.logo} src={icons.ipfs} /> */}
                         </Box>
                     </Grid>
                     <Grid item sm={3}>

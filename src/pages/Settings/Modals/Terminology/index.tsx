@@ -120,7 +120,7 @@ const TerminologyModal = ({ open, onClose }: any) => {
             <Box sx={{ mt: 0 }} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
                     <img src={OD} />
                     <Typography sx={{ mt: 4 }} className={classes.headerTitle}>Terminologies</Typography>
-                    <Typography sx={{ mt: 2 }} className={classes.headerDescription}>Make it yours. Customize the terminology for<br /> everything in your organization's space.</Typography>
+                    <Typography sx={{ mt: 2 }} className={classes.headerDescription}>Make it yours. Customize the terminology <br /> within your organization's dashboard.</Typography>
             </Box>
             { !showEdit ?
             <Box>
