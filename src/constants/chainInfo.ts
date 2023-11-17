@@ -1,11 +1,11 @@
 import ethereumLogoUrl from 'assets/images/ethereum-logo.png'
 import polygonMaticLogo from 'assets/svg/polygon-matic-logo.svg'
 import celoLogo from 'assets/svg/celo.svg'
-import baseLogo from 'assets/svg/base.svg'
+import baseLogo from 'assets/svg/basechain.png'
 import optLogo from 'assets/svg/Opt.svg'
-import arbLogo from 'assets/svg/arb.svg'
-import avaxLogo from 'assets/svg/avax.svg'
-import gnosisLogo from 'assets/svg/gnosis.svg'
+import arbLogo from 'assets/svg/arbitrum-arb-logo.png'
+import avaxLogo from 'assets/svg/avalanche-avax-logo.png'
+import gnosisLogo from 'assets/svg/gnosischain_logo.png'
 
 import { SupportedChainId } from './chains'
 
